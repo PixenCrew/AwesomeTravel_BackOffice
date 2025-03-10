@@ -3,8 +3,8 @@ package renewal.awesome_travel_backoffice.admin;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
-@Table
+// @Entity
+// @Table
 @Getter
 @Setter
 public class Admin {
