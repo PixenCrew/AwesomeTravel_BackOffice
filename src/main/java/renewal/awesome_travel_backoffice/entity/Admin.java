@@ -1,4 +1,4 @@
-package renewal.awesome_travel_backoffice.admin;
+package renewal.awesome_travel_backoffice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

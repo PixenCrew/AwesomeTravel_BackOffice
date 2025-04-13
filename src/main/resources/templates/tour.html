@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <title>투어</title>
+</head>
+
+<body>
+    <h1>투어</h1>
+    <table border="1 solid">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Company</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="tour : ${tourList}" th:onclick="|window.location.href='/tour/' + ${tour.id}|" style="cursor: pointer;">
+                <td th:text="${tour.id}"></td>
+                <td th:text="${tour.date}"></td>
+                <td th:text="${tour.name}"></td>
+                <td th:text="${tour.company}"></td>
+            </tr>
+        </tbody>
+    </table>
+    <a href="/tour/new">새 투어</a>
+</body>
+
+</html>
