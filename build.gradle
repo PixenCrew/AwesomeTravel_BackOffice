@@ -29,6 +29,9 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	testImplementation 'org.springframework.boot:spring-boot-test'
 
+	// dev
+    // implementation 'org.springframework.boot:spring-boot-devtools'
+
 	// lombok
 	compileOnly 			group: 'org.projectlombok', name: 'lombok', version: '1.18.36'
 	annotationProcessor 	group: 'org.projectlombok', name: 'lombok', version: '1.18.36'
