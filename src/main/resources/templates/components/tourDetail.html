@@ -7,8 +7,29 @@
         <input type="datetime" name="date" id="date" th:value="${tour.date}" placeholder="2000-00-00" required><br>
         <input type="submit" th:value="${tour.id == null} ? '등록' : '수정'">
     </form>
-    <button th:if="${tour.id != null}" th:onclick="|fetch('@{/tour/{id}(id=${tour.id})}', { method: 'DELETE', redirect: 'follow' }).then(response => {window.location.href = '/tour';});|">
+    <button th:if="${tour.id != null}" id="deleteButton">
         삭제
     </button>
     </form>
+    
+<script>
+    document.getElementById('deleteButton').addEventListener('click', function() {
+        if (confirm("정말로 삭제하시겠습니까?")) {
+            fetch('@{/tour/{id}(id=${tour.id})}', { 
+                method: 'DELETE', 
+                redirect: 'follow' 
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/tour';
+                } else {
+                    alert("삭제 실패하였습니다.");
+                }
+            })
+            .catch(error => {
+                alert("서버 오류가 발생했습니다. 다시 시도해주세요.");
+            });
+        }
+    });
+</script>
 </div>
