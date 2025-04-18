@@ -40,7 +40,7 @@ public class PackageHotel {
 
     public PackageHotel(Package pack, Hotel hotel, LocalDate checkIn, LocalDate checkOut,
                         RoomType roomType, Integer price, Integer reservedRooms) {
-        this.pack = pack;
+        //this.pack = pack;
         this.hotel = hotel;
         this.checkIn = checkIn;
         this.checkOut = checkOut;
