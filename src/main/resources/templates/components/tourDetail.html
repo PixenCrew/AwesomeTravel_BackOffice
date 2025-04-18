@@ -1,0 +1,14 @@
+<div th:fragment="content">
+    <h1 th:text="${tour.id} == null ? '투어 등록' : '투어 상세' "></h1>
+    <form th:action="${tour.id == null} ? '/tour/new' : '/tour/' + ${tour.id}" method="post">
+        <input type="text" name="id" id="id" th:value="${tour.id}" readonly><br>
+        <input type="text" name="name" id="name" th:value="${tour.name}" placeholder="이름" required><br>
+        <input type="text" name="company" id="company" th:value="${tour.company}" placeholder="회사" required><br>
+        <input type="datetime" name="date" id="date" th:value="${tour.date}" placeholder="2000-00-00" required><br>
+        <input type="submit" th:value="${tour.id == null} ? '등록' : '수정'">
+    </form>
+    <button th:if="${tour.id != null}" th:onclick="|fetch('@{/tour/{id}(id=${tour.id})}', { method: 'DELETE', redirect: 'follow' }).then(response => {window.location.href = '/tour';});|">
+        삭제
+    </button>
+    </form>
+</div>
