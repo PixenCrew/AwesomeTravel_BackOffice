@@ -1,11 +1,7 @@
 package renewal.awesome_travel_backoffice.service;
 
-import java.util.List;
 import java.util.Map;
 
-import javax.sql.DataSource;
-
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

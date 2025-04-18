@@ -57,7 +57,7 @@ public class TourController {
     
     // 특정 투어
     @GetMapping("/{id}")
-    public String selectTravel(@PathVariable Long id, Model model) {
+    public String selectTravel(@PathVariable("id") Long id, Model model) {
 
         Tour tour = tourRepo.getReferenceById(id);
         model.addAttribute("tour", tour);
