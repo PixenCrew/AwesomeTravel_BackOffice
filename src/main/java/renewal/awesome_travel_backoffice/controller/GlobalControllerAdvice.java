@@ -6,7 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-// 모든 컨트롤러에 적용
+// 모든 컨트롤러에 적용되는 함수들
 @ControllerAdvice
 public class GlobalControllerAdvice {
 
