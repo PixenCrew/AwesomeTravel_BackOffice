@@ -28,7 +28,7 @@ public class QHotel extends EntityPathBase<Hotel> {
 
     public final StringPath email = createString("email");
 
-    public final EnumPath<renewal.awesome_travel_backoffice.hotel.utiles.HotelType> hotelType = createEnum("hotelType", renewal.awesome_travel_backoffice.hotel.utiles.HotelType.class);
+    public final EnumPath<renewal.awesome_travel_backoffice.hotel.utils.HotelType> hotelType = createEnum("hotelType", renewal.awesome_travel_backoffice.hotel.utils.HotelType.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 

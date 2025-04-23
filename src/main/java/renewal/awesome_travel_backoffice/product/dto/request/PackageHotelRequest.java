@@ -2,7 +2,7 @@ package renewal.awesome_travel_backoffice.product.dto.request;
 
 import lombok.Builder;
 import lombok.Getter;
-import renewal.awesome_travel_backoffice.hotel.utiles.RoomType;
+import renewal.awesome_travel_backoffice.hotel.utils.RoomType;
 
 import java.time.LocalDate;
 

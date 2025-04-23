@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import renewal.awesome_travel_backoffice.hotel.dto.reqeust.HotelRequest;
-import renewal.awesome_travel_backoffice.hotel.utiles.HotelType;
+import renewal.awesome_travel_backoffice.hotel.utils.HotelType;
 
 import java.util.ArrayList;
 import java.util.List;

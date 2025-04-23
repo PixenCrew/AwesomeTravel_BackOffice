@@ -36,7 +36,7 @@ public class QPackageHotel extends EntityPathBase<PackageHotel> {
 
     public final NumberPath<Integer> reservedRooms = createNumber("reservedRooms", Integer.class);
 
-    public final EnumPath<renewal.awesome_travel_backoffice.hotel.utiles.RoomType> roomType = createEnum("roomType", renewal.awesome_travel_backoffice.hotel.utiles.RoomType.class);
+    public final EnumPath<renewal.awesome_travel_backoffice.hotel.utils.RoomType> roomType = createEnum("roomType", renewal.awesome_travel_backoffice.hotel.utils.RoomType.class);
 
     public QPackageHotel(String variable) {
         this(PackageHotel.class, forVariable(variable), INITS);
