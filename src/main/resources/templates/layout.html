@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <title th:text="${title}">기본 타이틀</title>
+    <link rel="stylesheet" th:href="@{/layout.css}">
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.toggle-menu h4').forEach(header => {
+                header.addEventListener('click', () => {
+                    const parent = header.parentElement;
+                    console.log("parent" + parent);
+                    parent.classList.toggle('active');
+                });
+            });
+        });
+    </script>
+
+</head>
+
+<body class="layout">
+    <div class="container">
+        <!-- Fixed Sidebar -->
+        <aside class="sidebar">
+            <a href="/" class="sidebar-header">
+                <h4>Awesome Travel<br>Back Office</h4>
+            </a>
+            <nav class="sidebar-nav">
+
+                <div class="toggle-menu">
+                    <h4>회원 관리</h4>
+                    <ul>
+                        <li><a href="/member">회원 정보 관리</a></li>
+                        <li><a href="/tier">회원 등급 관리</a></li>
+                    </ul>
+                </div>
+
+                <div class="toggle-menu">
+                    <h4>전시 관리</h4>
+                    <ul>
+                        <li><a href="/popup">팝업 관리</a></li>
+                        <li><a href="/banner">배너 관리</a></li>
+                    </ul>
+                </div>
+
+                <div class="toggle-menu">
+                    <h4>상품 관리</h4>
+                    <ul>
+                        <li><a href="/category">카테고리 관리</a></li>
+                        <li><a href="/product">여행상품 관리</a></li>
+                        <li><a href="/air">항공상품 관리</a></li>
+                        <li><a href="/tour">투어 관리</a></li>
+                    </ul>
+                </div>
+
+                <div class="toggle-menu">
+                    <h4>주문 관리</h4>
+                    <ul>
+                        <li><a href="/order">주문 목록</a></li>
+                    </ul>
+                </div>
+
+                <div class="toggle-menu">
+                    <h4>프로모션 관리</h4>
+                    <ul>
+                        <li><a href="/timedeal">타임딜</a></li>
+                        <li><a href="/coupon">쿠폰</a></li>
+                        <li><a href="/event">이벤트</a></li>
+                        <li><a href="/promotion">프로모션</a></li>
+                    </ul>
+                </div>
+
+            </nav>
+            <div class="sidebar-footer">
+                <div class="support-box">
+                    <h3>Need help?</h3>
+                    <p>Check our documentation or contact support.</p>
+                    <button class="support-button">Contact Support</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Wrapper -->
+        <div class="main-wrapper">
+            <!-- Main Content Header -->
+            <header class="main-header">
+
+                <div class="breadcrumb" th:text="${title}"></div>
+
+                <div class="header-actions">
+
+                    <div class="search-box">
+                        <input type="text" placeholder="Search...">
+                    </div>
+
+                    <div class="user-profile">
+                        <span th:text="${userName}"></span>
+                        <a href="/logout">로그아웃</a>
+                    </div>
+
+                </div>
+
+            </header>
+
+            <!-- Scrollable Main Content -->
+            <main class="main-content">
+                <div th:replace="${content} :: content"></div>
+            </main>
+
+            <!-- Main Content Footer -->
+            <footer class="main-footer">
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Contact Us</a>
+                </div>
+                <div class="copyright">
+                    &copy; 2025 My Application. All rights reserved.
+                </div>
+            </footer>
+        </div>
+    </div>
+</body>
+
+</html>
