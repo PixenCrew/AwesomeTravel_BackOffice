@@ -23,24 +23,24 @@ repositories {
 	mavenCentral()
 }
 
-def generated = "src/main/generated"
+// def generated = "src/main/generated"
 
-// ✅ Q클래스 생성 디렉토리 명시 (꼭 필요함)
-tasks.withType(JavaCompile).configureEach {
-	options.annotationProcessorGeneratedSourcesDirectory = file(generated)
-}
+// // ✅ Q클래스 생성 디렉토리 명시 (꼭 필요함)
+// tasks.withType(JavaCompile).configureEach {
+// 	options.annotationProcessorGeneratedSourcesDirectory = file(generated)
+// }
 
-sourceSets {
-    main.java.srcDirs += [ generated ]
-}
+// sourceSets {
+//     main.java.srcDirs += [ generated ]
+// }
 
-clean.doLast {
-    file(generated).deleteDir()
-}
+// clean.doLast {
+//     file(generated).deleteDir()
+// }
 
-clean {
-    delete file('src/main/generated')
-}
+// clean {
+//     delete file('src/main/generated')
+// }
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'

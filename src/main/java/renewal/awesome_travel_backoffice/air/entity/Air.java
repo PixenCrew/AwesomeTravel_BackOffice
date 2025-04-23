@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import renewal.awesome_travel_backoffice.air.utiles.AirStatus;
 import renewal.awesome_travel_backoffice.air.utiles.FlightType;
-import renewal.awesome_travel_backoffice.air.utiles.SeatClassType;
 import renewal.awesome_travel_backoffice.config.AuditingFields;
 
 import java.util.ArrayList;

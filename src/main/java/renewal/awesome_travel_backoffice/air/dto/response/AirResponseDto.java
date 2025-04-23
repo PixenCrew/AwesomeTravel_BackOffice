@@ -2,7 +2,6 @@ package renewal.awesome_travel_backoffice.air.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import renewal.awesome_travel_backoffice.air.entity.Airline;
 import renewal.awesome_travel_backoffice.air.utiles.AirStatus;
 import renewal.awesome_travel_backoffice.air.utiles.FlightType;
 
