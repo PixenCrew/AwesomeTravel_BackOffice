@@ -1,22 +1,133 @@
 <div th:fragment="content">
     <h1>투어</h1>
-    <table border="1 solid">
+
+    <!-- 1) 필터 폼 -->
+    <form th:action="@{/tour}" th:object="${filter}" method="get">
+        <!-- Tour 이름 -->
+        <label>Tour 이름:</label>
+        <input type="text" th:field="*{name}" placeholder="Enter tour name" />
+
+        <!-- 회사 체크박스 -->
+        <div>
+            <label>회사 선택:</label><br />
+            <div th:each="comp : ${companies}">
+                <input type="checkbox" th:field="*{companies}" th:value="${comp}" th:id="${'cmp_' + comp}" />
+                <label th:for="${'cmp_' + comp}" th:text="${comp}"></label>
+            </div>
+        </div>
+        <br/>
+        <!-- 시작일 범위 -->
+        <label>시작일 (From):</label>
+        <input type="date" th:field="*{startDateFrom}" />
+        <label>시작일 (To):</label>
+        <input type="date" th:field="*{startDateTo}" />
+        <br/>
+        <!-- 종료일 범위 -->
+        <label>종료일 (From):</label>
+        <input type="date" th:field="*{endDateFrom}" />
+        <label>종료일 (To):</label>
+        <input type="date" th:field="*{endDateTo}" />
+        <br/>
+        <!-- 가격 범위 -->
+        <label>최소 가격:</label>
+        <input type="number" th:field="*{minPrice}" step="0.01" />
+        <label>최대 가격:</label>
+        <input type="number" th:field="*{maxPrice}" step="0.01" />
+        <br/>
+        <!-- Course.location 포함 검색 -->
+        <label>Course 위치:</label>
+        <input type="text" th:field="*{courseLocation}" placeholder="Enter location text" />
+        <br/>
+        <button type="submit">검색</button>
+    </form>
+
+    <!-- 2) 결과 테이블 -->
+    <table border="1">
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Date</th>
-                <th>Name</th>
-                <th>Company</th>
+                <th>시작일</th>
+                <th>종료일</th>
+                <th>이름</th>
+                <th>회사</th>
+                <th>가격</th>
+                <th>코스 포인트</th>
             </tr>
         </thead>
         <tbody>
-            <tr th:each="tour : ${tourList}" th:onclick="|window.location.href='/tour/' + ${tour.id}|" style="cursor: pointer;">
-                <td th:text="${tour.id}"></td>
-                <td th:text="${tour.date}"></td>
-                <td th:text="${tour.name}"></td>
-                <td th:text="${tour.company}"></td>
+            <tr th:each="tour : ${tourList}" th:onclick="|window.location.href='@{/tour/{id}(id=${tour.id})}'|"
+                style="cursor: pointer;">
+                <td th:text="${tour.id}">1</td>
+                <td th:text="${tour.startdate}">2000-01-01</td>
+                <td th:text="${tour.enddate}">2000-12-31</td>
+                <td th:text="${tour.name}">투어</td>
+                <td th:text="${tour.company}">Awesome</td>
+                <td th:text="${tour.price}">100000</td>
+                <td>
+                    <ul>
+                        <li th:each="pt : ${tour.course}" type="none">
+                            <span th:text="${pt.location}">서울</span>
+                            (종료: <span th:text="${pt.enddate}">2000-12-31</span>)
+                        </li>
+                    </ul>
+                </td>
             </tr>
         </tbody>
     </table>
+
+    <!-- 3) 페이징 네비게이션 -->
+    <div>
+        <ul style="list-style: none; display: flex; gap:0.5rem;">
+            <!-- 이전 페이지 -->
+            <li th:if="${tourPage.hasPrevious()}">
+                <a th:href="@{/tour(
+                page=${tourPage.number - 1},
+                name=${filter.name},
+                startDateFrom=${filter.startDateFrom},
+                startDateTo=${filter.startDateTo},
+                endDateFrom=${filter.endDateFrom},
+                endDateTo=${filter.endDateTo},
+                minPrice=${filter.minPrice},
+                maxPrice=${filter.maxPrice},
+                courseLocation=${filter.courseLocation},
+                companies=${filter.companies}
+              )}">Prev</a>
+            </li>
+
+            <!-- 페이지 번호 -->
+            <li th:each="i : ${#numbers.sequence(0, tourPage.totalPages - 1)}">
+                <a th:href="@{/tour(
+                  page=${i},
+                  name=${filter.name},
+                  startDateFrom=${filter.startDateFrom},
+                  startDateTo=${filter.startDateTo},
+                  endDateFrom=${filter.endDateFrom},
+                  endDateTo=${filter.endDateTo},
+                  minPrice=${filter.minPrice},
+                  maxPrice=${filter.maxPrice},
+                  courseLocation=${filter.courseLocation},
+                  companies=${filter.companies}
+                )}" th:classappend="${i == tourPage.number} ? ' active' : ''" th:text="${i + 1}">1</a>
+            </li>
+
+            <!-- 다음 페이지 -->
+            <li th:if="${tourPage.hasNext()}">
+                <a th:href="@{/tour(
+                page=${tourPage.number + 1},
+                name=${filter.name},
+                startDateFrom=${filter.startDateFrom},
+                startDateTo=${filter.startDateTo},
+                endDateFrom=${filter.endDateFrom},
+                endDateTo=${filter.endDateTo},
+                minPrice=${filter.minPrice},
+                maxPrice=${filter.maxPrice},
+                courseLocation=${filter.courseLocation},
+                companies=${filter.companies}
+              )}">Next</a>
+            </li>
+        </ul>
+    </div>
+
+
     <a href="/tour/new">새 투어</a>
 </div>
