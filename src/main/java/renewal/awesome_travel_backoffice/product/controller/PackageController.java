@@ -11,13 +11,13 @@ import renewal.awesome_travel_backoffice.product.service.PackageService;
 @RequiredArgsConstructor
 public class PackageController {
 
-    private final PackageService packageService;
+    // private final PackageService packageService;
 
-    @PostMapping("/{packageId}/hotels")
-    public ResponseEntity<Long> addHotelToPackage(@PathVariable Long packageId,
-                                                  @RequestBody PackageHotelRequest dto) {
-        Long id = packageService.addHotelToPackage(packageId, dto);
-        return ResponseEntity.ok(id);
-    }
+    // @PostMapping("/{packageId}/hotels")
+    // public ResponseEntity<Long> addHotelToPackage(@PathVariable Long packageId,
+    //                                               @RequestBody PackageHotelRequest dto) {
+    //     Long id = packageService.addHotelToPackage(packageId, dto);
+    //     return ResponseEntity.ok(id);
+    // }
 
 }

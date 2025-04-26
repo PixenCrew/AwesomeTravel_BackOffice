@@ -38,17 +38,17 @@ public class PackageHotel {
 
     private Integer price;  // 이 호텔이 해당 패키지에서 적용되는 가격
 
-    public PackageHotel(Package pack, Hotel hotel, LocalDate checkIn, LocalDate checkOut,
-                        RoomType roomType, Integer price, Integer reservedRooms) {
-        //this.pack = pack;
-        this.hotel = hotel;
-        this.checkIn = checkIn;
-        this.checkOut = checkOut;
-        this.roomType = roomType;
-        this.price = price;
-        this.reservedRooms = reservedRooms;
-        this.bookedRooms = 0;
-    }
+    // public PackageHotel(Package pack, Hotel hotel, LocalDate checkIn, LocalDate checkOut,
+    //                     RoomType roomType, Integer price, Integer reservedRooms) {
+    //     //this.pack = pack;
+    //     this.hotel = hotel;
+    //     this.checkIn = checkIn;
+    //     this.checkOut = checkOut;
+    //     this.roomType = roomType;
+    //     this.price = price;
+    //     this.reservedRooms = reservedRooms;
+    //     this.bookedRooms = 0;
+    // }
 
 }
 
