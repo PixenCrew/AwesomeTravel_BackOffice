@@ -33,14 +33,14 @@ public class Tour {
   @OneToMany(mappedBy = "tour", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   private List<Point> course = new ArrayList<>();
 
-  // 양방향 관계 설정용 편의 메서드
-  public void addCoursePoint(Point point) {
-    course.add(point);
-    point.setTour(this);
-  }
+  // // 양방향 관계 설정용 편의 메서드
+  // public void addCoursePoint(Point point) {
+  //   course.add(point);
+  //   point.setTour(this);
+  // }
 
-  public void removeCoursePoint(Point point) {
-    course.remove(point);
-    point.setTour(null);
-  }
+  // public void removeCoursePoint(Point point) {
+  //   course.remove(point);
+  //   point.setTour(null);
+  // }
 }

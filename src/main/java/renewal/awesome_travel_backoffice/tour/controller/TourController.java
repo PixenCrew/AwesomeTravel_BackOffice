@@ -75,7 +75,7 @@ public class TourController {
         Point defaultPoint = new Point();
         defaultPoint.setLocation("");
         defaultPoint.setEnddate(null);
-        blank.addCoursePoint(defaultPoint);
+        blank.getCourse().add(defaultPoint);
 
         model.addAttribute("tour", blank);
         model.addAttribute("title", "New Tour");
