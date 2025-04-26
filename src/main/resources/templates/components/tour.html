@@ -1,4 +1,4 @@
-<div th:fragment="content">
+<div th:fragment="content" th:inline="text">
     <h1>투어</h1>
 
     <!-- 1) 필터 폼 -->
@@ -46,16 +46,74 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>시작일</th>
-                <th>종료일</th>
+                <th>
+                  <a th:href="@{/tour(
+                        page=0,
+                        name=${filter.name},
+                        startDateFrom=${filter.startDateFrom},
+                        startDateTo=${filter.startDateTo},
+                        endDateFrom=${filter.endDateFrom},
+                        endDateTo=${filter.endDateTo},
+                        minPrice=${filter.minPrice},
+                        maxPrice=${filter.maxPrice},
+                        courseLocation=${filter.courseLocation},
+                        companies=${filter.companies},
+                        sortField='startdate',
+                        sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}
+                  )}">
+                    시작일
+                    <span th:if="${sortField=='startdate'}"
+                          th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
+                  </a>
+                </th>
+                <th>
+                  <a th:href="@{/tour(
+                        page=0,
+                        name=${filter.name},
+                        startDateFrom=${filter.startDateFrom},
+                        startDateTo=${filter.startDateTo},
+                        endDateFrom=${filter.endDateFrom},
+                        endDateTo=${filter.endDateTo},
+                        minPrice=${filter.minPrice},
+                        maxPrice=${filter.maxPrice},
+                        courseLocation=${filter.courseLocation},
+                        companies=${filter.companies},
+                        sortField='enddate',
+                        sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}
+                  )}">
+                    종료일
+                    <span th:if="${sortField=='enddate'}"
+                          th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
+                  </a>
+                </th>
                 <th>이름</th>
                 <th>회사</th>
-                <th>가격</th>
+                <th>
+                  <a th:href="@{/tour(
+                        page=0,
+                        name=${filter.name},
+                        startDateFrom=${filter.startDateFrom},
+                        startDateTo=${filter.startDateTo},
+                        endDateFrom=${filter.endDateFrom},
+                        endDateTo=${filter.endDateTo},
+                        minPrice=${filter.minPrice},
+                        maxPrice=${filter.maxPrice},
+                        courseLocation=${filter.courseLocation},
+                        companies=${filter.companies},
+                        sortField='price',
+                        sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}
+                  )}">
+                    가격
+                    <span th:if="${sortField=='price'}"
+                          th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
+                  </a>
+                </th>
                 <th>코스 포인트</th>
             </tr>
         </thead>
         <tbody>
-            <tr th:each="tour : ${tourList}" th:onclick="|window.location.href='@{/tour/{id}(id=${tour.id})}'|"
+            <tr th:each="tour : ${tourPage.content}"
+                th:onclick="|window.location.href='@{/tour/{id}(id=${tour.id})}'|"
                 style="cursor: pointer;">
                 <td th:text="${tour.id}">1</td>
                 <td th:text="${tour.startdate}">2000-01-01</td>
@@ -75,55 +133,58 @@
         </tbody>
     </table>
 
-    <!-- 3) 페이징 네비게이션 -->
+    <!-- 3) 페이징 네비게이션 (정렬·필터 파라미터 유지) -->
     <div>
         <ul style="list-style: none; display: flex; gap:0.5rem;">
-            <!-- 이전 페이지 -->
             <li th:if="${tourPage.hasPrevious()}">
                 <a th:href="@{/tour(
-                page=${tourPage.number - 1},
-                name=${filter.name},
-                startDateFrom=${filter.startDateFrom},
-                startDateTo=${filter.startDateTo},
-                endDateFrom=${filter.endDateFrom},
-                endDateTo=${filter.endDateTo},
-                minPrice=${filter.minPrice},
-                maxPrice=${filter.maxPrice},
-                courseLocation=${filter.courseLocation},
-                companies=${filter.companies}
-              )}">Prev</a>
+                    page=${tourPage.number - 1},
+                    name=${filter.name},
+                    startDateFrom=${filter.startDateFrom},
+                    startDateTo=${filter.startDateTo},
+                    endDateFrom=${filter.endDateFrom},
+                    endDateTo=${filter.endDateTo},
+                    minPrice=${filter.minPrice},
+                    maxPrice=${filter.maxPrice},
+                    courseLocation=${filter.courseLocation},
+                    companies=${filter.companies},
+                    sortField=${sortField},
+                    sortDir=${sortDir}
+                )}">Prev</a>
             </li>
-
-            <!-- 페이지 번호 -->
             <li th:each="i : ${#numbers.sequence(0, tourPage.totalPages - 1)}">
                 <a th:href="@{/tour(
-                  page=${i},
-                  name=${filter.name},
-                  startDateFrom=${filter.startDateFrom},
-                  startDateTo=${filter.startDateTo},
-                  endDateFrom=${filter.endDateFrom},
-                  endDateTo=${filter.endDateTo},
-                  minPrice=${filter.minPrice},
-                  maxPrice=${filter.maxPrice},
-                  courseLocation=${filter.courseLocation},
-                  companies=${filter.companies}
-                )}" th:classappend="${i == tourPage.number} ? ' active' : ''" th:text="${i + 1}">1</a>
+                    page=${i},
+                    name=${filter.name},
+                    startDateFrom=${filter.startDateFrom},
+                    startDateTo=${filter.startDateTo},
+                    endDateFrom=${filter.endDateFrom},
+                    endDateTo=${filter.endDateTo},
+                    minPrice=${filter.minPrice},
+                    maxPrice=${filter.maxPrice},
+                    courseLocation=${filter.courseLocation},
+                    companies=${filter.companies},
+                    sortField=${sortField},
+                    sortDir=${sortDir}
+                )}"
+                th:classappend="${i == tourPage.number} ? ' active' : ''"
+                th:text="${i + 1}">1</a>
             </li>
-
-            <!-- 다음 페이지 -->
             <li th:if="${tourPage.hasNext()}">
                 <a th:href="@{/tour(
-                page=${tourPage.number + 1},
-                name=${filter.name},
-                startDateFrom=${filter.startDateFrom},
-                startDateTo=${filter.startDateTo},
-                endDateFrom=${filter.endDateFrom},
-                endDateTo=${filter.endDateTo},
-                minPrice=${filter.minPrice},
-                maxPrice=${filter.maxPrice},
-                courseLocation=${filter.courseLocation},
-                companies=${filter.companies}
-              )}">Next</a>
+                    page=${tourPage.number + 1},
+                    name=${filter.name},
+                    startDateFrom=${filter.startDateFrom},
+                    startDateTo=${filter.startDateTo},
+                    endDateFrom=${filter.endDateFrom},
+                    endDateTo=${filter.endDateTo},
+                    minPrice=${filter.minPrice},
+                    maxPrice=${filter.maxPrice},
+                    courseLocation=${filter.courseLocation},
+                    companies=${filter.companies},
+                    sortField=${sortField},
+                    sortDir=${sortDir}
+                )}">Next</a>
             </li>
         </ul>
     </div>

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -38,19 +39,28 @@ public class TourController {
     public String listAndFilter(
             @ModelAttribute("filter") TourFilterDTO filter,     // 필터 DTO를 바인딩
             @RequestParam(defaultValue = "0") int page,          // 페이지 번호
+            @RequestParam(defaultValue = "startdate") String sortField,
+            @RequestParam(defaultValue = "asc") String sortDir,
             Model model
     ) {
+        // 1) 정렬 객체 설정
+        Sort sort = sortDir.equalsIgnoreCase("asc")
+        ? Sort.by(sortField).ascending()
+        : Sort.by(sortField).descending();
+
         // 1) 회사 목록 (체크박스용)
         List<String> companies = tourService.getAllCompanies();
         model.addAttribute("companies", companies);
 
         // 2) 페이징(10개 고정) + 필터링 로직
-        Pageable pageable = PageRequest.of(page, 10);
+        Pageable pageable = PageRequest.of(page, 10, sort);
         Page<Tour> tourPage = tourService.searchTours(filter, pageable);
 
         // 3) View에서 쓸 속성들
         model.addAttribute("tourPage", tourPage);
         model.addAttribute("tourList", tourPage.getContent());  
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDir", sortDir);
         model.addAttribute("title", "Tour List");
         model.addAttribute("content", "components/tour");  // layout 안에서 이 fragment를 렌더
 
