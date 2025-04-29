@@ -18,3 +18,4 @@ public interface QnaRepository extends JpaRepository<Qna, Long> {
                           Pageable pageable);
 
 }
+

@@ -48,3 +48,4 @@ public class Qna extends AuditingFields {
         this.content = content;
     }
 }
+

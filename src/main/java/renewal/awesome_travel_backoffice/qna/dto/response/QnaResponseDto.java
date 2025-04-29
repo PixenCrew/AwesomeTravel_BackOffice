@@ -16,3 +16,4 @@ public class QnaResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime answeredAt;
 }
+

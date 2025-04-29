@@ -8,3 +8,4 @@ import java.util.List;
 public interface QnaAnswerRepository extends JpaRepository<QnaAnswer, Long> {
     List<QnaAnswer> findByQnaId(Long qnaId);
 }
+

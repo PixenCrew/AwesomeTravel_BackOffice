@@ -56,4 +56,5 @@ public class QnaAdminController {
     public ResponseEntity<Page<QnaResponseDto>> getAllAdmin(@RequestParam(required = false) Boolean isAnswered, Pageable pageable) {
         return ResponseEntity.ok(qnaService.getAllQnaAdmin(isAnswered, pageable));
     }
+
 }

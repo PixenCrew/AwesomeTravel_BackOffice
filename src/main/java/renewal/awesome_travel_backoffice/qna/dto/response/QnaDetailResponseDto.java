@@ -17,3 +17,4 @@ public class QnaDetailResponseDto {
     private List<QnaAnswerResponseDto> answers;
 }
 
+

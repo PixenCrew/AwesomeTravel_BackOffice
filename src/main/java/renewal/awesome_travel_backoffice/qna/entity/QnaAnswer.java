@@ -31,3 +31,4 @@ public class QnaAnswer extends AuditingFields {
         this.content = content;
     }
 }
+
