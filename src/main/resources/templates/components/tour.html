@@ -2,7 +2,7 @@
     <h1>투어</h1>
 
     <!-- 1) 필터 폼 -->
-    <form th:action="@{/tour}" th:object="${filter}" method="get">
+    <form id="filterForm" th:object="${filter}">
         <!-- Tour 이름 -->
         <label>Tour 이름:</label>
         <input type="text" th:field="*{name}" placeholder="Enter tour name" />
@@ -10,110 +10,86 @@
         <!-- 회사 체크박스 -->
         <div>
             <label>회사 선택:</label><br />
-            <div th:each="comp : ${companies}">
+            <div th:each="comp : ${allCompanies}">
                 <input type="checkbox" th:field="*{companies}" th:value="${comp}" th:id="${'cmp_' + comp}" />
                 <label th:for="${'cmp_' + comp}" th:text="${comp}"></label>
             </div>
         </div>
-        <br/>
+        <br />
+
         <!-- 시작일 범위 -->
         <label>시작일 (From):</label>
         <input type="date" th:field="*{startDateFrom}" />
         <label>시작일 (To):</label>
         <input type="date" th:field="*{startDateTo}" />
-        <br/>
+        <br />
+
         <!-- 종료일 범위 -->
         <label>종료일 (From):</label>
         <input type="date" th:field="*{endDateFrom}" />
         <label>종료일 (To):</label>
         <input type="date" th:field="*{endDateTo}" />
-        <br/>
+        <br />
+
         <!-- 가격 범위 -->
         <label>최소 가격:</label>
-        <input type="number" th:field="*{minPrice}" step="0.01" />
+        <input type="number" step="0.01" th:field="*{minPrice}" />
         <label>최대 가격:</label>
-        <input type="number" th:field="*{maxPrice}" step="0.01" />
-        <br/>
+        <input type="number" step="0.01" th:field="*{maxPrice}" />
+        <br />
+
         <!-- Course.location 포함 검색 -->
         <label>Course 위치:</label>
         <input type="text" th:field="*{courseLocation}" placeholder="Enter location text" />
-        <br/>
-        <button type="submit">검색</button>
+        <br />
+
+        <!-- 검색 버튼 -->
+        <button type="button" onclick="get(0, event)">검색</button>
     </form>
+
 
     <!-- 2) 결과 테이블 -->
     <table border="1">
         <thead>
             <tr>
                 <th>ID</th>
+
+                <!-- 시작일 -->
                 <th>
-                  <a th:href="@{/tour(
-                        page=0,
-                        name=${filter.name},
-                        startDateFrom=${filter.startDateFrom},
-                        startDateTo=${filter.startDateTo},
-                        endDateFrom=${filter.endDateFrom},
-                        endDateTo=${filter.endDateTo},
-                        minPrice=${filter.minPrice},
-                        maxPrice=${filter.maxPrice},
-                        courseLocation=${filter.courseLocation},
-                        companies=${filter.companies},
-                        sortField='startdate',
-                        sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}
-                  )}">
-                    시작일
-                    <span th:if="${sortField=='startdate'}"
-                          th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
-                  </a>
+                    <a href="javascript:void(0)" th:data-sortfield="'startdate'"
+                        th:data-sortdir="${sortField=='startdate' && sortDir=='asc' ? 'desc' : 'asc'}" onclick="get(0)">
+                        시작일
+                        <span th:if="${sortField=='startdate'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
+                    </a>
                 </th>
+
+                <!-- 종료일 -->
                 <th>
-                  <a th:href="@{/tour(
-                        page=0,
-                        name=${filter.name},
-                        startDateFrom=${filter.startDateFrom},
-                        startDateTo=${filter.startDateTo},
-                        endDateFrom=${filter.endDateFrom},
-                        endDateTo=${filter.endDateTo},
-                        minPrice=${filter.minPrice},
-                        maxPrice=${filter.maxPrice},
-                        courseLocation=${filter.courseLocation},
-                        companies=${filter.companies},
-                        sortField='enddate',
-                        sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}
-                  )}">
-                    종료일
-                    <span th:if="${sortField=='enddate'}"
-                          th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
-                  </a>
+                    <a th:data-sortfield="'enddate'"
+                        th:data-sortdir="${sortField=='enddate' && sortDir=='asc' ? 'desc' : 'asc'}" onclick="get(0)">
+                        종료일
+                        <span th:if="${sortField=='enddate'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
+                    </a>
                 </th>
+
                 <th>이름</th>
                 <th>회사</th>
+
+                <!-- 가격 -->
                 <th>
-                  <a th:href="@{/tour(
-                        page=0,
-                        name=${filter.name},
-                        startDateFrom=${filter.startDateFrom},
-                        startDateTo=${filter.startDateTo},
-                        endDateFrom=${filter.endDateFrom},
-                        endDateTo=${filter.endDateTo},
-                        minPrice=${filter.minPrice},
-                        maxPrice=${filter.maxPrice},
-                        courseLocation=${filter.courseLocation},
-                        companies=${filter.companies},
-                        sortField='price',
-                        sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}
-                  )}">
-                    가격
-                    <span th:if="${sortField=='price'}"
-                          th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
-                  </a>
+                    <a th:data-sortfield="'price'"
+                        th:data-sortdir="${sortField=='price' && sortDir=='asc' ? 'desc' : 'asc'}" onclick="get(0)">
+                        가격
+                        <span th:if="${sortField=='price'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
+                    </a>
                 </th>
+
                 <th>코스 포인트</th>
             </tr>
+
         </thead>
         <tbody>
-            <tr th:each="tour : ${tourPage.content}"
-                th:onclick="|window.location.href='@{/tour/{id}(id=${tour.id})}'|"
+            <tr th:each="tour : ${tourPage.content}" th:onclick="|window.location.href='@{/tour/{id}(id=${tour.id})}'|"
                 style="cursor: pointer;">
                 <td th:text="${tour.id}">1</td>
                 <td th:text="${tour.startdate}">2000-01-01</td>
@@ -137,58 +113,60 @@
     <div>
         <ul style="list-style: none; display: flex; gap:0.5rem;">
             <li th:if="${tourPage.hasPrevious()}">
-                <a th:href="@{/tour(
-                    page=${tourPage.number - 1},
-                    name=${filter.name},
-                    startDateFrom=${filter.startDateFrom},
-                    startDateTo=${filter.startDateTo},
-                    endDateFrom=${filter.endDateFrom},
-                    endDateTo=${filter.endDateTo},
-                    minPrice=${filter.minPrice},
-                    maxPrice=${filter.maxPrice},
-                    courseLocation=${filter.courseLocation},
-                    companies=${filter.companies},
-                    sortField=${sortField},
-                    sortDir=${sortDir}
-                )}">Prev</a>
+                <a th:onclick="|get(${tourPage.number - 1})|">
+                    Prev
+                </a>
             </li>
             <li th:each="i : ${#numbers.sequence(0, tourPage.totalPages - 1)}">
-                <a th:href="@{/tour(
-                    page=${i},
-                    name=${filter.name},
-                    startDateFrom=${filter.startDateFrom},
-                    startDateTo=${filter.startDateTo},
-                    endDateFrom=${filter.endDateFrom},
-                    endDateTo=${filter.endDateTo},
-                    minPrice=${filter.minPrice},
-                    maxPrice=${filter.maxPrice},
-                    courseLocation=${filter.courseLocation},
-                    companies=${filter.companies},
-                    sortField=${sortField},
-                    sortDir=${sortDir}
-                )}"
-                th:classappend="${i == tourPage.number} ? ' active' : ''"
-                th:text="${i + 1}">1</a>
+                <a th:onclick="|get(${i})|" th:classappend="${i == tourPage.number} ? ' active' : ''"
+                    th:text="${i + 1}">
+                </a>
             </li>
             <li th:if="${tourPage.hasNext()}">
-                <a th:href="@{/tour(
-                    page=${tourPage.number + 1},
-                    name=${filter.name},
-                    startDateFrom=${filter.startDateFrom},
-                    startDateTo=${filter.startDateTo},
-                    endDateFrom=${filter.endDateFrom},
-                    endDateTo=${filter.endDateTo},
-                    minPrice=${filter.minPrice},
-                    maxPrice=${filter.maxPrice},
-                    courseLocation=${filter.courseLocation},
-                    companies=${filter.companies},
-                    sortField=${sortField},
-                    sortDir=${sortDir}
-                )}">Next</a>
+                <a th:onclick="|get(${tourPage.number + 1})|">>
+                    Next
+                </a>
             </li>
         </ul>
     </div>
 
 
     <a href="/tour/new">새 투어</a>
+
+    <script>
+        function get(page, event) {
+            if (event) {
+                event.preventDefault(); // form+button 기본 동작 방지
+            }
+            const form = document.getElementById('filterForm');
+            const formData = new FormData(form);
+            const params = new URLSearchParams();
+
+            for (const [key, value] of formData.entries()) {
+                if (value != null && value !== '' && !key.startsWith('_')) {
+                    params.append(key, value);
+                }
+            }
+
+            // 페이지 파라미터
+            if (page != null) {
+                params.set('page', page);
+            }
+
+
+            // console.log("params:"+params.getAll())
+            const baseUrl = location.pathname;
+            const qs = params.toString();
+            const url = baseUrl + (qs ? `?${qs}` : '');
+            console.log("baseUrl:" + baseUrl)
+            console.log("qs:" + qs)
+            console.log("url:" + url)
+
+            if (confirm("GET?")) {
+                window.location.href = url;
+            }
+        }
+
+
+    </script>
 </div>

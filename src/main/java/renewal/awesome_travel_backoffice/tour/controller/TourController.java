@@ -49,8 +49,8 @@ public class TourController {
         : Sort.by(sortField).descending();
 
         // 1) 회사 목록 (체크박스용)
-        List<String> companies = tourService.getAllCompanies();
-        model.addAttribute("companies", companies);
+        List<String> allCompanies = tourService.getAllCompanies();
+        model.addAttribute("allCompanies", allCompanies);
 
         // 2) 페이징(10개 고정) + 필터링 로직
         Pageable pageable = PageRequest.of(page, 10, sort);
@@ -67,15 +67,15 @@ public class TourController {
         return "layout";
     }
 
-    @GetMapping("/search")
-    public Page<Tour> searchTours(
-        TourFilterDTO filter,
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size
-    ) {
-        Pageable pageable = PageRequest.of(page, size);
-        return tourService.searchTours(filter, pageable);
-    }
+    // @GetMapping("/search")
+    // public Page<Tour> searchTours(
+    //     TourFilterDTO filter,
+    //     @RequestParam(defaultValue = "0") int page,
+    //     @RequestParam(defaultValue = "10") int size
+    // ) {
+    //     Pageable pageable = PageRequest.of(page, size);
+    //     return tourService.searchTours(filter, pageable);
+    // }
 
     // 새 투어
     @GetMapping("/new")
