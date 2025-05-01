@@ -45,6 +45,12 @@ public class TourService {
         if (filter.getCourseLocation() != null && !filter.getCourseLocation().isEmpty()) {
             spec = spec.and(TourSpecification.courseLocationContains(filter.getCourseLocation()));
         }
+        if (filter.getCountry() != null && !filter.getCountry().isEmpty()) {
+            spec = spec.and(TourSpecification.countryContains(filter.getCountry()));
+        }
+        if (filter.getStartCount() != null || filter.getEndCount() != null) {
+            spec = spec.and(TourSpecification.countBetween(filter.getStartCount(), filter.getEndCount()));
+        }
 
         return tourRepository.findAll(spec, pageable);
     }

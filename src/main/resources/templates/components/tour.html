@@ -33,9 +33,9 @@
 
         <!-- 가격 범위 -->
         <label>최소 가격:</label>
-        <input type="number" step="0.01" th:field="*{minPrice}" />
+        <input type="number" step="1" th:field="*{minPrice}" />
         <label>최대 가격:</label>
-        <input type="number" step="0.01" th:field="*{maxPrice}" />
+        <input type="number" step="1" th:field="*{maxPrice}" />
         <br />
 
         <!-- Course.location 포함 검색 -->
@@ -43,10 +43,28 @@
         <input type="text" th:field="*{courseLocation}" placeholder="Enter location text" />
         <br />
 
+        <!-- 국가 -->
+        <label> 국가:</label>
+        <input type="text" th:field="*{country}" placeholder="Enter country" /><br>
+
+        <!-- 인원 범위 -->
+        <label>최소 인원:</label>
+        <input type="number" step="1" th:field="*{startCount}" />
+        <label>최대 인원:</label>
+        <input type="number" step="1" th:field="*{endCount}" />
+        <br />
+
         <!-- 검색 버튼 -->
         <button type="button" onclick="get(0, event)">검색</button>
+
+        <!-- 정렬 기준 및 방향 (hidden input) -->
+        <input type="hidden" name="sortField" th:value="${sortField}" />
+        <input type="hidden" name="sortDir" th:value="${sortDir}" />
+
     </form>
 
+    <!-- 조건 초기화 버튼 -->
+    <button type="button" onclick="reset(event)">검색 초기화</button>
 
     <!-- 2) 결과 테이블 -->
     <table border="1">
@@ -56,8 +74,9 @@
 
                 <!-- 시작일 -->
                 <th>
-                    <a href="javascript:void(0)" th:data-sortfield="'startdate'"
-                        th:data-sortdir="${sortField=='startdate' && sortDir=='asc' ? 'desc' : 'asc'}" onclick="get(0)">
+                    <a href="#" data-sortfield="startdate"
+                        th:data-sortdir="${sortField=='startdate' and sortDir=='asc' ? 'asc' : 'desc'}"
+                        onclick="toggleSort(this, event)">
                         시작일
                         <span th:if="${sortField=='startdate'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
                     </a>
@@ -65,8 +84,9 @@
 
                 <!-- 종료일 -->
                 <th>
-                    <a th:data-sortfield="'enddate'"
-                        th:data-sortdir="${sortField=='enddate' && sortDir=='asc' ? 'desc' : 'asc'}" onclick="get(0)">
+                    <a href="#" data-sortfield="enddate"
+                        th:data-sortdir="${sortField=='enddate' and sortDir=='asc' ? 'asc' : 'desc'}"
+                        onclick="toggleSort(this, event)">
                         종료일
                         <span th:if="${sortField=='enddate'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
                     </a>
@@ -77,14 +97,17 @@
 
                 <!-- 가격 -->
                 <th>
-                    <a th:data-sortfield="'price'"
-                        th:data-sortdir="${sortField=='price' && sortDir=='asc' ? 'desc' : 'asc'}" onclick="get(0)">
+                    <a href="#" data-sortfield="price"
+                        th:data-sortdir="${sortField=='price' and sortDir=='asc' ? 'asc' : 'desc'}"
+                        onclick="toggleSort(this, event)">
                         가격
                         <span th:if="${sortField=='price'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
                     </a>
                 </th>
 
                 <th>코스 포인트</th>
+                <th>국가</th>
+                <th>인원</th>
             </tr>
 
         </thead>
@@ -105,6 +128,8 @@
                         </li>
                     </ul>
                 </td>
+                <td th:text="${tour.country}">KR</td>
+                <td th:text="${tour.count}">1212</td>
             </tr>
         </tbody>
     </table>
@@ -113,28 +138,27 @@
     <div>
         <ul style="list-style: none; display: flex; gap:0.5rem;">
             <li th:if="${tourPage.hasPrevious()}">
-                <a th:onclick="|get(${tourPage.number - 1})|">
+                <a th:onclick="|get(${tourPage.number - 1})|" style="cursor: pointer;">
                     Prev
                 </a>
             </li>
             <li th:each="i : ${#numbers.sequence(0, tourPage.totalPages - 1)}">
-                <a th:onclick="|get(${i})|" th:classappend="${i == tourPage.number} ? ' active' : ''"
-                    th:text="${i + 1}">
+                <a th:onclick="|get(${i})|" th:classappend="${i == tourPage.number} ? ' active' : ''" th:text="${i + 1}"
+                    style="cursor: pointer;">
                 </a>
             </li>
             <li th:if="${tourPage.hasNext()}">
-                <a th:onclick="|get(${tourPage.number + 1})|">>
+                <a th:onclick="|get(${tourPage.number + 1})|" style="cursor: pointer;">>
                     Next
                 </a>
             </li>
         </ul>
     </div>
 
-
     <a href="/tour/new">새 투어</a>
 
     <script>
-        function get(page, event) {
+        function get(page, event, sortField = null, sortDir = null) {
             if (event) {
                 event.preventDefault(); // form+button 기본 동작 방지
             }
@@ -153,20 +177,47 @@
                 params.set('page', page);
             }
 
-
             // console.log("params:"+params.getAll())
             const baseUrl = location.pathname;
             const qs = params.toString();
             const url = baseUrl + (qs ? `?${qs}` : '');
-            console.log("baseUrl:" + baseUrl)
-            console.log("qs:" + qs)
-            console.log("url:" + url)
 
-            if (confirm("GET?")) {
-                window.location.href = url;
+            // if (confirm("GET?")) {
+            window.location.href = url;
+            // }
+        }
+
+        function reset(event) {
+            console.log("sadasd")
+            event.preventDefault();
+
+            if (confirm("필터를 초기화합니다.")) {
+                // form 선택
+                const form = document.getElementById("filterForm");
+
+                // form 항목 모두 빈값으로 초기화
+                form.reset();
+
+                // 기본 페이지로 이동
+                const baseUrl = location.pathname;
+                window.location.href = baseUrl;
             }
         }
 
+        function toggleSort(el, event) {
+            const field = el.dataset.sortfield;
+            const currentDir = el.dataset.sortdir;
+            console.log("currentDir" + currentDir)
+            const nextDir = currentDir == 'asc' ? 'desc' : 'asc';
+            console.log("nextDir" + nextDir)
 
+            // form 내부 hidden 필드 업데이트
+            const form = document.getElementById('filterForm');
+            form.querySelector('input[name="sortField"]').value = field;
+            form.querySelector('input[name="sortDir"]').value = nextDir;
+
+            confirm('?')
+            get(0, event, field, nextDir);
+        }
     </script>
 </div>

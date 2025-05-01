@@ -19,4 +19,7 @@ public class TourFilterDTO {
     private BigDecimal minPrice;
     private BigDecimal maxPrice;
     private String courseLocation;
+    private String country;
+    private Long startCount;
+    private Long endCount;
 }

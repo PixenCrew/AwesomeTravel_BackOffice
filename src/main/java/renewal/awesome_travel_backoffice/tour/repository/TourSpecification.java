@@ -23,14 +23,12 @@ public class TourSpecification {
 
     // Tour.name LIKE %name%
     public static Specification<Tour> nameContains(String name) {
-        return (root, query, builder) -> 
-            builder.like(root.get("name"), "%" + name + "%");
+        return (root, query, builder) -> builder.like(root.get("name"), "%" + name + "%");
     }
 
     // Tour.company LIKE %company%
     public static Specification<Tour> companyContains(String company) {
-        return (root, query, builder) -> 
-            builder.like(root.get("company"), "%" + company + "%");
+        return (root, query, builder) -> builder.like(root.get("company"), "%" + company + "%");
     }
 
     // Tour.startDate BETWEEN from AND to
@@ -85,4 +83,25 @@ public class TourSpecification {
             return builder.like(courseJoin.get("location"), "%" + location + "%");
         };
     }
+
+    // Tour.name LIKE %name%
+    public static Specification<Tour> countryContains(String country) {
+        return (root, query, builder) -> builder.like(root.get("country"), "%" + country + "%");
+    }
+
+    // Tour.count BETWEEN min AND max
+    public static Specification<Tour> countBetween(Long min, Long max) {
+        return (root, query, builder) -> {
+            if (min != null && max != null) {
+                return builder.between(root.get("count"), min, max);
+            } else if (min != null) {
+                return builder.greaterThanOrEqualTo(root.get("count"), min);
+            } else if (max != null) {
+                return builder.lessThanOrEqualTo(root.get("count"), max);
+            } else {
+                return null;
+            }
+        };
+    }
+
 }
