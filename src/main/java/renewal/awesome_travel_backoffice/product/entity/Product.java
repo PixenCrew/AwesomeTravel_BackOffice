@@ -10,7 +10,7 @@ import lombok.*;
 @Getter 
 @Setter
 @NoArgsConstructor
-public class Package {
+public class Product {
     @Id
     private int id;
 }
