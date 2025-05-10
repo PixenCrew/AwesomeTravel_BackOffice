@@ -1,23 +1,24 @@
-package renewal.awesome_travel_backoffice.qna.entity;
+package renewal.awesome_travel_backoffice.qna.entity.;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import renewal.awesome_travel_backoffice.config.AuditingFields;
+import renewal.awesome_travel_backoffice.user.entity.User;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor
-public class Qna extends AuditingFields {
+public class Qna {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long writerId; // 유저
+    // 연관관계 변경
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User writer; // 유저
+
     private String title;
     private String content;
     private boolean isAnswered;
@@ -26,18 +27,13 @@ public class Qna extends AuditingFields {
 
     private LocalDateTime answeredAt;
 
-    public static Qna create(Long writerId, String title, String content) {
+    public static Qna create(User writer, String title, String content) {
         Qna qna = new Qna();
-        qna.writerId = writerId;
+        qna.writer = writer;
         qna.title = title;
         qna.content = content;
         qna.createdAt = LocalDateTime.now();
         return qna;
-    }
-
-    public void markAnswered() {
-        this.isAnswered = true;
-        this.answeredAt = LocalDateTime.now();
     }
 
     public void updateTitle(String title) {
@@ -47,5 +43,10 @@ public class Qna extends AuditingFields {
     public void updateContent(String content) {
         this.content = content;
     }
-}
 
+
+    public void markAnswered() {
+        this.isAnswered = true;
+        this.answeredAt = LocalDateTime.now();
+    }
+}
