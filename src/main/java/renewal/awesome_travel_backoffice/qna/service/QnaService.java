@@ -27,18 +27,6 @@ public class QnaService {
     private final QnaRepository qnaRepository;
     private final QnaAnswerRepository qnaAnswerRepository;
 
-    // 질문 등록
-    public Long createQna(Long writerId, QnaRequestDto dto) {
-        Qna qna = Qna.create(writerId, dto.getTitle(), dto.getContent());
-        return qnaRepository.save(qna).getId();
-    }
-
-    // 전체 질문 조회
-    public Page<QnaResponseDto> getAllQna(Pageable pageable) {
-        return qnaRepository.findAll(pageable)
-                .map(this::toQnaDto);
-    }
-
     // 답변 여부로 필터 조회 (관리자용)
     public Page<QnaResponseDto> getAllQnaAdmin(Boolean isAnswered, Pageable pageable) {
         if (isAnswered == null) {
@@ -54,49 +42,6 @@ public class QnaService {
     public Page<QnaResponseDto> searchQnaAdmin(String keyword, Boolean isAnswered, Pageable pageable) {
         return qnaRepository.searchAdmin(keyword, isAnswered, pageable)
                 .map(this::toQnaDto);
-    }
-
-
-    // 질문 상세 조회 (질문 + 답변 리스트)
-    public QnaDetailResponseDto getQna(Long id) {
-        Qna qna = qnaRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("QnA가 존재하지 않습니다."));
-        List<QnaAnswerResponseDto> answers = qnaAnswerRepository.findByQnaId(id).stream()
-                .map(this::toAnswerDto)
-                .toList();
-
-        return QnaDetailResponseDto.builder()
-                .id(qna.getId())
-                .writerId(qna.getWriterId())
-                .title(qna.getTitle())
-                .content(qna.getContent())
-                .isAnswered(qna.isAnswered())
-                .createdAt(qna.getCreatedAt())
-                .answers(answers)
-                .build();
-    }
-
-    // 질문 수정 (본인만)
-    @Transactional
-    public void updateQnaPartial(Long qnaId, Long requestUserId, QnaUpdateRequestDto dto) {
-        Qna qna = qnaRepository.findById(qnaId)
-                .orElseThrow(() -> new IllegalArgumentException("QnA가 존재하지 않습니다."));
-        if (!qna.getWriterId().equals(requestUserId)) {
-            throw new AccessDeniedException("작성자만 수정할 수 있습니다.");
-        }
-        if (dto.getTitle() != null) qna.updateTitle(dto.getTitle());
-        if (dto.getContent() != null) qna.updateContent(dto.getContent());
-    }
-
-    // 질문 삭제 (본인만)
-    @Transactional
-    public void deleteQna(Long qnaId, Long requestUserId) {
-        Qna qna = qnaRepository.findById(qnaId)
-                .orElseThrow(() -> new IllegalArgumentException("QnA가 존재하지 않습니다."));
-        if (!qna.getWriterId().equals(requestUserId)) {
-            throw new AccessDeniedException("작성자만 삭제할 수 있습니다.");
-        }
-        qnaRepository.delete(qna);
     }
 
     // 답변 등록 (관리자만, @PreAuthorize로 제한)
@@ -129,7 +74,7 @@ public class QnaService {
     private QnaResponseDto toQnaDto(Qna qna) {
         return QnaResponseDto.builder()
                 .id(qna.getId())
-                .writerId(qna.getWriterId())
+                .writerId(qna.getWriter().getId())
                 .title(qna.getTitle())
                 .content(qna.getContent())
                 .isAnswered(qna.isAnswered())
