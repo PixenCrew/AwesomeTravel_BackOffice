@@ -2,6 +2,7 @@ package renewal.awesome_travel_backoffice.inquiry.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import renewal.awesome_travel_backoffice.user.entity.User;
 
 import java.time.LocalDateTime;
 
@@ -11,7 +12,9 @@ public class Inquiry {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
     private String title;
     @Column(columnDefinition = "TEXT")
     private String content;
@@ -19,9 +22,9 @@ public class Inquiry {
     private LocalDateTime createdAt;
     private LocalDateTime answeredAt;
 
-    public static Inquiry create(Long userId, String title, String content) {
+    public static Inquiry create(User user, String title, String content) {
         Inquiry i = new Inquiry();
-        i.userId = userId;
+        i.user = user;
         i.title = title;
         i.content = content;
         i.createdAt = LocalDateTime.now();

@@ -35,7 +35,7 @@ public class InquiryService {
         inquiryAnswerRepository.save(answer);
         inquiry.markAnswered();
         notificationRepository.save(Notification.create(
-                inquiry.getUserId(),
+                inquiry.getUser().getId(),  // 연관관계 기반
                 "작성하신 문의에 답변이 등록되었습니다."
         ));
         return answer.getId();
@@ -56,7 +56,7 @@ public class InquiryService {
     private InquiryResponseDto toDto(Inquiry inquiry) {
         return InquiryResponseDto.builder()
                 .id(inquiry.getId())
-                .userId(inquiry.getUserId())
+                .userId(inquiry.getUser().getId())
                 .title(inquiry.getTitle())
                 .content(inquiry.getContent())
                 .isAnswered(inquiry.isAnswered())
