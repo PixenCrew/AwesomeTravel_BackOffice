@@ -1,7 +1,5 @@
 package renewal.awesome_travel_backoffice.config;
 
-import java.io.File;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;

@@ -1,4 +1,4 @@
-package renewal.awesome_travel_backoffice.qna.entity.;
+package renewal.awesome_travel_backoffice.qna.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
