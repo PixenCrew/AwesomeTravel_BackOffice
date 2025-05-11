@@ -2,7 +2,7 @@ package renewal.awesome_travel_backoffice.comment.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.product.entity.Product;
 import renewal.awesome_travel_backoffice.user.entity.User;
 
@@ -12,7 +12,7 @@ import java.util.List;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class Comment {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

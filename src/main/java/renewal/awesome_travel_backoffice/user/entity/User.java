@@ -18,10 +18,9 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
 @DynamicInsert
 @DynamicUpdate
-@Table(name = "users")
+@Table
 public class User {
 
     @Id
@@ -84,8 +83,8 @@ public class User {
 //    @OneToMany(mappedBy = "user")
 //    private List<Wait> waitList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
-    private List<Comment> reviewComments = new ArrayList<>();
+    @OneToMany(mappedBy = "id")
+    private List<Comment> comment = new ArrayList<>();
 
 //    @OneToMany(mappedBy = "user")
 //    private List<AirPurchase> airPurchases = new ArrayList<>();
