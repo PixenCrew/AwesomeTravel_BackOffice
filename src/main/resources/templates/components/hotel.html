@@ -1,0 +1,118 @@
+<div th:fragment="content" th:inline="text">
+    <h1>호텔 목록</h1>
+
+    <!-- 1) 필터 폼 -->
+    <form id="filterForm" th:object="${filter}">
+        <label>호텔 이름:</label>
+        <input type="text" th:field="*{name}" placeholder="Enter hotel name" /><br>
+
+        <label>주소:</label>
+        <input type="text" th:field="*{address}" placeholder="Enter address" /><br>
+
+        <label>이메일:</label>
+        <input type="text" th:field="*{email}" placeholder="Enter email" /><br>
+
+        <label>최소 가격:</label>
+        <input type="number" step="1" th:field="*{minPrice}" />
+        <label>최대 가격:</label>
+        <input type="number" step="1" th:field="*{maxPrice}" /><br>
+
+        <label>호텔 유형:</label>
+        <select th:field="*{hotelType}">
+            <option value="">-- 선택 --</option>
+            <option th:each="type : ${T(renewal.awesome_travel_backoffice.hotel.utils.HotelType).values()}"
+                th:value="${type}" th:text="${type}"></option>
+        </select><br>
+
+        <label>사용 가능:</label>
+        <select th:field="*{isActive}">
+            <option value="">-- 선택 --</option>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </select>
+
+        <br><br>
+        <button type="button" onclick="get(0, event)">검색</button>
+
+        <input type="hidden" name="sortField" th:value="${sortField}" />
+        <input type="hidden" name="sortDir" th:value="${sortDir}" />
+    </form>
+    <button type="button" onclick="reset(event)">검색 초기화</button>
+
+    <!-- 2) 결과 테이블 -->
+    <table border="1">
+        <thead>
+            <tr>
+                <th>
+                    <a href="#" data-sortfield="id"
+                        th:data-sortdir="${sortField=='id' and sortDir=='asc' ? 'asc' : 'desc'}"
+                        onclick="toggleSort(this, event)">ID
+                        <span th:if="${sortField=='id'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
+                    </a>
+                </th>
+                <th>이름</th>
+                <th>설명</th>
+                <th>주소</th>
+                <th>이메일</th>
+                <th>웹사이트</th>
+                <th>유형</th>
+                <th>
+                    <a href="#" data-sortfield="price"
+                        th:data-sortdir="${sortField=='price' and sortDir=='asc' ? 'asc' : 'desc'}"
+                        onclick="toggleSort(this, event)">가격
+                        <span th:if="${sortField=='price'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
+                    </a>
+                </th>
+                <th>활성</th>
+                <th>전화번호</th>
+                <th> <a href="#" data-sortfield="maxRoomCount"
+                        th:data-sortdir="${sortField=='maxRoomCount' and sortDir=='asc' ? 'asc' : 'desc'}"
+                        onclick="toggleSort(this, event)">객실 수
+                        <span th:if="${sortField=='maxRoomCount'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
+                    </a>
+                </th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="hotel : ${hotelPage.content}"
+                th:onclick="|window.location.href='@{/hotel/{id}(id=${hotel.id})}'|" style="cursor: pointer;">
+                <td th:text="${hotel.id}">1</td>
+                <td th:text="${hotel.name}">호텔명</td>
+                <td th:text="${hotel.description}">설명</td>
+                <td th:text="${hotel.address}">주소</td>
+                <td th:text="${hotel.email}">이메일</td>
+                <td>
+                    <a th:if="${hotel.website}" th:href="${hotel.website}" th:text="${hotel.website}">링크</a>
+                    <span th:if="${hotel.website == null}">-</span>
+                </td>
+                <td th:text="${hotel.hotelType}">HOTEL</td>
+                <td th:text="${hotel.price}">100000</td>
+                <td th:text="${hotel.isActive ? 'Yes' : 'No'}">Yes</td>
+                <td th:text="${hotel.number}">010-0000-0000</td>
+                <td th:text="${hotel.maxRoomCount}">20</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- 3) 페이징 -->
+    <div>
+        <ul style="list-style: none; display: flex; gap: 0.5rem;">
+            <li th:if="${hotelPage.hasPrevious()}">
+                <a th:onclick="|get(${hotelPage.number - 1})|" style="cursor: pointer;">Prev</a>
+            </li>
+            <li th:each="i : ${#numbers.sequence(0, hotelPage.totalPages - 1)}">
+                <a th:onclick="|get(${i})|" th:classappend="${i == hotelPage.number} ? ' active' : ''"
+                    th:text="${i + 1}" style="cursor: pointer;"></a>
+            </li>
+            <li th:if="${hotelPage.hasNext()}">
+                <a th:onclick="|get(${hotelPage.number + 1})|" style="cursor: pointer;">Next</a>
+            </li>
+        </ul>
+    </div>
+
+    <a href="/hotel/new">새 호텔 등록</a>
+
+    <script src="/js/filter.js"></script>
+
+</div>

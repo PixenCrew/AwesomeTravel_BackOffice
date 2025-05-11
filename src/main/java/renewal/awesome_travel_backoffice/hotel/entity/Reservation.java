@@ -1,6 +1,8 @@
 package renewal.awesome_travel_backoffice.hotel.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import renewal.awesome_travel_backoffice.product.entity.Product;
 
 import java.time.LocalDate;
@@ -8,6 +10,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "reservation")
+@Getter
+@Setter
 public class Reservation {
 
     @Id

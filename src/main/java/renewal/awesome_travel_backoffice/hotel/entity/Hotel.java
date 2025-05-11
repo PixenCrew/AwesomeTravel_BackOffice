@@ -32,6 +32,7 @@ public class Hotel {
     @Enumerated(EnumType.STRING)
     private HotelType hotelType;
     private Integer price;
+    private Integer maxRoomCount;
 
     // 패키지에 사용 가능한 호텔 여부
     private Boolean isActive = true; 
