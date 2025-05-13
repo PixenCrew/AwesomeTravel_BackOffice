@@ -49,7 +49,7 @@
                 <input type="file" onchange="uploadImage(this)" />
             </div>
             <button type="button" onclick="addImage()">이미지 추가</button>
-        </fieldset>        
+        </fieldset>
 
         <fieldset>
             <legend>편의시설 선택</legend>
@@ -87,12 +87,13 @@
             const item = document.createElement("div");
             item.classList.add("image-item");
             item.innerHTML = `
+                <input type="text" readonly placeholder="이미지 URL" />
                 <input type="file" onchange="uploadImage(this)" />
                 <button type="button" onclick="removeImage(this)">삭제</button>
             `;
             fieldset.insertBefore(item, fieldset.lastElementChild);
         }
-        
+
         function uploadImage(inputElement) {
             const file = inputElement.files[0];
             if (!file) return;
@@ -100,7 +101,7 @@
             const formData = new FormData();
             formData.append("file", file);
 
-            fetch("/upload/image", {  // 이미지 업로드 엔드포인트
+            fetch("/image", {  // 이미지 업로드 엔드포인트
                 method: "POST",
                 body: formData
             })
@@ -115,8 +116,26 @@
                 });
         }
         function removeImage(btn) {
-            const item = btn.closest(".image-item");
-            item.remove();
+            if (confirm('정말로 삭제하시겠습니까?')) {
+                const item = btn.closest(".image-item");
+                const imageUrlInput = item.querySelector('input[type="text"]');
+                const imageUrl = imageUrlInput.value;
+                // 서버에 DELETE 요청
+
+                fetch(`/image?target=${encodeURIComponent(imageUrl)}`, {
+                    method: 'DELETE'
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('서버에서 삭제 실패');
+                        }
+                        // 요소 제거
+                        item.remove();
+                    })
+                    .catch(error => {
+                        alert('이미지 삭제 실패: ' + error.message);
+                    });
+            }
         }
     </script>
 </div>

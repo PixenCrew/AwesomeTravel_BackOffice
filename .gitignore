@@ -42,3 +42,5 @@ gradle/wrapper/gradle-wrapper.jar
 gradle/wrapper/gradle-wrapper.properties
 certicificate.p12
 src/main/generated/
+
+images/
