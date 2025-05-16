@@ -18,13 +18,12 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    // @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    // @JoinColumn(name = "product_id", nullable = false)
+    // private Product product;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "hotel_id", nullable = false)
-    private Hotel hotel;
+    @Column(name = "hotel_id", nullable = false)
+    private Long hotelId;
 
     @Column(name = "room_count", nullable = false)
     private Long roomCount;
@@ -38,13 +37,13 @@ public class Reservation {
     @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
-    // @Enumerated(EnumType.STRING)
-    // @Column(length = 10, nullable = false)
-    // private Status status;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 10, nullable = false)
+    private Status status;
 
-    // public enum Status {
-    //     BOOKED,
-    //     CANCELLED,
-    //     COMPLETED
-    // }
+    public enum Status {
+        BOOKED,
+        CANCELLED,
+        COMPLETED
+    }
 }

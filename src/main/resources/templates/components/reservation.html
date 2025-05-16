@@ -1,0 +1,56 @@
+<!-- templates/components/hotelReservation.html -->
+<div th:fragment="content">
+
+    <!-- 예약 현황 차트 -->
+    <section class="reservation-chart">
+        <h3>예약 현황 (차트)</h3>
+        <canvas id="reservationChart" width="800" height="400"></canvas>
+    </section>
+
+    <!-- Chart.js and process full reservation object in JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:inline="javascript">
+        // 서버에서 받은 Reservation 객체 배열
+        var reservations = /*[[${reservation}]]*/[];
+
+        // 콘솔에서 확인해 보기
+        console.log(reservations);
+        // 날짜별 roomCount를 위한 데이터 매핑
+        const labels = reservations.map(r => r.startDate); // ["2025-06-01", ...]
+        const roomCounts = reservations.map(r => r.roomCount); // [10, ...]
+
+        const ctx = document.getElementById('reservationChart').getContext('2d');
+        const reservationChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '예약된 방 수',
+                    data: roomCounts,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '방 수'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: '예약 시작 날짜'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+</div>

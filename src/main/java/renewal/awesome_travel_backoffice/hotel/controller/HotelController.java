@@ -108,4 +108,14 @@ public class HotelController {
         
         return ResponseEntity.ok("삭제 완료");
     }
+
+    // 특정 호텔 예약 조회
+    @GetMapping("/{id}/reservation")
+    public String selectHotelReservation(@PathVariable("id") Long id, Model model) {
+        List<Reservation> reservations = reservationRepo.findByHotelId(id);
+        model.addAttribute("reservation", reservations);
+        model.addAttribute("title", "Hotel ID "+id+" Reservation");
+        model.addAttribute("content", "components/reservation");
+        return "layout";
+    }
 }
