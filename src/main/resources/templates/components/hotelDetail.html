@@ -45,11 +45,13 @@
 
         <fieldset id="images-fieldset">
             <legend>이미지</legend>
-            <div class="image-item" th:each="img, stat : *{images}">
-                <input type="file" onchange="uploadImage(this)" />
+            <div class="image-item" th:each="img, iterStat : *{images}">
+                <input type="text" th:field="*{images[__${iterStat.index}__]}" placeholder="이미지 URL" />
+                <button type="button" onclick="removeImage(this)">제거</button>
             </div>
             <button type="button" onclick="addImage()">이미지 추가</button>
         </fieldset>
+
 
         <fieldset>
             <legend>편의시설 선택</legend>
@@ -82,15 +84,34 @@
             }
         }
 
+        // function addImage() {
+        //     const fieldset = document.getElementById("images-fieldset");
+        //     const item = document.createElement("div");
+        //     const index = fieldset.querySelectorAll(".image-item").length;
+
+        //     item.classList.add("image-item");
+        //     item.innerHTML = `
+        //         <input type="text" name="images[${index}]" placeholder="이미지 URL" readonly />
+        //         <input type="file" onchange="uploadImage(this, ${index})" />
+        //         <button type="button" onclick="removeImage(this)">삭제</button>
+        //     `;
+        //     fieldset.insertBefore(item, fieldset.lastElementChild);
+        // }
         function addImage() {
             const fieldset = document.getElementById("images-fieldset");
+
+            // .image-item 개수 → 다음 인덱스
+            const index = fieldset.querySelectorAll(".image-item").length;
+
             const item = document.createElement("div");
             item.classList.add("image-item");
+
             item.innerHTML = `
-                <input type="text" readonly placeholder="이미지 URL" />
+                <input type="text" name="images[${index}]" placeholder="이미지 URL" readonly />
                 <input type="file" onchange="uploadImage(this)" />
                 <button type="button" onclick="removeImage(this)">삭제</button>
             `;
+
             fieldset.insertBefore(item, fieldset.lastElementChild);
         }
 

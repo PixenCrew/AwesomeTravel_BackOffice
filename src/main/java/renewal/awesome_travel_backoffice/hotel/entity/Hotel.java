@@ -38,6 +38,7 @@ public class Hotel {
     private Boolean isActive = true; 
 
     // 이미지 URL들
+    @ElementCollection
     private List<String> images = new ArrayList<>();
 
     // 편의시설 목록
