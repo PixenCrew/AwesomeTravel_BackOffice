@@ -3,8 +3,6 @@ package renewal.awesome_travel_backoffice.admin.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-// @Entity
-// @Table
 @Getter
 @Setter
 public class Admin {
@@ -18,5 +16,8 @@ public class Admin {
 
   @Column
   private String password;
+
+  @Column
+  private Role role;
 
 }
