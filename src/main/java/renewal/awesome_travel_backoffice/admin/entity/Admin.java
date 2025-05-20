@@ -5,19 +5,19 @@ import lombok.*;
 
 @Getter
 @Setter
+@RequiredArgsConstructor
 public class Admin {
     
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long admin_id;
+  private final Long admin_id;
 
   @Column(unique = true)
-  private String id;
+  private final String id;
 
-  @Column
-  private String password;
-
-  @Column
-  private Role role;
+  private final String password;
+  
+  @Enumerated(EnumType.STRING)
+  private final Role role;
 
 }

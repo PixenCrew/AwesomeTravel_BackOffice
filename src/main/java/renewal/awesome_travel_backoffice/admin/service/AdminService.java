@@ -2,6 +2,8 @@ package renewal.awesome_travel_backoffice.admin.service;
 
 import java.util.Map;
 
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -23,20 +25,30 @@ public class AdminService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         System.out.println("admin 테이블 조회");
-        
-        Map<String, Object> adminMap = AdminDataSourceConfig.externalDataSource().queryForMap("SELECT * FROM admin WHERE id = ?", username);
-        Admin admin = new Admin();
-        admin.setId((String) adminMap.get("id"));
-        admin.setPassword((String) adminMap.get("password"));
 
-        // Admin admin = adminRepository.findById(username);
-        if (admin.getId() == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
-
+        try {
+            Map<String, Object> adminMap = AdminDataSourceConfig.externalDataSource().queryForMap("SELECT * FROM admin WHERE id = ?", username);
         return User.builder()
-                .username(admin.getId())
-                .password(passwordEncoder.encode(admin.getPassword())) // 비밀번호 인코딩
+                .username(adminMap.get("id").toString())
+                .password(adminMap.get("password").toString()) // 인코딩된 비밀번호 사용
+                .roles(adminMap.get("role").toString())
                 .build();
+
+        } catch (EmptyResultDataAccessException e) {
+            // 유저가 존재하지 않으면
+            throw new UsernameNotFoundException("User not found with username: " + username, e);
+        } catch (IncorrectResultSizeDataAccessException e) {
+            // 결과가 2개 이상인 경우
+            throw new IllegalStateException("Multiple users found with username: " + username, e);
+        }
+    }
+
+    public void createUser(Admin admin) {
+
+        String hashedPassword = passwordEncoder.encode(admin.getPassword()); // 인코딩된 비밀번호 사용
+        String sql = "INSERT INTO admin (id, password, role) VALUES (?, ?, ?)";
+
+        AdminDataSourceConfig.externalDataSource().update(sql, admin.getId(), hashedPassword, admin.getRole().name());
+
     }
 }

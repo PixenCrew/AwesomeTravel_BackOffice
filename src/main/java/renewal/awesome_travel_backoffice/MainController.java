@@ -2,6 +2,7 @@ package renewal.awesome_travel_backoffice;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.security.core.Authentication;
@@ -9,11 +10,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 
 import lombok.RequiredArgsConstructor;
+import renewal.awesome_travel_backoffice.admin.entity.Admin;
+import renewal.awesome_travel_backoffice.admin.service.AdminService;
 
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("/")
 public class MainController {
+
+    private final AdminService adminService;
 
     // 로그인 페이지
     @GetMapping("/login")
@@ -30,4 +35,13 @@ public class MainController {
         return "layout";
     }
     
+    // TEST 테스트용 가입 TEST
+    @PostMapping("/admin")
+    public String newAdmin(Admin admin) {
+        System.out.println(admin.getId());
+        System.out.println(admin.getPassword());
+        System.out.println(admin.getRole());
+        adminService.createUser(admin);
+        return "redirect:/login";
+    }
 }

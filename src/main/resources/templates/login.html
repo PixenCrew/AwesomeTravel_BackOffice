@@ -22,5 +22,24 @@
     <div>
         <p style="color:red;" th:if="${param.error}">Invalid username or password.</p>
     </div>
+
+    <br>
+    <h1>TEST 계정생성 TEST</h1>
+    <form method="post" action="/admin">
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" id="id" name="id" required value="admin">
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required value="admin">
+        </div>
+        <div>
+            <label for="role">Role:</label>
+            <input type="radio" value="ADMIN" id="role2" name="role" checked="checked">ADMIN
+            <input type="radio" value="SERVICE" id="role1" name="role">SERVICE
+        </div>
+        <button type="submit">Login</button>
+    </form>
 </body>
 </html>
