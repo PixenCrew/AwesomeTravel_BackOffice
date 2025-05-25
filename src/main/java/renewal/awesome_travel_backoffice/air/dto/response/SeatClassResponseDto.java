@@ -9,8 +9,8 @@ import renewal.awesome_travel_backoffice.air.utiles.SeatClassType;
 public class SeatClassResponseDto {
     private Long id;
     private SeatClassType classType;
-    private Integer price;
-    private Integer maxSeats;
-    private Integer availableSeats;
+    private Long price;
+    private Long maxSeats;
+    private Long availableSeats;
 }
 

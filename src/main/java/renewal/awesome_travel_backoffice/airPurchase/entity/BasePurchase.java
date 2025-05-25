@@ -23,7 +23,7 @@ public abstract class BasePurchase {
 
 
     @Column(nullable = false)
-    protected Integer price; //결제금액
+    protected Long price; //결제금액
 
     @Column(nullable = false)
     protected Long member_id; //구매자
@@ -43,7 +43,7 @@ public abstract class BasePurchase {
     @Column
     protected LocalDateTime paymentDueDate; //결제기한
 
-    public BasePurchase(Integer price, Long member_id, String name, String number, String email, LocalDateTime purchaseDate, LocalDateTime paymentDueDate) {
+    public BasePurchase(Long price, Long member_id, String name, String number, String email, LocalDateTime purchaseDate, LocalDateTime paymentDueDate) {
         this.price = price;
         this.member_id = member_id;
         this.name = name;

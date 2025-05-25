@@ -8,8 +8,8 @@ public class HotelFilterDTO {
     private String name;
     private String address;
     private String email;
-    private Integer minPrice;
-    private Integer maxPrice;
+    private Long minPrice;
+    private Long maxPrice;
     private HotelType hotelType;
     private Boolean isActive;
 }

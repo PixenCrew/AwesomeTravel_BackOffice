@@ -3,11 +3,13 @@ package renewal.awesome_travel_backoffice.air.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import renewal.awesome_travel_backoffice.air.utiles.SeatClassType;
 
 @Entity
 @NoArgsConstructor
 @Getter
+@Setter
 @Table(name = "SeatClass")
 public class SeatClass {
 
@@ -25,28 +27,29 @@ public class SeatClass {
     private SeatClassType classType; // 좌석 등급
 
     @Column(nullable = false)
-    private Integer price; // 해당 등급의 가격
+    private Long price; // 해당 등급의 가격
 
     @Column(nullable = false)
-    private Integer maxSeats; // 해당 등급의 최대 좌석 수
+    private Long maxSeats; // 해당 등급의 최대 좌석 수
 
     @Column(nullable = false)
-    private Integer availableSeats; // 잔여 좌석 수
+    private Long availableSeats; // 잔여 좌석 수
 
-    public SeatClass(SeatClassType classType, Integer price, Integer maxSeats, Integer availableSeats) {
+    public SeatClass(Air air, SeatClassType classType, Long price, Long maxSeats, Long availableSeats) {
+        this.air = air;
         this.classType = classType;
         this.price = price;
         this.maxSeats = maxSeats;
         this.availableSeats = availableSeats;
     }
 
-    public void updateSeatClass(Integer price, Integer maxSeats, Integer availableSeats) {
+    public void updateSeatClass(Long price, Long maxSeats, Long availableSeats) {
         if (price != null) this.price = price;
         if (maxSeats != null) this.maxSeats = maxSeats;
         if (availableSeats != null) this.availableSeats = availableSeats;
     }
 
-    public void update(SeatClassType classType, Integer price, Integer maxSeats, Integer availableSeats) {
+    public void update(SeatClassType classType, Long price, Long maxSeats, Long availableSeats) {
         this.classType = classType;
         this.price = price;
         this.maxSeats = maxSeats;

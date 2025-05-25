@@ -21,7 +21,7 @@ public class AirPurchaseResponseDto {
 
     private PurchaseStatus status;
 
-    private Integer price;
+    private Long price;
 
     private Long member_id;
 

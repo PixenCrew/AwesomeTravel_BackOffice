@@ -37,6 +37,7 @@ public class SeatClassService {
         }
 
         SeatClass seatClass = new SeatClass(
+                air,
                 dto.getClassType(),
                 dto.getPrice(),
                 dto.getMaxSeats(),

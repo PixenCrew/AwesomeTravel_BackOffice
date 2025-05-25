@@ -23,7 +23,7 @@ public class AirPurchase extends BasePurchase {
     @OneToMany(mappedBy = "airPurchase", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AirPassenger> airPassengers = new ArrayList<>();
 
-    public AirPurchase(SeatClass seatClass, Integer price, Long member_id, String name, String number, String email, LocalDateTime purchaseDate, LocalDateTime paymentDueDate) {
+    public AirPurchase(SeatClass seatClass, Long price, Long member_id, String name, String number, String email, LocalDateTime purchaseDate, LocalDateTime paymentDueDate) {
         super(price, member_id, name, number, email, purchaseDate, paymentDueDate);
         this.seatClass = seatClass;
 

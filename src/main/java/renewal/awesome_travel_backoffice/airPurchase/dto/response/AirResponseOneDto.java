@@ -26,7 +26,7 @@ public class AirResponseOneDto {
     // 단일 좌석 정보
     private Long seatClassId;
     private SeatClassType seatClassType;
-    private Integer price;
-    private Integer availableSeats;
+    private Long price;
+    private Long availableSeats;
 }
 

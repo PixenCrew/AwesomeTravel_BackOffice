@@ -3,6 +3,7 @@ package renewal.awesome_travel_backoffice.air.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import renewal.awesome_travel_backoffice.air.utiles.AirStatus;
 import renewal.awesome_travel_backoffice.air.utiles.FlightType;
 import renewal.awesome_travel_backoffice.config.AuditingFields;
@@ -13,6 +14,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @Getter
+@Setter
 @Table(name = "Air")
 public class Air extends AuditingFields {
 
@@ -41,7 +43,7 @@ public class Air extends AuditingFields {
     private String arrive_time;
 
     @Column(nullable = false)
-    private Integer stopovers; // 경유 횟수 (0 = 직항, 1 이상 = 경유)
+    private Integer stopovers = 0; // 경유 횟수 (0 = 직항, 1 이상 = 경유)
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -49,7 +51,7 @@ public class Air extends AuditingFields {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private FlightType flightType;
+    private FlightType flightType = FlightType.DIRECT;
 
     @OneToMany(mappedBy = "air", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SeatClass> seatClasses = new ArrayList<>();
@@ -89,41 +91,41 @@ public class Air extends AuditingFields {
         this.flightType = flightType;
     }
 
-    public void setCode(String code) {
-        this.code = code;
-    }
+    // public void setCode(String code) {
+    //     this.code = code;
+    // }
 
-    public void setAirline(Airline airline) {
-        this.airline = airline;
-    }
+    // public void setAirline(Airline airline) {
+    //     this.airline = airline;
+    // }
 
-    public void setDepart(String depart) {
-        this.depart = depart;
-    }
+    // public void setDepart(String depart) {
+    //     this.depart = depart;
+    // }
 
-    public void setDepart_time(String depart_time) {
-        this.depart_time = depart_time;
-    }
+    // public void setDepart_time(String depart_time) {
+    //     this.depart_time = depart_time;
+    // }
 
-    public void setArrive(String arrive) {
-        this.arrive = arrive;
-    }
+    // public void setArrive(String arrive) {
+    //     this.arrive = arrive;
+    // }
 
-    public void setArrive_time(String arrive_time) {
-        this.arrive_time = arrive_time;
-    }
+    // public void setArrive_time(String arrive_time) {
+    //     this.arrive_time = arrive_time;
+    // }
 
-    public void setStopovers(Integer stopovers) {
-        this.stopovers = stopovers;
-    }
+    // public void setStopovers(Integer stopovers) {
+    //     this.stopovers = stopovers;
+    // }
 
-    public void setFlightType(FlightType flightType) {
-        this.flightType = flightType;
-    }
+    // public void setFlightType(FlightType flightType) {
+    //     this.flightType = flightType;
+    // }
 
-    public void updateStatus(AirStatus newStatus) {
-        this.status = newStatus;
-    }
+    // public void updateStatus(AirStatus newStatus) {
+    //     this.status = newStatus;
+    // }
 
     public void addSeatClass(SeatClass seatClass) {
         this.seatClasses.add(seatClass);

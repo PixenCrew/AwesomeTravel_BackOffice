@@ -15,6 +15,7 @@ import renewal.awesome_travel_backoffice.air.dto.response.SeatClassResponseDto;
 import renewal.awesome_travel_backoffice.air.entity.Air;
 import renewal.awesome_travel_backoffice.air.entity.Airline;
 import renewal.awesome_travel_backoffice.air.entity.QAir;
+import renewal.awesome_travel_backoffice.air.entity.SeatClass;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -88,15 +89,16 @@ public class AirRepositoryCustomImpl implements AirRepositoryCustom {
     }
 
     private AirResponseDto toDto(Air air) {
-        List<SeatClassResponseDto> seatDtos = air.getSeatClasses().stream()
-                .map(seat -> SeatClassResponseDto.builder()
-                        .id(seat.getId())
-                        .classType(seat.getClassType())
-                        .price(seat.getPrice())
-                        .maxSeats(seat.getMaxSeats())
-                        .availableSeats(seat.getAvailableSeats())
-                        .build())
-                .collect(Collectors.toList());
+        // List<SeatClass> seatDtos = air.getSeatClasses().stream()
+        //         .map(seat -> SeatClass.builder()
+        //                 .id(seat.getId())
+        //                 .classType(seat.getClassType())
+        //                 .price(seat.getPrice())
+        //                 .maxSeats(seat.getMaxSeats())
+        //                 .availableSeats(seat.getAvailableSeats())
+        //                 .build())
+        //         .collect(Collectors.toList());        
+        List<SeatClass> seatDtos = air.getSeatClasses();
 
         Airline airline = air.getAirline();
 

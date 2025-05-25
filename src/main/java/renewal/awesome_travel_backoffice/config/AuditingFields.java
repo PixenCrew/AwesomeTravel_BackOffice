@@ -4,6 +4,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
+import lombok.Setter;
+
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -14,6 +16,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 @EntityListeners(AuditingEntityListener.class)
 @MappedSuperclass
 public class AuditingFields {
@@ -25,14 +28,14 @@ public class AuditingFields {
 
     @CreatedBy
     @Column(nullable = false, updatable = false, length = 100)
-    private String cratedBy; //생성자
+    private String createdBy; //생성자
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @LastModifiedDate
-    @Column(nullable = false)
+    @Column(nullable = true)
     private LocalDateTime modifiedAt; //수정일시
 
     @LastModifiedBy
-    @Column(nullable = false, length = 100)
+    @Column(nullable = true, length = 100)
     private String modifiedBy;
 }

@@ -1,27 +1,129 @@
 package renewal.awesome_travel_backoffice.air.controller;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Sort;
+
+import renewal.awesome_travel_backoffice.air.dto.AirFilterDTO;
 import renewal.awesome_travel_backoffice.air.dto.request.AirRequestDto;
 import renewal.awesome_travel_backoffice.air.dto.request.AirSearchRequestDto;
+import renewal.awesome_travel_backoffice.air.dto.request.SeatClassRequestDto;
 import renewal.awesome_travel_backoffice.air.dto.response.AirResponseDto;
+import renewal.awesome_travel_backoffice.air.entity.Air;
+import renewal.awesome_travel_backoffice.air.entity.Airline;
+import renewal.awesome_travel_backoffice.air.entity.SeatClass;
+import renewal.awesome_travel_backoffice.air.repository.AirRepository;
 import renewal.awesome_travel_backoffice.air.service.AirService;
 import renewal.awesome_travel_backoffice.air.utiles.AirStatus;
+import renewal.awesome_travel_backoffice.air.utiles.SeatClassType;
+import renewal.awesome_travel_backoffice.hotel.entity.Hotel;
 
-@RestController
-@RequestMapping("/admin/air")
+@Controller
+@RequestMapping("/air")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
 public class AirController {
 
     private final AirService airService;
+    private final AirRepository airRepository;
 
-    @PostMapping
-    public ResponseEntity<AirResponseDto> createAir(@RequestBody AirRequestDto dto) {
-        return ResponseEntity.ok(airService.createAir(dto));
+    // 항공 목록
+    @GetMapping
+    // @PreAuthorize("hasRole('ADMIN')")
+    public String listAndFilter(
+            @ModelAttribute("filter") AirFilterDTO filter, // 필터 DTO를 바인딩
+            @RequestParam(defaultValue = "0") int page, // 페이지 번호
+            @RequestParam(defaultValue = "id") String sortField,
+            @RequestParam(defaultValue = "asc") String sortDir,
+            Model model) {
+        // 1) 정렬 객체 설정
+        Sort sort = sortDir.equalsIgnoreCase("asc")
+        ? Sort.by(sortField).ascending()
+        : Sort.by(sortField).descending();
+
+        // 1) 회사 목록 (체크박스용)
+        List<String> allAirlines = airService.getAllCompanies();
+        model.addAttribute("allAirlines", allAirlines);
+
+        // 2) 페이징(10개 고정) + 필터링 로직
+        Pageable pageable = PageRequest.of(page, 10, sort);
+        Page<Air> airPage = airService.searchAirs(filter, pageable);
+
+        // 3) View에서 쓸 속성들
+        model.addAttribute("airPage", airPage);
+        model.addAttribute("airList", airPage.getContent());
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDir", sortDir);
+        model.addAttribute("title", "Air List");
+        model.addAttribute("content", "components/air"); // layout 안에서 이 fragment를 렌더
+
+        return "layout";
+    }
+
+    @GetMapping("/new")
+    public String newAir(Model model) {
+
+        // 빈 Air 객체
+        Air air = new Air();
+
+        // 빈 Airline 객체
+        air.setAirline(new Airline());
+        // 빈 SeatClasses 배열
+        for (SeatClassType seat : SeatClassType.values()) {
+            // SeatClass 종류만큼 SeatClass 객체 추가
+            air.getSeatClasses().add(new SeatClass(air, seat, 0L, 0L, 0L));
+        }
+        model.addAttribute("air", air);
+        model.addAttribute("title", "New Air");
+        model.addAttribute("content", "components/airDetail"); // layout 안에서 이 fragment를 렌더
+
+        return "layout";
+    }
+
+    @PostMapping("/new")
+    public String createAir(@ModelAttribute Air air, Authentication authentication, Model model) {
+        String username = authentication.getName();
+        air.setCreatedBy(username);
+        System.out.println(air.getAirline().getCode());
+        airService.createAir(air);
+
+        model.addAttribute("title", "Air List");
+        model.addAttribute("content", "components/air"); // layout 안에서 이 fragment를 렌더
+        return "layout";
+    }
+
+    @GetMapping("/{id}")
+    public String selectAir(@PathVariable("id") Long id, Model model) {
+        Air air = airRepository.getReferenceById(id);
+
+        model.addAttribute("air", air);
+        model.addAttribute("title", "Air Detail");
+        model.addAttribute("content", "components/airDetail"); // layout 안에서 이 fragment를 렌더
+
+        return "layout";
+    }
+
+    @PostMapping("/{id}")
+    public String modifyAir(@ModelAttribute Air air, Authentication authentication, Model model) {
+        String username = authentication.getName();
+        air.setModifiedBy(username);
+        for (SeatClass seat : air.getSeatClasses()) {
+            seat.setAir(air);
+        }
+        airRepository.save(air);
+
+        model.addAttribute("title", "Air List");
+        model.addAttribute("content", "components/air"); // layout 안에서 이 fragment를 렌더
+        return "layout";
     }
 
     @GetMapping("/search")

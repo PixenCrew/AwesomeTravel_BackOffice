@@ -1,0 +1,84 @@
+<div th:fragment="content">
+    <h1 th:text="${air.id == null} ? '항공 등록' : '항공 상세' "></h1>
+
+    <form th:object="${air}" th:action="${air.id == null} ? @{/air/new} : @{/air/{id}(id=${air.id})}" method="post">
+
+        <div th:if="${air.id != null}">
+            <label>ID:</label>
+            <input type="text" th:field="*{id}" readonly /><br>
+        </div>
+
+        <div>
+            <label>항공편 코드:</label>
+            <input type="text" th:field="*{code}" required />
+        </div>
+
+        <div>
+            <label>항공사 코드:</label>
+            <input type="text" th:field="*{airline.code}" required />
+        </div>
+
+        <div>
+            <label>출발지:</label>
+            <input type="text" th:field="*{depart}" required />
+        </div>
+
+        <div>
+            <label>출발 시간:</label>
+            <input type="time" th:field="*{depart_time}" required />
+        </div>
+
+        <div>
+            <label>도착지:</label>
+            <input type="text" th:field="*{arrive}" required />
+        </div>
+
+        <div>
+            <label>도착 시간:</label>
+            <input type="time" th:field="*{arrive_time}" required />
+        </div>
+
+        <div>
+            <label>경유 횟수:</label>
+            <input type="number" th:field="*{stopovers}" min="0" />
+        </div>
+
+        <div>
+            <label>상태:</label>
+            <select th:field="*{status}">
+                <option value="ACTIVE">활성</option>
+                <option value="INACTIVE">비활성</option>
+            </select>
+        </div>
+
+        <div>
+            <label>비행 유형:</label>
+            <select th:field="*{flightType}">
+                <option value="DIRECT">직항</option>
+                <option value="INDIRECT">경유</option>
+            </select>
+        </div>
+
+        <hr />
+
+        <h3>좌석 등급 정보</h3>
+
+        <div th:each="seat, iterStat : ${air.seatClasses}">
+            <label>등급:</label>
+            <input type="text" th:field="*{seatClasses[__${iterStat.index}__].classType}" readonly />
+
+            <label>가격:</label>
+            <input type="number" th:field="*{seatClasses[__${iterStat.index}__].price}" min="0" required />
+
+            <label>최대 좌석 수:</label>
+            <input type="number" th:field="*{seatClasses[__${iterStat.index}__].maxSeats}" min="0" required />
+
+            <label>잔여 좌석 수:</label>
+            <input type="number" th:field="*{seatClasses[__${iterStat.index}__].availableSeats}" min="0" required />
+        </div>
+
+        <button type="submit">등록</button>
+    </form>
+
+
+</div>
