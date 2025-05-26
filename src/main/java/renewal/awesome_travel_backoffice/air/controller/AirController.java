@@ -114,16 +114,12 @@ public class AirController {
 
     @PostMapping("/{id}")
     public String modifyAir(@ModelAttribute Air air, Authentication authentication, Model model) {
-        String username = authentication.getName();
-        air.setModifiedBy(username);
         for (SeatClass seat : air.getSeatClasses()) {
             seat.setAir(air);
         }
         airRepository.save(air);
 
-        model.addAttribute("title", "Air List");
-        model.addAttribute("content", "components/air"); // layout 안에서 이 fragment를 렌더
-        return "layout";
+        return "redirect:/air";
     }
 
     @GetMapping("/search")
