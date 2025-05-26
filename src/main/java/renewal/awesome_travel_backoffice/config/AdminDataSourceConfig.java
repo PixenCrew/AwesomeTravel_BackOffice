@@ -8,7 +8,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 @Configuration
 public class AdminDataSourceConfig {
 
-    @Bean
+    @Bean("adminJdbcTemplate")
     public JdbcTemplate externalDataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setUrl("jdbc:mariadb://127.0.0.1:3306/admin");
