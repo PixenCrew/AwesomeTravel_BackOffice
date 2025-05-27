@@ -24,6 +24,7 @@ import renewal.awesome_travel_backoffice.air.entity.SeatClass;
 import renewal.awesome_travel_backoffice.air.repository.AirRepository;
 import renewal.awesome_travel_backoffice.air.service.AirService;
 import renewal.awesome_travel_backoffice.air.utiles.AirStatus;
+import renewal.awesome_travel_backoffice.air.utiles.FlightType;
 import renewal.awesome_travel_backoffice.air.utiles.SeatClassType;
 
 @Controller
@@ -92,10 +93,14 @@ public class AirController {
     }
 
     @PostMapping("/new")
-    public String createAir(@ModelAttribute Air air, Authentication authentication, Model model) {
-        String username = authentication.getName();
-        air.setCreatedBy(username);
-        System.out.println(air.getAirline().getCode());
+    public String createAir(@ModelAttribute Air air, Model model) {
+        // 경유 횟수로 비행 타입 지정
+        if (air.getStopovers()==0) {
+            air.setFlightType(FlightType.DIRECT);
+        }else {
+            air.setFlightType(FlightType.STOP_OVER);
+        }
+
         airService.createAir(air);
 
         return "redirect:/air";
@@ -117,6 +122,14 @@ public class AirController {
 
     @PostMapping("/{id}")
     public String modifyAir(@ModelAttribute Air air, Authentication authentication, Model model) {
+        // 경유 횟수로 비행 타입 지정
+        if (air.getStopovers()==0) {
+            air.setFlightType(FlightType.DIRECT);
+        }else {
+            air.setFlightType(FlightType.STOP_OVER);
+        }
+
+        // seatClass 지정
         for (SeatClass seat : air.getSeatClasses()) {
             seat.setAir(air);
         }

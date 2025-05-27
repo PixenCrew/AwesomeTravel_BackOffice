@@ -57,10 +57,11 @@
 
         <div>
             <label>비행 유형:</label>
-            <select th:field="*{flightType}">
+            <!-- <select th:field="*{flightType}">
                 <option value="DIRECT">직항</option>
                 <option value="INDIRECT">경유</option>
-            </select>
+            </select> -->
+            <input type="text" th:field="*{flightType}" readonly/>
         </div>
 
         <hr />
