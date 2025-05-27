@@ -29,7 +29,7 @@
 
         <div>
             <label>출발 시간:</label>
-            <input type="time" th:field="*{depart_time}" required />
+            <input type="datetime-local" th:field="*{depart_time}" required />
         </div>
 
         <div>
@@ -39,7 +39,7 @@
 
         <div>
             <label>도착 시간:</label>
-            <input type="time" th:field="*{arrive_time}" required />
+            <input type="datetime-local" th:field="*{arrive_time}" required />
         </div>
 
         <div>
@@ -81,7 +81,7 @@
             <input type="number" th:field="*{seatClasses[__${iterStat.index}__].availableSeats}" min="0" required />
         </div>
 
-        <button type="submit">등록</button>
+        <button type="submit" th:text="${air.id == null} ? '등록' : '수정' "></button>
     </form>
 
     <button th:if="${air.id != null}" th:onclick="deleteAir([[${air.id}]])">삭제</button>
