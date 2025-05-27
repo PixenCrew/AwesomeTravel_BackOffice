@@ -82,6 +82,10 @@ public class AirController {
             // SeatClass 종류만큼 SeatClass 객체 추가
             air.getSeatClasses().add(new SeatClass(air, seat, 0L, 0L, 0L));
         }
+
+        // 회사 목록 (드롭박스용)
+        List<String> allAirlines = airService.getAllCompanies();
+        model.addAttribute("allAirlines", allAirlines);
         model.addAttribute("air", air);
         model.addAttribute("title", "New Air");
         model.addAttribute("content", "components/airDetail"); // layout 안에서 이 fragment를 렌더
@@ -104,7 +108,10 @@ public class AirController {
     @GetMapping("/{id}")
     public String selectAir(@PathVariable("id") Long id, Model model) {
         Air air = airRepository.getReferenceById(id);
-
+        
+        // 회사 목록 (드롭박스용)
+        List<String> allAirlines = airService.getAllCompanies();
+        model.addAttribute("allAirlines", allAirlines);
         model.addAttribute("air", air);
         model.addAttribute("title", "Air Detail");
         model.addAttribute("content", "components/airDetail"); // layout 안에서 이 fragment를 렌더
@@ -148,6 +155,6 @@ public class AirController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAir(@PathVariable Long id) {
         airService.deleteAir(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 }

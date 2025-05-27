@@ -14,8 +14,12 @@
         </div>
 
         <div>
-            <label>항공사 코드:</label>
-            <input type="text" th:field="*{airline.code}" required />
+            <label for="airlineCode">항공사 코드:</label>
+            <select id="airlineCode" th:field="*{airline.code}" required>
+                <option value="" disabled>-- 항공사 선택 --</option>
+                <option th:each="code : ${allAirlines}" th:value="${code}" th:text="${code}">
+                </option>
+            </select>
         </div>
 
         <div>
@@ -80,5 +84,21 @@
         <button type="submit">등록</button>
     </form>
 
+    <button th:if="${air.id != null}" th:onclick="deleteAir([[${air.id}]])">삭제</button>
 
+    <script>
+        function deleteAir(id) {
+            if (confirm('정말로 삭제하시겠습니까?')) {
+                fetch('/air/' + id, { method: 'DELETE' })
+                    .then(res => {
+                        if (res.ok) {
+                            alert('삭제 성공');
+                            window.location.href = '/air';
+                        } else {
+                            alert('삭제 실패');
+                        }
+                    });
+            }
+        }
+    </script>
 </div>
