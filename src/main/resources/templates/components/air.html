@@ -39,9 +39,28 @@
         <br />
 
         <!-- 경유지 수 -->
-        <label>경유지 수:</label>
-        <input type="number" th:field="*{stopovers}" min="0" />
+        <label>경유지 수 최소:</label>
+        <input type="number" th:field="*{minStopovers}" min="0" />
+        <label>경유지 수 최대:</label>
+        <input type="number" th:field="*{maxStopovers}" min="1" />
         <br />
+
+        <!-- 유아좌석 -->
+        <div>
+            <span>유아 좌석 필요 여부:</span>
+
+            <!-- 1) 선택 안 함 (null) -->
+            <input type="radio" th:field="*{infantSeatsRequired}" value="" id="infant-none"/>
+            <label for="infant-none">선택 안 함</label>
+
+            <!-- 2) 필요 (true) -->
+            <input type="radio" th:field="*{infantSeatsRequired}" value="true" id="infant-yes" />
+            <label for="infant-yes">필요</label>
+
+            <!-- 3) 불필요 (false) -->
+            <input type="radio" th:field="*{infantSeatsRequired}" value="false" id="infant-no" />
+            <label for="infant-no">불필요</label>
+        </div>
 
         <!-- 좌석 수 범위
         <label>최소 좌석 수:</label>
@@ -67,9 +86,14 @@
 
         <!-- 가격 범위 -->
         <label>최소 가격:</label>
-        <input type="number" step="0.01" th:field="*{minPrice}" />
+        <input type="number" th:field="*{minPrice}" />
         <label>최대 가격:</label>
-        <input type="number" step="0.01" th:field="*{maxPrice}" />
+        <input type="number" th:field="*{maxPrice}" />
+        <br />
+
+        <!-- 잔여 좌석 -->
+        <label>잔여 좌석:</label>
+        <input type="number" th:field="*{availableSeats}" />
         <br />
 
         <!-- 검색 버튼 -->
@@ -88,6 +112,7 @@
         <thead>
             <tr>
                 <th>ID</th>
+                <th>출발지</th>
                 <th>
                     <a href="#" data-sortfield="departDate"
                         th:data-sortdir="${sortField=='departDate' and sortDir=='asc' ? 'asc' : 'desc'}"
@@ -96,6 +121,7 @@
                         <span th:if="${sortField=='departDate'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
                     </a>
                 </th>
+                <th>도착지</th>
                 <th>
                     <a href="#" data-sortfield="arriveDate"
                         th:data-sortdir="${sortField=='arriveDate' and sortDir=='asc' ? 'asc' : 'desc'}"
@@ -131,7 +157,9 @@
                 <tr th:each="seatClass : ${air.seatClasses}"
                     th:onclick="|window.location.href='@{/air/{id}(id=${air.id})}'|" style="cursor:pointer;">
                     <td th:text="${air.id}">1</td>
+                    <td th:text="${air.depart}">1</td>
                     <td th:text="${air.depart_time}">2025-01-01</td>
+                    <td th:text="${air.arrive}">1</td>
                     <td th:text="${air.arrive_time}">2025-01-02</td>
                     <td th:text="${air.code}">AB123</td>
                     <td th:text="${air.airline.code}">AAA</td>

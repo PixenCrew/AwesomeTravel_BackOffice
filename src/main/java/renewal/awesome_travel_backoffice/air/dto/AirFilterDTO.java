@@ -20,7 +20,9 @@ public class AirFilterDTO {
     private LocalDate arriveDateTo;
     private String depart;
     private String arrive;
-    private Long stopovers;
+    private Long minStopovers;
+    private Long maxStopovers;
+    private Boolean infantSeatsRequired;
     private Long startCount;
     private Long endCount;
     private FlightType flightType;
@@ -29,4 +31,5 @@ public class AirFilterDTO {
     // SeatClasses 검색
     private BigDecimal minPrice;
     private BigDecimal maxPrice;
+    private Long availableSeats;
 }

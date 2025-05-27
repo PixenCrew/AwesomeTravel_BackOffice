@@ -218,6 +218,11 @@ public class AirService {
             spec = spec.and(AirSpecification.airlinesIn(filter.getArilines()));
         }
 
+        // infantSeatsRequired
+        if (filter.getInfantSeatsRequired() != null) {
+            spec = spec.and(AirSpecification.getInfantSeatsRequired(filter.getInfantSeatsRequired()));
+        }
+
         // departDate BETWEEN from AND to
         if (filter.getDepartDateFrom() != null || filter.getDepartDateTo() != null) {
             spec = spec.and(AirSpecification.departDateBetween(
@@ -240,9 +245,15 @@ public class AirService {
             spec = spec.and(AirSpecification.arriveEquals(filter.getArrive()));
         }
 
-        // stopovers == value
-        if (filter.getStopovers() != null) {
-            spec = spec.and(AirSpecification.stopoversEquals(filter.getStopovers()));
+        // // stopovers == value
+        // if (filter.getStopovers() != null) {
+        //     spec = spec.and(AirSpecification.stopoversEquals(filter.getStopovers()));
+        // }
+
+        // stopovers BETWEEN from AND to
+        if (filter.getMinStopovers() != null || filter.getMaxStopovers() != null) {
+            spec = spec.and(AirSpecification.stopoversBetween(
+                filter.getMinStopovers(), filter.getMaxStopovers()));
         }
 
         // // seatCount BETWEEN min AND max
@@ -265,6 +276,11 @@ public class AirService {
         if (filter.getMinPrice() != null || filter.getMaxPrice() != null) {
             spec = spec.and(AirSpecification.priceBetween(
                 filter.getMinPrice(), filter.getMaxPrice()));
+        }
+
+        // seatClasses.availableSeats min
+        if (filter.getAvailableSeats() != null) {
+            spec = spec.and(AirSpecification.availableSeatsMore(filter.getAvailableSeats()));
         }
 
         return airRepository.findAll(spec, pageable);
