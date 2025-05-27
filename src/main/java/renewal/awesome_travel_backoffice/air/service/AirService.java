@@ -25,9 +25,6 @@ import renewal.awesome_travel_backoffice.air.repository.AirSpecification;
 import renewal.awesome_travel_backoffice.air.repository.AirlineRepository;
 import renewal.awesome_travel_backoffice.air.repository.SeatClassRepository;
 import renewal.awesome_travel_backoffice.air.utiles.AirStatus;
-import renewal.awesome_travel_backoffice.tour.dto.TourFilterDTO;
-import renewal.awesome_travel_backoffice.tour.entity.Tour;
-import renewal.awesome_travel_backoffice.tour.repository.TourSpecification;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +37,7 @@ public class AirService {
     private final AirRepositoryCustomImpl airRepositoryCustom;
 
     @Transactional
-    public AirResponseDto createAir(Air air) {
+    public void createAir(Air air) {
         if (airRepository.existsByCode(air.getCode())) {
             throw new IllegalArgumentException("중복된 항공편 코드입니다.");
         }
@@ -75,8 +72,9 @@ public class AirService {
             seat.setAir(air);
         }
 
-        Air saved = airRepository.save(air);
-        return toDto(saved);
+        airRepository.save(air);
+        // Air saved = airRepository.save(air);
+        // return toDto(saved);
     }
     public List<String> getAllCompanies() {
             return airlineRepository.findDistinctAirlines();

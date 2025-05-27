@@ -17,7 +17,6 @@ import org.springframework.data.domain.Sort;
 import renewal.awesome_travel_backoffice.air.dto.AirFilterDTO;
 import renewal.awesome_travel_backoffice.air.dto.request.AirRequestDto;
 import renewal.awesome_travel_backoffice.air.dto.request.AirSearchRequestDto;
-import renewal.awesome_travel_backoffice.air.dto.request.SeatClassRequestDto;
 import renewal.awesome_travel_backoffice.air.dto.response.AirResponseDto;
 import renewal.awesome_travel_backoffice.air.entity.Air;
 import renewal.awesome_travel_backoffice.air.entity.Airline;
@@ -26,7 +25,6 @@ import renewal.awesome_travel_backoffice.air.repository.AirRepository;
 import renewal.awesome_travel_backoffice.air.service.AirService;
 import renewal.awesome_travel_backoffice.air.utiles.AirStatus;
 import renewal.awesome_travel_backoffice.air.utiles.SeatClassType;
-import renewal.awesome_travel_backoffice.hotel.entity.Hotel;
 
 @Controller
 @RequestMapping("/air")
@@ -100,9 +98,7 @@ public class AirController {
         System.out.println(air.getAirline().getCode());
         airService.createAir(air);
 
-        model.addAttribute("title", "Air List");
-        model.addAttribute("content", "components/air"); // layout 안에서 이 fragment를 렌더
-        return "layout";
+        return "redirect:/air";
     }
 
     @GetMapping("/{id}")
