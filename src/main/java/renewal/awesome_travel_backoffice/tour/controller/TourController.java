@@ -19,11 +19,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
 import lombok.RequiredArgsConstructor;
+import renewal.awesome_travel_backoffice.code.CountryCodeRepository;
 import renewal.awesome_travel_backoffice.tour.TourService;
 import renewal.awesome_travel_backoffice.tour.dto.TourFilterDTO;
-import renewal.awesome_travel_backoffice.tour.entity.Point;
+import renewal.awesome_travel_backoffice.tour.entity.Location;
 import renewal.awesome_travel_backoffice.tour.entity.Tour;
 import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
+import renewal.awesome_travel_backoffice.tour.utiles.Type;
 
 @RequiredArgsConstructor
 @RequestMapping("/tour")
@@ -31,6 +33,7 @@ import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
 public class TourController {
 
     private final TourRepository tourRepo;
+    private final CountryCodeRepository countryRepo;
     private final TourService tourService;
 
     // 투어 목록
@@ -82,11 +85,14 @@ public class TourController {
     public String newTravel(Model model) {
 
         Tour blank = new Tour();
-        Point defaultPoint = new Point();
-        defaultPoint.setLocation("");
-        defaultPoint.setEnddate(null);
-        blank.getCourse().add(defaultPoint);
-
+        Location defaultLocation = new Location();
+        defaultLocation.setCountry(null);
+        defaultLocation.setDate(null);
+        defaultLocation.setType(Type.POINT);
+        blank.getLocations().add(defaultLocation);
+        
+        model.addAttribute("types", Type.values());
+        model.addAttribute("countryCode", countryRepo.findAll());
         model.addAttribute("tour", blank);
         model.addAttribute("title", "New Tour");
         model.addAttribute("content", "components/tourDetail");
@@ -98,7 +104,7 @@ public class TourController {
     @PostMapping("/new")
     public String submitTravel(@ModelAttribute Tour tour) {
         // 모든 Point 객체에 tour 참조를 세팅
-        tour.getCourse().forEach(point -> point.setTour(tour));
+        tour.getLocations().forEach(point -> point.setTour(tour));
 
         tourRepo.save(tour);
 
@@ -110,6 +116,8 @@ public class TourController {
     public String selectTravel(@PathVariable("id") Long id, Model model) {
 
         Tour tour = tourRepo.getReferenceById(id);
+        model.addAttribute("types", Type.values());
+        model.addAttribute("countryCode", countryRepo.findAll());
         model.addAttribute("tour", tour);
         model.addAttribute("title", "Tour " + tour.getName());
         model.addAttribute("content", "components/tourDetail");
@@ -121,7 +129,7 @@ public class TourController {
     @PostMapping("/{id}")
     public String submitSelectedTravel(@ModelAttribute Tour tour) {
         // 모든 Point 객체에 tour 참조를 세팅
-        tour.getCourse().forEach(point -> point.setTour(tour));
+        // tour.getCourse().forEach(point -> point.setTour(tour));
         tourRepo.save(tour);
 
         return "redirect:/tour";

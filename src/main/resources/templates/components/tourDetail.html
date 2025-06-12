@@ -44,19 +44,28 @@
 
         <!-- Point 리스트 바인딩 -->
         <fieldset id="fieldset">
-            <legend>코스 포인트</legend>
-            <div class="course-point" th:each="point, stat : *{course}">
-                <label>위치:</label>
-                <input type="text" th:field="*{course[__${stat.index}__].location}" placeholder="위치 입력" />
+            <legend>코스 포인트 및 항공</legend>
+            <div id="locationContainer">
+                <div class="location-point" th:each="loc, stat : *{locations}">
+                    <input type="hidden" th:field="*{locations[__${stat.index}__].type}" />
 
-                <label>포인트 종료일:</label>
-                <input type="date" th:field="*{course[__${stat.index}__].enddate}" min="2000-04-01" max="2026-12-31" />
-                <br>
-                <button type="button" onclick="removeCoursePoint(this)">삭제</button>
+                    <label>국가:</label>
+                    <input type="text" th:field="*{locations[__${stat.index}__].country}" list="countryList"
+                        placeholder="국가 입력 (예: KR | South Korea | 대한민국)" onchange="stripAfterPipe(this)"/>
 
+                    <!-- POINT용 필드 -->
+                    <label>포인트 종료일:</label>
+                    <input type="date" th:field="*{locations[__${stat.index}__].date}" min="2000-04-01"
+                        max="2026-12-31" />
+
+                    <button type="button" onclick="removeLocation(this)">삭제</button>
+                </div>
             </div>
-            <button id="addButton" type="button" onclick="addCoursePoint()">포인트 추가</button>
+
+            <button type="button" onclick="addLocationPoint()">POINT 추가</button>
+            <button type="button" onclick="addLocationAir()">AIR 추가</button>
         </fieldset>
+
 
         <button type="submit" th:text="${tour.id} == null ? '등록' : '수정'">
         </button>
@@ -65,71 +74,132 @@
     <button th:if="${tour.id != null}" th:onclick="deleteTour([[${tour.id}]])">삭제</button>
 
     <script>
-        function deleteTour(id) {
-            console.log('id : ' + id)
-            if (confirm('정말로 삭제하시겠습니까?')) {
-                fetch('/tour/' + id, { method: 'DELETE' })
-                    .then(response => {
-                        if (response.ok) {
-                            alert('삭제가 완료되었습니다.');
-                            window.location.href = '/tour';
-                        } else {
-                            alert('삭제 중 오류가 발생했습니다.\n' + response);
-                        }
-                    })
-                    .catch(error => {
-                        alert('삭제 요청에 오류가 발생했습니다: ' + error.message);
-                        console.error('삭제 요청 실패:', error);
-                    });
+        let locationIndex = document.querySelectorAll("#locationContainer .location-point").length;
+
+        function createLabel(text) {
+            const lbl = document.createElement("label");
+            lbl.textContent = text;
+            return lbl;
+        }
+
+        function createInput(type, name, placeholder = "", attrs = {}) {
+            const inp = document.createElement("input");
+            inp.type = type;
+            inp.name = name;
+            if (placeholder) inp.placeholder = placeholder;
+            // 추가 속성들 설정 (예: list, min, max)
+            Object.entries(attrs).forEach(([k, v]) => inp.setAttribute(k, v));
+            return inp;
+        }
+
+        function createHidden(name, value) {
+            const hid = document.createElement("input");
+            hid.type = "hidden";
+            hid.name = name;
+            hid.value = value;
+            return hid;
+        }
+
+        function removeLocation(btn) {
+            btn.closest(".location-point").remove();
+        }
+
+        function addLocationPoint() {
+            const idx = locationIndex++;
+            const container = document.getElementById("locationContainer");
+            const wrapper = document.createElement("div");
+            wrapper.className = "location-point";
+
+            // type 히든
+            wrapper.appendChild(createHidden(`locations[${idx}].type`, "POINT"));
+            // 국가
+            wrapper.appendChild(createLabel("국가:"));
+            const country = createInput(
+                "text",
+                `locations[${idx}].country`,
+                "국가 입력 (예: KR | South Korea | 대한민국)",
+                { list: "countryList" }
+            )
+            country.setAttribute("onchange", "stripAfterPipe(this)");
+            wrapper.appendChild(country);
+            // 날짜
+            wrapper.appendChild(createLabel("포인트 종료일:"));
+            wrapper.appendChild(createInput(
+                "date",
+                `locations[${idx}].date`,
+                "",
+                { min: "2000-04-01", max: "2026-12-31" }
+            ));
+            // 삭제 버튼
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.textContent = "삭제";
+            btn.addEventListener("click", () => removeLocation(btn));
+            wrapper.appendChild(btn);
+
+            container.appendChild(wrapper);
+        }
+
+        function addLocationAir() {
+            const idx = locationIndex++;
+            const container = document.getElementById("locationContainer");
+            const wrapper = document.createElement("div");
+            wrapper.className = "location-point";
+
+            // type 히든
+            wrapper.appendChild(createHidden(`locations[${idx}].type`, "AIR"));
+
+            // 항공편 번호
+            wrapper.appendChild(createLabel("항공편 번호:"));
+            const airInput = createInput(
+                "number",
+                `locations[${idx}].air`,
+                "항공편 번호 입력"
+            )
+            airInput.setAttribute("onclick", "searchAir(this)");
+            wrapper.appendChild(airInput);
+
+            // 설명
+            wrapper.appendChild(createLabel("설명:"));
+            wrapper.appendChild(createInput(
+                "text",
+                `locations[${idx}].description`,
+                "설명 입력"
+            ));
+            // 날짜
+            wrapper.appendChild(createLabel("날짜:"));
+            wrapper.appendChild(createInput(
+                "date",
+                `locations[${idx}].date`
+            ));
+            // 삭제 버튼
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.textContent = "삭제";
+            btn.addEventListener("click", () => removeLocation(btn));
+            wrapper.appendChild(btn);
+
+            container.appendChild(wrapper);
+        }
+
+        // 검색 결과중 코드 | 영문 | 한글 중 "코드"만 남기는 함수
+        function stripAfterPipe(input) {
+            const val = input.value;
+            if (val.includes('|')) {
+                input.value = val.split('|')[0].trim();
             }
         }
 
-        function addCoursePoint() {
+        function searchAir() {
 
-            // course 리스트를 렌더링한 첫 블록을 클론해서 빈 값으로 추가
-            const container = document.getElementById("fieldset");
-            const prototype = container.querySelector('.course-point'); // 기존의 코스 블록
-            const clone = prototype.cloneNode(true);
-
-            // 입력 필드 초기화
-            clone.querySelectorAll('input').forEach(i => i.value = '');
-
-            container.insertBefore(clone, document.getElementById('addButton'));
-
-            // 인덱스 재설정
-            reindexCoursePoints();
         }
 
-        function removeCoursePoint(button) {
-            const points = document.querySelectorAll('.course-point');
-            if (points.length <= 1) {
-                alert('코스 포인트는 최소 1개 이상이어야 합니다.');
-                return;
-            }
-            // 삭제 버튼의 부모 요소인 코스 포인트 항목을 찾아 제거
-            const coursePointDiv = button.closest('.course-point');
-            if (coursePointDiv) {
-                coursePointDiv.remove();
-            }
-
-            // 인덱스 재설정
-            reindexCoursePoints();
-        }
-
-        function reindexCoursePoints() {
-            const points = document.querySelectorAll('.course-point');
-            points.forEach((div, idx) => {
-                div.querySelectorAll('input').forEach(input => {
-                    // 원래 name/id 뒤에 붙은 필드명(예: location, enddate) 추출
-                    const field = (input.name || input.id).split(/[\[\]\.]/).pop();
-
-                    // name="course[<idx>].<field>"
-                    input.name = `course[${idx}].${field}`;
-                    // id="course<idx>.<field>"
-                    input.id = `course${idx}.${field}`;
-                });
-            });
-        }
     </script>
+
+
+    <datalist id="countryList">
+        <!-- countryRepo.findAll()으로 받아온 리스트를 순회하면서 옵션 생성 -->
+        <option th:each="cc : ${countryCode}" th:value="${cc.code} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
+    </datalist>
 
 </div>

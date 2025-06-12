@@ -122,9 +122,9 @@
                 <td th:text="${tour.price}">100000</td>
                 <td>
                     <ul>
-                        <li th:each="pt : ${tour.course}" type="none">
-                            <span th:text="${pt.location}">서울</span>
-                            (종료: <span th:text="${pt.enddate}">2000-12-31</span>)
+                        <li th:each="pt : ${tour.locations}" type="none">
+                            <span th:text="${pt.country}">서울</span>
+                            (종료: <span th:text="${pt.date}">2000-12-31</span>)
                         </li>
                     </ul>
                 </td>
