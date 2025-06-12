@@ -7,10 +7,10 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity
+// @Entity
 @Getter
 @NoArgsConstructor
-@Table
+// @Table
 public class Country {
 
     @Id
