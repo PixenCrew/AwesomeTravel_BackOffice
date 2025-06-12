@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "specialRequest")
+@Table
 public class SpecialRequest {
 
     @Id

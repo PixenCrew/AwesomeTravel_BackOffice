@@ -12,14 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@NoArgsConstructor
+@Table
 @Getter
 @Setter
-@Table(name = "Air")
+@NoArgsConstructor
 public class Air extends AuditingFields {
 
     @Id
-    @Column(name = "air_id")
+    @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

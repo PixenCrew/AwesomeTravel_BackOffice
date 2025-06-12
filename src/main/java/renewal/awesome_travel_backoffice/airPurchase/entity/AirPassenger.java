@@ -14,7 +14,7 @@ import java.util.Set;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "AirPassenger")
+@Table
 public class AirPassenger extends BasePassenger {
 
     @ManyToOne

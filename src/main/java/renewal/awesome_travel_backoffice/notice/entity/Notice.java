@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "notice")
+@Table
 public class Notice extends AuditingFields {
 
     @Id

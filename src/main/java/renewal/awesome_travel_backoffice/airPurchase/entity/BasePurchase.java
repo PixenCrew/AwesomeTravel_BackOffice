@@ -14,7 +14,7 @@ public abstract class BasePurchase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "product_purchase_id")
+    @Column
     protected Long id;
 
     @Enumerated(EnumType.STRING)

@@ -13,7 +13,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "AirPurchase")
+@Table
 public class AirPurchase extends BasePurchase {
 
     @ManyToOne(fetch = FetchType.LAZY)

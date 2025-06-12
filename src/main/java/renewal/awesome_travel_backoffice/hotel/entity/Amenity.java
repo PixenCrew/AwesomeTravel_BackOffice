@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "amenity")
+@Table
 @Getter
 @Setter
 @RequiredArgsConstructor
@@ -17,7 +17,7 @@ public class Amenity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "amenity_id")
+    @Column
     private Long id;
 
     @Column(nullable = false, length = 50, unique = true)

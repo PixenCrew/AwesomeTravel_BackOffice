@@ -14,7 +14,7 @@ import lombok.Setter;
 public class Airline {
 
     @Id
-    @Column(name = "airline_code",length = 10)
+    @Column(length = 10)
     private String code; // 예: "KE", "OZ"
 
     private String nameKor;

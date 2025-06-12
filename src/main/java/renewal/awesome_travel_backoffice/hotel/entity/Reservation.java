@@ -3,13 +3,12 @@ package renewal.awesome_travel_backoffice.hotel.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import renewal.awesome_travel_backoffice.product.entity.Product;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "reservation")
+@Table
 @Getter
 @Setter
 public class Reservation {
@@ -22,19 +21,19 @@ public class Reservation {
     // @JoinColumn(name = "product_id", nullable = false)
     // private Product product;
 
-    @Column(name = "hotel_id", nullable = false)
+    @Column(nullable = false)
     private Long hotelId;
 
-    @Column(name = "room_count", nullable = false)
+    @Column(nullable = false)
     private Long roomCount;
 
-    @Column(name = "start_date", nullable = false)
+    @Column(nullable = false)
     private LocalDate startDate;
 
-    @Column(name = "end_date", nullable = false)
+    @Column(nullable = false)
     private LocalDate endDate;
 
-    @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)

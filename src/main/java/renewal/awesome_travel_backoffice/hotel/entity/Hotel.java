@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import renewal.awesome_travel_backoffice.hotel.utils.HotelType;
+import renewal.awesome_travel_backoffice.product.entity.Product;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "hotels")
+@Table
 @Getter
 @Setter
 @RequiredArgsConstructor
@@ -20,7 +21,7 @@ public class Hotel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "hotel_id")
+    @Column
     private Long id;
 
     private String name;
@@ -50,5 +51,7 @@ public class Hotel {
     )
     private Set<Amenity> amenities = new HashSet<>();
 
+    @OneToOne(mappedBy = "hotel")
+    private Product product;
 }
 

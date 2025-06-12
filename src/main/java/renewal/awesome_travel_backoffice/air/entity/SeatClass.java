@@ -10,12 +10,12 @@ import renewal.awesome_travel_backoffice.air.utiles.SeatClassType;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "SeatClass")
+@Table
 public class SeatClass {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "seat_class_id")
+    @Column
     private Long id;
 
     @ManyToOne
