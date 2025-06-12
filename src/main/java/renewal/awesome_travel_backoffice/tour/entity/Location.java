@@ -4,7 +4,10 @@ import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,26 +18,34 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import renewal.awesome_travel_backoffice.tour.utiles.Type;
 
 @Entity
-@Table(name = "point")
-@Getter 
+@Table
+@Getter
 @Setter
 @NoArgsConstructor
-public class Point {
-
+public class Location{
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String location;
-    
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate enddate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tour_id", nullable = false)
     private Tour tour;
 
-}
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Type type;
 
+    // Type이 AIR면 사용할 필드
+    private Long air;
+
+    private String country;
+    private String city;
+    private String description;
+    
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate date;
+}
