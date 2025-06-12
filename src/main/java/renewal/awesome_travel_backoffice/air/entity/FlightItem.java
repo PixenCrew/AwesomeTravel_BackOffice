@@ -9,7 +9,7 @@ import lombok.Setter;
 public class FlightItem {
 
     @JsonProperty("항공사")
-    private String airline;
+    private String airline;  // 항공사 코드 (예: AAR = 아시아나)
 
     @JsonProperty("운항편명")
     private String flightNumber;
@@ -21,20 +21,18 @@ public class FlightItem {
     private String arrivalAirport;
 
     @JsonProperty("출발시간")
-    private String departureTime;
+    private String departureTime;  // "16:00" 형식
 
     @JsonProperty("도착시간")
     private String arrivalTime;
 
     @JsonProperty("운항요일")
-    private String operatingDays;
+    private String operatingDays;  // "토" 형식
 
     @JsonProperty("시작일자")
-    private String startDate;
+    private String startDate;  // "2024-04-27" 형식
 
     @JsonProperty("종료일자")
     private String endDate;
-
-    @JsonProperty("국내_국제")
-    private String domesticInternational;
 }
+
