@@ -2,6 +2,7 @@ package renewal.awesome_travel_backoffice.tour.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,20 +29,24 @@ public class Tour {
 
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate enddate;
-  
+
   private Long price;
 
   @OneToMany(mappedBy = "tour", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-  private List<Point> course = new ArrayList<>();
+  @OrderColumn
+  private List<Location> locations = new ArrayList<>();
 
   // // 양방향 관계 설정용 편의 메서드
   // public void addCoursePoint(Point point) {
-  //   course.add(point);
-  //   point.setTour(this);
+  // course.add(point);
+  // point.setTour(this);
   // }
 
   // public void removeCoursePoint(Point point) {
-  //   course.remove(point);
-  //   point.setTour(null);
+  // course.remove(point);
+  // point.setTour(null);
   // }
+  
+  // @OneToOne(mappedBy = "tour")
+  // private Product product;
 }
