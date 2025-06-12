@@ -7,7 +7,7 @@ import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.Join;
-import renewal.awesome_travel_backoffice.tour.entity.Point;
+import renewal.awesome_travel_backoffice.tour.entity.Location;
 import renewal.awesome_travel_backoffice.tour.entity.Tour;
 
 public class TourSpecification {
@@ -79,7 +79,7 @@ public class TourSpecification {
     // 연관된 Course 리스트에서 location LIKE %location%
     public static Specification<Tour> courseLocationContains(String location) {
         return (root, query, builder) -> {
-            Join<Tour, Point> courseJoin = root.join("course");
+            Join<Tour, Location> courseJoin = root.join("course");
             return builder.like(courseJoin.get("location"), "%" + location + "%");
         };
     }
