@@ -26,6 +26,7 @@ import renewal.awesome_travel_backoffice.air.service.AirService;
 import renewal.awesome_travel_backoffice.air.utiles.AirStatus;
 import renewal.awesome_travel_backoffice.air.utiles.FlightType;
 import renewal.awesome_travel_backoffice.air.utiles.SeatClassType;
+import renewal.awesome_travel_backoffice.code.CityCodeRepository;
 
 @Controller
 @RequestMapping("/air")
@@ -34,6 +35,7 @@ public class AirController {
 
     private final AirService airService;
     private final AirRepository airRepository;
+    private final CityCodeRepository cityRepo;
 
     // 항공 목록
     @GetMapping
@@ -56,6 +58,9 @@ public class AirController {
         // 2) 페이징(10개 고정) + 필터링 로직
         Pageable pageable = PageRequest.of(page, 10, sort);
         Page<Air> airPage = airService.searchAirs(filter, pageable);
+
+        // 도시코드
+        model.addAttribute("cityCode", cityRepo.findAll());
 
         // 3) View에서 쓸 속성들
         model.addAttribute("airPage", airPage);
@@ -85,6 +90,10 @@ public class AirController {
         // 회사 목록 (드롭박스용)
         List<String> allAirlines = airService.getAllCompanies();
         model.addAttribute("allAirlines", allAirlines);
+
+        // 도시코드
+        model.addAttribute("cityCode", cityRepo.findAll());
+
         model.addAttribute("air", air);
         model.addAttribute("title", "New Air");
         model.addAttribute("content", "components/airDetail"); // layout 안에서 이 fragment를 렌더
@@ -113,6 +122,10 @@ public class AirController {
         // 회사 목록 (드롭박스용)
         List<String> allAirlines = airService.getAllCompanies();
         model.addAttribute("allAirlines", allAirlines);
+        
+        // 도시코드
+        model.addAttribute("cityCode", cityRepo.findAll());
+        
         model.addAttribute("air", air);
         model.addAttribute("title", "Air Detail");
         model.addAttribute("content", "components/airDetail"); // layout 안에서 이 fragment를 렌더

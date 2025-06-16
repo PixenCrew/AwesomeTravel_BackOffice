@@ -33,9 +33,11 @@
 
         <!-- 출발지/도착지 -->
         <label>출발지:</label>
-        <input type="text" th:field="*{depart}" placeholder="Enter depart" />
+        <input type="text" th:field="*{depart}" placeholder="Enter depart" list="cityList"
+            onchange="stripAfterPipe(this)" />
         <label>도착지:</label>
-        <input type="text" th:field="*{arrive}" placeholder="Enter arrive" />
+        <input type="text" th:field="*{arrive}" placeholder="Enter arrive" list="cityList"
+            onchange="stripAfterPipe(this)" />
         <br />
 
         <!-- 경유지 수 -->
@@ -50,7 +52,7 @@
             <span>유아 좌석 필요 여부:</span>
 
             <!-- 1) 선택 안 함 (null) -->
-            <input type="radio" th:field="*{infantSeatsRequired}" value="" id="infant-none"/>
+            <input type="radio" th:field="*{infantSeatsRequired}" value="" id="infant-none" />
             <label for="infant-none">선택 안 함</label>
 
             <!-- 2) 필요 (true) -->
@@ -138,6 +140,7 @@
                 <th>경유지 수</th>
                 <th>비행 타입</th>
                 <th>상태</th>
+                <th>좌석ID</th>
                 <th>등급</th>
                 <th>
                     <a href="#" data-sortfield="price"
@@ -169,6 +172,7 @@
                     <td th:text="${air.stopovers}">0</td>
                     <td th:text="${air.flightType}">ONE_WAY</td>
                     <td th:text="${air.status}">ACTIVE</td>
+                    <td th:text="${seatClass.id}">123</td>
                     <td th:text="${seatClass.classType}">FIRST</td>
                     <td th:text="${seatClass.price}">50000</td>
                     <td th:text="${seatClass.maxSeats}">100</td>
@@ -200,4 +204,19 @@
     <a href="/air/new">새 항공편 등록</a>
 
     <script src="/js/filter.js"></script>
+
+    <script>
+        // 검색 결과중 코드 | 영문 | 한글 중 "코드"만 남기는 함수
+        function stripAfterPipe(input) {
+            const val = input.value;
+            if (val.includes('|')) {
+                input.value = val.split('|')[0].trim();
+            }
+        }
+    </script>
+
+    <datalist id="cityList">
+        <option th:each="cc : ${cityCode}" th:value="${cc.code} + ' | ' + ${cc.country} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
+    </datalist>
+
 </div>

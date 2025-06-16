@@ -45,6 +45,9 @@ public class Air extends AuditingFields {
     @Column(nullable = false)
     private Integer stopovers = 0; // 경유 횟수 (0 = 직항, 1 이상 = 경유)
 
+    @ElementCollection
+    private List<String> stopoverList; // 경유지 없으면 null
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AirStatus status = AirStatus.ACTIVE;

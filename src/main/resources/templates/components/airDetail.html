@@ -24,7 +24,7 @@
 
         <div>
             <label>출발지:</label>
-            <input type="text" th:field="*{depart}" required />
+            <input type="text" th:field="*{depart}" list="cityList" onchange="stripAfterPipe(this)" required />
         </div>
 
         <div>
@@ -34,7 +34,7 @@
 
         <div>
             <label>도착지:</label>
-            <input type="text" th:field="*{arrive}" required />
+            <input type="text" th:field="*{arrive}" list="cityList" onchange="stripAfterPipe(this)" required />
         </div>
 
         <div>
@@ -44,8 +44,19 @@
 
         <div>
             <label>경유 횟수:</label>
-            <input type="number" th:field="*{stopovers}" min="0" />
+            <input type="number" th:field="*{stopovers}" id="stopovers" min="0" readonly />
         </div>
+
+        <div id="stopoverContainer">
+            <div th:each="stop, iterStat : *{stopoverList}">
+                <div class="stopover-entry">
+                    <input type="text" th:field="*{stopoverList[__${iterStat.index}__]}" list="cityList"
+                        onchange="stripAfterPipe(this)" required />
+                    <button type="button" onclick="removeStopover(this)">삭제</button>
+                </div>
+            </div>
+        </div>
+        <button type="button" onclick="addStopover()">경유지 추가</button>
 
         <div>
             <label>상태:</label>
@@ -61,7 +72,7 @@
                 <option value="DIRECT">직항</option>
                 <option value="INDIRECT">경유</option>
             </select> -->
-            <input type="text" th:field="*{flightType}" readonly/>
+            <input type="text" th:field="*{flightType}" readonly />
         </div>
 
         <hr />
@@ -101,5 +112,51 @@
                     });
             }
         }
+
+        // 검색 결과중 코드 | 영문 | 한글 중 "코드"만 남기는 함수
+        function stripAfterPipe(input) {
+            const val = input.value;
+            if (val.includes('|')) {
+                input.value = val.split('|')[0].trim();
+            }
+        }
+
+        // 페이지 로딩 시 stopovers 값으로 초기화
+        let stopoverCount = parseInt(document.getElementById("stopovers").value) || 0;
+
+        function addStopover() {
+            const container = document.getElementById("stopoverContainer");
+            const stopoverDiv = document.createElement("div");
+            stopoverDiv.className = "stopover-entry";
+
+            stopoverDiv.innerHTML = `
+            <input type="text"
+                   name="stopoverList[${stopoverCount}]"
+                   list="cityList"
+                   onchange="stripAfterPipe(this)"
+                   required />
+            <button type="button" onclick="removeStopover(this)">삭제</button>
+            `;
+
+            container.appendChild(stopoverDiv);
+            stopoverCount++;
+            updateStopoverCount();
+        }
+
+        function removeStopover(button) {
+            button.parentElement.remove();
+            stopoverCount = Math.max(0, stopoverCount - 1);
+            updateStopoverCount();
+        }
+
+        function updateStopoverCount() {
+            document.getElementById("stopovers").value = stopoverCount;
+        }
+
     </script>
+
+    <datalist id="cityList">
+        <option th:each="cc : ${cityCode}"
+            th:value="${cc.code} + ' | ' + ${cc.country} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
+    </datalist>
 </div>

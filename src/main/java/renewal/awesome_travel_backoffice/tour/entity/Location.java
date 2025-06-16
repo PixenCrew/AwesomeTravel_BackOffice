@@ -42,7 +42,7 @@ public class Location{
     // Type이 AIR면 사용할 필드
     private Long air;
 
-    private String country;
+    // private String country;
     private String city;
     private String description;
     
