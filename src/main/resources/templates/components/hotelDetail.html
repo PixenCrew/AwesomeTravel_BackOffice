@@ -19,6 +19,9 @@
         <label>설명:</label>
         <textarea th:field="*{description}" required></textarea><br>
 
+        <label>도시:</label>
+        <input type="text" th:field="*{city}" list="cityList" onchange="stripAfterPipe(this)" required /><br>
+
         <label>주소:</label>
         <input type="text" th:field="*{address}" required /><br>
 
@@ -161,5 +164,19 @@
                     });
             }
         }
+
+        // 검색 결과중 코드 | 영문 | 한글 중 "코드"만 남기는 함수
+        function stripAfterPipe(input) {
+            const val = input.value;
+            if (val.includes('|')) {
+                input.value = val.split('|')[0].trim();
+            }
+        }
+        
     </script>
+    
+    <datalist id="cityList">
+        <option th:each="cc : ${cityCode}"
+            th:value="${cc.code} + ' | ' + ${cc.country} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
+    </datalist>
 </div>

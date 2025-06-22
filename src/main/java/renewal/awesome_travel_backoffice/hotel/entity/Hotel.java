@@ -26,6 +26,7 @@ public class Hotel {
 
     private String name;
     private String description;
+    private String city;
     private String address;
     private String number;
     private String email;

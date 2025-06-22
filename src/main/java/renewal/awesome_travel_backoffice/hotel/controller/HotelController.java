@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import renewal.awesome_travel_backoffice.hotel.entity.Hotel;
 import renewal.awesome_travel_backoffice.hotel.entity.Reservation;
 import renewal.awesome_travel_backoffice.hotel.utils.HotelType;
+import renewal.awesome_travel_backoffice.code.CityCodeRepository;
 import renewal.awesome_travel_backoffice.hotel.dto.HotelFilterDTO;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelRepository;
 import renewal.awesome_travel_backoffice.hotel.repository.ReservationRepository;
@@ -27,6 +28,7 @@ public class HotelController {
     private final HotelRepository hotelRepo;
     private final ReservationRepository reservationRepo;
     private final AmenityRepository amenityRepo;
+    private final CityCodeRepository cityRepo;
 
     // 호텔 목록 + 필터 + 페이징
     @GetMapping
@@ -43,6 +45,9 @@ public class HotelController {
         Pageable pageable = PageRequest.of(page, 10, sort);
         Page<Hotel> hotelPage = hotelService.searchHotels(filter, pageable);
 
+        // 도시코드
+        model.addAttribute("cityCode", cityRepo.findAll());
+
         model.addAttribute("hotelPage", hotelPage);
         model.addAttribute("hotelList", hotelPage.getContent());
         model.addAttribute("sortField", sortField);
@@ -57,6 +62,10 @@ public class HotelController {
     @GetMapping("/new")
     public String newHotel(Model model) {
         Hotel hotel = new Hotel();
+        
+        // 도시코드
+        model.addAttribute("cityCode", cityRepo.findAll());
+        
         model.addAttribute("hotel", hotel);
         model.addAttribute("hotelTypes", HotelType.values());
         model.addAttribute("allAmenities", amenityRepo.findAll());
@@ -76,6 +85,10 @@ public class HotelController {
     @GetMapping("/{id}")
     public String selectHotel(@PathVariable("id") Long id, Model model) {
         Hotel hotel = hotelRepo.getReferenceById(id);
+
+        // 도시코드
+        model.addAttribute("cityCode", cityRepo.findAll());
+        
         model.addAttribute("hotel", hotel);
         model.addAttribute("hotelTypes", HotelType.values());
         model.addAttribute("allAmenities", amenityRepo.findAll());
