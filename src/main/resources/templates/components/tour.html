@@ -159,4 +159,8 @@
 
     <script src="/js/filter.js"></script>
 
+    <datalist id="cityList">
+        <option th:each="cc : ${cityCode}" th:value="${cc.code} + ' | ' + ${cc.country} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
+    </datalist>
+
 </div>

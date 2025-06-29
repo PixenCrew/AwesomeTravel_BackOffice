@@ -34,7 +34,7 @@ public class Tour {
 
   @OneToMany(mappedBy = "tour", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   @OrderColumn
-  private List<Location> locations = new ArrayList<>();
+  private List<Schedule> schedules = new ArrayList<>();
 
   // // 양방향 관계 설정용 편의 메서드
   // public void addCoursePoint(Point point) {

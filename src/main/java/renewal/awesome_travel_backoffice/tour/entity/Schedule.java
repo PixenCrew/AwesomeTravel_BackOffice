@@ -1,55 +1,54 @@
 package renewal.awesome_travel_backoffice.tour.entity;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import jakarta.persistence.Column;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import renewal.awesome_travel_backoffice.air.entity.Air;
-import renewal.awesome_travel_backoffice.tour.utiles.Type;
+import renewal.awesome_travel_backoffice.hotel.entity.Hotel;
 
 @Entity
 @Table
 @Getter
 @Setter
 @NoArgsConstructor
-public class Location{
+public class Schedule{
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "schedule_id", nullable = false)
-    private Schedule schedule;
+    @JoinColumn(name = "tour_id", nullable = false)
+    private Tour tour;
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Type type;
+    // private Long day; // 1일차, 2일차 ...
 
-    // ==============Type이 AIR면 사용할 필드===============
-    @OneToOne
-    @JoinColumn(name = "air_id", nullable = false)
-    private Air air;
-
-    // ==============Type이 POINT면 사용할 필드===============
-    // private String country;
-    private String city;
-    private String description;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
+
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OrderColumn
+    private List<Location> locations = new ArrayList<>();
+    
+    // 해당 날짜의 숙소
+    @OneToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "hotel_id")
+    private Hotel hotel;
 }

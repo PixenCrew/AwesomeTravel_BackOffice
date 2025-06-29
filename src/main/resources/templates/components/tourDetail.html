@@ -31,39 +31,109 @@
         <input type="date" th:field="*{startdate}" min="2000-04-01" max="2026-12-31" required /><br>
 
         <label for="enddate">종료일:</label>
-        <input type="date" th:field="*{enddate}" min="2000-04-01" max="2026-12-31" required /><br>
+        <input type="date" th:field="*{enddate}" min="2000-04-01" max="2026-12-31" readonly required /><br>
 
         <label for="price">가격:</label>
         <input type="number" th:field="*{price}" required /><br>
 
         <label for="country">국가:</label>
-        <input type="text" th:field="*{country}" /><br>
+        <input type="text" th:field="*{country}" list="countryList" /><br>
 
         <label for="count">인원:</label>
         <input type="number" th:field="*{count}" required /><br>
 
-        <!-- Point 리스트 바인딩 -->
+        <!-- Schedule 리스트 바인딩 -->
+        <!-- <fieldset id="fieldset">
+            <legend>코스 스케줄 및 포인트/항공 정보</legend>
+            <button type="button" onclick="addSchedule()">스케줄 추가</button>
+            <div id="scheduleContainer">
+                <div class="schedule-point" th:each="sched, schedStat : *{schedules}" th:attr="data-sched-idx=${schedStat.index}">
+                    <div>일자: </div>
+                    <input type="date" th:field="*{schedules[__${schedStat.index}__].date}" />
+                    
+
+
+                    <div id="locationContainer" th:each="loc, locStat : *{schedules[__${schedStat.index}__].locations}">
+
+                        <div class="location-point">
+                            <input type="hidden" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].type}" />
+
+                            <label>도시:</label>
+                            <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].city}" list="cityList" placeholder="예: KR | South Korea | 대한민국" onchange="stripAfterPipe(this)" />
+
+                            <label>포인트 종료일:</label>
+                            <input type="date" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].date}" min="2000-04-01" max="2026-12-31" />
+
+                            <div th:if="${loc.type.name() == 'AIR'}">
+                                <label>항공편:</label>
+                                <select th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].air.id}">
+                                    <option th:each="airEntity : ${airList}" th:value="${airEntity.id}" th:text="${airEntity.name}">항공사</option>
+                                </select>
+                            </div>
+
+                            <button type="button" onclick="removeLocation(this)">삭제</button>
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="addLocationPoint(this)">POINT 추가</button>
+                    <button type="button" onclick="addLocationAir(this)">AIR 추가</button>
+                    <button type="button" onclick="removeSchedule(this)">스케줄 삭제</button>
+                </div>
+
+
+        </fieldset> -->
         <fieldset id="fieldset">
-            <legend>코스 포인트 및 항공</legend>
-            <div id="locationContainer">
-                <div class="location-point" th:each="loc, stat : *{locations}">
-                    <input type="hidden" th:field="*{locations[__${stat.index}__].type}" />
+            <legend>코스 스케줄 및 포인트/항공 정보</legend>
 
-                    <label>국가:</label>
-                    <input type="text" th:field="*{locations[__${stat.index}__].country}" list="countryList"
-                        placeholder="국가 입력 (예: KR | South Korea | 대한민국)" onchange="stripAfterPipe(this)"/>
+            <!-- 전체 Tour에 새 Schedule 추가 버튼 -->
+            <button type="button" onclick="addSchedule()">스케줄 추가</button>
 
-                    <!-- POINT용 필드 -->
-                    <label>포인트 종료일:</label>
-                    <input type="date" th:field="*{locations[__${stat.index}__].date}" min="2000-04-01"
-                        max="2026-12-31" />
+            <!-- 1) Tour → Schedule 반복 -->
+            <div id="scheduleContainer">
+                <div class="schedule-point" th:each="sched, schedStat : *{schedules}" th:attr="data-sched-idx=${schedStat.index}">
+                    <label>날짜:</label>
+                    <input type="date" th:field="*{schedules[__${schedStat.index}__].date}" /><br>
+                    <label>숙소:</label>
+                    <input type="number" th:field="*{schedules[__${schedStat.index}__].hotel.id}" /><br>
+                    <button type="button" onclick="removeSchedule(this)">스케줄 삭제</button>
 
-                    <button type="button" onclick="removeLocation(this)">삭제</button>
+                    <!-- 2) 하나의 LocationContainer에 여러 Location -->
+                    <div class="location-container" th:attr="id=|locationContainer-${schedStat.index}|">
+                        <!-- Schedule → Location 반복 -->
+                        <div class="location-point" th:each="loc, locStat : *{schedules[__${schedStat.index}__].locations}">
+                            <!-- 위치 타입 -->
+                            <input type="hidden" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].type}" />
+
+                            <!-- 도시 입력 -->
+                            <label>도시:</label>
+                            <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].city}" list="cityList" placeholder="예: KR | South Korea | 대한민국" onchange="stripAfterPipe(this)" />
+
+                            <!-- POINT 전용 -->
+                            <label>포인트 종료일:</label>
+                            <input type="date" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].date}" min="2000-04-01" max="2026-12-31" />
+
+                            <!-- AIR 전용 -->
+                            <div th:if="${loc.type.name() == 'AIR'}">
+                                <label>항공편:</label>
+                                <select th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].air.id}">
+                                    <option th:each="airEntity : ${airList}" th:value="${airEntity.id}" th:text="${airEntity.name}">
+                                        항공사
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- 삭제 -->
+                            <button type="button" onclick="removeLocation(this)">삭제</button>
+                        </div>
+                    </div>
+
+                    <!-- 추가/삭제 버튼 -->
+                    <button type="button" onclick="addLocationPoint(this)">
+                        POINT 추가
+                    </button>
+                    <button type="button" onclick="addLocationAir(this)">AIR 추가</button>
                 </div>
             </div>
-
-            <button type="button" onclick="addLocationPoint()">POINT 추가</button>
-            <button type="button" onclick="addLocationAir()">AIR 추가</button>
         </fieldset>
 
 
@@ -74,8 +144,183 @@
     <button th:if="${tour.id != null}" th:onclick="deleteTour([[${tour.id}]])">삭제</button>
 
     <script>
-        let locationIndex = document.querySelectorAll("#locationContainer .location-point").length;
+        // 전역 스케줄 인덱스 (초기값: 이미 렌더링된 .schedule-point 개수)
+        let scheduleIndex = document.querySelectorAll(
+            "#scheduleContainer .schedule-point"
+        ).length;
 
+        // 1) 스케줄 추가
+        function addSchedule() {
+            const idx = scheduleIndex;
+            const container = document.getElementById("scheduleContainer");
+
+            // 스케줄 래퍼 생성
+            const schedDiv = document.createElement("div");
+            schedDiv.className = "schedule-point";
+            schedDiv.dataset.schedIdx = idx;
+
+            // 날짜 입력
+            schedDiv.appendChild(createLabel("날짜:"));
+            const dateInput = createInput("date", `schedules[${idx}].date`);
+            schedDiv.appendChild(dateInput);
+            schedDiv.appendChild(document.createElement("br"));
+
+            // 숙소 입력
+            schedDiv.appendChild(createLabel("숙소:"));
+            const hotelInput = createInput("number", `schedules[${idx}].hotel.id`);
+            schedDiv.appendChild(hotelInput);
+            schedDiv.appendChild(document.createElement("br"));
+
+            // 스케줄 삭제 버튼
+            const removeBtn = document.createElement("button");
+            removeBtn.type = "button";
+            removeBtn.textContent = "스케줄 삭제";
+            removeBtn.addEventListener("click", () => removeSchedule(removeBtn));
+            schedDiv.appendChild(removeBtn);
+
+            // 로케이션 컨테이너
+            const locContainer = document.createElement("div");
+            locContainer.id = `locationContainer-${idx}`;
+            locContainer.className = "location-container";
+            schedDiv.appendChild(locContainer);
+
+            // POINT/AIR 추가 버튼
+            const pBtn = document.createElement("button");
+            pBtn.type = "button";
+            pBtn.textContent = "POINT 추가";
+            pBtn.addEventListener("click", () => addLocationPoint(pBtn));
+            schedDiv.appendChild(pBtn);
+
+            const aBtn = document.createElement("button");
+            aBtn.type = "button";
+            aBtn.textContent = "AIR 추가";
+            aBtn.addEventListener("click", () => addLocationAir(aBtn));
+            schedDiv.appendChild(aBtn);
+
+            container.appendChild(schedDiv);
+            scheduleIndex++;
+        }
+
+        // 2) 스케줄 삭제 (인덱스 감소)
+        function removeSchedule(btn) {
+            btn.closest(".schedule-point").remove();
+            scheduleIndex--;
+        }
+
+        // 3) Location 추가
+        function addLocationPoint(btn) {
+            const schedDiv = btn.closest(".schedule-point");
+            const schedIdx = parseInt(schedDiv.dataset.schedIdx, 10);
+            const container = schedDiv.querySelector(
+                `#locationContainer-${schedIdx}`
+            );
+            const locIdx = container.querySelectorAll(".location-point").length;
+
+            const wrapper = document.createElement("div");
+            wrapper.className = "location-point";
+
+            wrapper.appendChild(createHidden(
+                `schedules[${schedIdx}].locations[${locIdx}].type`, "POINT"));
+
+            wrapper.appendChild(createLabel("도시:"));
+            const city = createInput("text",
+                `schedules[${schedIdx}].locations[${locIdx}].city`,
+                "예: KR | South Korea | 대한민국",
+                { list: "cityList", onchange: "stripAfterPipe(this)" });
+            wrapper.appendChild(city);
+
+            wrapper.appendChild(createLabel("포인트 종료일:"));
+            wrapper.appendChild(createInput("date",
+                `schedules[${schedIdx}].locations[${locIdx}].date`,
+                "",
+                { min: "2000-04-01", max: "2026-12-31" }));
+
+            const btnDel = document.createElement("button");
+            btnDel.type = "button";
+            btnDel.textContent = "삭제";
+            btnDel.addEventListener("click", () => removeLocation(btnDel));
+            wrapper.appendChild(btnDel);
+
+            container.appendChild(wrapper);
+        }
+
+        function addLocationAir(btn) {
+            const schedDiv = btn.closest(".schedule-point");
+            const schedIdx = parseInt(schedDiv.dataset.schedIdx, 10);
+            const container = schedDiv.querySelector(
+                `#locationContainer-${schedIdx}`
+            );
+            const locIdx = container.querySelectorAll(".location-point").length;
+
+            const wrapper = document.createElement("div");
+            wrapper.className = "location-point";
+
+            wrapper.appendChild(createHidden(
+                `schedules[${schedIdx}].locations[${locIdx}].type`, "AIR"));
+
+            wrapper.appendChild(createLabel("항공편 번호:"));
+            const airNo = createInput("text",
+                `schedules[${schedIdx}].locations[${locIdx}].air.id`,
+                "항공편 번호 입력",
+                { onclick: "searchAir(this)" });
+            wrapper.appendChild(airNo);
+
+            wrapper.appendChild(createLabel("설명:"));
+            wrapper.appendChild(createInput("text",
+                `schedules[${schedIdx}].locations[${locIdx}].description`,
+                "설명 입력"));
+
+            wrapper.appendChild(createLabel("날짜:"));
+            wrapper.appendChild(createInput("date",
+                `schedules[${schedIdx}].locations[${locIdx}].date`));
+
+            const btnDel = document.createElement("button");
+            btnDel.type = "button";
+            btnDel.textContent = "삭제";
+            btnDel.addEventListener("click", () => removeLocation(btnDel));
+            wrapper.appendChild(btnDel);
+
+            container.appendChild(wrapper);
+        }
+
+        // 4) Location 삭제
+        function removeLocation(btn) {
+            const wrapper = btn.closest(".location-point");
+            const schedDiv = btn.closest(".schedule-point");
+            const schedIdx = parseInt(schedDiv.dataset.schedIdx, 10);
+
+            // 1) 제거
+            wrapper.remove();
+
+            // 2) 남은 location-point 들을 0,1,2… 로 재인덱싱
+            reindexLocations(schedIdx);
+        }
+
+        // 삭제시 재인덱싱 함수
+        function reindexLocations(schedIdx) {
+            const container = document.querySelector(
+                `#scheduleContainer .schedule-point[data-sched-idx="${schedIdx}"]`
+            ).querySelector(`#locationContainer-${schedIdx}`);
+
+            container.querySelectorAll(".location-point").forEach((locDiv, newIdx) => {
+                // 각 필드(name 속성)에 반영될 prefix
+                const prefix = `schedules[${schedIdx}].locations[${newIdx}]`;
+
+                // type(hidden)
+                locDiv.querySelectorAll('input[type="hidden"]').forEach(h => {
+                    h.name = `${prefix}.type`;
+                });
+
+                // 텍스트/날짜/셀렉트/기타 input들
+                Array.from(locDiv.querySelectorAll("input, select")).forEach(input => {
+                    // 원래 name 에서 앞부분만 바꾸고, 뒤속성(.city, .date, .air.id 등)는 유지
+                    const parts = input.name.split(".");
+                    const suffix = parts.slice(1).join(".");
+                    input.name = `${prefix}.${suffix}`;
+                });
+            });
+        }
+        // 유틸 함수들
         function createLabel(text) {
             const lbl = document.createElement("label");
             lbl.textContent = text;
@@ -87,7 +332,6 @@
             inp.type = type;
             inp.name = name;
             if (placeholder) inp.placeholder = placeholder;
-            // 추가 속성들 설정 (예: list, min, max)
             Object.entries(attrs).forEach(([k, v]) => inp.setAttribute(k, v));
             return inp;
         }
@@ -100,106 +344,38 @@
             return hid;
         }
 
-        function removeLocation(btn) {
-            btn.closest(".location-point").remove();
-        }
-
-        function addLocationPoint() {
-            const idx = locationIndex++;
-            const container = document.getElementById("locationContainer");
-            const wrapper = document.createElement("div");
-            wrapper.className = "location-point";
-
-            // type 히든
-            wrapper.appendChild(createHidden(`locations[${idx}].type`, "POINT"));
-            // 국가
-            wrapper.appendChild(createLabel("국가:"));
-            const country = createInput(
-                "text",
-                `locations[${idx}].country`,
-                "국가 입력 (예: KR | South Korea | 대한민국)",
-                { list: "countryList" }
-            )
-            country.setAttribute("onchange", "stripAfterPipe(this)");
-            wrapper.appendChild(country);
-            // 날짜
-            wrapper.appendChild(createLabel("포인트 종료일:"));
-            wrapper.appendChild(createInput(
-                "date",
-                `locations[${idx}].date`,
-                "",
-                { min: "2000-04-01", max: "2026-12-31" }
-            ));
-            // 삭제 버튼
-            const btn = document.createElement("button");
-            btn.type = "button";
-            btn.textContent = "삭제";
-            btn.addEventListener("click", () => removeLocation(btn));
-            wrapper.appendChild(btn);
-
-            container.appendChild(wrapper);
-        }
-
-        function addLocationAir() {
-            const idx = locationIndex++;
-            const container = document.getElementById("locationContainer");
-            const wrapper = document.createElement("div");
-            wrapper.className = "location-point";
-
-            // type 히든
-            wrapper.appendChild(createHidden(`locations[${idx}].type`, "AIR"));
-
-            // 항공편 번호
-            wrapper.appendChild(createLabel("항공편 번호:"));
-            const airInput = createInput(
-                "number",
-                `locations[${idx}].air`,
-                "항공편 번호 입력"
-            )
-            airInput.setAttribute("onclick", "searchAir(this)");
-            wrapper.appendChild(airInput);
-
-            // 설명
-            wrapper.appendChild(createLabel("설명:"));
-            wrapper.appendChild(createInput(
-                "text",
-                `locations[${idx}].description`,
-                "설명 입력"
-            ));
-            // 날짜
-            wrapper.appendChild(createLabel("날짜:"));
-            wrapper.appendChild(createInput(
-                "date",
-                `locations[${idx}].date`
-            ));
-            // 삭제 버튼
-            const btn = document.createElement("button");
-            btn.type = "button";
-            btn.textContent = "삭제";
-            btn.addEventListener("click", () => removeLocation(btn));
-            wrapper.appendChild(btn);
-
-            container.appendChild(wrapper);
-        }
-
-        // 검색 결과중 코드 | 영문 | 한글 중 "코드"만 남기는 함수
         function stripAfterPipe(input) {
-            const val = input.value;
-            if (val.includes('|')) {
-                input.value = val.split('|')[0].trim();
+            if (input.value.includes("|")) {
+                input.value = input.value.split("|")[0].trim();
             }
         }
 
-        function searchAir() {
-
+        function searchAir(input) {
+            // TODO: 날짜, 도시 입력 후 항공 목록 Popup
+            console.log("searchAir called for:", input.value);
         }
-
     </script>
-
 
     <datalist id="countryList">
         <!-- countryRepo.findAll()으로 받아온 리스트를 순회하면서 옵션 생성 -->
         <option th:each="cc : ${countryCode}" th:value="${cc.code} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
     </datalist>
 
+    <datalist id="cityList">
+        <option th:each="cc : ${cityCode}" th:value="${cc.code} + ' | ' + ${cc.country} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
+    </datalist>
+
+    <style>
+        .schedule-point {
+            border: 1px solid blue;
+            margin: 5px;
+            padding: 5px;
+        }
+
+        .location-container {
+            border: 1px solid red;
+            margin: 5px;
+            padding: 5px;
+        }
+    </style>
 </div>

@@ -19,10 +19,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
 import lombok.RequiredArgsConstructor;
+import renewal.awesome_travel_backoffice.code.CityCodeRepository;
 import renewal.awesome_travel_backoffice.code.CountryCodeRepository;
 import renewal.awesome_travel_backoffice.tour.TourService;
 import renewal.awesome_travel_backoffice.tour.dto.TourFilterDTO;
 import renewal.awesome_travel_backoffice.tour.entity.Location;
+import renewal.awesome_travel_backoffice.tour.entity.Schedule;
 import renewal.awesome_travel_backoffice.tour.entity.Tour;
 import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
 import renewal.awesome_travel_backoffice.tour.utiles.Type;
@@ -34,22 +36,22 @@ public class TourController {
 
     private final TourRepository tourRepo;
     private final CountryCodeRepository countryRepo;
+    private final CityCodeRepository cityRepo;
     private final TourService tourService;
 
     // 투어 목록
     // 필터 폼과 결과 리스트(또는 전체 리스트)를 동일하게 렌더링
     @GetMapping
     public String listAndFilter(
-            @ModelAttribute("filter") TourFilterDTO filter,     // 필터 DTO를 바인딩
-            @RequestParam(defaultValue = "0") int page,          // 페이지 번호
+            @ModelAttribute("filter") TourFilterDTO filter, // 필터 DTO를 바인딩
+            @RequestParam(defaultValue = "0") int page, // 페이지 번호
             @RequestParam(defaultValue = "startdate") String sortField,
             @RequestParam(defaultValue = "asc") String sortDir,
-            Model model
-    ) {
+            Model model) {
         // 1) 정렬 객체 설정
         Sort sort = sortDir.equalsIgnoreCase("asc")
-        ? Sort.by(sortField).ascending()
-        : Sort.by(sortField).descending();
+                ? Sort.by(sortField).ascending()
+                : Sort.by(sortField).descending();
 
         // 1) 회사 목록 (체크박스용)
         List<String> allCompanies = tourService.getAllCompanies();
@@ -60,40 +62,53 @@ public class TourController {
         Page<Tour> tourPage = tourService.searchTours(filter, pageable);
 
         // 3) View에서 쓸 속성들
+        model.addAttribute("countryCode", countryRepo.findAll());
         model.addAttribute("tourPage", tourPage);
-        model.addAttribute("tourList", tourPage.getContent());  
+        model.addAttribute("tourList", tourPage.getContent());
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("title", "Tour List");
-        model.addAttribute("content", "components/tour");  // layout 안에서 이 fragment를 렌더
+        model.addAttribute("content", "components/tour"); // layout 안에서 이 fragment를 렌더
 
         return "layout";
     }
 
     // @GetMapping("/search")
     // public Page<Tour> searchTours(
-    //     TourFilterDTO filter,
-    //     @RequestParam(defaultValue = "0") int page,
-    //     @RequestParam(defaultValue = "10") int size
+    // TourFilterDTO filter,
+    // @RequestParam(defaultValue = "0") int page,
+    // @RequestParam(defaultValue = "10") int size
     // ) {
-    //     Pageable pageable = PageRequest.of(page, size);
-    //     return tourService.searchTours(filter, pageable);
+    // Pageable pageable = PageRequest.of(page, size);
+    // return tourService.searchTours(filter, pageable);
     // }
 
     // 새 투어
     @GetMapping("/new")
     public String newTravel(Model model) {
 
-        Tour blank = new Tour();
-        Location defaultLocation = new Location();
-        defaultLocation.setCountry(null);
-        defaultLocation.setDate(null);
-        defaultLocation.setType(Type.POINT);
-        blank.getLocations().add(defaultLocation);
-        
+        // 역순으로 구조 생성
+        // 3. Location
+        Location blankLocation = new Location();
+        blankLocation.setType(Type.POINT);
+
+        // 2. Schedule
+        Schedule blankSchedule = new Schedule();
+        blankSchedule.getLocations().add(blankLocation);
+
+        // 1. Tour
+        Tour blankTour = new Tour();
+        blankTour.getSchedules().add(blankSchedule);
+
+        // defaultLocation.setCity(null);
+        // defaultLocation.setDate(null);
+        // defaultLocation.setType(Type.POINT);
+        // blank.getLocations().add(defaultLocation);
+
         model.addAttribute("types", Type.values());
         model.addAttribute("countryCode", countryRepo.findAll());
-        model.addAttribute("tour", blank);
+        model.addAttribute("cityCode", cityRepo.findAll());
+        model.addAttribute("tour", blankTour);
         model.addAttribute("title", "New Tour");
         model.addAttribute("content", "components/tourDetail");
 
@@ -103,8 +118,14 @@ public class TourController {
     // 새 투어 등록
     @PostMapping("/new")
     public String submitTravel(@ModelAttribute Tour tour) {
-        // 모든 Point 객체에 tour 참조를 세팅
-        tour.getLocations().forEach(point -> point.setTour(tour));
+        // 모든 Schedule 객체에 tour 참조를 세팅
+        tour.getSchedules().forEach(schedule -> {
+            schedule.setTour(tour);
+            // 모든 location 객체에 schedule 참조를 세팅
+            schedule.getLocations().forEach(location -> {
+                location.setSchedule(schedule);
+            });
+        });
 
         tourRepo.save(tour);
 
@@ -118,6 +139,7 @@ public class TourController {
         Tour tour = tourRepo.getReferenceById(id);
         model.addAttribute("types", Type.values());
         model.addAttribute("countryCode", countryRepo.findAll());
+        model.addAttribute("cityCode", cityRepo.findAll());
         model.addAttribute("tour", tour);
         model.addAttribute("title", "Tour " + tour.getName());
         model.addAttribute("content", "components/tourDetail");
