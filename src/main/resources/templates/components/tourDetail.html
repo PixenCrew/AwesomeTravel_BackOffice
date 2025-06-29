@@ -93,8 +93,6 @@
                 <div class="schedule-point" th:each="sched, schedStat : *{schedules}" th:attr="data-sched-idx=${schedStat.index}">
                     <label>날짜:</label>
                     <input type="date" th:field="*{schedules[__${schedStat.index}__].date}" /><br>
-                    <label>숙소:</label>
-                    <input type="number" th:field="*{schedules[__${schedStat.index}__].hotel.id}" /><br>
                     <button type="button" onclick="removeSchedule(this)">스케줄 삭제</button>
 
                     <!-- 2) 하나의 LocationContainer에 여러 Location -->
@@ -128,10 +126,9 @@
                     </div>
 
                     <!-- 추가/삭제 버튼 -->
-                    <button type="button" onclick="addLocationPoint(this)">
-                        POINT 추가
-                    </button>
+                    <button type="button" onclick="addLocationPoint(this)">POINT 추가</button>
                     <button type="button" onclick="addLocationAir(this)">AIR 추가</button>
+                    <button type="button" onclick="addLocationHotel(this)">HOTEL 추가</button>
                 </div>
             </div>
         </fieldset>
@@ -165,11 +162,11 @@
             schedDiv.appendChild(dateInput);
             schedDiv.appendChild(document.createElement("br"));
 
-            // 숙소 입력
-            schedDiv.appendChild(createLabel("숙소:"));
-            const hotelInput = createInput("number", `schedules[${idx}].hotel.id`);
-            schedDiv.appendChild(hotelInput);
-            schedDiv.appendChild(document.createElement("br"));
+            // // 숙소 입력
+            // schedDiv.appendChild(createLabel("숙소:"));
+            // const hotelInput = createInput("number", `schedules[${idx}].hotel.id`);
+            // schedDiv.appendChild(hotelInput);
+            // schedDiv.appendChild(document.createElement("br"));
 
             // 스케줄 삭제 버튼
             const removeBtn = document.createElement("button");
@@ -184,7 +181,7 @@
             locContainer.className = "location-container";
             schedDiv.appendChild(locContainer);
 
-            // POINT/AIR 추가 버튼
+            // POINT/AIR/HOTEL 추가 버튼
             const pBtn = document.createElement("button");
             pBtn.type = "button";
             pBtn.textContent = "POINT 추가";
@@ -196,6 +193,12 @@
             aBtn.textContent = "AIR 추가";
             aBtn.addEventListener("click", () => addLocationAir(aBtn));
             schedDiv.appendChild(aBtn);
+
+            const hBtn = document.createElement("button");
+            aBtn.type = "button";
+            aBtn.textContent = "HOTEL 추가";
+            aBtn.addEventListener("click", () => addLocationHotel(hBtn));
+            schedDiv.appendChild(hBtn);
 
             container.appendChild(schedDiv);
             scheduleIndex++;
@@ -264,6 +267,45 @@
                 "항공편 번호 입력",
                 { onclick: "searchAir(this)" });
             wrapper.appendChild(airNo);
+
+            wrapper.appendChild(createLabel("설명:"));
+            wrapper.appendChild(createInput("text",
+                `schedules[${schedIdx}].locations[${locIdx}].description`,
+                "설명 입력"));
+
+            wrapper.appendChild(createLabel("날짜:"));
+            wrapper.appendChild(createInput("date",
+                `schedules[${schedIdx}].locations[${locIdx}].date`));
+
+            const btnDel = document.createElement("button");
+            btnDel.type = "button";
+            btnDel.textContent = "삭제";
+            btnDel.addEventListener("click", () => removeLocation(btnDel));
+            wrapper.appendChild(btnDel);
+
+            container.appendChild(wrapper);
+        }
+
+        function addLocationHotel(btn) {
+            const schedDiv = btn.closest(".schedule-point");
+            const schedIdx = parseInt(schedDiv.dataset.schedIdx, 10);
+            const container = schedDiv.querySelector(
+                `#locationContainer-${schedIdx}`
+            );
+            const locIdx = container.querySelectorAll(".location-point").length;
+
+            const wrapper = document.createElement("div");
+            wrapper.className = "location-point";
+
+            wrapper.appendChild(createHidden(
+                `schedules[${schedIdx}].locations[${locIdx}].type`, "HOTEL"));
+
+            wrapper.appendChild(createLabel("숙소 ID:"));
+            const hotelNo = createInput("text",
+                `schedules[${schedIdx}].locations[${locIdx}].hotel.id`,
+                "숙소ID 입력",
+                { onclick: "searchHotel(this)" });
+            wrapper.appendChild(hotelNo);
 
             wrapper.appendChild(createLabel("설명:"));
             wrapper.appendChild(createInput("text",

@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import renewal.awesome_travel_backoffice.air.entity.Air;
+import renewal.awesome_travel_backoffice.hotel.entity.Hotel;
 import renewal.awesome_travel_backoffice.tour.utiles.Type;
 
 @Entity
@@ -40,7 +41,10 @@ public class Location{
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Type type;
-
+    private String description;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate date;
+    
     // ==============Type이 AIR면 사용할 필드===============
     @OneToOne
     @JoinColumn(name = "air_id", nullable = false)
@@ -49,7 +53,9 @@ public class Location{
     // ==============Type이 POINT면 사용할 필드===============
     // private String country;
     private String city;
-    private String description;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate date;
+    
+    // ==============Type이 HOTEL이면 사용할 필드===============
+    @OneToOne
+    @JoinColumn(name = "hotel_id", nullable = false)
+    private Hotel hotel;
 }
