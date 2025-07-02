@@ -15,13 +15,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import renewal.awesome_travel_backoffice.hotel.entity.Hotel;
 
 @Entity
 @Table
@@ -47,8 +45,8 @@ public class Schedule{
     @OrderColumn
     private List<Location> locations = new ArrayList<>();
     
-    // 해당 날짜의 숙소
-    @OneToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "hotel_id")
-    private Hotel hotel;
+    // // 해당 날짜의 숙소
+    // @OneToOne(fetch = FetchType.LAZY, optional = true)
+    // @JoinColumn(name = "hotel_id")
+    // private Hotel hotel;
 }

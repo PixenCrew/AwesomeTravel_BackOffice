@@ -150,19 +150,25 @@ public class TourController {
     // 특정 투어 수정
     @PostMapping("/{id}")
     public String submitSelectedTravel(@ModelAttribute Tour tour) {
-        // 모든 Point 객체에 tour 참조를 세팅
-        // tour.getCourse().forEach(point -> point.setTour(tour));
+        // 모든 Schedule 객체에 tour 참조를 세팅
+        tour.getSchedules().forEach(schedule -> {
+            schedule.setTour(tour);
+            // 모든 location 객체에 schedule 참조를 세팅
+            schedule.getLocations().forEach(location -> {
+                location.setSchedule(schedule);
+            });
+        });
         tourRepo.save(tour);
 
         return "redirect:/tour";
     }
 
-    // 특정 투어 삭제
+    // 투어 삭제 처리
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteSelectedTravel(@PathVariable Long id) {
+    public ResponseEntity<String> deleteHotel(@PathVariable Long id) {
 
         tourRepo.deleteById(id);
-
-        return ResponseEntity.ok("삭제가 완료되었습니다.");
+        
+        return ResponseEntity.ok("삭제 완료");
     }
 }

@@ -1,9 +1,5 @@
 package renewal.awesome_travel_backoffice.tour.entity;
 
-import java.time.LocalDate;
-
-import org.springframework.format.annotation.DateTimeFormat;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -19,7 +15,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import renewal.awesome_travel_backoffice.air.entity.Air;
+import renewal.awesome_travel_backoffice.air.entity.SeatClass;
 import renewal.awesome_travel_backoffice.hotel.entity.Hotel;
 import renewal.awesome_travel_backoffice.tour.utiles.Type;
 
@@ -42,20 +38,21 @@ public class Location{
     @Column(nullable = false)
     private Type type;
     private String description;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate date;
+    // @DateTimeFormat(pattern = "yyyy-MM-dd")
+    // private LocalDate date;
     
     // ==============Type이 AIR면 사용할 필드===============
     @OneToOne
-    @JoinColumn(name = "air_id", nullable = false)
-    private Air air;
+    @JoinColumn(name = "seatClass_id")
+    private SeatClass seatClass;
 
     // ==============Type이 POINT면 사용할 필드===============
     // private String country;
+    @Column
     private String city;
     
     // ==============Type이 HOTEL이면 사용할 필드===============
     @OneToOne
-    @JoinColumn(name = "hotel_id", nullable = false)
+    @JoinColumn(name = "hotel_id")
     private Hotel hotel;
 }

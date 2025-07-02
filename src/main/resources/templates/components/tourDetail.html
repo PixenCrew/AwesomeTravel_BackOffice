@@ -90,7 +90,7 @@
 
             <!-- 1) Tour → Schedule 반복 -->
             <div id="scheduleContainer">
-                <div class="schedule-point" th:each="sched, schedStat : *{schedules}" th:attr="data-sched-idx=${schedStat.index}">
+                <div class="schedule-point" th:if="${tour.id != null}" th:each="sched, schedStat : *{schedules}" th:attr="data-sched-idx=${schedStat.index}">
                     <label>날짜:</label>
                     <input type="date" th:field="*{schedules[__${schedStat.index}__].date}" /><br>
                     <button type="button" onclick="removeSchedule(this)">스케줄 삭제</button>
@@ -100,25 +100,28 @@
                         <!-- Schedule → Location 반복 -->
                         <div class="location-point" th:each="loc, locStat : *{schedules[__${schedStat.index}__].locations}">
                             <!-- 위치 타입 -->
-                            <input type="hidden" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].type}" />
+                            <select th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].type}">
+                                <option th:each="type : ${types}" th:value="${type}" th:text="${type}"></option>
+                            </select>
+                            <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].description}" />
+                            <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].seatClass}" />
+                            <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].city}" list="countryList" />
+                            <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].hotel}" />
 
-                            <!-- 도시 입력 -->
-                            <label>도시:</label>
+                            <!-- <label>도시:</label>
                             <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].city}" list="cityList" placeholder="예: KR | South Korea | 대한민국" onchange="stripAfterPipe(this)" />
 
-                            <!-- POINT 전용 -->
                             <label>포인트 종료일:</label>
                             <input type="date" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].date}" min="2000-04-01" max="2026-12-31" />
 
-                            <!-- AIR 전용 -->
                             <div th:if="${loc.type.name() == 'AIR'}">
                                 <label>항공편:</label>
-                                <select th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].air.id}">
+                                <select th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].seatClass.id}">
                                     <option th:each="airEntity : ${airList}" th:value="${airEntity.id}" th:text="${airEntity.name}">
                                         항공사
                                     </option>
                                 </select>
-                            </div>
+                            </div> -->
 
                             <!-- 삭제 -->
                             <button type="button" onclick="removeLocation(this)">삭제</button>
@@ -195,9 +198,9 @@
             schedDiv.appendChild(aBtn);
 
             const hBtn = document.createElement("button");
-            aBtn.type = "button";
-            aBtn.textContent = "HOTEL 추가";
-            aBtn.addEventListener("click", () => addLocationHotel(hBtn));
+            hBtn.type = "button";
+            hBtn.textContent = "HOTEL 추가";
+            hBtn.addEventListener("click", () => addLocationHotel(hBtn));
             schedDiv.appendChild(hBtn);
 
             container.appendChild(schedDiv);
@@ -263,7 +266,7 @@
 
             wrapper.appendChild(createLabel("항공편 번호:"));
             const airNo = createInput("text",
-                `schedules[${schedIdx}].locations[${locIdx}].air.id`,
+                `schedules[${schedIdx}].locations[${locIdx}].seatClass.id`,
                 "항공편 번호 입력",
                 { onclick: "searchAir(this)" });
             wrapper.appendChild(airNo);
@@ -396,6 +399,20 @@
             // TODO: 날짜, 도시 입력 후 항공 목록 Popup
             console.log("searchAir called for:", input.value);
         }
+
+        function deleteTour(id) {
+            if (confirm('정말로 삭제하시겠습니까?')) {
+                fetch('/tour/' + id, { method: 'DELETE' })
+                    .then(res => {
+                        if (res.ok) {
+                            alert('삭제 성공');
+                            window.location.href = '/tour';
+                        } else {
+                            alert('삭제 실패');
+                        }
+                    });
+            }
+        }
     </script>
 
     <datalist id="countryList">
@@ -405,6 +422,10 @@
 
     <datalist id="cityList">
         <option th:each="cc : ${cityCode}" th:value="${cc.code} + ' | ' + ${cc.country} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
+    </datalist>
+
+    <datalist id="types">
+        <option th:each="type : ${types}" th:value="${type}"></option>
     </datalist>
 
     <style>
