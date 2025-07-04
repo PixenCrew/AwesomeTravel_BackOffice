@@ -119,3 +119,191 @@ VALUES
 (5, 20, '2025-06-20', '2025-06-23', '2025-06-20 04:43:59', 'COMPLETED'),
 (5, 22, '2025-06-25', '2025-06-27', '2025-06-25 16:19:13', 'COMPLETED'),
 (5, 14, '2025-06-04', '2025-06-06', '2025-06-04 12:06:12', 'COMPLETED');
+
+INSERT IGNORE INTO airline (code, name_kor, name_eng, infant_seats_required) VALUES
+('AA', '아메리칸 항공',        'American Airlines',           false),
+('BA', '영국항공',            'British Airways',             false),
+('DL', '델타 항공',           'Delta Air Lines',             false),
+('EK', '에미레이트 항공',     'Emirates',                    false),
+('JL', '일본항공',            'Japan Airlines',              false),
+('AF', '에어프랑스',          'Air France',                  false),
+('LH', '루프트한자',          'Lufthansa',                   false),
+('SQ', '싱가포르항공',        'Singapore Airlines',          false),
+('CX', '캐세이퍼시픽',        'Cathay Pacific',              false),
+('UA', '유나이티드항공',      'United Airlines',             false),
+('QR', '카타르항공',          'Qatar Airways',               false),
+('EY', '에티하드항공',        'Etihad Airways',              false),
+('QF', '콴타스항공',          'Qantas',                      false),
+('NZ', '에어뉴질랜드',        'Air New Zealand',             false),
+('AC', '에어캐나다',          'Air Canada',                  false),
+('TK', '터키항공',            'Turkish Airlines',            false),
+('KL', 'KLM 네덜란드항공',    'KLM Royal Dutch Airlines',    false);
+
+INSERT IGNORE INTO air (id, code, airline_code, depart, depart_time, arrive, arrive_time, stopovers, status, flight_type, created_at, created_by, modified_at, modified_by)
+VALUES 
+( 1, 'AA101', 'AA', 'ICN', '08:00', 'JFK', '14:00', 0, 'ACTIVE', 'DIRECT','2025-07-01 09:00:00', 'admin', '2025-07-01 09:00:00', 'admin'),
+( 2, 'BA202', 'BA', 'LHR', '09:30', 'CDG', '11:50', 0, 'ACTIVE', 'DIRECT','2025-07-01 09:05:00', 'admin', '2025-07-01 09:05:00', 'admin'),
+( 3, 'DL303', 'DL', 'ATL', '13:00', 'LAX', '15:45', 1, 'ACTIVE', 'DIRECT','2025-07-01 09:10:00', 'admin', '2025-07-01 09:10:00', 'admin'),
+( 4, 'EK404', 'EK', 'DXB', '02:00', 'SYD', '18:00', 2, 'ACTIVE', 'DIRECT','2025-07-01 09:15:00', 'admin', '2025-07-01 09:15:00', 'admin'),
+( 5, 'JL505', 'JL', 'NRT', '07:45', 'ICN', '10:15', 0, 'ACTIVE', 'DIRECT','2025-07-01 09:20:00', 'admin', '2025-07-01 09:20:00', 'admin'),
+( 6, 'AF707', 'AF', 'CDG', '12:20', 'ICN', '06:30', 1, 'ACTIVE', 'DIRECT','2025-07-01 09:25:00', 'admin', '2025-07-01 09:25:00', 'admin'),
+( 7, 'LH808', 'LH', 'FRA', '10:00', 'JFK', '13:00', 0, 'ACTIVE', 'DIRECT','2025-07-01 09:30:00', 'admin', '2025-07-01 09:30:00', 'admin'),
+( 8, 'SQ909', 'SQ', 'SIN', '23:00', 'LAX', '07:00', 1, 'ACTIVE', 'DIRECT','2025-07-01 09:35:00', 'admin', '2025-07-01 09:35:00', 'admin'),
+( 9, 'CX010', 'CX', 'HKG', '14:15', 'LHR', '19:40', 0, 'ACTIVE', 'DIRECT','2025-07-01 09:40:00', 'admin', '2025-07-01 09:40:00', 'admin'),
+(10, 'UA111', 'UA', 'SFO', '16:30', 'EWR', '00:50', 1, 'ACTIVE', 'DIRECT','2025-07-01 09:45:00', 'admin', '2025-07-01 09:45:00', 'admin'),
+(11, 'QR121', 'QR', 'DOH', '02:45', 'LHR', '07:45', 0, 'ACTIVE', 'DIRECT','2025-07-01 09:50:00', 'admin', '2025-07-01 09:50:00', 'admin'),
+(12, 'EY131', 'EY', 'AUH', '09:10', 'JFK', '15:20', 1, 'ACTIVE', 'DIRECT','2025-07-01 09:55:00', 'admin', '2025-07-01 09:55:00', 'admin'),
+(13, 'QF141', 'QF', 'SYD', '22:00', 'LAX', '06:30', 2, 'ACTIVE', 'DIRECT','2025-07-01 10:00:00', 'admin', '2025-07-01 10:00:00', 'admin'),
+(14, 'NZ151', 'NZ', 'AKL', '08:50', 'SYD', '10:30', 0, 'ACTIVE', 'DIRECT','2025-07-01 10:05:00', 'admin', '2025-07-01 10:05:00', 'admin'),
+(15, 'AC161', 'AC', 'YVR', '11:20', 'LHR', '05:15', 1, 'ACTIVE', 'DIRECT','2025-07-01 10:10:00', 'admin', '2025-07-01 10:10:00', 'admin'),
+(16, 'TK171', 'TK', 'IST', '06:00', 'AMS', '08:30', 0, 'ACTIVE', 'DIRECT','2025-07-01 10:15:00', 'admin', '2025-07-01 10:15:00', 'admin'),
+(17, 'KL181', 'KL', 'AMS', '15:40', 'ICN', '09:50', 1, 'ACTIVE', 'DIRECT','2025-07-01 10:20:00', 'admin', '2025-07-01 10:20:00', 'admin'),
+(18, 'CX191', 'CX', 'HKG', '07:30', 'SIN', '11:00', 0, 'ACTIVE', 'DIRECT','2025-07-01 10:25:00', 'admin', '2025-07-01 10:25:00', 'admin'),
+(19, 'LH202', 'LH', 'FRA', '13:15', 'PEK', '05:45', 1, 'ACTIVE', 'DIRECT','2025-07-01 10:30:00', 'admin', '2025-07-01 10:30:00', 'admin'),
+(20, 'JL212', 'JL', 'HND', '10:05', 'LHR', '15:20', 0, 'ACTIVE', 'DIRECT', '2025-07-01 10:35:00', 'admin', '2025-07-01 10:35:00', 'admin');
+
+-- ====== stopoverList ======
+INSERT IGNORE INTO air_stopover_list (air_id, stopover_list) VALUES
+-- Flight 3 (air_id = 3, stopovers = 1)
+  (3, 'MDW'),
+-- Flight 4 (air_id = 4, stopovers = 2)
+  (4, 'SIN'),
+  (4, 'MEL'),
+-- Flight 6 (air_id = 6, stopovers = 1)
+  (6, 'IST'),
+-- Flight 8 (air_id = 8, stopovers = 1)
+  (8, 'DXB'),
+-- Flight 10 (air_id = 10, stopovers = 1)
+  (10, 'ORD'),
+-- Flight 12 (air_id = 12, stopovers = 1)
+  (12, 'LHR'),
+-- Flight 13 (air_id = 13, stopovers = 2)
+  (13, 'HNL'),
+  (13, 'GDL'),
+-- Flight 15 (air_id = 15, stopovers = 1)
+  (15, 'YYZ'),
+-- Flight 17 (air_id = 17, stopovers = 1)
+  (17, 'DXB'),
+-- Flight 19 (air_id = 19, stopovers = 1)
+  (19, 'IST');
+
+INSERT IGNORE INTO seat_class (id, air_id, class_type, price, max_seats, available_seats) 
+VALUES 
+-- Flight 1 (air_id = 1)
+( 1,  1, 'ECONOMY',        100000, 200, 200),
+( 2,  1, 'PREMIUMECONOMY', 150000,  50,  50),
+( 3,  1, 'BUSINESS',       300000,  20,  20),
+( 4,  1, 'FIRST',          500000,   5,   5),
+-- Flight 2 (air_id = 2)
+( 5,  2, 'ECONOMY',        100000, 200, 200),
+( 6,  2, 'PREMIUMECONOMY', 150000,  50,  50),
+( 7,  2, 'BUSINESS',       300000,  20,  20),
+( 8,  2, 'FIRST',          500000,   5,   5),
+
+-- Flight 3 (air_id = 3)
+( 9,  3, 'ECONOMY',        100000, 200, 200),
+(10,  3, 'PREMIUMECONOMY', 150000,  50,  50),
+(11,  3, 'BUSINESS',       300000,  20,  20),
+(12,  3, 'FIRST',          500000,   5,   5),
+
+-- Flight 4 (air_id = 4)
+(13,  4, 'ECONOMY',        100000, 200, 200),
+(14,  4, 'PREMIUMECONOMY', 150000,  50,  50),
+(15,  4, 'BUSINESS',       300000,  20,  20),
+(16,  4, 'FIRST',          500000,   5,   5),
+
+-- Flight 5 (air_id = 5)
+(17,  5, 'ECONOMY',        100000, 200, 200),
+(18,  5, 'PREMIUMECONOMY', 150000,  50,  50),
+(19,  5, 'BUSINESS',       300000,  20,  20),
+(20,  5, 'FIRST',          500000,   5,   5),
+
+-- Flight 6 (air_id = 6)
+(21,  6, 'ECONOMY',        100000, 200, 200),
+(22,  6, 'PREMIUMECONOMY', 150000,  50,  50),
+(23,  6, 'BUSINESS',       300000,  20,  20),
+(24,  6, 'FIRST',          500000,   5,   5),
+
+-- Flight 7 (air_id = 7)
+(25,  7, 'ECONOMY',        100000, 200, 200),
+(26,  7, 'PREMIUMECONOMY', 150000,  50,  50),
+(27,  7, 'BUSINESS',       300000,  20,  20),
+(28,  7, 'FIRST',          500000,   5,   5),
+
+-- Flight 8 (air_id = 8)
+(29,  8, 'ECONOMY',        100000, 200, 200),
+(30,  8, 'PREMIUMECONOMY', 150000,  50,  50),
+(31,  8, 'BUSINESS',       300000,  20,  20),
+(32,  8, 'FIRST',          500000,   5,   5),
+
+-- Flight 9 (air_id = 9)
+(33,  9, 'ECONOMY',        100000, 200, 200),
+(34,  9, 'PREMIUMECONOMY', 150000,  50,  50),
+(35,  9, 'BUSINESS',       300000,  20,  20),
+(36,  9, 'FIRST',          500000,   5,   5),
+
+-- Flight 10 (air_id = 10)
+(37, 10, 'ECONOMY',        100000, 200, 200),
+(38, 10, 'PREMIUMECONOMY', 150000,  50,  50),
+(39, 10, 'BUSINESS',       300000,  20,  20),
+(40, 10, 'FIRST',          500000,   5,   5),
+
+-- Flight 11 (air_id = 11)
+(41, 11, 'ECONOMY',        100000, 200, 200),
+(42, 11, 'PREMIUMECONOMY', 150000,  50,  50),
+(43, 11, 'BUSINESS',       300000,  20,  20),
+(44, 11, 'FIRST',          500000,   5,   5),
+
+-- Flight 12 (air_id = 12)
+(45, 12, 'ECONOMY',        100000, 200, 200),
+(46, 12, 'PREMIUMECONOMY', 150000,  50,  50),
+(47, 12, 'BUSINESS',       300000,  20,  20),
+(48, 12, 'FIRST',          500000,   5,   5),
+
+-- Flight 13 (air_id = 13)
+(49, 13, 'ECONOMY',        100000, 200, 200),
+(50, 13, 'PREMIUMECONOMY', 150000,  50,  50),
+(51, 13, 'BUSINESS',       300000,  20,  20),
+(52, 13, 'FIRST',          500000,   5,   5),
+
+-- Flight 14 (air_id = 14)
+(53, 14, 'ECONOMY',        100000, 200, 200),
+(54, 14, 'PREMIUMECONOMY', 150000,  50,  50),
+(55, 14, 'BUSINESS',       300000,  20,  20),
+(56, 14, 'FIRST',          500000,   5,   5),
+
+-- Flight 15 (air_id = 15)
+(57, 15, 'ECONOMY',        100000, 200, 200),
+(58, 15, 'PREMIUMECONOMY', 150000,  50,  50),
+(59, 15, 'BUSINESS',       300000,  20,  20),
+(60, 15, 'FIRST',          500000,   5,   5),
+
+-- Flight 16 (air_id = 16)
+(61, 16, 'ECONOMY',        100000, 200, 200),
+(62, 16, 'PREMIUMECONOMY', 150000,  50,  50),
+(63, 16, 'BUSINESS',       300000,  20,  20),
+(64, 16, 'FIRST',          500000,   5,   5),
+
+-- Flight 17 (air_id = 17)
+(65, 17, 'ECONOMY',        100000, 200, 200),
+(66, 17, 'PREMIUMECONOMY', 150000,  50,  50),
+(67, 17, 'BUSINESS',       300000,  20,  20),
+(68, 17, 'FIRST',          500000,   5,   5),
+
+-- Flight 18 (air_id = 18)
+(69, 18, 'ECONOMY',        100000, 200, 200),
+(70, 18, 'PREMIUMECONOMY', 150000,  50,  50),
+(71, 18, 'BUSINESS',       300000,  20,  20),
+(72, 18, 'FIRST',          500000,   5,   5),
+
+-- Flight 19 (air_id = 19)
+(73, 19, 'ECONOMY',        100000, 200, 200),
+(74, 19, 'PREMIUMECONOMY', 150000,  50,  50),
+(75, 19, 'BUSINESS',       300000,  20,  20),
+(76, 19, 'FIRST',          500000,   5,   5),
+
+-- Flight 20 (air_id = 20)
+(77, 20, 'ECONOMY',        100000, 200, 200),
+(78, 20, 'PREMIUMECONOMY', 150000,  50,  50),
+(79, 20, 'BUSINESS',       300000,  20,  20),
+(80, 20, 'FIRST',          500000,   5,   5);
