@@ -45,7 +45,8 @@ public class Location{
     @OneToOne
     @JoinColumn(name = "seatClass_id")
     private SeatClass seatClass;
-
+    private String from;
+    private String to;
     // ==============Type이 POINT면 사용할 필드===============
     // private String country;
     @Column
