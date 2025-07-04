@@ -137,7 +137,7 @@ public class TourController {
     public String selectTravel(@PathVariable("id") Long id, Model model) {
 
         Tour tour = tourRepo.getReferenceById(id);
-        model.addAttribute("types", Type.values());
+        model.addAttribute("types", Type.class);
         model.addAttribute("countryCode", countryRepo.findAll());
         model.addAttribute("cityCode", cityRepo.findAll());
         model.addAttribute("tour", tour);
