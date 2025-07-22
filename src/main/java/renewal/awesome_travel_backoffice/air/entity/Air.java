@@ -8,8 +8,13 @@ import renewal.awesome_travel_backoffice.air.utiles.AirStatus;
 import renewal.awesome_travel_backoffice.air.utiles.FlightType;
 import renewal.awesome_travel_backoffice.config.AuditingFields;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Table
@@ -24,23 +29,31 @@ public class Air extends AuditingFields {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String code;
+    private String flightNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "airline_code", nullable = false)
     private Airline airline;
 
     @Column(nullable = false)
-    private String depart;
+    private String departAirport;
 
     @Column(nullable = false)
-    private String depart_time;
+    private LocalDate departDate;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
+    @Column(nullable = false)
+    private LocalTime departTime;
 
     @Column(nullable = false)
-    private String arrive;
+    private String arriveAirport;
 
     @Column(nullable = false)
-    private String arrive_time;
+    private LocalDate arriveDate;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
+    @Column(nullable = false)
+    private LocalTime arriveTime;
 
     @Column(nullable = false)
     private Integer stopovers = 0; // 경유 횟수 (0 = 직항, 1 이상 = 경유)
@@ -60,87 +73,26 @@ public class Air extends AuditingFields {
     private List<SeatClass> seatClasses = new ArrayList<>();
 
     //공공데이터용 생성자
-    public Air(String code, Airline airline, String depart, String depart_time, String arrive, String arrive_time) {
-        this.code = code;
+    public Air(String flightNumber, Airline airline, String departAirport, LocalDate departDate, LocalTime departTime, String arriveAirport, LocalDate arriveDate, LocalTime arriveTime) {
+        this.flightNumber = flightNumber;
         this.airline = airline;
-        this.depart = depart;
-        this.depart_time = depart_time;
-        this.arrive = arrive;
-        this.arrive_time = arrive_time;
-        this.status = AirStatus.ACTIVE; // 예시: 기본 상태
-        this.stopovers = 0;              // 예시: 기본 경유 없음
-        this.flightType = FlightType.DIRECT; // 예시: 기본 직항 처리
+        this.departAirport = departAirport;
+        this.departDate = departDate;
+        this.departTime = departTime;
+        this.arriveAirport = arriveAirport;
+        this.arriveDate = arriveDate;
+        this.arriveTime = arriveTime;
     }
-    //수동생성 생성자
-    public Air(String code, Airline airline, String depart, String depart_time, String arrive, String arrive_time, Integer stopovers, FlightType flightType) {
-        this.code = code;
-        this.airline = airline;
-        this.depart = depart;
-        this.depart_time = depart_time;
-        this.arrive = arrive;
-        this.arrive_time = arrive_time;
+
+    public Air updateAir(Integer stopovers, List<SeatClass> seatClasses){
+        this.status = AirStatus.ACTIVE;
         this.stopovers = stopovers;
-        this.flightType = flightType;
+        if(stopovers == 0){
+            this.flightType = FlightType.DIRECT;
+        } else {
+            this.flightType = FlightType.STOP_OVER;
+        }
+        this.seatClasses = seatClasses;
+        return this;
     }
-
-    public void updateAir(String code, Airline airline, String depart, String depart_time, String arrive, String arrive_time, Integer stopovers, FlightType flightType) {
-        this.code = code;
-        this.airline = airline;
-        this.depart = depart;
-        this.depart_time = depart_time;
-        this.arrive = arrive;
-        this.arrive_time = arrive_time;
-        this.stopovers = stopovers;
-        this.flightType = flightType;
-    }
-
-    // public void setCode(String code) {
-    //     this.code = code;
-    // }
-
-    // public void setAirline(Airline airline) {
-    //     this.airline = airline;
-    // }
-
-    // public void setDepart(String depart) {
-    //     this.depart = depart;
-    // }
-
-    // public void setDepart_time(String depart_time) {
-    //     this.depart_time = depart_time;
-    // }
-
-    // public void setArrive(String arrive) {
-    //     this.arrive = arrive;
-    // }
-
-    // public void setArrive_time(String arrive_time) {
-    //     this.arrive_time = arrive_time;
-    // }
-
-    // public void setStopovers(Integer stopovers) {
-    //     this.stopovers = stopovers;
-    // }
-
-    // public void setFlightType(FlightType flightType) {
-    //     this.flightType = flightType;
-    // }
-
-    // public void updateStatus(AirStatus newStatus) {
-    //     this.status = newStatus;
-    // }
-
-    public void addSeatClass(SeatClass seatClass) {
-        this.seatClasses.add(seatClass);
-    }
-
-    public void clearSeatClasses() {
-        this.seatClasses.clear();
-    }
-
-    public void removeSeatClass(SeatClass seatClass) {
-        this.seatClasses.remove(seatClass);
-        seatClass.setAir(null);
-    }
-
 }
