@@ -21,5 +21,10 @@ public class Airline {
     private String nameEng;
 
     private boolean infantSeatsRequired;
+    
+    // 이름만 있는 생성자
+    public Airline(String airlineName){
+        this.code = airlineName;
+    }
 }
 

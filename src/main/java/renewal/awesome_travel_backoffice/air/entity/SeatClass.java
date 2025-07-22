@@ -1,13 +1,15 @@
 package renewal.awesome_travel_backoffice.air.entity;
 
+import org.springframework.lang.NonNull;
+
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import renewal.awesome_travel_backoffice.air.utiles.SeatClassType;
 
 @Entity
-@NoArgsConstructor
+@RequiredArgsConstructor
 @Getter
 @Setter
 @Table
@@ -15,59 +17,24 @@ public class SeatClass {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
     private Long id;
 
     @ManyToOne
     @JoinColumn(name = "air_id", nullable = false)
+    @NonNull
     private Air air;
 
     @Enumerated(EnumType.STRING) // Enum을 DB에 문자열로 저장
-    @Column(nullable = false)
+    @NonNull
     private SeatClassType classType; // 좌석 등급
 
-    @Column(nullable = false)
+    @NonNull
     private Long price; // 해당 등급의 가격
 
-    @Column(nullable = false)
+    @NonNull
     private Long maxSeats; // 해당 등급의 최대 좌석 수
-
-    @Column(nullable = false)
+    
+    @NonNull
     private Long availableSeats; // 잔여 좌석 수
 
-    public SeatClass(Air air, SeatClassType classType, Long price, Long maxSeats, Long availableSeats) {
-        this.air = air;
-        this.classType = classType;
-        this.price = price;
-        this.maxSeats = maxSeats;
-        this.availableSeats = availableSeats;
-    }
-
-    public void updateSeatClass(Long price, Long maxSeats, Long availableSeats) {
-        if (price != null) this.price = price;
-        if (maxSeats != null) this.maxSeats = maxSeats;
-        if (availableSeats != null) this.availableSeats = availableSeats;
-    }
-
-    public void update(SeatClassType classType, Long price, Long maxSeats, Long availableSeats) {
-        this.classType = classType;
-        this.price = price;
-        this.maxSeats = maxSeats;
-        this.availableSeats = availableSeats;
-    }
-
-    public void decreaseAvailableSeats(int count) {
-        if (this.availableSeats < count) {
-            throw new IllegalStateException("잔여 좌석이 부족합니다.");
-        }
-        this.availableSeats -= count;
-    }
-
-    public void increaseAvailableSeats(int count) {
-        this.availableSeats += count;
-    }
-
-    public void setAir(Air air) {
-        this.air = air;
-    }
 }

@@ -8,18 +8,19 @@ import lombok.Getter;
 import lombok.Setter;
 import renewal.awesome_travel_backoffice.air.utiles.AirStatus;
 import renewal.awesome_travel_backoffice.air.utiles.FlightType;
+import renewal.awesome_travel_backoffice.air.utiles.SeatClassType;
 
 @Getter
 @Setter
 public class AirFilterDTO {
     private String code;
-    private List<String> arilines;
+    private List<String> airlines;
     private LocalDate departDateFrom;
     private LocalDate departDateTo;
     private LocalDate arriveDateFrom;
     private LocalDate arriveDateTo;
-    private String depart;
-    private String arrive;
+    private String departAirport;
+    private String arriveAirport;
     private Long minStopovers;
     private Long maxStopovers;
     private Boolean infantSeatsRequired;
@@ -32,4 +33,5 @@ public class AirFilterDTO {
     private BigDecimal minPrice;
     private BigDecimal maxPrice;
     private Long availableSeats;
+    private SeatClassType seatClassType;
 }

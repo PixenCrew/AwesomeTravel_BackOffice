@@ -3,6 +3,8 @@ package renewal.awesome_travel_backoffice.air.entity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -14,25 +16,30 @@ public class FlightItem {
     @JsonProperty("운항편명")
     private String flightNumber;
 
+    @JsonProperty("운항요일")
+    private String operatingDays;  // "토" 형식
+
+    //========================================
+
     @JsonProperty("출발공항")
     private String departureAirport;
+    
+    @JsonProperty("시작일자")
+    private LocalDate startDate;  // "2024-04-27" 형식
+
+    @JsonProperty("출발시간")
+    private LocalTime departureTime;  // "16:00" 형식
+
+    //========================================
 
     @JsonProperty("도착공항")
     private String arrivalAirport;
 
-    @JsonProperty("출발시간")
-    private String departureTime;  // "16:00" 형식
+    @JsonProperty("종료일자")
+    private LocalDate endDate;
 
     @JsonProperty("도착시간")
-    private String arrivalTime;
-
-    @JsonProperty("운항요일")
-    private String operatingDays;  // "토" 형식
-
-    @JsonProperty("시작일자")
-    private String startDate;  // "2024-04-27" 형식
-
-    @JsonProperty("종료일자")
-    private String endDate;
+    private LocalTime arrivalTime;
+    
 }
 
