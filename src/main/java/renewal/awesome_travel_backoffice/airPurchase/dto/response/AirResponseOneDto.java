@@ -1,5 +1,7 @@
 package renewal.awesome_travel_backoffice.airPurchase.dto.response;
 
+import java.time.LocalDateTime;
+
 import lombok.Builder;
 import lombok.Getter;
 import renewal.awesome_travel_backoffice.air.utiles.FlightType;
@@ -18,8 +20,8 @@ public class AirResponseOneDto {
 
     private String depart;
     private String arrive;
-    private String departTime;
-    private String arriveTime;
+    private LocalDateTime departTime;
+    private LocalDateTime arriveTime;
     private int stopovers;
     private FlightType flightType;
 
