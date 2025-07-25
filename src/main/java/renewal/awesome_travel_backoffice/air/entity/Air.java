@@ -9,7 +9,6 @@ import renewal.awesome_travel_backoffice.air.utiles.FlightType;
 import renewal.awesome_travel_backoffice.config.AuditingFields;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
