@@ -10,7 +10,7 @@
 
         <div>
             <label>항공편 코드:</label>
-            <input type="text" th:field="*{code}" required />
+            <input type="text" th:field="*{flightNumber}" required />
         </div>
 
         <div>
@@ -24,22 +24,32 @@
 
         <div>
             <label>출발지:</label>
-            <input type="text" th:field="*{depart}" list="cityList" onchange="stripAfterPipe(this)" required />
+            <input type="text" th:field="*{departAirport}" list="cityList" onchange="stripAfterPipe(this)" required />
+        </div>
+
+        <div>
+            <label>출발 일:</label>
+            <input type="date" th:field="*{departDate}" required />
         </div>
 
         <div>
             <label>출발 시간:</label>
-            <input type="datetime-local" th:field="*{depart_time}" required />
+            <input type="time" th:field="*{departTime}" required />
         </div>
 
         <div>
             <label>도착지:</label>
-            <input type="text" th:field="*{arrive}" list="cityList" onchange="stripAfterPipe(this)" required />
+            <input type="text" th:field="*{arriveAirport}" list="cityList" onchange="stripAfterPipe(this)" required />
+        </div>
+
+        <div>
+            <label>도착일:</label>
+            <input type="date" th:field="*{arriveDate}" required />
         </div>
 
         <div>
             <label>도착 시간:</label>
-            <input type="datetime-local" th:field="*{arrive_time}" required />
+            <input type="time" th:field="*{arriveTime}" required />
         </div>
 
         <div>
@@ -50,8 +60,7 @@
         <div id="stopoverContainer">
             <div th:each="stop, iterStat : *{stopoverList}">
                 <div class="stopover-entry">
-                    <input type="text" th:field="*{stopoverList[__${iterStat.index}__]}" list="cityList"
-                        onchange="stripAfterPipe(this)" required />
+                    <input type="text" th:field="*{stopoverList[__${iterStat.index}__]}" list="cityList" onchange="stripAfterPipe(this)" required />
                     <button type="button" onclick="removeStopover(this)">삭제</button>
                 </div>
             </div>
@@ -153,10 +162,27 @@
             document.getElementById("stopovers").value = stopoverCount;
         }
 
+        function searchAir(button) {
+            const locPoint = button.closest('.location-point');
+            const from = locPoint.querySelector('input[list="cityList"]').value;
+            const to = locPoint.querySelectorAll('input[list="cityList"]')[1].value;
+            const count = document.querySelector('input[name="count"]').value;
+            window.open(
+                `/air/search?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&count=${encodeURIComponent(count)}`,
+                'airSearchPopup',
+                'width=800,height=600,scrollbars=yes'
+            );
+            window.__lastSeatInput__ = locPoint.querySelector('input[data-role="seatClass"]');
+        }
+
+        function __fillSelectedAirId__(selectedId) {
+            if (window.__lastSeatInput__) {
+                window.__lastSeatInput__.value = selectedId;
+            }
+        }
     </script>
 
     <datalist id="cityList">
-        <option th:each="cc : ${cityCode}"
-            th:value="${cc.code} + ' | ' + ${cc.country} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
+        <option th:each="cc : ${cityCode}" th:value="${cc.code} + ' | ' + ${cc.country} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
     </datalist>
 </div>

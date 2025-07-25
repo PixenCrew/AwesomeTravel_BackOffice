@@ -11,32 +11,36 @@
         <div>
             <label>항공사 선택:</label><br />
             <div th:each="airline : ${allAirlines}">
-                <input type="checkbox" th:field="*{arilines}" th:value="${airline}" th:id="${'air_' + airline}" />
+                <input type="checkbox" th:field="*{airlines}" th:value="${airline}" th:id="${'air_' + airline}" />
                 <label th:for="${'air_' + airline}" th:text="${airline}"></label>
             </div>
         </div>
         <br />
 
+        <!-- 좌석등급 -->
+        <label>좌석등급:</label>
+        <input type="text" th:field="*{seatClassType}" list="seatClassList"/>
+
         <!-- 출발일 범위 -->
         <label>출발일 (From):</label>
-        <input type="datetime-local" th:field="*{departDateFrom}" />
+        <input type="date" th:field="*{departDateFrom}" />
         <label>출발일 (To):</label>
-        <input type="datetime-local" th:field="*{departDateTo}" />
+        <input type="date" th:field="*{departDateTo}" />
         <br />
 
         <!-- 도착일 범위 -->
         <label>도착일 (From):</label>
-        <input type="datetime-local" th:field="*{arriveDateFrom}" />
+        <input type="date" th:field="*{arriveDateFrom}" />
         <label>도착일 (To):</label>
-        <input type="datetime-local" th:field="*{arriveDateTo}" />
+        <input type="date" th:field="*{arriveDateTo}" />
         <br />
 
         <!-- 출발지/도착지 -->
         <label>출발지:</label>
-        <input type="text" th:field="*{depart}" placeholder="Enter depart" list="cityList"
+        <input type="text" th:field="*{departAirport}" placeholder="Enter depart" list="cityList"
             onchange="stripAfterPipe(this)" />
         <label>도착지:</label>
-        <input type="text" th:field="*{arrive}" placeholder="Enter arrive" list="cityList"
+        <input type="text" th:field="*{arriveAirport}" placeholder="Enter arrive" list="cityList"
             onchange="stripAfterPipe(this)" />
         <br />
 
@@ -123,6 +127,7 @@
                         <span th:if="${sortField=='departDate'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
                     </a>
                 </th>
+                <th>출발시간</th>
                 <th>도착지</th>
                 <th>
                     <a href="#" data-sortfield="arriveDate"
@@ -132,6 +137,7 @@
                         <span th:if="${sortField=='arriveDate'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
                     </a>
                 </th>
+                <th>도착시간</th>
                 <th>코드</th>
                 <th>항공사</th>
                 <th>항공사(한글)</th>
@@ -143,11 +149,11 @@
                 <th>좌석ID</th>
                 <th>등급</th>
                 <th>
-                    <a href="#" data-sortfield="price"
-                        th:data-sortdir="${sortField=='price' and sortDir=='asc' ? 'asc' : 'desc'}"
+                    <a href="#" data-sortfield="seatClasses.price"
+                        th:data-sortdir="${sortField=='seatClasses.price' and sortDir=='asc' ? 'asc' : 'desc'}"
                         onclick="toggleSort(this, event)">
                         가격
-                        <span th:if="${sortField=='price'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
+                        <span th:if="${sortField=='seatClasses.price'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
                     </a>
                 </th>
                 <th>총 좌석</th>
@@ -156,22 +162,23 @@
             </tr>
         </thead>
         <tbody>
-            <th:block th:each="air : ${airPage.content}">
-                <tr th:each="seatClass : ${air.seatClasses}"
-                    th:onclick="|window.location.href='@{/air/{id}(id=${air.id})}'|" style="cursor:pointer;">
-                    <td th:text="${air.id}">1</td>
-                    <td th:text="${air.depart}">1</td>
-                    <td th:text="${air.depart_time}">2025-01-01</td>
-                    <td th:text="${air.arrive}">1</td>
-                    <td th:text="${air.arrive_time}">2025-01-02</td>
-                    <td th:text="${air.code}">AB123</td>
-                    <td th:text="${air.airline.code}">AAA</td>
-                    <td th:text="${air.airline.nameKor}">좋은항공</td>
-                    <td th:text="${air.airline.nameEng}">GreatAir</td>
-                    <td th:text="${air.airline.infantSeatsRequired}">1</td>
-                    <td th:text="${air.stopovers}">0</td>
-                    <td th:text="${air.flightType}">ONE_WAY</td>
-                    <td th:text="${air.status}">ACTIVE</td>
+            <th:block th:each="seatClass : ${airPage.content}">
+                <tr th:onclick="|window.location.href='@{/air/{id}(id=${seatClass.air.id})}'|" style="cursor:pointer;">
+                    <td th:text="${seatClass.air.id}">1</td>
+                    <td th:text="${seatClass.air.departAirport}">1</td>
+                    <td th:text="${seatClass.air.departDate}">2025-01-01</td>
+                    <td th:text="${seatClass.air.departTime}">01:00</td>
+                    <td th:text="${seatClass.air.arriveAirport}">1</td>
+                    <td th:text="${seatClass.air.arriveDate}">2025-01-02</td>                    
+                    <td th:text="${seatClass.air.arriveTime}">01:00</td>
+                    <td th:text="${seatClass.air.flightNumber}">AB123</td>
+                    <td th:text="${seatClass.air.airline.code}">AAA</td>
+                    <td th:text="${seatClass.air.airline.nameKor}">좋은항공</td>
+                    <td th:text="${seatClass.air.airline.nameEng}">GreatAir</td>
+                    <td th:text="${seatClass.air.airline.infantSeatsRequired}">1</td>
+                    <td th:text="${seatClass.air.stopovers}">0</td>
+                    <td th:text="${seatClass.air.flightType}">ONE_WAY</td>
+                    <td th:text="${seatClass.air.status}">ACTIVE</td>
                     <td th:text="${seatClass.id}">123</td>
                     <td th:text="${seatClass.classType}">FIRST</td>
                     <td th:text="${seatClass.price}">50000</td>
@@ -217,6 +224,13 @@
 
     <datalist id="cityList">
         <option th:each="cc : ${cityCode}" th:value="${cc.code} + ' | ' + ${cc.country} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
+    </datalist>
+
+    <datalist id="seatClassList">
+        <option value="ECONOMY">ECONOMY</option>
+        <option value="PREMIUMECONOMY">PREMIUMECONOMY</option>
+        <option value="BUSINESS">BUSINESS</option>
+        <option value="FIRST">FIRST</option>
     </datalist>
 
 </div>
