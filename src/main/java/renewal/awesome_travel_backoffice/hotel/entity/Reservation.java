@@ -1,17 +1,17 @@
 package renewal.awesome_travel_backoffice.hotel.entity;
+import renewal.awesome_travel_backoffice.config.AuditingFields;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Table
 @Getter
 @Setter
-public class Reservation {
+public class Reservation extends AuditingFields {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,8 +33,8 @@ public class Reservation {
     @Column(nullable = false)
     private LocalDate endDate;
 
-    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime createdAt;
+    // @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    // private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 10, nullable = false)

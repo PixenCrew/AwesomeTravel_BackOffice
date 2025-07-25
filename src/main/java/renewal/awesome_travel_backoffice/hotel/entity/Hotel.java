@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import renewal.awesome_travel_backoffice.hotel.utils.HotelType;
 import renewal.awesome_travel_backoffice.product.entity.Product;
+import renewal.awesome_travel_backoffice.config.AuditingFields;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,7 +18,7 @@ import java.util.Set;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class Hotel {
+public class Hotel extends AuditingFields {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
