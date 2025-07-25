@@ -42,46 +42,6 @@
         <label for="count">인원:</label>
         <input type="number" th:field="*{count}" required /><br>
 
-        <!-- Schedule 리스트 바인딩 -->
-        <!-- <fieldset id="fieldset">
-            <legend>코스 스케줄 및 포인트/항공 정보</legend>
-            <button type="button" onclick="addSchedule()">스케줄 추가</button>
-            <div id="scheduleContainer">
-                <div class="schedule-point" th:each="sched, schedStat : *{schedules}" th:attr="data-sched-idx=${schedStat.index}">
-                    <div>일자: </div>
-                    <input type="date" th:field="*{schedules[__${schedStat.index}__].date}" />
-                    
-
-
-                    <div id="locationContainer" th:each="loc, locStat : *{schedules[__${schedStat.index}__].locations}">
-
-                        <div class="location-point">
-                            <input type="hidden" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].type}" />
-
-                            <label>도시:</label>
-                            <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].city}" list="cityList" placeholder="예: KR | South Korea | 대한민국" onchange="stripAfterPipe(this)" />
-
-                            <label>포인트 종료일:</label>
-                            <input type="date" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].date}" min="2000-04-01" max="2026-12-31" />
-
-                            <div th:if="${loc.type.name() == 'AIR'}">
-                                <label>항공편:</label>
-                                <select th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].air.id}">
-                                    <option th:each="airEntity : ${airList}" th:value="${airEntity.id}" th:text="${airEntity.name}">항공사</option>
-                                </select>
-                            </div>
-
-                            <button type="button" onclick="removeLocation(this)">삭제</button>
-                        </div>
-                    </div>
-
-                    <button type="button" onclick="addLocationPoint(this)">POINT 추가</button>
-                    <button type="button" onclick="addLocationAir(this)">AIR 추가</button>
-                    <button type="button" onclick="removeSchedule(this)">스케줄 삭제</button>
-                </div>
-
-
-        </fieldset> -->
         <fieldset id="fieldset">
             <legend>코스 스케줄 및 포인트/항공 정보</legend>
 
@@ -114,7 +74,7 @@
                                 항공편 번호
                                 <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].from}" placeholder="출발지 선택" list="cityList"/>
                                 <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].to}" placeholder="도착지 선택" list="cityList"/>
-                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].seatClass}" placeholder="항공편 ID 입력"/>
+                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].seatClass}" placeholder="항공편 ID 입력" onclick="searchAir(this)"/>
                             </div>
 
                             <div th:attr="hidden=${loc.type != types.POINT}">
