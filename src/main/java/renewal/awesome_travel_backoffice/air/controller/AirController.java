@@ -62,7 +62,6 @@ public class AirController {
 
         // 3) View에서 쓸 속성들
         model.addAttribute("airPage", airPage);
-        // model.addAttribute("airList", airPage.getContent());
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("title", "Air List");

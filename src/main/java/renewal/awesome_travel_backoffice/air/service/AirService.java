@@ -122,12 +122,6 @@ public class AirService {
                 filter.getMinStopovers(), filter.getMaxStopovers()));
         }
 
-        // // seatCount BETWEEN min AND max
-        // if (filter.getStartCount() != null || filter.getEndCount() != null) {
-        //     spec = spec.and(AirSpecification.seatCountBetween(
-        //         filter.getStartCount(), filter.getEndCount()));
-        // }
-
         // flightType == value
         if (filter.getFlightType() != null) {
             spec = spec.and(AirSpecification.flightTypeEquals(filter.getFlightType()));
@@ -148,11 +142,6 @@ public class AirService {
         if (filter.getAvailableSeats() != null) {
             spec = spec.and(AirSpecification.availableSeatsMore(filter.getAvailableSeats()));
         }
-
-        // seatClass.seatClassType == value
-        // if (filter.getSeatClassType() != null) {
-        //     spec = spec.and(AirSpecification.seatClassEquals(filter.getSeatClassType()));
-        // }
 
         return seatClassRepository.findAll(spec, pageable);
     }
