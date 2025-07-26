@@ -106,7 +106,8 @@
     </form>
 
     <button th:if="${tour.id != null}" th:onclick="deleteTour([[${tour.id}]])">삭제</button>
-
+    
+    <script src="/js/util.js"></script>
     <script>
         // 전역 스케줄 인덱스 (초기값: 이미 렌더링된 .schedule-point 개수)
         let scheduleIndex = document.querySelectorAll(
@@ -220,7 +221,7 @@
                     'text',
                     `schedules[${schedIdx}].locations[${locIdx}].city`,
                     '예: KR | South Korea | 대한민국',
-                    { list: 'countryList', onchange: 'stripAfterPipe(this)' }
+                    { list: 'countryList', onchange: '(this)' }
                 ));
             } else if (type === 'AIR') {
                 addDiv.appendChild(createLabel('출발지 '));
@@ -328,14 +329,26 @@
             return hidden;
         }
 
-        function stripAfterPipe(input) {
-            if (input.value.includes("|")) {
-                input.value = input.value.split("|")[0].trim();
-            }
-        }
-
         function searchAir(input) {
             // TODO: 날짜, 도시 입력 후 항공 목록 Popup
+            const locationDiv = input.closest(".location-point"); // .from, .to는 여기 안에 있음
+            const containerDiv = input.closest(".location-container"); // .date는 여기 바깥에 있음
+
+            // 1. 형제 요소 from, to
+            const fromInput = locationDiv.querySelector("input[name$='.from']");
+            const toInput = locationDiv.querySelector("input[name$='.to']");
+
+            // 2. 상위 스케줄 블록의 date
+            const dateInput = containerDiv.closest("div").querySelector("input[type='date']");
+
+            // 3. 값 읽기
+            const fromValue = fromInput?.value || "(없음)";
+            const toValue = toInput?.value || "(없음)";
+            const dateValue = dateInput?.value || "(없음)";
+
+            console.log("출발지 (from):", fromValue);
+            console.log("도착지 (to):", toValue);
+            console.log("날짜 (date):", dateValue);
             console.log("searchAir called for:", input.value);
         }
 

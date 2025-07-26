@@ -74,7 +74,8 @@
     </form>
 
     <button th:if="${hotel.id != null}" th:onclick="deleteHotel([[${hotel.id}]])">삭제</button>
-
+    
+    <script src="/js/util.js"></script>
     <script>
         function deleteHotel(id) {
             if (confirm('정말로 삭제하시겠습니까?')) {
@@ -162,14 +163,6 @@
                     .catch(error => {
                         alert('이미지 삭제 실패: ' + error.message);
                     });
-            }
-        }
-
-        // 검색 결과중 코드 | 영문 | 한글 중 "코드"만 남기는 함수
-        function stripAfterPipe(input) {
-            const val = input.value;
-            if (val.includes('|')) {
-                input.value = val.split('|')[0].trim();
             }
         }
         
