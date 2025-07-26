@@ -53,6 +53,11 @@
         </div>
 
         <div>
+            <label>비행 유형:</label>
+            <input type="text" th:field="*{flightType}" readonly />
+        </div>
+
+        <div>
             <label>경유 횟수:</label>
             <input type="number" th:field="*{stopovers}" id="stopovers" min="0" readonly />
         </div>
@@ -70,18 +75,9 @@
         <div>
             <label>상태:</label>
             <select th:field="*{status}">
-                <option value="ACTIVE">활성</option>
-                <option value="INACTIVE">비활성</option>
+                <option th:each="st : ${T(renewal.awesome_travel_backoffice.air.utiles.AirStatus).values()}" th:value="${st}" th:text="${st}">STATUS</option>
             </select>
-        </div>
-
-        <div>
-            <label>비행 유형:</label>
-            <!-- <select th:field="*{flightType}">
-                <option value="DIRECT">직항</option>
-                <option value="INDIRECT">경유</option>
-            </select> -->
-            <input type="text" th:field="*{flightType}" readonly />
+            <br />
         </div>
 
         <hr />
