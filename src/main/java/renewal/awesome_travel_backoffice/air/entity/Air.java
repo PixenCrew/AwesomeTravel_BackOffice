@@ -37,6 +37,7 @@ public class Air extends AuditingFields {
     @Column(nullable = false)
     private String departAirport;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(nullable = false)
     private LocalDate departDate;
 
@@ -46,7 +47,8 @@ public class Air extends AuditingFields {
 
     @Column(nullable = false)
     private String arriveAirport;
-
+    
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(nullable = false)
     private LocalDate arriveDate;
 

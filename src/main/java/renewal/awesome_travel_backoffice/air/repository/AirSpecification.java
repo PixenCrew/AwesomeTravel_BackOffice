@@ -58,11 +58,11 @@ public class AirSpecification {
         return (root, query, builder) -> {
             Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT);
             if (from != null && to != null) {
-                return builder.between(seatJoin.get("depart_time"), from, to);
+                return builder.between(seatJoin.get("departDate"), from, to);
             } else if (from != null) {
-                return builder.greaterThanOrEqualTo(seatJoin.get("depart_time"), from);
+                return builder.greaterThanOrEqualTo(seatJoin.get("departDate"), from);
             } else if (to != null) {
-                return builder.lessThanOrEqualTo(seatJoin.get("depart_time"), to);
+                return builder.lessThanOrEqualTo(seatJoin.get("departDate"), to);
             } else {
                 return null;
             }
@@ -74,11 +74,11 @@ public class AirSpecification {
         return (root, query, builder) -> {
             Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT);
             if (from != null && to != null) {
-                return builder.between(seatJoin.get("arrive_time"), from, to);
+                return builder.between(seatJoin.get("arriveDate"), from, to);
             } else if (from != null) {
-                return builder.greaterThanOrEqualTo(seatJoin.get("arrive_time"), from);
+                return builder.greaterThanOrEqualTo(seatJoin.get("arriveDate"), from);
             } else if (to != null) {
-                return builder.lessThanOrEqualTo(seatJoin.get("arrive_time"), to);
+                return builder.lessThanOrEqualTo(seatJoin.get("arriveDate"), to);
             } else {
                 return null;
             }
