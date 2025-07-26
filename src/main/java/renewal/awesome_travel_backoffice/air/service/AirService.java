@@ -69,6 +69,11 @@ public class AirService {
 
         Specification<SeatClass> spec = Specification.where(null);
 
+        // seatClassType LIKE %seatClassType%
+        if (filter.getSeatClassType() != null) {
+            spec = spec.and(AirSpecification.seatClassEquals(filter.getSeatClassType()));
+        }
+
         // code LIKE %code%
         if (StringUtils.hasText(filter.getCode())) {
             spec = spec.and(AirSpecification.codeContains(filter.getCode()));

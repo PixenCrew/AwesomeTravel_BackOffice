@@ -19,7 +19,12 @@
 
         <!-- 좌석등급 -->
         <label>좌석등급:</label>
-        <input type="text" th:field="*{seatClassType}" list="seatClassList"/>
+        <select th:field="*{seatClassType}">
+            <option value=""> ALL </option>
+            <option th:each="type : ${T(renewal.awesome_travel_backoffice.air.utiles.SeatClassType).values()}"
+                th:value="${type}" th:text="${type}">TYPE</option>
+        </select>
+        <br />
 
         <!-- 출발일 범위 -->
         <label>출발일 (From):</label>
@@ -56,7 +61,7 @@
             <span>유아 좌석 필요 여부:</span>
 
             <!-- 1) 선택 안 함 (null) -->
-            <input type="radio" th:field="*{infantSeatsRequired}" value="" id="infant-none" />
+            <input type="radio" th:field="*{infantSeatsRequired}" value="" id="infant-none" checked/>
             <label for="infant-none">선택 안 함</label>
 
             <!-- 2) 필요 (true) -->
@@ -78,13 +83,16 @@
         <!-- 비행 타입 -->
         <label>비행 타입:</label>
         <select th:field="*{flightType}">
+            <option value=""> ALL </option>
             <option th:each="type : ${T(renewal.awesome_travel_backoffice.air.utiles.FlightType).values()}"
                 th:value="${type}" th:text="${type}">TYPE</option>
         </select>
+        <br />
 
         <!-- 상태 -->
         <label>상태:</label>
         <select th:field="*{status}">
+            <option value=""> ALL </option>
             <option th:each="st : ${T(renewal.awesome_travel_backoffice.air.utiles.AirStatus).values()}"
                 th:value="${st}" th:text="${st}">STATUS</option>
         </select>
