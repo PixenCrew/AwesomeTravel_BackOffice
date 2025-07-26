@@ -102,7 +102,8 @@
     </form>
 
     <button th:if="${air.id != null}" th:onclick="deleteAir([[${air.id}]])">삭제</button>
-
+    
+    <script src="/js/util.js"></script>
     <script>
         function deleteAir(id) {
             if (confirm('정말로 삭제하시겠습니까?')) {
@@ -115,14 +116,6 @@
                             alert('삭제 실패');
                         }
                     });
-            }
-        }
-
-        // 검색 결과중 코드 | 영문 | 한글 중 "코드"만 남기는 함수
-        function stripAfterPipe(input) {
-            const val = input.value;
-            if (val.includes('|')) {
-                input.value = val.split('|')[0].trim();
             }
         }
 
