@@ -128,21 +128,21 @@
                 <th>ID</th>
                 <th>출발지</th>
                 <th>
-                    <a href="#" data-sortfield="departDate"
-                        th:data-sortdir="${sortField=='departDate' and sortDir=='asc' ? 'asc' : 'desc'}"
+                    <a href="#" data-sortfield="air.departDate"
+                        th:data-sortdir="${sortField=='air.departDate' and sortDir=='asc' ? 'asc' : 'desc'}"
                         onclick="toggleSort(this, event)">
                         출발일
-                        <span th:if="${sortField=='departDate'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
+                        <span th:if="${sortField=='air.departDate'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
                     </a>
                 </th>
                 <th>출발시간</th>
                 <th>도착지</th>
                 <th>
-                    <a href="#" data-sortfield="arriveDate"
-                        th:data-sortdir="${sortField=='arriveDate' and sortDir=='asc' ? 'asc' : 'desc'}"
+                    <a href="#" data-sortfield="air.arriveDate"
+                        th:data-sortdir="${sortField=='air.arriveDate' and sortDir=='asc' ? 'asc' : 'desc'}"
                         onclick="toggleSort(this, event)">
                         도착일
-                        <span th:if="${sortField=='arriveDate'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
+                        <span th:if="${sortField=='air.arriveDate'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
                     </a>
                 </th>
                 <th>도착시간</th>
