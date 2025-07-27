@@ -8,8 +8,8 @@
         <input type="text" th:field="*{code}" placeholder="Enter code" />
 
         <!-- 항공사 체크박스 -->
-        <div>
-            <label>항공사 선택:</label><br />
+        <label>항공사 선택:</label><br />
+        <div style="height: 100px; overflow-y:scroll">
             <div th:each="airline : ${allAirlines}">
                 <input type="checkbox" th:field="*{airlines}" th:value="${airline}" th:id="${'air_' + airline}" />
                 <label th:for="${'air_' + airline}" th:text="${airline}"></label>
@@ -210,8 +210,8 @@
     <script src="/js/filter.js"></script>
     <script src="/js/util.js"></script>
     <script>
-        function returnNumber(airId){
-            console.log('returnNumber'+airId)
+        function returnNumber(airId) {
+            console.log('returnNumber' + airId)
             if (window.opener && !window.opener.closed) {
                 window.opener.setAir(airId);  // 부모 함수 호출
                 window.close(); // 팝업 닫기
