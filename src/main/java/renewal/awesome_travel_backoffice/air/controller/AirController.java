@@ -179,10 +179,8 @@ public class AirController {
 
     @GetMapping("/search")
     public String searchAir(
-            @RequestParam(defaultValue = "2000-01-01")  LocalDate from,
-            @RequestParam(defaultValue = "2025-01-01")  LocalDate to,
-            @RequestParam(defaultValue = "1")  Long count,
-            @RequestParam(defaultValue = "departDate") String sortField,
+            @ModelAttribute("filter") AirFilterDTO filter, // 필터 DTO를 바인딩
+            @RequestParam(defaultValue = "air.departDate") String sortField,
             @RequestParam(defaultValue = "asc") String sortDir,
             @RequestParam(defaultValue = "0") int page, // 페이지 번호
             Model model) {
@@ -192,11 +190,6 @@ public class AirController {
 
         Pageable pageable = PageRequest.of(page, 10, sort);
 
-        AirFilterDTO filter = new AirFilterDTO();
-        // filter.setDepart(from);
-        // filter.setArrive(to);
-        filter.setStartCount(count);
-
         Page<SeatClass> airPage = airService.searchAirs(filter, pageable);
 
         // View에서 쓸 속성들
@@ -204,7 +197,11 @@ public class AirController {
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("title", "Air Select");
+        
+        // 항공선택 플래그
+        model.addAttribute("isSelectionPage", true);
 
-        return "airSelect";
+        // return "airSelect";
+        return "components/air";
     }
 }

@@ -85,7 +85,7 @@ public class AirSpecification {
         };
     }
 
-    // depart == value
+    // departAirport == value
     public static Specification<SeatClass> departEquals(String depart) {
         return (root, query, builder) -> {
             Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT);
@@ -95,13 +95,13 @@ public class AirSpecification {
         };
     }
 
-    // arrive == value
+    // arriveAirport == value
     public static Specification<SeatClass> arriveEquals(String arrive) {
         return (root, query, builder) -> {
             Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT);
             if (!StringUtils.hasText(arrive))
                 return null;
-            return builder.equal(seatJoin.get("arrive"), arrive);
+            return builder.equal(seatJoin.get("arriveAirport"), arrive);
         };
     }
 
