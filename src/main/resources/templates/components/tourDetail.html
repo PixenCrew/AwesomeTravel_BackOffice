@@ -52,7 +52,7 @@
             <div id="scheduleContainer">
                 <div class="schedule-point" th:if="${tour.id != null}" th:each="sched, schedStat : *{schedules}" th:attr="data-sched-idx=${schedStat.index}">
                     <label>날짜:</label>
-                    <input type="date" th:field="*{schedules[__${schedStat.index}__].date}" /><br>
+                    <input type="date" th:field="*{schedules[__${schedStat.index}__].date}"  /><br>
                     <button type="button" onclick="removeSchedule(this)">스케줄 삭제</button>
 
                     <!-- 2) 하나의 LocationContainer에 여러 Location -->
@@ -72,8 +72,8 @@
 
                             <div th:attr="hidden=${loc.type != types.AIR}">
                                 항공편 번호
-                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].from}" placeholder="출발지 선택" list="cityList" onchange="stripAfterPipe(this)"/>
-                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].to}" placeholder="도착지 선택" list="cityList" onchange="stripAfterPipe(this)"/>
+                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].departAirport}" placeholder="출발지 선택" list="cityList" onchange="stripAfterPipe(this)"/>
+                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].arriveAirport}" placeholder="도착지 선택" list="cityList" onchange="stripAfterPipe(this)"/>
                                 <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].seatClass}" placeholder="항공편 ID 입력" onclick="searchAir(this)"/>
                             </div>
 
@@ -199,7 +199,7 @@
             // 타입
             const typeDiv = document.createElement('div');
             typeDiv.appendChild(createLabel('타입 '));
-            const typeinput = createInput('text',type,'',{readonly: true});
+            const typeinput = createInput('text',`schedules[${schedIdx}].locations[${locIdx}].type`,'',{readonly: true});
             typeinput.value = type;
             typeDiv.appendChild(typeinput);
             wrapper.appendChild(typeDiv);
@@ -228,7 +228,7 @@
                 addDiv.appendChild(createLabel('출발지 '));
                 addDiv.appendChild(createInput(
                     'text',
-                    `schedules[${schedIdx}].locations[${locIdx}].from`,
+                    `schedules[${schedIdx}].locations[${locIdx}].departAirport`,
                     '출발지 선택',
                     { list: 'cityList', onchange: 'stripAfterPipe(this)' }
                 ));
@@ -236,7 +236,7 @@
                 addDiv.appendChild(createLabel('도착지 '));
                 addDiv.appendChild(createInput(
                     'text',
-                    `schedules[${schedIdx}].locations[${locIdx}].to`,
+                    `schedules[${schedIdx}].locations[${locIdx}].arriveAirport`,
                     '도착지 선택',
                     { list: 'cityList', onchange: 'stripAfterPipe(this)' }
                 ));
@@ -336,8 +336,8 @@
             const containerDiv = input.closest(".location-container"); // .date는 여기 바깥에 있음
 
             // 1. 형제 요소 from, to
-            const fromInput = locationDiv.querySelector("input[name$='.from']");
-            const toInput = locationDiv.querySelector("input[name$='.to']");
+            const fromInput = locationDiv.querySelector("input[name$='.departAirport']");
+            const toInput = locationDiv.querySelector("input[name$='.arriveAirport']");
 
             // 2. 상위 스케줄 블록의 date
             const schedulePoint = input.closest('.schedule-point');

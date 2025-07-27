@@ -7,16 +7,15 @@
         <label>코드:</label>
         <input type="text" th:field="*{code}" placeholder="Enter code" />
         <br />
-        
+
         <!-- 항공사 체크박스 -->
         <label>항공사 선택:</label><br />
-        <div style="height: 100px; border: 1px solid black; overflow-y:scroll">
+        <div style="height: 100px; padding: 5px; border: 1px solid black; overflow-y:scroll">
             <div th:each="airline : ${allAirlines}">
                 <input type="checkbox" th:field="*{airlines}" th:value="${airline}" th:id="${'air_' + airline}" />
                 <label th:for="${'air_' + airline}" th:text="${airline}"></label>
             </div>
         </div>
-        <br />
 
         <!-- 좌석등급 -->
         <label>좌석등급:</label>
