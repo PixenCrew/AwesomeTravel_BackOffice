@@ -38,6 +38,7 @@ public class Location{
     @Column(nullable = false)
     private Type type;
     private String description;
+    private String city;
     // @DateTimeFormat(pattern = "yyyy-MM-dd")
     // private LocalDate date;
     
@@ -49,8 +50,7 @@ public class Location{
     private String arriveAirport;
     // ==============Type이 POINT면 사용할 필드===============
     // private String country;
-    @Column
-    private String city;
+
     
     // ==============Type이 HOTEL이면 사용할 필드===============
     @OneToOne

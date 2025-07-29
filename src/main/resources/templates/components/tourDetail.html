@@ -28,19 +28,19 @@
         <input type="text" th:field="*{company}" required /><br>
 
         <label for="startdate">시작일:</label>
-        <input type="date" th:field="*{startdate}" min="2000-04-01" max="2026-12-31" required /><br>
+        <input type="date" th:field="*{startdate}" min="2000-04-01" required /><br>
 
         <label for="enddate">종료일:</label>
-        <input type="date" th:field="*{enddate}" min="2000-04-01" max="2026-12-31" readonly required /><br>
+        <input type="date" th:field="*{enddate}" min="2000-04-01" required /><br>
 
         <label for="price">가격:</label>
-        <input type="number" th:field="*{price}" required /><br>
+        <input type="number" th:field="*{price}" min="1" required /><br>
 
         <label for="country">국가:</label>
-        <input type="text" th:field="*{country}" list="countryList" /><br>
+        <input type="text" th:field="*{country}" onchange="stripAfterPipe(this)" list="countryList" required /><br>
 
         <label for="count">인원:</label>
-        <input type="number" th:field="*{count}" required /><br>
+        <input type="number" th:field="*{count}" min="1" required /><br>
 
         <fieldset id="fieldset">
             <legend>코스 스케줄 및 포인트/항공 정보</legend>
@@ -52,7 +52,7 @@
             <div id="scheduleContainer">
                 <div class="schedule-point" th:if="${tour.id != null}" th:each="sched, schedStat : *{schedules}" th:attr="data-sched-idx=${schedStat.index}">
                     <label>날짜:</label>
-                    <input type="date" th:field="*{schedules[__${schedStat.index}__].date}"  /><br>
+                    <input type="date" th:field="*{schedules[__${schedStat.index}__].date}" /><br>
                     <button type="button" onclick="removeSchedule(this)">스케줄 삭제</button>
 
                     <!-- 2) 하나의 LocationContainer에 여러 Location -->
@@ -62,19 +62,19 @@
                             <!-- 위치 타입 -->
                             <div>
                                 타입
-                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].type}" readonly/>
+                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].type}" readonly />
                             </div>
 
                             <div>
                                 설명
-                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].description}" placeholder="설명 입력"/>
+                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].description}" placeholder="설명 입력" />
                             </div>
 
                             <div th:attr="hidden=${loc.type != types.AIR}">
                                 항공편 번호
-                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].departAirport}" placeholder="출발지 선택" list="cityList" onchange="stripAfterPipe(this)"/>
-                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].arriveAirport}" placeholder="도착지 선택" list="cityList" onchange="stripAfterPipe(this)"/>
-                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].seatClass}" placeholder="항공편 ID 입력" onclick="searchAir(this)"/>
+                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].departAirport}" placeholder="출발지 선택" list="cityList" onchange="stripAfterPipe(this)" />
+                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].arriveAirport}" placeholder="도착지 선택" list="cityList" onchange="stripAfterPipe(this)" />
+                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].seatClass}" placeholder="항공편 ID 입력" onclick="searchAir(this)" />
                             </div>
 
                             <div th:attr="hidden=${loc.type != types.POINT}">
@@ -84,7 +84,7 @@
 
                             <div th:attr="hidden=${loc.type != types.HOTEL}">
                                 호텔 번호
-                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].hotel}" placeholder="호텔 ID 입력"/>
+                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].hotel}" placeholder="호텔 ID 입력" />
                             </div>
 
                             <!-- 삭제 -->
@@ -106,10 +106,11 @@
     </form>
 
     <button th:if="${tour.id != null}" th:onclick="deleteTour([[${tour.id}]])">삭제</button>
-    
+
     <script src="/js/util.js"></script>
     <script>
-        let searchTarget;
+        let airSearchTarget;
+        let hotelSearchTarget;
         // 전역 스케줄 인덱스 (초기값: 이미 렌더링된 .schedule-point 개수)
         let scheduleIndex = document.querySelectorAll(
             "#scheduleContainer .schedule-point"
@@ -199,7 +200,7 @@
             // 타입
             const typeDiv = document.createElement('div');
             typeDiv.appendChild(createLabel('타입 '));
-            const typeinput = createInput('text',`schedules[${schedIdx}].locations[${locIdx}].type`,'',{readonly: true});
+            const typeinput = createInput('text', `schedules[${schedIdx}].locations[${locIdx}].type`, '', { readonly: true });
             typeinput.value = type;
             typeDiv.appendChild(typeinput);
             wrapper.appendChild(typeDiv);
@@ -216,15 +217,7 @@
 
             // 타입별 추가 필드
             const addDiv = document.createElement('div');
-            if (type === 'POINT') {
-                addDiv.appendChild(createLabel('도시 '));
-                addDiv.appendChild(createInput(
-                    'text',
-                    `schedules[${schedIdx}].locations[${locIdx}].city`,
-                    '예: KR | South Korea | 대한민국',
-                    { list: 'countryList', onchange: 'stripAfterPipe(this)' }
-                ));
-            } else if (type === 'AIR') {
+            if (type === 'AIR') {
                 addDiv.appendChild(createLabel('출발지 '));
                 addDiv.appendChild(createInput(
                     'text',
@@ -232,7 +225,7 @@
                     '출발지 선택',
                     { list: 'cityList', onchange: 'stripAfterPipe(this)' }
                 ));
-                
+
                 addDiv.appendChild(createLabel('도착지 '));
                 addDiv.appendChild(createInput(
                     'text',
@@ -240,7 +233,7 @@
                     '도착지 선택',
                     { list: 'cityList', onchange: 'stripAfterPipe(this)' }
                 ));
-                
+
                 addDiv.appendChild(createLabel('항공편 번호 '));
                 addDiv.appendChild(createInput(
                     'text',
@@ -248,14 +241,24 @@
                     '항공편 ID 입력',
                     { onclick: 'searchAir(this)', readonly: true }
                 ));
-            } else if (type === 'HOTEL') {
-                addDiv.appendChild(createLabel('호텔 번호 '));
+            } else {
+                addDiv.appendChild(createLabel('도시 '));
                 addDiv.appendChild(createInput(
                     'text',
-                    `schedules[${schedIdx}].locations[${locIdx}].hotel`,
-                    '호텔 ID 입력',
-                    { onclick: 'searchHotel(this)' }
+                    `schedules[${schedIdx}].locations[${locIdx}].city`,
+                    '예: KR | South Korea | 대한민국',
+                    { list: 'countryList', onchange: 'stripAfterPipe(this)' }
                 ));
+
+                if (type === 'HOTEL') {
+                    addDiv.appendChild(createLabel('호텔 번호 '));
+                    addDiv.appendChild(createInput(
+                        'text',
+                        `schedules[${schedIdx}].locations[${locIdx}].hotel`,
+                        '호텔 ID 입력',
+                        { onclick: 'searchHotel(this)' }
+                    ));
+                }
             }
             wrapper.appendChild(addDiv);
 
@@ -331,9 +334,9 @@
         }
 
         function searchAir(input) {
-            // TODO: 날짜, 도시 입력 후 항공 목록 Popup
-            const locationDiv = input.closest(".location-point"); // .from, .to는 여기 안에 있음
-            const containerDiv = input.closest(".location-container"); // .date는 여기 바깥에 있음
+            // 날짜, 출발지, 도착지, 인원 입력 후 항공 목록 Popup
+            const locationDiv = input.closest(".location-point");
+            // const containerDiv = input.closest(".location-container");
 
             // 1. 형제 요소 from, to
             const fromInput = locationDiv.querySelector("input[name$='.departAirport']");
@@ -360,21 +363,62 @@
 
             if (fromValue != null && toValue != null && dateValue != null && countValue != null) {
                 console.log("searchAir called for:", input.value);
-                searchTarget = input;
+                airSearchTarget = input;
                 const popup = window.open(
-                    '/air/search?departAirport='+fromValue+'&arriveAirport='+toValue+'&departDateFrom='+dateValue +'&departDateTo='+dateValue +'&availableSeats='+countValue, // URL + 파라미터
+                    '/air/search?departAirport=' + fromValue + '&arriveAirport=' + toValue + '&departDateFrom=' + dateValue + '&departDateTo=' + dateValue + '&availableSeats=' + countValue, // URL + 파라미터
                     'airSearchPopup',
-                    'width=800,height=600'
+                    'width=1200,height=800'
                 );
             } else {
                 alert("인원수, 날짜, 출발지, 도착지를 모두 입력하세요")
             }
         }
+        
+        function searchHotel(input) {
+            // 날짜, 도시, 인원 입력 후 호텔 목록 Popup
+            const locationDiv = input.closest(".location-point");
+
+            // 1. 형제 요소 city
+            const cityInput = locationDiv.querySelector("input[name$='.city']");
+
+            // 2. 상위 스케줄 블록의 date
+            const schedulePoint = input.closest('.schedule-point');
+            const dateInput = schedulePoint.querySelector('input[type="date"]');
+
+            // 3. 최상위 블록의 인원수 count
+            const countInput = document.querySelector('#count');
+
+            // 4. 값 읽기
+            const cityValue = cityInput?.value || null;
+            const dateValue = dateInput?.value || null;
+            const countValue = countInput?.value || null;
+
+            console.log("도시 (city):", cityValue);
+            console.log("날짜 (date):", dateValue);
+            console.log("인원수 (count):", countValue);
+
+            if (cityValue != null && dateValue != null && countValue != null) {
+                console.log("searchHotel called for:", input.value);
+                hotelSearchTarget = input;
+                const popup = window.open(
+                    '/hotel/search?city=' + cityValue + '&date=' + dateValue + '&roomCount=' + countValue, // URL + 파라미터
+                    'hotelSearchPopup',
+                    'width=1200,height=800'
+                );
+            } else {
+                alert("인원수, 날짜, 도시를 모두 입력하세요")
+            }
+        }
 
         // 팝업에서 선택한 값을 입력하는 메서드
         function setAir(airId) {
-            searchTarget.value = airId;
-            console.log("searchTarget updated:", searchTarget.value);
+            airSearchTarget.value = airId;
+            console.log("airSearchTarget updated:", airSearchTarget.value);
+        }
+
+        function setHotel(hotelId) {
+            hotelSearchTarget.value = hotelId;
+            console.log("hotelSearchTarget updated:", hotelSearchTarget.value);
         }
 
         function deleteTour(id) {
