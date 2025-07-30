@@ -70,19 +70,19 @@
                                 <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].description}" placeholder="설명 입력" />
                             </div>
 
-                            <div th:attr="hidden=${loc.type != types.AIR}">
+                            <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].type == T(renewal.awesome_travel_backoffice.tour.utiles.Type).AIR}">
                                 항공편 번호
                                 <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].departAirport}" placeholder="출발지 선택" list="cityList" onchange="stripAfterPipe(this)" />
                                 <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].arriveAirport}" placeholder="도착지 선택" list="cityList" onchange="stripAfterPipe(this)" />
                                 <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].seatClass}" placeholder="항공편 ID 입력" onclick="searchAir(this)" />
                             </div>
 
-                            <div th:attr="hidden=${loc.type != types.POINT}">
+                            <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].type == T(renewal.awesome_travel_backoffice.tour.utiles.Type).POINT}">
                                 도시
                                 <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].city}" placeholder="예: KR | South Korea | 대한민국" list="countryList" />
                             </div>
 
-                            <div th:attr="hidden=${loc.type != types.HOTEL}">
+                            <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].type == T(renewal.awesome_travel_backoffice.tour.utiles.Type).HOTEL}">
                                 호텔 번호
                                 <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].hotel}" placeholder="호텔 ID 입력" />
                             </div>
