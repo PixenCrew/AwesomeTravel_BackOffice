@@ -6,10 +6,11 @@
         <!-- Tour 이름 -->
         <label>Tour 이름:</label>
         <input type="text" th:field="*{name}" placeholder="Enter tour name" />
+        <br />
 
         <!-- 회사 체크박스 -->
-        <div>
-            <label>회사 선택:</label><br />
+        <label>회사 선택:</label><br />
+        <div style="height: 100px; padding: 5px; border: 1px solid black; overflow-y:scroll">
             <div th:each="comp : ${allCompanies}">
                 <input type="checkbox" th:field="*{companies}" th:value="${comp}" th:id="${'cmp_' + comp}" />
                 <label th:for="${'cmp_' + comp}" th:text="${comp}"></label>
@@ -38,9 +39,9 @@
         <input type="number" step="1" th:field="*{maxPrice}" />
         <br />
 
-        <!-- Course.location 포함 검색 -->
-        <label>Course 위치:</label>
-        <input type="text" th:field="*{courseLocation}" placeholder="Enter location text" />
+        <!-- Point.Schedule.location 포함 검색 -->
+        <label>Point 위치:</label>
+        <input type="text" th:field="*{pointLocation}" placeholder="Enter location text" />
         <br />
 
         <!-- 국가 -->

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.Join;
 import renewal.awesome_travel_backoffice.tour.entity.Location;
+import renewal.awesome_travel_backoffice.tour.entity.Schedule;
 import renewal.awesome_travel_backoffice.tour.entity.Tour;
 
 public class TourSpecification {
@@ -77,10 +78,11 @@ public class TourSpecification {
     }
 
     // 연관된 Course 리스트에서 location LIKE %location%
-    public static Specification<Tour> courseLocationContains(String location) {
+    public static Specification<Tour> scheduleLocationContains(String city) {
         return (root, query, builder) -> {
-            Join<Tour, Location> courseJoin = root.join("course");
-            return builder.like(courseJoin.get("location"), "%" + location + "%");
+            Join<Tour, Schedule> scheduleJoin = root.join("schedules");
+            Join<Schedule, Location> locationJoin = scheduleJoin.join("locations");
+            return builder.like(locationJoin.get("city"), "%" + city + "%");
         };
     }
 
