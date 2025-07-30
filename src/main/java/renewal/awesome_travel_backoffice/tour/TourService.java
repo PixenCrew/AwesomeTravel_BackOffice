@@ -42,8 +42,8 @@ public class TourService {
         if (filter.getMinPrice() != null || filter.getMaxPrice() != null) {
             spec = spec.and(TourSpecification.priceBetween(filter.getMinPrice(), filter.getMaxPrice()));
         }
-        if (filter.getCourseLocation() != null && !filter.getCourseLocation().isEmpty()) {
-            spec = spec.and(TourSpecification.courseLocationContains(filter.getCourseLocation()));
+        if (filter.getPointLocation() != null && !filter.getPointLocation().isEmpty()) {
+            spec = spec.and(TourSpecification.scheduleLocationContains(filter.getPointLocation()));
         }
         if (filter.getCountry() != null && !filter.getCountry().isEmpty()) {
             spec = spec.and(TourSpecification.countryContains(filter.getCountry()));
