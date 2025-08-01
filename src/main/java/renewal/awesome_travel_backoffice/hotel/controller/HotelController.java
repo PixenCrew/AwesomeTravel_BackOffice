@@ -49,7 +49,7 @@ public class HotelController {
         model.addAttribute("cityCode", cityRepo.findAll());
 
         model.addAttribute("hotelPage", hotelPage);
-        model.addAttribute("hotelList", hotelPage.getContent());
+        // model.addAttribute("hotelList", hotelPage.getContent());
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("title", "Hotel List");

@@ -63,8 +63,9 @@ public class TourController {
 
         // 3) View에서 쓸 속성들
         model.addAttribute("countryCode", countryRepo.findAll());
+        model.addAttribute("cityCode", cityRepo.findAll());
         model.addAttribute("tourPage", tourPage);
-        model.addAttribute("tourList", tourPage.getContent());
+        // model.addAttribute("tourList", tourPage.getContent());
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("title", "Tour List");
@@ -90,7 +91,7 @@ public class TourController {
         // 역순으로 구조 생성
         // 3. Location
         Location blankLocation = new Location();
-        blankLocation.setType(Type.POINT);
+        blankLocation.setLocationType(Type.POINT);
 
         // 2. Schedule
         Schedule blankSchedule = new Schedule();

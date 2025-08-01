@@ -62,7 +62,7 @@
                             <!-- 위치 타입 -->
                             <div>
                                 타입
-                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].type}" readonly />
+                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType}" readonly />
                             </div>
 
                             <div>
@@ -70,19 +70,19 @@
                                 <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].description}" placeholder="설명 입력" />
                             </div>
 
-                            <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].type == T(renewal.awesome_travel_backoffice.tour.utiles.Type).AIR}">
+                            <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType == T(renewal.awesome_travel_backoffice.tour.utiles.Type).AIR}">
                                 항공편 번호
                                 <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].departAirport}" placeholder="출발지 선택" list="cityList" onchange="stripAfterPipe(this)" />
                                 <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].arriveAirport}" placeholder="도착지 선택" list="cityList" onchange="stripAfterPipe(this)" />
                                 <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].seatClass}" placeholder="항공편 ID 입력" onclick="searchAir(this)" />
                             </div>
 
-                            <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].type == T(renewal.awesome_travel_backoffice.tour.utiles.Type).POINT}">
+                            <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType == T(renewal.awesome_travel_backoffice.tour.utiles.Type).POINT}">
                                 도시
                                 <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].city}" placeholder="예: KR | South Korea | 대한민국" list="countryList" />
                             </div>
 
-                            <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].type == T(renewal.awesome_travel_backoffice.tour.utiles.Type).HOTEL}">
+                            <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType == T(renewal.awesome_travel_backoffice.tour.utiles.Type).HOTEL}">
                                 호텔 번호
                                 <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].hotel}" placeholder="호텔 ID 입력" />
                             </div>
@@ -200,7 +200,7 @@
             // 타입
             const typeDiv = document.createElement('div');
             typeDiv.appendChild(createLabel('타입 '));
-            const typeinput = createInput('text', `schedules[${schedIdx}].locations[${locIdx}].type`, '', { readonly: true });
+            const typeinput = createInput('text', `schedules[${schedIdx}].locations[${locIdx}].locationType`, '', { readonly: true });
             typeinput.value = type;
             typeDiv.appendChild(typeinput);
             wrapper.appendChild(typeDiv);
@@ -297,7 +297,7 @@
 
                 // type(hidden)
                 locDiv.querySelectorAll('input[type="hidden"]').forEach(h => {
-                    h.name = `${prefix}.type`;
+                    h.name = `${prefix}.locationType`;
                 });
 
                 // 텍스트/날짜/셀렉트/기타 input들
