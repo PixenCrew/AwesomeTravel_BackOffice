@@ -12,10 +12,27 @@ VALUES ('AD','ALV','안도라라베야','ANDORRA LA VELLA'),('AE','AAN','알 아
 
 INSERT IGNORE INTO hotel (`is_active`, `id`, `max_room_count`, `price`, `address`, `city`, `description`, `email`, `name`, `number`, `website`, `hotel_type`)
 VALUES
-(1, 2, 20, 100, 'ASD', 'AAA', 'asd', 'A@A', 'A', '123', 'asd', 'HOTEL'),
-(1, 3, 10, 1000, 'ABC', 'AAA', 'asd', 'A@A', 'A', '123', 'asd', 'HOTEL'),
-(1, 4, 50, 10000, 'DEF', 'AAA', 'asd', 'A@A', 'A', '123', 'asd', 'HOTEL'),
-(1, 5, 100, 10000, 'GHUI', 'AAA', 'asd', 'A@A', 'A', '123', 'asd', 'HOTEL');
+(1, 1, 30, 200, '123 Main St', 'SEL', 'Modern and cozy', 'info@hotel6.com', 'Hotel Sunrise', '010-0001-0001', 'www.hotel6.com', 'HOTEL'),
+(1, 2, 15, 150, '456 River Rd', 'NYC', 'Riverside view', 'contact@hotel7.com', 'River Hotel', '010-0002-0002', 'www.hotel7.com', 'HOTEL'),
+(1, 3, 40, 300, '789 Beach Ave', 'HKG', 'Close to the beach', 'hello@hotel8.com', 'Beach Stay', '010-0003-0003', 'www.hotel8.com', 'HOTEL'),
+(1, 4, 25, 250, '101 Mountain Way', 'TYO', 'Mountain view resort', 'mail@hotel9.com', 'Mountain Lodge', '010-0004-0004', 'www.hotel9.com', 'HOTEL'),
+(1, 5, 20, 180, '202 City Blvd', 'PAR', 'Downtown access', 'stay@hotel10.com', 'City Inn', '010-0005-0005', 'www.hotel10.com', 'HOTEL'),
+(1, 6, 35, 280, '303 Lake Dr', 'LAX', 'Lake-side rooms', 'book@hotel11.com', 'Lakeside Hotel', '010-0006-0006', 'www.hotel11.com', 'HOTEL'),
+(1, 7, 60, 500, '404 Hilltop Ln', 'DXB', 'Hilltop retreat', 'admin@hotel12.com', 'Hilltop View', '010-0007-0007', 'www.hotel12.com', 'HOTEL'),
+(1, 8, 45, 320, '505 Garden Rd', 'BKK', 'Botanic garden nearby', 'info@hotel13.com', 'Garden Hotel', '010-0008-0008', 'www.hotel13.com', 'HOTEL'),
+(1, 9, 55, 450, '606 Forest Path', 'BER', 'In the forest', 'forest@hotel14.com', 'Forest Lodge', '010-0009-0009', 'www.hotel14.com', 'HOTEL'),
+(1, 10, 70, 700, '707 Desert St', 'SYD', 'Desert-inspired design', 'desert@hotel15.com', 'Desert Pearl', '010-0010-0010', 'www.hotel15.com', 'HOTEL'),
+(1, 11, 90, 850, '808 Riverbank', 'SFO', 'Next to riverwalk', 'river@hotel16.com', 'Riverwalk Inn', '010-0011-0011', 'www.hotel16.com', 'HOTEL'),
+(1, 12, 10, 120, '909 Island Way', 'ROM', 'Island escape', 'island@hotel17.com', 'Island Resort', '010-0012-0012', 'www.hotel17.com', 'HOTEL'),
+(1, 13, 18, 160, '1001 Harbor St', 'LON', 'Harbor view', 'harbor@hotel18.com', 'Harbor Stay', '010-0013-0013', 'www.hotel18.com', 'HOTEL'),
+(1, 14, 22, 240, '1102 Tower Blvd', 'CHI', 'Next to tower', 'tower@hotel19.com', 'Tower Inn', '010-0014-0014', 'www.hotel19.com', 'HOTEL'),
+(1, 15, 80, 900, '1203 Sky Rd', 'SIN', 'Skyline views', 'sky@hotel20.com', 'Sky Hotel', '010-0015-0015', 'www.hotel20.com', 'HOTEL'),
+(1, 16, 100, 1000, '1304 Coastal Dr', 'HNL', 'Luxury beachfront', 'coast@hotel21.com', 'Coastal Resort', '010-0016-0016', 'www.hotel21.com', 'HOTEL'),
+(1, 17, 28, 275, '1405 Mall Rd', 'MNL', 'Shopping district', 'mall@hotel22.com', 'Mallside Hotel', '010-0017-0017', 'www.hotel22.com', 'HOTEL'),
+(1, 18, 33, 260, '1506 Museum Way', 'JKT', 'Next to museum', 'museum@hotel23.com', 'Museum Stay', '010-0018-0018', 'www.hotel23.com', 'HOTEL'),
+(1, 19, 65, 620, '1607 Temple Rd', 'KUL', 'Cultural heritage site', 'temple@hotel24.com', 'Temple View', '010-0019-0019', 'www.hotel24.com', 'HOTEL'),
+(1, 20, 75, 880, '1708 Palace St', 'VIE', 'Historic area', 'palace@hotel25.com', 'Palace Inn', '010-0020-0020', 'www.hotel25.com', 'HOTEL');
+
 
 INSERT IGNORE INTO reservation (`hotel_id`, `room_count`, `start_date`, `end_date`, `created_at`, `status`) 
 VALUES 
@@ -308,30 +325,30 @@ VALUES
 (79, 20, 'BUSINESS',       300000,  20,  20),
 (80, 20, 'FIRST',          500000,   5,   5);
 
-INSERT IGNORE INTO tour (id, company, name, country, count, startdate, enddate, price) 
-VALUES 
-(1, 'Company1', 'Tour1', 'Country1', 28, '2025-08-01', '2025-08-05', 1010000),
-(2, 'Company2', 'Tour2', 'Country2', 10, '2025-08-02', '2025-08-06', 1020000),
-(3, 'Company3', 'Tour3', 'Country3', 12, '2025-08-03', '2025-08-07', 1030000),
-(4, 'Company4', 'Tour4', 'Country4', 11, '2025-08-04', '2025-08-08', 1040000),
-(5, 'Company5', 'Tour5', 'Country5', 10, '2025-08-05', '2025-08-09', 1050000),
-(6, 'Company6', 'Tour6', 'Country6', 14, '2025-08-06', '2025-08-10', 1060000),
-(7, 'Company7', 'Tour7', 'Country7', 29, '2025-08-07', '2025-08-11', 1070000),
-(8, 'Company8', 'Tour8', 'Country8', 23, '2025-08-08', '2025-08-12', 1080000),
-(9, 'Company9', 'Tour9', 'Country9', 34, '2025-08-09', '2025-08-13', 1090000),
-(10, 'Company10', 'Tour10', 'Country10', 14, '2025-08-10', '2025-08-14', 1100000),
-(11, 'Company11', 'Tour11', 'Country11', 25, '2025-08-11', '2025-08-15', 1110000),
-(12, 'Company12', 'Tour12', 'Country12', 34, '2025-08-12', '2025-08-16', 1120000),
-(13, 'Company13', 'Tour13', 'Country13', 21, '2025-08-13', '2025-08-17', 1130000),
-(14, 'Company14', 'Tour14', 'Country14', 33, '2025-08-14', '2025-08-18', 1140000),
-(15, 'Company15', 'Tour15', 'Country15', 17, '2025-08-15', '2025-08-19', 1150000),
-(16, 'Company16', 'Tour16', 'Country16', 39, '2025-08-16', '2025-08-20', 1160000),
-(17, 'Company17', 'Tour17', 'Country17', 39, '2025-08-17', '2025-08-21', 1170000),
-(18, 'Company18', 'Tour18', 'Country18', 22, '2025-08-18', '2025-08-22', 1180000),
-(19, 'Company19', 'Tour19', 'Country19', 14, '2025-08-19', '2025-08-23', 1190000),
-(20, 'Company20', 'Tour20', 'Country20', 26, '2025-08-20', '2025-08-24', 1200000);
+INSERT INTO tour (id, company, name, country, count, startdate, enddate, price)
+VALUES
+(1, 'GlobalTravel', 'Tour1', 'KR', 28, '2025-08-01', '2025-08-05', 1010000),
+(2, 'SkyTours', 'Tour2', 'US', 10, '2025-08-02', '2025-08-06', 1020000),
+(3, 'GlobalTravel', 'Tour3', 'JP', 12, '2025-08-03', '2025-08-07', 1030000),
+(4, 'AdventurePlus', 'Tour4', 'FR', 11, '2025-08-04', '2025-08-08', 1040000),
+(5, 'SkyTours', 'Tour5', 'DE', 10, '2025-08-05', '2025-08-09', 1050000),
+(6, 'WorldExplorer', 'Tour6', 'IT', 14, '2025-08-06', '2025-08-10', 1060000),
+(7, 'GlobalTravel', 'Tour7', 'ES', 29, '2025-08-07', '2025-08-11', 1070000),
+(8, 'SkyTours', 'Tour8', 'TH', 23, '2025-08-08', '2025-08-12', 1080000),
+(9, 'AdventurePlus', 'Tour9', 'VN', 34, '2025-08-09', '2025-08-13', 1090000),
+(10, 'GlobalTravel', 'Tour10', 'CN', 14, '2025-08-10', '2025-08-14', 1100000),
+(11, 'WorldExplorer', 'Tour11', 'PH', 25, '2025-08-11', '2025-08-15', 1110000),
+(12, 'SkyTours', 'Tour12', 'ID', 34, '2025-08-12', '2025-08-16', 1120000),
+(13, 'AdventurePlus', 'Tour13', 'AU', 21, '2025-08-13', '2025-08-17', 1130000),
+(14, 'SkyTours', 'Tour14', 'NZ', 33, '2025-08-14', '2025-08-18', 1140000),
+(15, 'GlobalTravel', 'Tour15', 'MY', 17, '2025-08-15', '2025-08-19', 1150000),
+(16, 'WorldExplorer', 'Tour16', 'SG', 39, '2025-08-16', '2025-08-20', 1160000),
+(17, 'SkyTours', 'Tour17', 'GB', 39, '2025-08-17', '2025-08-21', 1170000),
+(18, 'AdventurePlus', 'Tour18', 'CA', 22, '2025-08-18', '2025-08-22', 1180000),
+(19, 'SkyTours', 'Tour19', 'BR', 14, '2025-08-19', '2025-08-23', 1190000),
+(20, 'GlobalTravel', 'Tour20', 'ZA', 26, '2025-08-20', '2025-08-24', 1200000);
 
-INSERT IGNORE INTO schedule (schedules_order, id, tour_id, date) 
+INSERT INTO schedule (schedules_order, id, tour_id, date) 
 VALUES 
 (0, 1, 1, '2025-08-01'),
 (1, 2, 1, '2025-08-02'),
@@ -384,177 +401,128 @@ VALUES
 (0, 49, 20, '2025-08-20'),
 (1, 50, 20, '2025-08-21');
 
-INSERT IGNORE INTO location (locations_order, id, schedule_id, type, description, city, seat_class_id, depart_airport, arrive_airport, hotel_id) 
-VALUES 
-(0, 1, 1, 'AIR', 'AIR activity for Tour 1', null, 67, 'BKK', 'SFO', null),
-(1, 2, 1, 'HOTEL', 'HOTEL activity for Tour 1', 'HKG', null, null, null, 4),
-(2, 3, 1, 'POINT', 'POINT activity for Tour 1', 'PAR', null, null, null, null),
-
-(0, 4, 2, 'AIR', 'AIR activity for Tour 1', null, 30, 'SYD', 'TYO', null),
-(1, 5, 2, 'POINT', 'POINT activity for Tour 1', 'HKG', null, null, null, null),
-(2, 6, 2, 'AIR', 'AIR activity for Tour 1', null, 43, 'TYO', 'ROM', null),
-
-(0, 7, 3, 'HOTEL', 'HOTEL activity for Tour 1', 'PAR', null, null, null, 2),
-(1, 8, 3, 'AIR', 'AIR activity for Tour 1', null, 55, 'CHI', 'LAX', null),
-
-(0, 9, 4, 'HOTEL', 'HOTEL activity for Tour 2', 'BKK', null, null, null, 5),
-(1, 10, 4, 'HOTEL', 'HOTEL activity for Tour 2', 'SFO', null, null, null, 4),
-(2, 11, 4, 'HOTEL', 'HOTEL activity for Tour 2', 'CHI', null, null, null, 3),
-
-(0, 12, 5, 'AIR', 'AIR activity for Tour 2', null, 54, 'HKG', 'BKK', null),
-(1, 13, 5, 'HOTEL', 'HOTEL activity for Tour 2', 'SFO', null, null, null, 3),
-
-(0, 14, 6, 'POINT', 'POINT activity for Tour 3', 'PAR', null, null, null, null),
-(1, 15, 6, 'HOTEL', 'HOTEL activity for Tour 3', 'TYO', null, null, null, 3),
-
-(0, 16, 7, 'AIR', 'AIR activity for Tour 3', null, 9, 'SEL', 'BKK', null),
-(1, 17, 7, 'HOTEL', 'HOTEL activity for Tour 3', 'LAX', null, null, null, 4),
-(2, 18, 7, 'HOTEL', 'HOTEL activity for Tour 3', 'SFO', null, null, null, 2),
-
-(0, 19, 8, 'HOTEL', 'HOTEL activity for Tour 4', 'SEL', null, null, null, 5),
-(1, 20, 8, 'HOTEL', 'HOTEL activity for Tour 4', 'SIN', null, null, null, 3),
-
-(0, 21, 9, 'HOTEL', 'HOTEL activity for Tour 4', 'LAX', null, null, null, 5),
-(1, 22, 9, 'HOTEL', 'HOTEL activity for Tour 4', 'CHI', null, null, null, 2),
-(2, 23, 9, 'POINT', 'POINT activity for Tour 4', 'SFO', null, null, null, null),
-
-(0, 24, 10, 'HOTEL', 'HOTEL activity for Tour 5', 'SFO', null, null, null, 4),
-(1, 25, 10, 'POINT', 'POINT activity for Tour 5', 'SFO', null, null, null, null),
-
-(0, 26, 11, 'HOTEL', 'HOTEL activity for Tour 5', 'BER', null, null, null, 5),
-(1, 27, 11, 'HOTEL', 'HOTEL activity for Tour 5', 'NYC', null, null, null, 2),
-(2, 28, 11, 'HOTEL', 'HOTEL activity for Tour 5', 'LAX', null, null, null, 2),
-
-(0, 29, 12, 'HOTEL', 'HOTEL activity for Tour 5', 'PAR', null, null, null, 3),
-(1, 30, 12, 'HOTEL', 'HOTEL activity for Tour 5', 'HKG', null, null, null, 3),
-(2, 31, 12, 'POINT', 'POINT activity for Tour 5', 'BKK', null, null, null, null),
-
-(0, 32, 13, 'HOTEL', 'HOTEL activity for Tour 6', 'HKG', null, null, null, 5),
-(1, 33, 13, 'AIR', 'AIR activity for Tour 6', null, 43, 'SEL', 'LAX', null),
-(2, 34, 13, 'POINT', 'POINT activity for Tour 6', 'SEL', null, null, null, null),
-
-(0, 35, 14, 'POINT', 'POINT activity for Tour 6', 'BKK', null, null, null, null),
-(1, 36, 14, 'AIR', 'AIR activity for Tour 6', null, 11, 'NYC', 'HKG', null),
-(2, 37, 14, 'AIR', 'AIR activity for Tour 6', null, 45, 'ROM', 'CHI', null),
-
-(0, 38, 15, 'HOTEL', 'HOTEL activity for Tour 6', 'SYD', null, null, null, 5),
-(1, 39, 15, 'POINT', 'POINT activity for Tour 6', 'BKK', null, null, null, null),
-
-(0, 40, 16, 'AIR', 'AIR activity for Tour 7', null, 10, 'PAR', 'LON', null),
-(1, 41, 16, 'AIR', 'AIR activity for Tour 7', null, 30, 'NYC', 'HKG', null),
-(2, 42, 16, 'HOTEL', 'HOTEL activity for Tour 7', 'BER', null, null, null, 5),
-
-(0, 43, 17, 'AIR', 'AIR activity for Tour 7', null, 69, 'SYD', 'BER', null),
-(1, 44, 17, 'HOTEL', 'HOTEL activity for Tour 7', 'ROM', null, null, null, 3),
-
-(0, 45, 18, 'AIR', 'AIR activity for Tour 7', null, 72, 'SFO', 'BER', null),
-(1, 46, 18, 'POINT', 'POINT activity for Tour 7', 'BER', null, null, null, null),
-
-(0, 47, 19, 'POINT', 'POINT activity for Tour 8', 'ROM', null, null, null, null),
-(1, 48, 19, 'AIR', 'AIR activity for Tour 8', null, 47, 'SEL', 'NYC', null),
-(2, 49, 19, 'AIR', 'AIR activity for Tour 8', null, 35, 'NYC', 'SEL', null),
-
-(0, 50, 20, 'AIR', 'AIR activity for Tour 8', null, 65, 'SFO', 'NYC', null),
-(1, 51, 20, 'AIR', 'AIR activity for Tour 8', null, 48, 'TYO', 'LON', null),
-
-(0, 54, 22, 'POINT', 'POINT activity for Tour 9', 'BKK', null, null, null, null),
-(1, 55, 22, 'AIR', 'AIR activity for Tour 9', null, 22, 'BKK', 'BER', null),
-(2, 56, 22, 'HOTEL', 'HOTEL activity for Tour 9', 'ROM', null, null, null, 2),
-
-(0, 52, 21, 'HOTEL', 'HOTEL activity for Tour 9', 'LAX', null, null, null, 4),
-(1, 53, 21, 'HOTEL', 'HOTEL activity for Tour 9', 'NYC', null, null, null, 4),
-
-(0, 57, 23, 'POINT', 'POINT activity for Tour 9', 'DXB', null, null, null, null),
-(1, 58, 23, 'POINT', 'POINT activity for Tour 9', 'NYC', null, null, null, null),
-
-(0, 59, 24, 'AIR', 'AIR activity for Tour 10', null, 68, 'CHI', 'DXB', null),
-(1, 60, 24, 'HOTEL', 'HOTEL activity for Tour 10', 'BKK', null, null, null, 3),
-
-(0, 61, 25, 'POINT', 'POINT activity for Tour 10', 'ROM', null, null, null, null),
-(1, 62, 25, 'HOTEL', 'HOTEL activity for Tour 10', 'SYD', null, null, null, 4),
-
-(0, 63, 26, 'POINT', 'POINT activity for Tour 10', 'DXB', null, null, null, null),
-(1, 64, 26, 'HOTEL', 'HOTEL activity for Tour 10', 'SYD', null, null, null, 3),
-
-(0, 67, 28, 'HOTEL', 'HOTEL activity for Tour 11', 'SYD', null, null, null, 2),
-(1, 68, 28, 'HOTEL', 'HOTEL activity for Tour 11', 'SEL', null, null, null, 2),
-(2, 69, 28, 'AIR', 'AIR activity for Tour 11', null, 21, 'TYO', 'LON', null),
-
-(0, 65, 27, 'AIR', 'AIR activity for Tour 11', null, 78, 'ROM', 'BER', null),
-(1, 66, 27, 'POINT', 'POINT activity for Tour 11', 'HKG', null, null, null, null),
-
-(0, 70, 29, 'HOTEL', 'HOTEL activity for Tour 12', 'CHI', null, null, null, 3),
-(1, 71, 29, 'HOTEL', 'HOTEL activity for Tour 12', 'TYO', null, null, null, 5),
-(2, 72, 29, 'HOTEL', 'HOTEL activity for Tour 12', 'DXB', null, null, null, 5),
-
-(0, 73, 30, 'AIR', 'AIR activity for Tour 12', null, 65, 'SYD', 'NYC', null),
-(1, 74, 30, 'POINT', 'POINT activity for Tour 12', 'HKG', null, null, null, null),
-(2, 75, 30, 'AIR', 'AIR activity for Tour 12', null, 29, 'LON', 'BKK', null),
-
-(0, 76, 31, 'POINT', 'POINT activity for Tour 12', 'SIN', null, null, null, null),
-(1, 77, 31, 'AIR', 'AIR activity for Tour 12', null, 59, 'LON', 'HKG', null),
-(2, 78, 31, 'POINT', 'POINT activity for Tour 12', 'LAX', null, null, null, null),
-
-(0, 79, 32, 'HOTEL', 'HOTEL activity for Tour 13', 'SEL', null, null, null, 5),
-(1, 80, 32, 'HOTEL', 'HOTEL activity for Tour 13', 'PAR', null, null, null, 2),
-
-(0, 81, 33, 'POINT', 'POINT activity for Tour 13', 'BKK', null, null, null, null),
-(1, 82, 33, 'POINT', 'POINT activity for Tour 13', 'CHI', null, null, null, null),
-(2, 83, 33, 'POINT', 'POINT activity for Tour 13', 'DXB', null, null, null, null),
-
-(0, 84, 34, 'AIR', 'AIR activity for Tour 13', null, 47, 'SFO', 'BER', null),
-(1, 85, 34, 'POINT', 'POINT activity for Tour 13', 'SIN', null, null, null, null),
-(2, 86, 34, 'HOTEL', 'HOTEL activity for Tour 13', 'LAX', null, null, null, 3),
-
-(0, 87, 35, 'HOTEL', 'HOTEL activity for Tour 14', 'CHI', null, null, null, 4),
-(1, 88, 35, 'POINT', 'POINT activity for Tour 14', 'BER', null, null, null, null),
-
-(0, 89, 36, 'POINT', 'POINT activity for Tour 14', 'BER', null, null, null, null),
-(1, 90, 36, 'HOTEL', 'HOTEL activity for Tour 14', 'LON', null, null, null, 2),
-(2, 91, 36, 'POINT', 'POINT activity for Tour 14', 'SIN', null, null, null, null),
-
-(0, 92, 37, 'POINT', 'POINT activity for Tour 14', 'SYD', null, null, null, null),
-(1, 93, 37, 'POINT', 'POINT activity for Tour 14', 'BKK', null, null, null, null),
-(2, 94, 37, 'HOTEL', 'HOTEL activity for Tour 14', 'CHI', null, null, null, 3),
-
-(0, 95, 38, 'AIR', 'AIR activity for Tour 15', null, 48, 'HKG', 'ROM', null),
-(1, 96, 38, 'HOTEL', 'HOTEL activity for Tour 15', 'SEL', null, null, null, 2),
-
-(0, 97, 39, 'POINT', 'POINT activity for Tour 15', 'CHI', null, null, null, null),
-(1, 98, 39, 'HOTEL', 'HOTEL activity for Tour 15', 'HKG', null, null, null, 2),
-
-(0, 99, 40, 'HOTEL', 'HOTEL activity for Tour 16', 'BER', null, null, null, 3),
-(1, 100, 40, 'AIR', 'AIR activity for Tour 16', null, 6, 'TYO', 'CHI', null),
-
-(0, 101, 41, 'AIR', 'AIR activity for Tour 16', null, 43, 'HKG', 'BER', null),
-(1, 102, 41, 'POINT', 'POINT activity for Tour 16', 'TYO', null, null, null, null),
-(2, 103, 41, 'POINT', 'POINT activity for Tour 16', 'SIN', null, null, null, null),
-
-(0, 104, 42, 'POINT', 'POINT activity for Tour 17', 'SYD', null, null, null, null),
-(1, 105, 42, 'AIR', 'AIR activity for Tour 17', null, 32, 'SIN', 'LON', null),
-
-(0, 106, 43, 'HOTEL', 'HOTEL activity for Tour 17', 'HKG', null, null, null, 2),
-(1, 107, 43, 'POINT', 'POINT activity for Tour 17', 'CHI', null, null, null, null),
-
-(0, 108, 44, 'AIR', 'AIR activity for Tour 18', null, 47, 'SYD', 'LON', null),
-(1, 109, 44, 'HOTEL', 'HOTEL activity for Tour 18', 'SYD', null, null, null, 4),
-
-(0, 110, 45, 'HOTEL', 'HOTEL activity for Tour 18', 'ROM', null, null, null, 2),
-(1, 111, 45, 'POINT', 'POINT activity for Tour 18', 'BER', null, null, null, null),
-(2, 112, 45, 'HOTEL', 'HOTEL activity for Tour 18', 'HKG', null, null, null, 4),
-
-(0, 113, 46, 'AIR', 'AIR activity for Tour 19', null, 67, 'TYO', 'SYD', null),
-(1, 114, 46, 'HOTEL', 'HOTEL activity for Tour 19', 'NYC', null, null, null, 4),
-
-(0, 115, 47, 'HOTEL', 'HOTEL activity for Tour 19', 'PAR', null, null, null, 5),
-(1, 116, 47, 'HOTEL', 'HOTEL activity for Tour 19', 'NYC', null, null, null, 4),
-
-(0, 117, 48, 'POINT', 'POINT activity for Tour 19', 'LAX', null, null, null, null),
-(1, 118, 48, 'AIR', 'AIR activity for Tour 19', null, 16, 'PAR', 'SYD', null),
-(2, 119, 48, 'AIR', 'AIR activity for Tour 19', null, 11, 'LON', 'BKK', null),
-
-(0, 120, 49, 'AIR', 'AIR activity for Tour 20', null, 49, 'PAR', 'ROM', null),
-(1, 121, 49, 'HOTEL', 'HOTEL activity for Tour 20', 'DXB', null, null, null, 3),
-
-(0, 122, 50, 'HOTEL', 'HOTEL activity for Tour 20', 'LAX', null, null, null, 4),
-(1, 123, 50, 'HOTEL', 'HOTEL activity for Tour 20', 'BKK', null, null, null, 4);
+INSERT INTO location(locations_order,id,schedule_id,location_type,description,city,seat_class_id,depart_airport,arrive_airport,hotel_id)
+VALUES
+(0,1,1,'AIR','AIRactivityforTour1',null,67,'BKK','SFO',null),
+(1,2,1,'HOTEL','HOTELactivityforTour1','HKG',null,null,null,4),
+(2,3,1,'POINT','POINTactivityforTour1','PAR',null,null,null,null),
+(0,4,2,'AIR','AIRactivityforTour1',null,30,'SYD','TYO',null),
+(1,5,2,'POINT','POINTactivityforTour1','HKG',null,null,null,null),
+(2,6,2,'AIR','AIRactivityforTour1',null,43,'TYO','ROM',null),
+(0,7,3,'HOTEL','HOTELactivityforTour1','PAR',null,null,null,2),
+(1,8,3,'AIR','AIRactivityforTour1',null,55,'CHI','LAX',null),
+(0,9,4,'HOTEL','HOTELactivityforTour2','BKK',null,null,null,5),
+(1,10,4,'HOTEL','HOTELactivityforTour2','SFO',null,null,null,4),
+(2,11,4,'HOTEL','HOTELactivityforTour2','CHI',null,null,null,3),
+(0,12,5,'AIR','AIRactivityforTour2',null,54,'HKG','BKK',null),
+(1,13,5,'HOTEL','HOTELactivityforTour2','SFO',null,null,null,3),
+(0,14,6,'POINT','POINTactivityforTour3','PAR',null,null,null,null),
+(1,15,6,'HOTEL','HOTELactivityforTour3','TYO',null,null,null,3),
+(0,16,7,'AIR','AIRactivityforTour3',null,9,'SEL','BKK',null),
+(1,17,7,'HOTEL','HOTELactivityforTour3','LAX',null,null,null,4),
+(2,18,7,'HOTEL','HOTELactivityforTour3','SFO',null,null,null,2),
+(0,19,8,'HOTEL','HOTELactivityforTour4','SEL',null,null,null,5),
+(1,20,8,'HOTEL','HOTELactivityforTour4','SIN',null,null,null,3),
+(0,21,9,'HOTEL','HOTELactivityforTour4','LAX',null,null,null,5),
+(1,22,9,'HOTEL','HOTELactivityforTour4','CHI',null,null,null,2),
+(2,23,9,'POINT','POINTactivityforTour4','SFO',null,null,null,null),
+(0,24,10,'HOTEL','HOTELactivityforTour5','SFO',null,null,null,4),
+(1,25,10,'POINT','POINTactivityforTour5','SFO',null,null,null,null),
+(0,26,11,'HOTEL','HOTELactivityforTour5','BER',null,null,null,5),
+(1,27,11,'HOTEL','HOTELactivityforTour5','NYC',null,null,null,2),
+(2,28,11,'HOTEL','HOTELactivityforTour5','LAX',null,null,null,2),
+(0,29,12,'HOTEL','HOTELactivityforTour5','PAR',null,null,null,3),
+(1,30,12,'HOTEL','HOTELactivityforTour5','HKG',null,null,null,3),
+(2,31,12,'POINT','POINTactivityforTour5','BKK',null,null,null,null),
+(0,32,13,'HOTEL','HOTELactivityforTour6','HKG',null,null,null,5),
+(1,33,13,'AIR','AIRactivityforTour6',null,43,'SEL','LAX',null),
+(2,34,13,'POINT','POINTactivityforTour6','SEL',null,null,null,null),
+(0,35,14,'POINT','POINTactivityforTour6','BKK',null,null,null,null),
+(1,36,14,'AIR','AIRactivityforTour6',null,11,'NYC','HKG',null),
+(2,37,14,'AIR','AIRactivityforTour6',null,45,'ROM','CHI',null),
+(0,38,15,'HOTEL','HOTELactivityforTour6','SYD',null,null,null,5),
+(1,39,15,'POINT','POINTactivityforTour6','BKK',null,null,null,null),
+(0,40,16,'AIR','AIRactivityforTour7',null,10,'PAR','LON',null),
+(1,41,16,'AIR','AIRactivityforTour7',null,30,'NYC','HKG',null),
+(2,42,16,'HOTEL','HOTELactivityforTour7','BER',null,null,null,5),
+(0,43,17,'AIR','AIRactivityforTour7',null,69,'SYD','BER',null),
+(1,44,17,'HOTEL','HOTELactivityforTour7','ROM',null,null,null,3),
+(0,45,18,'AIR','AIRactivityforTour7',null,72,'SFO','BER',null),
+(1,46,18,'POINT','POINTactivityforTour7','BER',null,null,null,null),
+(0,47,19,'POINT','POINTactivityforTour8','ROM',null,null,null,null),
+(1,48,19,'AIR','AIRactivityforTour8',null,47,'SEL','NYC',null),
+(2,49,19,'AIR','AIRactivityforTour8',null,35,'NYC','SEL',null),
+(0,50,20,'AIR','AIRactivityforTour8',null,65,'SFO','NYC',null),
+(1,51,20,'AIR','AIRactivityforTour8',null,48,'TYO','LON',null),
+(0,52,21,'HOTEL','HOTELactivityforTour9','LAX',null,null,null,4),
+(1,53,21,'HOTEL','HOTELactivityforTour9','NYC',null,null,null,4),
+(0,54,22,'POINT','POINTactivityforTour9','BKK',null,null,null,null),
+(1,55,22,'AIR','AIRactivityforTour9',null,22,'BKK','BER',null),
+(2,56,22,'HOTEL','HOTELactivityforTour9','ROM',null,null,null,2),
+(0,57,23,'POINT','POINTactivityforTour9','DXB',null,null,null,null),
+(1,58,23,'POINT','POINTactivityforTour9','NYC',null,null,null,null),
+(0,59,24,'AIR','AIRactivityforTour10',null,68,'CHI','DXB',null),
+(1,60,24,'HOTEL','HOTELactivityforTour10','BKK',null,null,null,3),
+(0,61,25,'POINT','POINTactivityforTour10','ROM',null,null,null,null),
+(1,62,25,'HOTEL','HOTELactivityforTour10','SYD',null,null,null,4),
+(0,63,26,'POINT','POINTactivityforTour10','DXB',null,null,null,null),
+(1,64,26,'HOTEL','HOTELactivityforTour10','SYD',null,null,null,3),
+(0,65,27,'AIR','AIRactivityforTour11',null,78,'ROM','BER',null),
+(1,66,27,'POINT','POINTactivityforTour11','HKG',null,null,null,null),
+(0,67,28,'HOTEL','HOTELactivityforTour11','SYD',null,null,null,2),
+(1,68,28,'HOTEL','HOTELactivityforTour11','SEL',null,null,null,2),
+(2,69,28,'AIR','AIRactivityforTour11',null,21,'TYO','LON',null),
+(0,70,29,'HOTEL','HOTELactivityforTour12','CHI',null,null,null,3),
+(1,71,29,'HOTEL','HOTELactivityforTour12','TYO',null,null,null,5),
+(2,72,29,'HOTEL','HOTELactivityforTour12','DXB',null,null,null,5),
+(0,73,30,'AIR','AIRactivityforTour12',null,65,'SYD','NYC',null),
+(1,74,30,'POINT','POINTactivityforTour12','HKG',null,null,null,null),
+(2,75,30,'AIR','AIRactivityforTour12',null,29,'LON','BKK',null),
+(0,76,31,'POINT','POINTactivityforTour12','SIN',null,null,null,null),
+(1,77,31,'AIR','AIRactivityforTour12',null,59,'LON','HKG',null),
+(2,78,31,'POINT','POINTactivityforTour12','LAX',null,null,null,null),
+(0,79,32,'HOTEL','HOTELactivityforTour13','SEL',null,null,null,5),
+(1,80,32,'HOTEL','HOTELactivityforTour13','PAR',null,null,null,2),
+(0,81,33,'POINT','POINTactivityforTour13','BKK',null,null,null,null),
+(1,82,33,'POINT','POINTactivityforTour13','CHI',null,null,null,null),
+(2,83,33,'POINT','POINTactivityforTour13','DXB',null,null,null,null),
+(0,84,34,'AIR','AIRactivityforTour13',null,47,'SFO','BER',null),
+(1,85,34,'POINT','POINTactivityforTour13','SIN',null,null,null,null),
+(2,86,34,'HOTEL','HOTELactivityforTour13','LAX',null,null,null,3),
+(0,87,35,'HOTEL','HOTELactivityforTour14','CHI',null,null,null,4),
+(1,88,35,'POINT','POINTactivityforTour14','BER',null,null,null,null),
+(0,89,36,'POINT','POINTactivityforTour14','BER',null,null,null,null),
+(1,90,36,'HOTEL','HOTELactivityforTour14','LON',null,null,null,2),
+(2,91,36,'POINT','POINTactivityforTour14','SIN',null,null,null,null),
+(0,92,37,'POINT','POINTactivityforTour14','SYD',null,null,null,null),
+(1,93,37,'POINT','POINTactivityforTour14','BKK',null,null,null,null),
+(2,94,37,'HOTEL','HOTELactivityforTour14','CHI',null,null,null,3),
+(0,95,38,'AIR','AIRactivityforTour15',null,48,'HKG','ROM',null),
+(1,96,38,'HOTEL','HOTELactivityforTour15','SEL',null,null,null,2),
+(0,97,39,'POINT','POINTactivityforTour15','CHI',null,null,null,null),
+(1,98,39,'HOTEL','HOTELactivityforTour15','HKG',null,null,null,2),
+(0,99,40,'HOTEL','HOTELactivityforTour16','BER',null,null,null,3),
+(1,100,40,'AIR','AIRactivityforTour16',null,6,'TYO','CHI',null),
+(0,101,41,'AIR','AIRactivityforTour16',null,43,'HKG','BER',null),
+(1,102,41,'POINT','POINTactivityforTour16','TYO',null,null,null,null),
+(2,103,41,'POINT','POINTactivityforTour16','SIN',null,null,null,null),
+(0,104,42,'POINT','POINTactivityforTour17','SYD',null,null,null,null),
+(1,105,42,'AIR','AIRactivityforTour17',null,32,'SIN','LON',null),
+(0,106,43,'HOTEL','HOTELactivityforTour17','HKG',null,null,null,2),
+(1,107,43,'POINT','POINTactivityforTour17','CHI',null,null,null,null),
+(0,108,44,'AIR','AIRactivityforTour18',null,47,'SYD','LON',null),
+(1,109,44,'HOTEL','HOTELactivityforTour18','SYD',null,null,null,4),
+(0,110,45,'HOTEL','HOTELactivityforTour18','ROM',null,null,null,2),
+(1,111,45,'POINT','POINTactivityforTour18','BER',null,null,null,null),
+(2,112,45,'HOTEL','HOTELactivityforTour18','HKG',null,null,null,4),
+(0,113,46,'AIR','AIRactivityforTour19',null,67,'TYO','SYD',null),
+(1,114,46,'HOTEL','HOTELactivityforTour19','NYC',null,null,null,4),
+(0,115,47,'HOTEL','HOTELactivityforTour19','PAR',null,null,null,5),
+(1,116,47,'HOTEL','HOTELactivityforTour19','NYC',null,null,null,4),
+(0,117,48,'POINT','POINTactivityforTour19','LAX',null,null,null,null),
+(1,118,48,'AIR','AIRactivityforTour19',null,16,'PAR','SYD',null),
+(2,119,48,'AIR','AIRactivityforTour19',null,11,'LON','BKK',null),
+(0,120,49,'AIR','AIRactivityforTour20',null,49,'PAR','ROM',null),
+(1,121,49,'HOTEL','HOTELactivityforTour20','DXB',null,null,null,3),
+(0,122,50,'HOTEL','HOTELactivityforTour20','LAX',null,null,null,4),
+(1,123,50,'HOTEL','HOTELactivityforTour20','BKK',null,null,null,4);

@@ -10,7 +10,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,14 +35,14 @@ public class Location{
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Type type;
+    private Type locationType;
     private String description;
     private String city;
     // @DateTimeFormat(pattern = "yyyy-MM-dd")
     // private LocalDate date;
     
     // ==============Type이 AIR면 사용할 필드===============
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "seatClass_id")
     private SeatClass seatClass;
     private String departAirport;
@@ -53,7 +52,7 @@ public class Location{
 
     
     // ==============Type이 HOTEL이면 사용할 필드===============
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "hotel_id")
     private Hotel hotel;
 }
