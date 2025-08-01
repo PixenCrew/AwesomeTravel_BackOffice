@@ -41,12 +41,12 @@
 
         <!-- Point.Schedule.location 포함 검색 -->
         <label>Point 위치:</label>
-        <input type="text" th:field="*{pointLocation}" placeholder="Enter location text" />
+        <input type="text" th:field="*{pointLocation}" placeholder="Enter location text" onclick="stripAfterPipe(this)" list="cityList"/>
         <br />
 
         <!-- 국가 -->
         <label> 국가:</label>
-        <input type="text" th:field="*{country}" placeholder="Enter country" /><br>
+        <input type="text" th:field="*{country}" placeholder="Enter country" onclick="stripAfterPipe(this)" list="countryList"/><br>
 
         <!-- 인원 범위 -->
         <label>최소 인원:</label>
@@ -159,9 +159,14 @@
     <a href="/tour/new">새 투어</a>
 
     <script src="/js/filter.js"></script>
+    <script src="/js/util.js"></script>
 
     <datalist id="cityList">
         <option th:each="cc : ${cityCode}" th:value="${cc.code} + ' | ' + ${cc.country} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
+    </datalist>
+
+    <datalist id="countryList">
+        <option th:each="cc : ${countryCode}" th:value="${cc.code} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
     </datalist>
 
 </div>
