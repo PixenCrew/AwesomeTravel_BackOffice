@@ -58,7 +58,7 @@ public class TourController {
         model.addAttribute("allCompanies", allCompanies);
 
         // 2) 페이징(10개 고정) + 필터링 로직
-        Pageable pageable = PageRequest.of(page, 10, sort);
+        Pageable pageable = PageRequest.of(page, 50, sort);
         Page<Tour> tourPage = tourService.searchTours(filter, pageable);
 
         // 3) View에서 쓸 속성들

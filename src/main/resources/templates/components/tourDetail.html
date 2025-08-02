@@ -77,14 +77,14 @@
                                 <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].seatClass}" placeholder="항공편 ID 입력" onclick="searchAir(this)" />
                             </div>
 
-                            <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType == T(renewal.awesome_travel_backoffice.tour.utiles.Type).POINT}">
+                            <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType != T(renewal.awesome_travel_backoffice.tour.utiles.Type).AIR}">
                                 도시
                                 <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].city}" placeholder="예: KR | South Korea | 대한민국" list="countryList" />
                             </div>
 
                             <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType == T(renewal.awesome_travel_backoffice.tour.utiles.Type).HOTEL}">
                                 호텔 번호
-                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].hotel}" placeholder="호텔 ID 입력" />
+                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].hotel}" placeholder="호텔 ID 입력" onclick="searchHotel(this)" />
                             </div>
 
                             <!-- 삭제 -->
@@ -109,8 +109,9 @@
 
     <script src="/js/util.js"></script>
     <script>
-        let airSearchTarget;
-        let hotelSearchTarget;
+        // let airSearchTarget;
+        // let hotelSearchTarget;
+        let searchTarget;
         // 전역 스케줄 인덱스 (초기값: 이미 렌더링된 .schedule-point 개수)
         let scheduleIndex = document.querySelectorAll(
             "#scheduleContainer .schedule-point"
@@ -363,7 +364,7 @@
 
             if (fromValue != null && toValue != null && dateValue != null && countValue != null) {
                 console.log("searchAir called for:", input.value);
-                airSearchTarget = input;
+                searchTarget = input;
                 const popup = window.open(
                     '/air/search?departAirport=' + fromValue + '&arriveAirport=' + toValue + '&departDateFrom=' + dateValue + '&departDateTo=' + dateValue + '&availableSeats=' + countValue, // URL + 파라미터
                     'airSearchPopup',
@@ -375,6 +376,7 @@
         }
         
         function searchHotel(input) {
+            console.log('Search Hotel for : '+input.value)
             // 날짜, 도시, 인원 입력 후 호텔 목록 Popup
             const locationDiv = input.closest(".location-point");
 
@@ -399,9 +401,9 @@
 
             if (cityValue != null && dateValue != null && countValue != null) {
                 console.log("searchHotel called for:", input.value);
-                hotelSearchTarget = input;
+                searchTarget = input;
                 const popup = window.open(
-                    '/hotel/search?city=' + cityValue + '&date=' + dateValue + '&roomCount=' + countValue, // URL + 파라미터
+                    '/hotel/search?city=' + cityValue + '&targetDate=' + dateValue + '&requiredPersons=' + countValue, // URL + 파라미터
                     'hotelSearchPopup',
                     'width=1200,height=800'
                 );
@@ -411,14 +413,19 @@
         }
 
         // 팝업에서 선택한 값을 입력하는 메서드
-        function setAir(airId) {
-            airSearchTarget.value = airId;
-            console.log("airSearchTarget updated:", airSearchTarget.value);
-        }
+        // function setAir(airId) {
+        //     airSearchTarget.value = airId;
+        //     console.log("airSearchTarget updated:", airSearchTarget.value);
+        // }
 
-        function setHotel(hotelId) {
-            hotelSearchTarget.value = hotelId;
-            console.log("hotelSearchTarget updated:", hotelSearchTarget.value);
+        // function setHotel(hotelId) {
+        //     hotelSearchTarget.value = hotelId;
+        //     console.log("hotelSearchTarget updated:", hotelSearchTarget.value);
+        // }
+
+        function setId(id) {
+            searchTarget.value = id;
+            console.log("searchTarget updated:", searchTarget.value);
         }
 
         function deleteTour(id) {

@@ -7,7 +7,7 @@
         <input type="text" th:field="*{name}" placeholder="Enter hotel name" /><br>
 
         <label>도시:</label>
-        <input type="text" th:field="*{city}" placeholder="Enter city" list="cityList" onchange="stripAfterPipe(this)" required /><br>
+        <input type="text" th:field="*{city}" placeholder="Enter city" list="cityList" onchange="stripAfterPipe(this)" required th:attr="readonly=${isSelectionPage} ? 'readonly' : null" /><br>
 
         <label>주소:</label>
         <input type="text" th:field="*{address}" placeholder="Enter address" /><br>
@@ -41,8 +41,11 @@
             <label>체크아웃:</label>
             <input type="date" th:field="*{endDate}" /><br>
 
+            <label>특정날짜:</label>
+            <input type="date" th:field="*{targetDate}" th:attr="readonly=${isSelectionPage} ? 'readonly' : null" /><br>
+
             <label>필요 인원수:</label>
-            <input type="number" min="1" th:field="*{requiredPersons}" /><br>
+            <input type="number" min="1" th:field="*{requiredPersons}" th:attr="readonly=${isSelectionPage} ? 'readonly' : null" /><br>
         </div>
         <br>
         <button type="button" onclick="get(0, event)">검색</button>
@@ -83,15 +86,18 @@
             </tr>
         </thead>
         <tbody>
-            <tr th:each="hotel : ${hotelPage.content}" th:onclick="|window.location.href='@{/hotel/{id}(id=${hotel.id})}'|" style="cursor: pointer;">
-                <td th:text="${hotel.id}">1</td>
+            <th:block th:each="hotel : ${hotelPage.content}">
+                <!-- <tr th:onclick="|window.location.href='@{/air/{id}(id=${seatClass.air.id})}'|" style="cursor:pointer;"> -->
+                <tr th:onclick="${isSelectionPage} ? |returnNumber(${hotel.id})| : |window.location.href='@{/hotel/{id}(id=${hotel.id})}'|" style="cursor:pointer;">
+            
+                    <td th:text="${hotel.id}">1</td>
                 <td th:text="${hotel.name}">호텔명</td>
                 <td th:text="${hotel.description}">설명</td>
                 <td th:text="${hotel.city}">도시</td>
                 <td th:text="${hotel.address}">주소</td>
                 <td th:text="${hotel.email}">이메일</td>
                 <td>
-                    <a th:if="${hotel.website}" th:href="${hotel.website}" th:text="${hotel.website}">링크</a>
+                    <a th:if="${hotel.website}" th:text="${hotel.website}">링크</a>
                     <span th:if="${hotel.website == null}">-</span>
                 </td>
                 <td th:text="${hotel.hotelType}">HOTEL</td>

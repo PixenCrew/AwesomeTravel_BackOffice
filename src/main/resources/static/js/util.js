@@ -5,3 +5,14 @@ function stripAfterPipe(input) {
         input.value = val.split('|')[0].trim();
     }
 }
+
+// 선택 팝업에서 특정 튜플 선택시 부모창에 전달하고 팝업 닫음
+function returnNumber(id) {
+    console.log('returnNumber' + id)
+    if (window.opener && !window.opener.closed) {
+        window.opener.setId(id);  // 부모 setId 함수 호출
+        window.close(); // 팝업 닫기
+    } else {
+        console.log('returnNumber 오류')
+    }
+}

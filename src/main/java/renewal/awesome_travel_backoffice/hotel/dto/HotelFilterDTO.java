@@ -2,6 +2,8 @@ package renewal.awesome_travel_backoffice.hotel.dto;
 
 import java.time.LocalDate;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import lombok.Data;
 import renewal.awesome_travel_backoffice.hotel.utils.HotelType;
 
@@ -15,9 +17,13 @@ public class HotelFilterDTO {
     private Long maxPrice;
     private HotelType hotelType;
     private Boolean isActive;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate startDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd") 
+    private LocalDate endDate;
 
     // 예약검색용
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private Integer requiredPersons;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate targetDate;
+    private Long requiredPersons;
 }

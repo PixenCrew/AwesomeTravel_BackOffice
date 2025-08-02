@@ -24,12 +24,12 @@ public class HotelSpecification {
         };
     }
 
-    // city LIKE %city%
-    public static Specification<Hotel> cityContains(String city) {
+    // city == value
+    public static Specification<Hotel> cityEquals(String city) {
         return (root, query, builder) -> {
-            if (!StringUtils.hasText(city))
+            if (city == null)
                 return null;
-            return builder.like(builder.lower(root.get("city")), "%" + city.toLowerCase() + "%");
+            return builder.equal(root.get("city"), city);
         };
     }
 
@@ -99,7 +99,7 @@ public class HotelSpecification {
     public static Specification<Hotel> availableBetweenAndCapacity(
             LocalDate startDate,
             LocalDate endDate,
-            Integer requiredPersons) {
+            Long requiredPersons) {
         return (root, query, builder) -> {
             // 중복 결과 방지를 위해 distinct 설정
             query.distinct(true);
@@ -127,4 +127,27 @@ public class HotelSpecification {
         };
     }
 
+    public static Specification<Hotel> availableOnDateAndRooms(LocalDate date, Long requiredRooms) {
+        return (root, query, builder) -> {
+            // 서브쿼리: 해당 날짜에 BOOKED 상태인 예약 합계(roomCount)
+            Subquery<Long> sumSub = query.subquery(Long.class);
+            Root<Reservation> res = sumSub.from(Reservation.class);
+
+            // SUM(roomCount) 결과가 null 이면 0L 로 대체하기 위해 COALESCE 사용
+            Expression<Long> sumRoomCount = builder.coalesce(builder.sum(res.get("roomCount")), 0L);
+            sumSub.select(sumRoomCount);
+
+            // subquery의 WHERE 절
+            sumSub.where(
+                    builder.equal(res.get("hotelId"), root.get("id")),
+                    builder.equal(res.get("status"), Reservation.Status.BOOKED), // 예약 상태가 BOOKED
+                    builder.lessThanOrEqualTo(res.get("startDate"), date), // startDate <= date
+                    builder.greaterThanOrEqualTo(res.get("endDate"), date) // endDate >= date
+            );
+
+            // 호텔의 총 객실 수 - 예약된 객실 수 >= requiredRooms
+            Expression<Long> availableRooms = builder.diff(root.get("maxRoomCount"), sumSub);
+            return builder.greaterThanOrEqualTo(availableRooms, requiredRooms);
+        };
+    }
 }

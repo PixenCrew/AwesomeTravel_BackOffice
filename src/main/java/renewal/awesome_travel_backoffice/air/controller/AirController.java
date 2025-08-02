@@ -54,7 +54,7 @@ public class AirController {
         model.addAttribute("allAirlines", allAirlines);
 
         // 2) 페이징(10개 고정) + 필터링 로직
-        Pageable pageable = PageRequest.of(page, 10, sort);
+        Pageable pageable = PageRequest.of(page, 50, sort);
         Page<SeatClass> airPage = airService.searchAirs(filter, pageable);
 
         // 도시코드
@@ -188,7 +188,7 @@ public class AirController {
                 ? Sort.by(sortField).ascending()
                 : Sort.by(sortField).descending();
 
-        Pageable pageable = PageRequest.of(page, 10, sort);
+        Pageable pageable = PageRequest.of(page, 50, sort);
 
         Page<SeatClass> airPage = airService.searchAirs(filter, pageable);
 

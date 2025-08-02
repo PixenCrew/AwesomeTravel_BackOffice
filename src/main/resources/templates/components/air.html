@@ -209,17 +209,6 @@
 
     <script src="/js/filter.js"></script>
     <script src="/js/util.js"></script>
-    <script>
-        function returnNumber(airId) {
-            console.log('returnNumber' + airId)
-            if (window.opener && !window.opener.closed) {
-                window.opener.setAir(airId);  // 부모 함수 호출
-                window.close(); // 팝업 닫기
-            } else {
-                console.log('returnNumber 오류')
-            }
-        }
-    </script>
 
     <datalist id="cityList">
         <option th:each="cc : ${cityCode}" th:value="${cc.code} + ' | ' + ${cc.country} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>

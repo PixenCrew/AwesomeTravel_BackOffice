@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import renewal.awesome_travel_backoffice.hotel.entity.Hotel;
 import renewal.awesome_travel_backoffice.hotel.entity.Reservation;
 import renewal.awesome_travel_backoffice.hotel.utils.HotelType;
+import renewal.awesome_travel_backoffice.air.dto.AirFilterDTO;
+import renewal.awesome_travel_backoffice.air.entity.SeatClass;
 import renewal.awesome_travel_backoffice.code.CityCodeRepository;
 import renewal.awesome_travel_backoffice.hotel.dto.HotelFilterDTO;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelRepository;
@@ -42,7 +44,7 @@ public class HotelController {
                 ? Sort.by(sortField).ascending()
                 : Sort.by(sortField).descending();
 
-        Pageable pageable = PageRequest.of(page, 10, sort);
+        Pageable pageable = PageRequest.of(page, 50, sort);
         Page<Hotel> hotelPage = hotelService.searchHotels(filter, pageable);
 
         // 도시코드
@@ -130,5 +132,33 @@ public class HotelController {
         model.addAttribute("title", "Hotel ID "+id+" Reservation");
         model.addAttribute("content", "components/reservation");
         return "layout";
+    }
+    
+    @GetMapping("/search")
+    public String searchAir(
+            @ModelAttribute("filter") HotelFilterDTO filter, // 필터 DTO를 바인딩
+            @RequestParam(defaultValue = "id") String sortField,
+            @RequestParam(defaultValue = "asc") String sortDir,
+            @RequestParam(defaultValue = "0") int page, // 페이지 번호
+            Model model) {
+        Sort sort = sortDir.equalsIgnoreCase("asc")
+                ? Sort.by(sortField).ascending()
+                : Sort.by(sortField).descending();
+
+        Pageable pageable = PageRequest.of(page, 50, sort);
+
+        Page<Hotel> hotelPage = hotelService.searchHotels(filter, pageable);
+
+        // View에서 쓸 속성들
+        model.addAttribute("hotelPage", hotelPage);
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDir", sortDir);
+        model.addAttribute("title", "Hotel Select");
+        
+        // 호텔선택 플래그
+        model.addAttribute("isSelectionPage", true);
+
+        // return "hotelSelect";
+        return "components/hotel";
     }
 }
