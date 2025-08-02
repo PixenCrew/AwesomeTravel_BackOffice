@@ -31,8 +31,87 @@ VALUES
 (1, 17, 28, 275, '1405 Mall Rd', 'MNL', 'Shopping district', 'mall@hotel22.com', 'Mallside Hotel', '010-0017-0017', 'www.hotel22.com', 'HOTEL'),
 (1, 18, 33, 260, '1506 Museum Way', 'JKT', 'Next to museum', 'museum@hotel23.com', 'Museum Stay', '010-0018-0018', 'www.hotel23.com', 'HOTEL'),
 (1, 19, 65, 620, '1607 Temple Rd', 'KUL', 'Cultural heritage site', 'temple@hotel24.com', 'Temple View', '010-0019-0019', 'www.hotel24.com', 'HOTEL'),
-(1, 20, 75, 880, '1708 Palace St', 'VIE', 'Historic area', 'palace@hotel25.com', 'Palace Inn', '010-0020-0020', 'www.hotel25.com', 'HOTEL');
-
+(1, 20, 75, 880, '1708 Palace St', 'VIE', 'Historic area', 'palace@hotel25.com', 'Palace Inn', '010-0020-0020', 'www.hotel25.com', 'HOTEL'),
+(1, 21, 80, 160, '1021 Example Rd', 'VIE', 'Business-class convenience', 'contact@hotel21.com', 'Hotel 21', '010-0021-0021', 'www.hotel21.com', 'MOTEL'),
+(1, 22, 50, 280, '1022 Example Rd', 'CPH', 'Pet-friendly stay', 'contact@hotel22.com', 'Hotel 22', '010-0022-0022', 'www.hotel22.com', 'PENSION'),
+(1, 23, 75, 140, '1023 Example Rd', 'PRG', 'Pet-friendly stay', 'contact@hotel23.com', 'Hotel 23', '010-0023-0023', 'www.hotel23.com', 'GUESTHOUSE'),
+(1, 24, 65, 780, '1024 Example Rd', 'HKG', 'Affordable and central', 'contact@hotel24.com', 'Hotel 24', '010-0024-0024', 'www.hotel24.com', 'HOMESTAY'),
+(1, 25, 90, 140, '1025 Example Rd', 'PRG', 'Great for long stays', 'contact@hotel25.com', 'Hotel 25', '010-0025-0025', 'www.hotel25.com', 'LODGE'),
+(1, 26, 20, 780, '1026 Example Rd', 'HNL', 'Business-class convenience', 'contact@hotel26.com', 'Hotel 26', '010-0026-0026', 'www.hotel26.com', 'HOMESTAY'),
+(1, 27, 65, 120, '1027 Example Rd', 'PRG', 'Affordable and central', 'contact@hotel27.com', 'Hotel 27', '010-0027-0027', 'www.hotel27.com', 'RESORT'),
+(1, 28, 65, 780, '1028 Example Rd', 'LAX', 'Business-class convenience', 'contact@hotel28.com', 'Hotel 28', '010-0028-0028', 'www.hotel28.com', 'RESORT'),
+(1, 29, 80, 320, '1029 Example Rd', 'DXB', 'Perfect for families', 'contact@hotel29.com', 'Hotel 29', '010-0029-0029', 'www.hotel29.com', 'MOTEL'),
+(1, 30, 15, 680, '1030 Example Rd', 'CPH', 'Cozy downtown hotel', 'contact@hotel30.com', 'Hotel 30', '010-0030-0030', 'www.hotel30.com', 'MOTEL'),
+(1, 31, 25, 240, '1031 Example Rd', 'LIM', 'Close to public transport', 'contact@hotel31.com', 'Hotel 31', '010-0031-0031', 'www.hotel31.com', 'ETC'),
+(1, 32, 65, 160, '1032 Example Rd', 'SFO', 'Modern and spacious', 'contact@hotel32.com', 'Hotel 32', '010-0032-0032', 'www.hotel32.com', 'RESORT'),
+(1, 33, 80, 400, '1033 Example Rd', 'LON', 'Pet-friendly stay', 'contact@hotel33.com', 'Hotel 33', '010-0033-0033', 'www.hotel33.com', 'LODGE'),
+(1, 34, 90, 560, '1034 Example Rd', 'PRG', 'Perfect for families', 'contact@hotel34.com', 'Hotel 34', '010-0034-0034', 'www.hotel34.com', 'LODGE'),
+(1, 35, 65, 980, '1035 Example Rd', 'CPH', 'Business-class convenience', 'contact@hotel35.com', 'Hotel 35', '010-0035-0035', 'www.hotel35.com', 'GUESTHOUSE'),
+(1, 36, 85, 840, '1036 Example Rd', 'JKT', 'All-inclusive resort', 'contact@hotel36.com', 'Hotel 36', '010-0036-0036', 'www.hotel36.com', 'GUESTHOUSE'),
+(1, 37, 90, 380, '1037 Example Rd', 'BKK', 'Cozy downtown hotel', 'contact@hotel37.com', 'Hotel 37', '010-0037-0037', 'www.hotel37.com', 'VILLA'),
+(1, 38, 45, 940, '1038 Example Rd', 'TPE', 'Minutes from airport', 'contact@hotel38.com', 'Hotel 38', '010-0038-0038', 'www.hotel38.com', 'RESORT'),
+(1, 39, 10, 660, '1039 Example Rd', 'MAD', 'Tranquil setting', 'contact@hotel39.com', 'Hotel 39', '010-0039-0039', 'www.hotel39.com', 'PENSION'),
+(1, 40, 85, 780, '1040 Example Rd', 'SYD', 'Tranquil setting', 'contact@hotel40.com', 'Hotel 40', '010-0040-0040', 'www.hotel40.com', 'ETC'),
+(1, 41, 20, 760, '1041 Example Rd', 'DXB', 'Pet-friendly stay', 'contact@hotel41.com', 'Hotel 41', '010-0041-0041', 'www.hotel41.com', 'HOSTEL'),
+(1, 42, 25, 380, '1042 Example Rd', 'HNL', 'Panoramic skyline view', 'contact@hotel42.com', 'Hotel 42', '010-0042-0042', 'www.hotel42.com', 'PENSION'),
+(1, 43, 95, 420, '1043 Example Rd', 'PRG', 'Affordable and central', 'contact@hotel43.com', 'Hotel 43', '010-0043-0043', 'www.hotel43.com', 'RESORT'),
+(1, 44, 70, 140, '1044 Example Rd', 'BRU', 'Minutes from airport', 'contact@hotel44.com', 'Hotel 44', '010-0044-0044', 'www.hotel44.com', 'PENSION'),
+(1, 45, 35, 760, '1045 Example Rd', 'BRU', 'Tranquil setting', 'contact@hotel45.com', 'Hotel 45', '010-0045-0045', 'www.hotel45.com', 'HOSTEL'),
+(1, 46, 100, 640, '1046 Example Rd', 'HEL', 'Perfect for families', 'contact@hotel46.com', 'Hotel 46', '010-0046-0046', 'www.hotel46.com', 'PENSION'),
+(1, 47, 90, 920, '1047 Example Rd', 'YVR', 'Surrounded by nature', 'contact@hotel47.com', 'Hotel 47', '010-0047-0047', 'www.hotel47.com', 'VILLA'),
+(1, 48, 30, 740, '1048 Example Rd', 'PAR', 'Surrounded by nature', 'contact@hotel48.com', 'Hotel 48', '010-0048-0048', 'www.hotel48.com', 'MOTEL'),
+(1, 49, 30, 300, '1049 Example Rd', 'HEL', 'Tranquil setting', 'contact@hotel49.com', 'Hotel 49', '010-0049-0049', 'www.hotel49.com', 'PENSION'),
+(1, 50, 95, 620, '1050 Example Rd', 'JKT', 'Affordable and central', 'contact@hotel50.com', 'Hotel 50', '010-0050-0050', 'www.hotel50.com', 'RESORT'),
+(1, 51, 20, 360, '1051 Example Rd', 'NYC', 'Minutes from airport', 'contact@hotel51.com', 'Hotel 51', '010-0051-0051', 'www.hotel51.com', 'HOTEL'),
+(1, 52, 55, 760, '1052 Example Rd', 'ZRH', 'Close to public transport', 'contact@hotel52.com', 'Hotel 52', '010-0052-0052', 'www.hotel52.com', 'ETC'),
+(1, 53, 75, 740, '1053 Example Rd', 'BNE', 'Business-class convenience', 'contact@hotel53.com', 'Hotel 53', '010-0053-0053', 'www.hotel53.com', 'PENSION'),
+(1, 54, 50, 920, '1054 Example Rd', 'BKK', 'Modern and spacious', 'contact@hotel54.com', 'Hotel 54', '010-0054-0054', 'www.hotel54.com', 'LODGE'),
+(1, 55, 20, 180, '1055 Example Rd', 'ZRH', 'Stylish and affordable', 'contact@hotel55.com', 'Hotel 55', '010-0055-0055', 'www.hotel55.com', 'GUESTHOUSE'),
+(1, 56, 10, 160, '1056 Example Rd', 'BRU', 'Minutes from airport', 'contact@hotel56.com', 'Hotel 56', '010-0056-0056', 'www.hotel56.com', 'HOTEL'),
+(1, 57, 35, 160, '1057 Example Rd', 'LIM', 'Panoramic skyline view', 'contact@hotel57.com', 'Hotel 57', '010-0057-0057', 'www.hotel57.com', 'GUESTHOUSE'),
+(1, 58, 60, 620, '1058 Example Rd', 'DXB', 'Great for long stays', 'contact@hotel58.com', 'Hotel 58', '010-0058-0058', 'www.hotel58.com', 'APARTMENT'),
+(1, 59, 20, 760, '1059 Example Rd', 'VIE', 'Eco-friendly design', 'contact@hotel59.com', 'Hotel 59', '010-0059-0059', 'www.hotel59.com', 'ETC'),
+(1, 60, 85, 620, '1060 Example Rd', 'ROM', 'Tranquil setting', 'contact@hotel60.com', 'Hotel 60', '010-0060-0060', 'www.hotel60.com', 'HOSTEL'),
+(1, 61, 75, 740, '1061 Example Rd', 'CAI', 'Luxury seaside resort', 'contact@hotel61.com', 'Hotel 61', '010-0061-0061', 'www.hotel61.com', 'RESORT'),
+(1, 62, 80, 980, '1062 Example Rd', 'CPT', 'Luxury seaside resort', 'contact@hotel62.com', 'Hotel 62', '010-0062-0062', 'www.hotel62.com', 'HOTEL'),
+(1, 63, 60, 220, '1063 Example Rd', 'JKT', 'Eco-friendly design', 'contact@hotel63.com', 'Hotel 63', '010-0063-0063', 'www.hotel63.com', 'HOSTEL'),
+(1, 64, 10, 580, '1064 Example Rd', 'BRU', 'Surrounded by nature', 'contact@hotel64.com', 'Hotel 64', '010-0064-0064', 'www.hotel64.com', 'HOSTEL'),
+(1, 65, 85, 340, '1065 Example Rd', 'HKG', 'Perfect for families', 'contact@hotel65.com', 'Hotel 65', '010-0065-0065', 'www.hotel65.com', 'PENSION'),
+(1, 66, 10, 440, '1066 Example Rd', 'KUL', 'Tranquil setting', 'contact@hotel66.com', 'Hotel 66', '010-0066-0066', 'www.hotel66.com', 'RESORT'),
+(1, 67, 70, 760, '1067 Example Rd', 'HEL', 'Luxury seaside resort', 'contact@hotel67.com', 'Hotel 67', '010-0067-0067', 'www.hotel67.com', 'APARTMENT'),
+(1, 68, 15, 780, '1068 Example Rd', 'MOW', 'Surrounded by nature', 'contact@hotel68.com', 'Hotel 68', '010-0068-0068', 'www.hotel68.com', 'PENSION'),
+(1, 69, 65, 480, '1069 Example Rd', 'YYZ', 'Eco-friendly design', 'contact@hotel69.com', 'Hotel 69', '010-0069-0069', 'www.hotel69.com', 'LODGE'),
+(1, 70, 80, 540, '1070 Example Rd', 'PRG', 'Boutique style charm', 'contact@hotel70.com', 'Hotel 70', '010-0070-0070', 'www.hotel70.com', 'HOTEL'),
+(1, 71, 20, 120, '1071 Example Rd', 'MAD', 'Vibrant nightlife nearby', 'contact@hotel71.com', 'Hotel 71', '010-0071-0071', 'www.hotel71.com', 'HOMESTAY'),
+(1, 72, 70, 800, '1072 Example Rd', 'CPT', 'Great for long stays', 'contact@hotel72.com', 'Hotel 72', '010-0072-0072', 'www.hotel72.com', 'RESORT'),
+(1, 73, 40, 860, '1073 Example Rd', 'HEL', 'Pet-friendly stay', 'contact@hotel73.com', 'Hotel 73', '010-0073-0073', 'www.hotel73.com', 'GUESTHOUSE'),
+(1, 74, 35, 580, '1074 Example Rd', 'BKK', 'Affordable and central', 'contact@hotel74.com', 'Hotel 74', '010-0074-0074', 'www.hotel74.com', 'GUESTHOUSE'),
+(1, 75, 55, 600, '1075 Example Rd', 'TYO', 'Elegant historic design', 'contact@hotel75.com', 'Hotel 75', '010-0075-0075', 'www.hotel75.com', 'ETC'),
+(1, 76, 60, 520, '1076 Example Rd', 'BRU', 'Pet-friendly stay', 'contact@hotel76.com', 'Hotel 76', '010-0076-0076', 'www.hotel76.com', 'PENSION'),
+(1, 77, 70, 840, '1077 Example Rd', 'AMS', 'Perfect for families', 'contact@hotel77.com', 'Hotel 77', '010-0077-0077', 'www.hotel77.com', 'RESORT'),
+(1, 78, 30, 600, '1078 Example Rd', 'BER', 'Perfect for families', 'contact@hotel78.com', 'Hotel 78', '010-0078-0078', 'www.hotel78.com', 'VILLA'),
+(1, 79, 55, 380, '1079 Example Rd', 'DUB', 'Modern and spacious', 'contact@hotel79.com', 'Hotel 79', '010-0079-0079', 'www.hotel79.com', 'LODGE'),
+(1, 80, 60, 720, '1080 Example Rd', 'ROM', 'Stylish and affordable', 'contact@hotel80.com', 'Hotel 80', '010-0080-0080', 'www.hotel80.com', 'PENSION'),
+(1, 81, 55, 740, '1081 Example Rd', 'BER', 'Perfect for families', 'contact@hotel81.com', 'Hotel 81', '010-0081-0081', 'www.hotel81.com', 'GUESTHOUSE'),
+(1, 82, 85, 920, '1082 Example Rd', 'NRT', 'Stylish and affordable', 'contact@hotel82.com', 'Hotel 82', '010-0082-0082', 'www.hotel82.com', 'HOTEL'),
+(1, 83, 45, 580, '1083 Example Rd', 'SEL', 'Modern and spacious', 'contact@hotel83.com', 'Hotel 83', '010-0083-0083', 'www.hotel83.com', 'MOTEL'),
+(1, 84, 30, 960, '1084 Example Rd', 'AKL', 'Panoramic skyline view', 'contact@hotel84.com', 'Hotel 84', '010-0084-0084', 'www.hotel84.com', 'ETC'),
+(1, 85, 25, 840, '1085 Example Rd', 'DXB', 'Vibrant nightlife nearby', 'contact@hotel85.com', 'Hotel 85', '010-0085-0085', 'www.hotel85.com', 'HOTEL'),
+(1, 86, 25, 280, '1086 Example Rd', 'JKT', 'Modern and spacious', 'contact@hotel86.com', 'Hotel 86', '010-0086-0086', 'www.hotel86.com', 'RESORT'),
+(1, 87, 45, 520, '1087 Example Rd', 'SYD', 'Close to public transport', 'contact@hotel87.com', 'Hotel 87', '010-0087-0087', 'www.hotel87.com', 'HOSTEL'),
+(1, 88, 50, 720, '1088 Example Rd', 'YVR', 'Vibrant nightlife nearby', 'contact@hotel88.com', 'Hotel 88', '010-0088-0088', 'www.hotel88.com', 'VILLA'),
+(1, 89, 40, 660, '1089 Example Rd', 'OSL', 'All-inclusive resort', 'contact@hotel89.com', 'Hotel 89', '010-0089-0089', 'www.hotel89.com', 'RESORT'),
+(1, 90, 65, 640, '1090 Example Rd', 'BRU', 'Close to public transport', 'contact@hotel90.com', 'Hotel 90', '010-0090-0090', 'www.hotel90.com', 'MOTEL'),
+(1, 91, 80, 440, '1091 Example Rd', 'NRT', 'Surrounded by nature', 'contact@hotel91.com', 'Hotel 91', '010-0091-0091', 'www.hotel91.com', 'LODGE'),
+(1, 92, 90, 200, '1092 Example Rd', 'TPE', 'Minutes from airport', 'contact@hotel92.com', 'Hotel 92', '010-0092-0092', 'www.hotel92.com', 'HOTEL'),
+(1, 93, 10, 280, '1093 Example Rd', 'SIN', 'Eco-friendly design', 'contact@hotel93.com', 'Hotel 93', '010-0093-0093', 'www.hotel93.com', 'RESORT'),
+(1, 94, 95, 320, '1094 Example Rd', 'DUB', 'All-inclusive resort', 'contact@hotel94.com', 'Hotel 94', '010-0094-0094', 'www.hotel94.com', 'LODGE'),
+(1, 95, 50, 140, '1095 Example Rd', 'NRT', 'Pet-friendly stay', 'contact@hotel95.com', 'Hotel 95', '010-0095-0095', 'www.hotel95.com', 'VILLA'),
+(1, 96, 65, 540, '1096 Example Rd', 'JKT', 'Stylish and affordable', 'contact@hotel96.com', 'Hotel 96', '010-0096-0096', 'www.hotel96.com', 'HOMESTAY'),
+(1, 97, 80, 800, '1097 Example Rd', 'HNL', 'Great for long stays', 'contact@hotel97.com', 'Hotel 97', '010-0097-0097', 'www.hotel97.com', 'RESORT'),
+(1, 98, 55, 360, '1098 Example Rd', 'CPH', 'Luxury seaside resort', 'contact@hotel98.com', 'Hotel 98', '010-0098-0098', 'www.hotel98.com', 'VILLA'),
+(1, 99, 45, 920, '1099 Example Rd', 'AKL', 'Luxury seaside resort', 'contact@hotel99.com', 'Hotel 99', '010-0099-0099', 'www.hotel99.com', 'RESORT'),
+(1, 100, 10, 600, '1100 Example Rd', 'AMS', 'Stylish and affordable', 'contact@hotel100.com', 'Hotel 100', '010-0100-0100', 'www.hotel100.com', 'MOTEL');
 
 INSERT IGNORE INTO reservation (`hotel_id`, `room_count`, `start_date`, `end_date`, `created_at`, `status`) 
 VALUES 
@@ -325,7 +404,7 @@ VALUES
 (79, 20, 'BUSINESS',       300000,  20,  20),
 (80, 20, 'FIRST',          500000,   5,   5);
 
-INSERT INTO tour (id, company, name, country, count, startdate, enddate, price)
+INSERT IGNORE INTO tour (id, company, name, country, count, startdate, enddate, price)
 VALUES
 (1, 'GlobalTravel', 'Tour1', 'KR', 28, '2025-08-01', '2025-08-05', 1010000),
 (2, 'SkyTours', 'Tour2', 'US', 10, '2025-08-02', '2025-08-06', 1020000),
@@ -348,7 +427,7 @@ VALUES
 (19, 'SkyTours', 'Tour19', 'BR', 14, '2025-08-19', '2025-08-23', 1190000),
 (20, 'GlobalTravel', 'Tour20', 'ZA', 26, '2025-08-20', '2025-08-24', 1200000);
 
-INSERT INTO schedule (schedules_order, id, tour_id, date) 
+INSERT IGNORE INTO schedule (schedules_order, id, tour_id, date) 
 VALUES 
 (0, 1, 1, '2025-08-01'),
 (1, 2, 1, '2025-08-02'),
@@ -401,7 +480,7 @@ VALUES
 (0, 49, 20, '2025-08-20'),
 (1, 50, 20, '2025-08-21');
 
-INSERT INTO location(locations_order,id,schedule_id,location_type,description,city,seat_class_id,depart_airport,arrive_airport,hotel_id)
+INSERT IGNORE INTO location ( locations_order, id,schedule_id, location_type, description, city, seat_class_id, depart_airport, arrive_airport, hotel_id )
 VALUES
 (0,1,1,'AIR','AIR activity for Tour1',null,67,'BKK','SFO',null),
 (1,2,1,'HOTEL','HOTEL activity for Tour1','HKG',null,null,null,4),

@@ -22,7 +22,7 @@ public class Reservation extends AuditingFields {
     // private Product product;
 
     @Column(nullable = false)
-    private Long hotelId;
+    private Long hotelId; // 호텔 1개에 대해 지나치게 많은 Reservation @ManyToOne - LAZY 로딩 대신 분리방식
 
     @Column(nullable = false)
     private Long roomCount;

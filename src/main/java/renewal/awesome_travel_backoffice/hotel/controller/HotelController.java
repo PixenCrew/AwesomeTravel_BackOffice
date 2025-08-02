@@ -35,7 +35,7 @@ public class HotelController {
     public String listAndFilter(
             @ModelAttribute("filter") HotelFilterDTO filter,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "name") String sortField,
+            @RequestParam(defaultValue = "id") String sortField,
             @RequestParam(defaultValue = "asc") String sortDir,
             Model model) {
         Sort sort = sortDir.equalsIgnoreCase("asc")
