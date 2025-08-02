@@ -36,4 +36,12 @@ public class SeatClass {
         this.availableSeats = availableSeats;
     }
 
+    public void reserveSeats(Long requiredPersons) throws Exception{
+        if (availableSeats>=requiredPersons) {
+            availableSeats -= requiredPersons;
+        } else{
+            throw new Exception("잔여 좌석 에러");
+        }
+    }
+
 }
