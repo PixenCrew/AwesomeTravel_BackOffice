@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +22,8 @@ import org.springframework.ui.Model;
 import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.code.CityCodeRepository;
 import renewal.awesome_travel_backoffice.code.CountryCodeRepository;
+import renewal.awesome_travel_backoffice.hotel.entity.Reservation;
+import renewal.awesome_travel_backoffice.hotel.repository.ReservationRepository;
 import renewal.awesome_travel_backoffice.tour.TourService;
 import renewal.awesome_travel_backoffice.tour.dto.TourFilterDTO;
 import renewal.awesome_travel_backoffice.tour.entity.Location;
@@ -28,6 +31,7 @@ import renewal.awesome_travel_backoffice.tour.entity.Schedule;
 import renewal.awesome_travel_backoffice.tour.entity.Tour;
 import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
 import renewal.awesome_travel_backoffice.tour.utiles.Type;
+import renewal.awesome_travel_backoffice.user.utils.Status;
 
 @RequiredArgsConstructor
 @RequestMapping("/tour")
@@ -37,6 +41,7 @@ public class TourController {
     private final TourRepository tourRepo;
     private final CountryCodeRepository countryRepo;
     private final CityCodeRepository cityRepo;
+    private final ReservationRepository reservationRepo;
     private final TourService tourService;
 
     // 투어 목록
@@ -118,16 +123,59 @@ public class TourController {
 
     // 새 투어 등록
     @PostMapping("/new")
-    public String submitTravel(@ModelAttribute Tour tour) {
+    public String submitTravel(@ModelAttribute Tour tour) throws Exception {
         // 모든 Schedule 객체에 tour 참조를 세팅
-        tour.getSchedules().forEach(schedule -> {
+        for (Schedule schedule : tour.getSchedules()) {
             schedule.setTour(tour);
             // 모든 location 객체에 schedule 참조를 세팅
-            schedule.getLocations().forEach(location -> {
+            for (Location location : schedule.getLocations()) {
                 location.setSchedule(schedule);
-            });
-        });
+            }
+        };
 
+        Long requiredPersons = tour.getCount(); // 인원수
+        Long hotelId = null; // 호텔
+        LocalDate startDate = null;
+        LocalDate endDate = null;
+
+        // Schedules 순회
+        for (Schedule schedule : tour.getSchedules()) {
+            LocalDate currentDate = schedule.getDate();
+
+            // Locations 순회
+            for (Location location : schedule.getLocations()) {
+                if (location.getLocationType() == Type.AIR) {
+                    location.setLocationType(Type.AIR);
+                    location.getSeatClass().reserveSeats(requiredPersons);
+                } else if(location.getLocationType() == Type.HOTEL) {
+                    location.setLocationType(Type.HOTEL);
+                    Long currentHotelId = location.getHotel().getId();
+
+                    if (hotelId==null) {
+                        hotelId = currentHotelId;
+                        startDate = currentDate;
+                    }
+                    if(!hotelId.equals(currentHotelId)){ // id 다르면
+                        // 전 호텔 끝
+                        reservationRepo.save(new Reservation(hotelId,requiredPersons,startDate,endDate,Reservation.Status.BOOKED));
+                        // 현 호텔 시작
+                        hotelId = currentHotelId;
+                        startDate = currentDate;
+                    }
+                } else{
+                    location.setLocationType(Type.POINT);
+
+                }
+            }
+            endDate = currentDate;
+        }
+        // 마지막 hotel 등록
+        if (hotelId != null) {
+            reservationRepo.save(new Reservation(hotelId,requiredPersons,startDate,endDate,Reservation.Status.BOOKED));
+        }
+        
+        // Air 예약 반영
+        // Hotel 예약 반영
         tourRepo.save(tour);
 
         return "redirect:/tour";
