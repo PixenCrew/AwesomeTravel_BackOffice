@@ -2,6 +2,7 @@ package renewal.awesome_travel_backoffice.tour.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import renewal.awesome_travel_backoffice.air.entity.AirReservation;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -36,4 +37,7 @@ public class Tour {
   @OrderColumn
   private List<Schedule> schedules = new ArrayList<>();
   
+  // @OneToMany(mappedBy = "seat_class", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  // private List<AirReservation> airReservations = new ArrayList<>();
+
 }

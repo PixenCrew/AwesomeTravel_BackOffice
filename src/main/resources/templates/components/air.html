@@ -161,7 +161,7 @@
         <tbody>
             <th:block th:each="seatClass : ${airPage.content}">
                 <!-- <tr th:onclick="|window.location.href='@{/air/{id}(id=${seatClass.air.id})}'|" style="cursor:pointer;"> -->
-                <tr th:onclick="${isSelectionPage} ? |returnNumber(${seatClass.air.id})| : |window.location.href='@{/air/{id}(id=${seatClass.air.id})}'|" style="cursor:pointer;">
+                <tr th:onclick="${isSelectionPage} ? |returnNumber(${seatClass.id})| : |window.location.href='@{/air/{id}(id=${seatClass.air.id})}'|" style="cursor:pointer;">
                     <td th:text="${seatClass.air.id}">1</td>
                     <td th:text="${seatClass.air.departAirport}">1</td>
                     <td th:text="${seatClass.air.departDate}">2025-01-01</td>

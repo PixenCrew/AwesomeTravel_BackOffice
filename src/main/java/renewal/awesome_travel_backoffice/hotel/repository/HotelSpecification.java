@@ -111,7 +111,7 @@ public class HotelSpecification {
             sq.select(builder.coalesce(builder.sum(r.get("roomCount")), 0L))
                     .where(
                             // HotelReservation.hotel 필드를 바깥 root(Hotel)와 연관시킴
-                            builder.equal(r.get("hotelId"), root.get("id")),
+                            builder.equal(r.get("hotel").get("id"), root.get("id")),
                             builder.equal(r.get("status"), HotelReservation.Status.BOOKED),
                             builder.and(
                                     builder.lessThan(r.get("startDate"), endDate),
@@ -139,7 +139,7 @@ public class HotelSpecification {
 
             // subquery의 WHERE 절
             sumSub.where(
-                    builder.equal(res.get("hotelId"), root.get("id")),
+                    builder.equal(res.get("hotel").get("id"), root.get("id")),
                     builder.equal(res.get("status"), HotelReservation.Status.BOOKED), // 예약 상태가 BOOKED
                     builder.lessThanOrEqualTo(res.get("startDate"), date), // startDate <= date
                     builder.greaterThanOrEqualTo(res.get("endDate"), date) // endDate >= date

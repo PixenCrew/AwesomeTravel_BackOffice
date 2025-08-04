@@ -21,24 +21,22 @@ public class HotelReservation extends AuditingFields {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    // @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    // @JoinColumn(name = "product_id", nullable = false)
-    // private Product product;
+    
     @NonNull
-    @Column(nullable = false)
-    private Long hotelId; // 호텔 1개에 대해 지나치게 많은 HotelReservation @ManyToOne - LAZY 로딩 대신 분리방식
+    @ManyToOne
+    @JoinColumn(name = "hotel_id")
+    private Hotel hotel;
+    
+    @NonNull
+    private Long tourId;
 
     @NonNull
-    @Column(nullable = false)
     private Long roomCount;
 
     @NonNull
-    @Column(nullable = false)
     private LocalDate startDate;
     
     @NonNull
-    @Column(nullable = false)
     private LocalDate endDate;
 
     // @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
@@ -46,7 +44,6 @@ public class HotelReservation extends AuditingFields {
 
     @Enumerated(EnumType.STRING)
     @NonNull
-    @Column(length = 10)
     private Status status;
 
     public enum Status {

@@ -16,7 +16,6 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.*;
 import renewal.awesome_travel_backoffice.config.AuditingFields;
-import renewal.awesome_travel_backoffice.hotel.entity.Hotel;
 import renewal.awesome_travel_backoffice.tour.entity.Tour;
 
 @Entity
@@ -33,24 +32,9 @@ public class Product extends AuditingFields{
     private String title;
     private Long price;
 
-    // // 1. tour
-    // @OneToOne(mappedBy = "id")
-    // private Tour tour;
-    
     @OneToOne
     @JoinColumn(name = "tour_id") // Product 테이블에 tour_id FK 생성
     private Tour tour;
-
-    // 2. hotel
-    @OneToOne
-    @JoinColumn(name = "hotel_id")
-    private Hotel hotel;
-    
-    // // 3. air
-    // @OneToOne(mappedBy = "air_id")
-    // private Air air;
-    
-    // 4. info
 
     // 이미지 URL들
     @ElementCollection
@@ -64,11 +48,11 @@ public class Product extends AuditingFields{
     // 일정표
 
     // 리뷰 요약
-    private Long totalReview;
-    private BigDecimal avgerageReview;
-    private Long star1;
-    private Long star2;
-    private Long star3;
+    private Long totalReview; // 총 리뷰 수
+    private BigDecimal avgerageReview; // 평점 평균
+    private Long star1; // 1점 리뷰 수
+    private Long star2; // 2점 리뷰 수
+    private Long star3; // ...
     private Long star4;
     private Long star5;
 

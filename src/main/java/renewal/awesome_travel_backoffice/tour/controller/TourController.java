@@ -6,7 +6,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import renewal.awesome_travel_backoffice.air.repository.SeatClassRepository;
+
+import renewal.awesome_travel_backoffice.air.entity.AirReservation;
+import renewal.awesome_travel_backoffice.air.entity.SeatClass;
+import renewal.awesome_travel_backoffice.air.repository.AirReservationRepository;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +17,6 @@ import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
 import java.util.List;
-
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,7 +25,9 @@ import org.springframework.ui.Model;
 import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.code.CityCodeRepository;
 import renewal.awesome_travel_backoffice.code.CountryCodeRepository;
+import renewal.awesome_travel_backoffice.hotel.entity.Hotel;
 import renewal.awesome_travel_backoffice.hotel.entity.HotelReservation;
+import renewal.awesome_travel_backoffice.hotel.repository.HotelRepository;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelReservationRepository;
 import renewal.awesome_travel_backoffice.tour.TourService;
 import renewal.awesome_travel_backoffice.tour.dto.TourFilterDTO;
@@ -32,7 +36,6 @@ import renewal.awesome_travel_backoffice.tour.entity.Schedule;
 import renewal.awesome_travel_backoffice.tour.entity.Tour;
 import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
 import renewal.awesome_travel_backoffice.tour.utiles.Type;
-import renewal.awesome_travel_backoffice.user.utils.Status;
 
 @RequiredArgsConstructor
 @RequestMapping("/tour")
@@ -42,10 +45,10 @@ public class TourController {
     private final TourRepository tourRepo;
     private final CountryCodeRepository countryRepo;
     private final CityCodeRepository cityRepo;
+    private final HotelRepository hotelRepo;
     private final HotelReservationRepository hotelReservationRepo;
     private final TourService tourService;
-    private final SeatClassRepository seatClassRepository;
-
+    private final AirReservationRepository airReservationRepo;
     // 투어 목록
     // 필터 폼과 결과 리스트(또는 전체 리스트)를 동일하게 렌더링
     @GetMapping
@@ -135,6 +138,9 @@ public class TourController {
             }
         };
 
+        // tour.id 생성을 위한 1차 저장
+        tourRepo.save(tour);
+
         Long requiredPersons = tour.getCount(); // 인원수
         Long hotelId = null; // 호텔
         LocalDate startDate = null;
@@ -147,8 +153,10 @@ public class TourController {
             // Locations 순회
             for (Location location : schedule.getLocations()) {
                 if (location.getLocationType() == Type.AIR) {
+                    SeatClass sc = location.getSeatClass();
+                    sc.reserveSeats(requiredPersons);
                     location.setLocationType(Type.AIR);
-                    location.getSeatClass().reserveSeats(requiredPersons);
+                    airReservationRepo.save(new AirReservation(sc,tour.getId(),requiredPersons,AirReservation.Status.BOOKED));
                 } else if(location.getLocationType() == Type.HOTEL) {
                     location.setLocationType(Type.HOTEL);
                     Long currentHotelId = location.getHotel().getId();
@@ -159,7 +167,8 @@ public class TourController {
                     }
                     if(!hotelId.equals(currentHotelId)){ // id 다르면
                         // 전 호텔 끝
-                        hotelReservationRepo.save(new HotelReservation(hotelId,requiredPersons,startDate,endDate,HotelReservation.Status.BOOKED));
+                        Hotel hotel = hotelRepo.findById(hotelId).get();
+                        hotelReservationRepo.save(new HotelReservation(hotel,tour.getId(),requiredPersons,startDate,endDate,HotelReservation.Status.BOOKED));
                         // 현 호텔 시작
                         hotelId = currentHotelId;
                         startDate = currentDate;
@@ -173,7 +182,8 @@ public class TourController {
         }
         // 마지막 hotel 등록
         if (hotelId != null) {
-            hotelReservationRepo.save(new HotelReservation(hotelId,requiredPersons,startDate,endDate,HotelReservation.Status.BOOKED));
+            Hotel hotel = hotelRepo.findById(hotelId).get();
+            hotelReservationRepo.save(new HotelReservation(hotel,tour.getId(),requiredPersons,startDate,endDate,HotelReservation.Status.BOOKED));
         }
         
         tourRepo.save(tour);

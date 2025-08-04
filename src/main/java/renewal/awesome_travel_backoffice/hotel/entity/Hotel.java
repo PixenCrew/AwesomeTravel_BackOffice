@@ -53,7 +53,13 @@ public class Hotel extends AuditingFields {
     )
     private Set<Amenity> amenities = new HashSet<>();
 
-    @OneToOne(mappedBy = "hotel")
-    private Product product;
+    // 예약 목록
+    @OneToMany(fetch = FetchType.LAZY)
+    // @JoinTable(
+    //     name = "hotel_reservations",
+    //     joinColumns = @JoinColumn(name = "hotel_id")
+    // )
+    private List<HotelReservation> hotelReservations = new ArrayList<>();
+
 }
 
