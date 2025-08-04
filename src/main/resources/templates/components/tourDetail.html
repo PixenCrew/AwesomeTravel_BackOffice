@@ -79,7 +79,7 @@
 
                             <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType != T(renewal.awesome_travel_backoffice.tour.utiles.Type).AIR}">
                                 도시
-                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].city}" placeholder="예: KR | South Korea | 대한민국" list="countryList" />
+                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].city}" placeholder="예: KR | South Korea | 대한민국" list="cityList" />
                             </div>
 
                             <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType == T(renewal.awesome_travel_backoffice.tour.utiles.Type).HOTEL}">
@@ -248,7 +248,7 @@
                     'text',
                     `schedules[${schedIdx}].locations[${locIdx}].city`,
                     '예: KR | South Korea | 대한민국',
-                    { list: 'countryList', onchange: 'stripAfterPipe(this)' }
+                    { list: 'cityList', onchange: 'stripAfterPipe(this)' }
                 ));
 
                 if (type === 'HOTEL') {
