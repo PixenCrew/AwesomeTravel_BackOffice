@@ -1,11 +1,11 @@
 package renewal.awesome_travel_backoffice.air.entity;
 
-import org.springframework.lang.NonNull;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import renewal.awesome_travel_backoffice.air.utiles.SeatClassType;
 
@@ -27,6 +27,9 @@ public class SeatClass {
     private Long price; // 해당 등급의 가격
     private Long maxSeats; // 해당 등급의 최대 좌석 수
     private Long availableSeats; // 잔여 좌석 수
+
+    @OneToMany(mappedBy = "seatClass", cascade = CascadeType.ALL)
+    private List<AirReservation> airReservations = new ArrayList<>();
 
     public SeatClass(Air air, SeatClassType classType, long price, long maxSeats, long availableSeats) {
         this.air = air;
