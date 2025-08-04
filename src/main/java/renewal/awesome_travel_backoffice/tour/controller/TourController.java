@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import renewal.awesome_travel_backoffice.air.repository.SeatClassRepository;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,8 +23,8 @@ import org.springframework.ui.Model;
 import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.code.CityCodeRepository;
 import renewal.awesome_travel_backoffice.code.CountryCodeRepository;
-import renewal.awesome_travel_backoffice.hotel.entity.Reservation;
-import renewal.awesome_travel_backoffice.hotel.repository.ReservationRepository;
+import renewal.awesome_travel_backoffice.hotel.entity.HotelReservation;
+import renewal.awesome_travel_backoffice.hotel.repository.HotelReservationRepository;
 import renewal.awesome_travel_backoffice.tour.TourService;
 import renewal.awesome_travel_backoffice.tour.dto.TourFilterDTO;
 import renewal.awesome_travel_backoffice.tour.entity.Location;
@@ -41,8 +42,9 @@ public class TourController {
     private final TourRepository tourRepo;
     private final CountryCodeRepository countryRepo;
     private final CityCodeRepository cityRepo;
-    private final ReservationRepository reservationRepo;
+    private final HotelReservationRepository hotelReservationRepo;
     private final TourService tourService;
+    private final SeatClassRepository seatClassRepository;
 
     // 투어 목록
     // 필터 폼과 결과 리스트(또는 전체 리스트)를 동일하게 렌더링
@@ -157,7 +159,7 @@ public class TourController {
                     }
                     if(!hotelId.equals(currentHotelId)){ // id 다르면
                         // 전 호텔 끝
-                        reservationRepo.save(new Reservation(hotelId,requiredPersons,startDate,endDate,Reservation.Status.BOOKED));
+                        hotelReservationRepo.save(new HotelReservation(hotelId,requiredPersons,startDate,endDate,HotelReservation.Status.BOOKED));
                         // 현 호텔 시작
                         hotelId = currentHotelId;
                         startDate = currentDate;
@@ -171,11 +173,9 @@ public class TourController {
         }
         // 마지막 hotel 등록
         if (hotelId != null) {
-            reservationRepo.save(new Reservation(hotelId,requiredPersons,startDate,endDate,Reservation.Status.BOOKED));
+            hotelReservationRepo.save(new HotelReservation(hotelId,requiredPersons,startDate,endDate,HotelReservation.Status.BOOKED));
         }
         
-        // Air 예약 반영
-        // Hotel 예약 반영
         tourRepo.save(tour);
 
         return "redirect:/tour";

@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @Setter
 @RequiredArgsConstructor
 @NoArgsConstructor
-public class Reservation extends AuditingFields {
+public class HotelReservation extends AuditingFields {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +27,7 @@ public class Reservation extends AuditingFields {
     // private Product product;
     @NonNull
     @Column(nullable = false)
-    private Long hotelId; // 호텔 1개에 대해 지나치게 많은 Reservation @ManyToOne - LAZY 로딩 대신 분리방식
+    private Long hotelId; // 호텔 1개에 대해 지나치게 많은 HotelReservation @ManyToOne - LAZY 로딩 대신 분리방식
 
     @NonNull
     @Column(nullable = false)

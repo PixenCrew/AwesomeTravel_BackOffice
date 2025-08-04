@@ -10,7 +10,7 @@ import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import renewal.awesome_travel_backoffice.hotel.entity.Hotel;
-import renewal.awesome_travel_backoffice.hotel.entity.Reservation;
+import renewal.awesome_travel_backoffice.hotel.entity.HotelReservation;
 import renewal.awesome_travel_backoffice.hotel.utils.HotelType;
 
 public class HotelSpecification {
@@ -106,13 +106,13 @@ public class HotelSpecification {
 
             // 1) 이 호텔에 대해 BOOKED 상태로 겹치는 기간의 roomCount 합을 구하는 서브쿼리
             Subquery<Long> sq = query.subquery(Long.class);
-            Root<Reservation> r = sq.from(Reservation.class);
+            Root<HotelReservation> r = sq.from(HotelReservation.class);
 
             sq.select(builder.coalesce(builder.sum(r.get("roomCount")), 0L))
                     .where(
-                            // Reservation.hotel 필드를 바깥 root(Hotel)와 연관시킴
+                            // HotelReservation.hotel 필드를 바깥 root(Hotel)와 연관시킴
                             builder.equal(r.get("hotelId"), root.get("id")),
-                            builder.equal(r.get("status"), Reservation.Status.BOOKED),
+                            builder.equal(r.get("status"), HotelReservation.Status.BOOKED),
                             builder.and(
                                     builder.lessThan(r.get("startDate"), endDate),
                                     builder.greaterThan(r.get("endDate"), startDate)));
@@ -131,7 +131,7 @@ public class HotelSpecification {
         return (root, query, builder) -> {
             // 서브쿼리: 해당 날짜에 BOOKED 상태인 예약 합계(roomCount)
             Subquery<Long> sumSub = query.subquery(Long.class);
-            Root<Reservation> res = sumSub.from(Reservation.class);
+            Root<HotelReservation> res = sumSub.from(HotelReservation.class);
 
             // SUM(roomCount) 결과가 null 이면 0L 로 대체하기 위해 COALESCE 사용
             Expression<Long> sumRoomCount = builder.coalesce(builder.sum(res.get("roomCount")), 0L);
@@ -140,7 +140,7 @@ public class HotelSpecification {
             // subquery의 WHERE 절
             sumSub.where(
                     builder.equal(res.get("hotelId"), root.get("id")),
-                    builder.equal(res.get("status"), Reservation.Status.BOOKED), // 예약 상태가 BOOKED
+                    builder.equal(res.get("status"), HotelReservation.Status.BOOKED), // 예약 상태가 BOOKED
                     builder.lessThanOrEqualTo(res.get("startDate"), date), // startDate <= date
                     builder.greaterThanOrEqualTo(res.get("endDate"), date) // endDate >= date
             );

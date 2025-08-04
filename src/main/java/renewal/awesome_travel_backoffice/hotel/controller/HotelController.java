@@ -10,14 +10,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import renewal.awesome_travel_backoffice.hotel.entity.Hotel;
-import renewal.awesome_travel_backoffice.hotel.entity.Reservation;
+import renewal.awesome_travel_backoffice.hotel.entity.HotelReservation;
 import renewal.awesome_travel_backoffice.hotel.utils.HotelType;
 import renewal.awesome_travel_backoffice.air.dto.AirFilterDTO;
 import renewal.awesome_travel_backoffice.air.entity.SeatClass;
 import renewal.awesome_travel_backoffice.code.CityCodeRepository;
 import renewal.awesome_travel_backoffice.hotel.dto.HotelFilterDTO;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelRepository;
-import renewal.awesome_travel_backoffice.hotel.repository.ReservationRepository;
+import renewal.awesome_travel_backoffice.hotel.repository.HotelReservationRepository;
 import renewal.awesome_travel_backoffice.hotel.service.HotelService;
 import renewal.awesome_travel_backoffice.hotel.repository.AmenityRepository;
 
@@ -28,7 +28,7 @@ public class HotelController {
 
     private final HotelService hotelService;
     private final HotelRepository hotelRepo;
-    private final ReservationRepository reservationRepo;
+    private final HotelReservationRepository hotelReservationRepo;
     private final AmenityRepository amenityRepo;
     private final CityCodeRepository cityRepo;
 
@@ -111,11 +111,11 @@ public class HotelController {
     public ResponseEntity<String> deleteHotel(@PathVariable Long id) {
 
         // 1. 호텔 ID에 연결된 모든 예약 가져오기
-        List<Reservation> reservations = reservationRepo.findByHotelId(id);
+        List<HotelReservation> hotelReservations = hotelReservationRepo.findByHotelId(id);
 
         // 2. 예약 삭제
-        for (Reservation reservation : reservations) {
-            reservationRepo.deleteById(reservation.getId());
+        for (HotelReservation hotelReservation : hotelReservations) {
+            hotelReservationRepo.deleteById(hotelReservation.getId());
         }
         
         // 3. 호텔 삭제
@@ -125,12 +125,12 @@ public class HotelController {
     }
 
     // 특정 호텔 예약 조회
-    @GetMapping("/{id}/reservation")
-    public String selectHotelReservation(@PathVariable("id") Long id, Model model) {
-        List<Reservation> reservations = reservationRepo.findByHotelId(id);
-        model.addAttribute("reservation", reservations);
-        model.addAttribute("title", "Hotel ID "+id+" Reservation");
-        model.addAttribute("content", "components/reservation");
+    @GetMapping("/{id}/hotelReservation")
+    public String selectHotelHotelReservation(@PathVariable("id") Long id, Model model) {
+        List<HotelReservation> hotelReservations = hotelReservationRepo.findByHotelId(id);
+        model.addAttribute("hotelReservation", hotelReservations);
+        model.addAttribute("title", "Hotel ID "+id+" HotelReservation");
+        model.addAttribute("content", "components/hotelReservation");
         return "layout";
     }
     

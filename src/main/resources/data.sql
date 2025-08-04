@@ -113,7 +113,7 @@ VALUES
 (1, 99, 45, 920, '1099 Example Rd', 'AKL', 'Luxury seaside resort', 'contact@hotel99.com', 'Hotel 99', '010-0099-0099', 'www.hotel99.com', 'RESORT'),
 (1, 100, 10, 600, '1100 Example Rd', 'AMS', 'Stylish and affordable', 'contact@hotel100.com', 'Hotel 100', '010-0100-0100', 'www.hotel100.com', 'MOTEL');
 
-INSERT IGNORE INTO reservation (`hotel_id`, `room_count`, `start_date`, `end_date`, `created_at`, `status`) 
+INSERT IGNORE INTO hotel_reservation (`hotel_id`, `room_count`, `start_date`, `end_date`, `created_at`, `status`) 
 VALUES 
 (2, 1, '2025-06-19', '2025-06-20', '2025-06-19 10:30:28', 'COMPLETED'),
 (2, 1, '2025-07-14', '2025-07-15', '2025-06-19 10:30:28', 'BOOKED'),

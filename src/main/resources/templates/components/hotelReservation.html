@@ -19,16 +19,16 @@
     <h3>예약 현황 (차트)</h3>
     <div class="chart-wrapper">
         <div id="chart-canvas" class="chart-canvas">
-            <canvas id="reservationChart"></canvas>
+            <canvas id="hotelReservationChart"></canvas>
         </div>
     </div>
 
-    <!-- Chart.js and process full reservation object in JS -->
+    <!-- Chart.js and process full hotelReservation object in JS -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
 
     <script th:inline="javascript">
-        const reservations = /*[[${reservation}]]*/[];
+        const hotelReservations = /*[[${hotelReservation}]]*/[];
 
         function getDateRange(start, end) {
             const result = [];
@@ -48,7 +48,7 @@
         }
 
         // 1. 전체 날짜 범위 계산
-        const allDates = reservations.flatMap(r => getDateRange(r.startDate, r.endDate));
+        const allDates = hotelReservations.flatMap(r => getDateRange(r.startDate, r.endDate));
         const uniqueDates = Array.from(new Set(allDates)).sort();
         const minDate = new Date(uniqueDates[0]);
         const maxDate = new Date(uniqueDates[uniqueDates.length - 1]);
@@ -57,9 +57,9 @@
         // 2. canvas 크기 설정
         const pxPerDay = 100;
         const pxPerRes = 80;
-        const canvas = document.getElementById('reservationChart');
+        const canvas = document.getElementById('hotelReservationChart');
         canvas.style.width = (totalDays * pxPerDay) + 'px';
-        canvas.style.height = (reservations.length * pxPerRes * 1.2) + 'px';
+        canvas.style.height = (hotelReservations.length * pxPerRes * 1.2) + 'px';
 
         // 3. 상태별 색상 지정
         function getStatusColor(status) {
@@ -73,7 +73,7 @@
 
         // 4. 날짜별 roomCount 합계 계산
         const roomCountByDate = {};
-        reservations.forEach(r => {
+        hotelReservations.forEach(r => {
             if (r.status === 'CANCELLED') return;
             getDateRange(r.startDate, r.endDate).forEach(date => {
                 roomCountByDate[date] = (roomCountByDate[date] || 0) + (r.roomCount || 0);
@@ -81,7 +81,7 @@
         });
 
         // 5. 데이터셋 생성
-        const datasets = reservations.map(r => ({
+        const datasets = hotelReservations.map(r => ({
             label: `예약 ${r.id}`,
             data: [{
                 x: [r.startDate, addOneDay(r.endDate)],
@@ -96,7 +96,7 @@
         }));
 
         // 6. Y축 라벨
-        const yLabels = reservations.map(r => `예약 ${r.id}`).reverse();
+        const yLabels = hotelReservations.map(r => `예약 ${r.id}`).reverse();
 
         // 7. 차트 생성
         const ctx = canvas.getContext('2d');
