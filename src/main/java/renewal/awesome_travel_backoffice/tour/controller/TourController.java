@@ -208,15 +208,61 @@ public class TourController {
 
     // 특정 투어 수정
     @PostMapping("/{id}")
-    public String submitSelectedTravel(@ModelAttribute Tour tour) {
+    public String submitSelectedTravel(@ModelAttribute Tour tour) throws Exception {
         // 모든 Schedule 객체에 tour 참조를 세팅
-        tour.getSchedules().forEach(schedule -> {
+        for (Schedule schedule : tour.getSchedules()) {
             schedule.setTour(tour);
             // 모든 location 객체에 schedule 참조를 세팅
-            schedule.getLocations().forEach(location -> {
+            for (Location location : schedule.getLocations()) {
                 location.setSchedule(schedule);
-            });
-        });
+            }
+        };
+
+        Long requiredPersons = tour.getCount(); // 인원수
+        Long hotelId = null; // 호텔
+        LocalDate startDate = null;
+        LocalDate endDate = null;
+
+        // Schedules 순회
+        for (Schedule schedule : tour.getSchedules()) {
+            LocalDate currentDate = schedule.getDate();
+
+            // Locations 순회
+            for (Location location : schedule.getLocations()) {
+                if (location.getLocationType() == Type.AIR) {
+                    SeatClass sc = location.getSeatClass();
+                    sc.reserveSeats(requiredPersons);
+                    location.setLocationType(Type.AIR);
+                    airReservationRepo.save(new AirReservation(sc,tour.getId(),requiredPersons,AirReservation.Status.BOOKED));
+                } else if(location.getLocationType() == Type.HOTEL) {
+                    location.setLocationType(Type.HOTEL);
+                    Long currentHotelId = location.getHotel().getId();
+
+                    if (hotelId==null) {
+                        hotelId = currentHotelId;
+                        startDate = currentDate;
+                    }
+                    if(!hotelId.equals(currentHotelId)){ // id 다르면
+                        // 전 호텔 끝
+                        Hotel hotel = hotelRepo.findById(hotelId).get();
+                        hotelReservationRepo.save(new HotelReservation(hotel,tour.getId(),requiredPersons,startDate,endDate,HotelReservation.Status.BOOKED));
+                        // 현 호텔 시작
+                        hotelId = currentHotelId;
+                        startDate = currentDate;
+                    }
+                } else{
+                    location.setLocationType(Type.POINT);
+
+                }
+            }
+            endDate = currentDate;
+        }
+        // 마지막 hotel 등록
+        if (hotelId != null) {
+            Hotel hotel = hotelRepo.findById(hotelId).get();
+            hotelReservationRepo.save(new HotelReservation(hotel,tour.getId(),requiredPersons,startDate,endDate,HotelReservation.Status.BOOKED));
+        }
+        
         tourRepo.save(tour);
 
         return "redirect:/tour";
@@ -226,6 +272,7 @@ public class TourController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteHotel(@PathVariable Long id) {
 
+        // 연결된 Air 예약 CANCELED로 변경
         tourRepo.deleteById(id);
         
         return ResponseEntity.ok("삭제 완료");
