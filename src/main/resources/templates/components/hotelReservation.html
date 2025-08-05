@@ -23,6 +23,31 @@
         </div>
     </div>
 
+    <!-- 예약 목록 -->
+    <div>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>예약 ID</th>
+                    <th>투어 ID</th>
+                    <th>방 수</th>
+                    <th>시작일</th>
+                    <th>완료일</th>
+                    <th>예약 상태</th>
+            </thead>
+            <tbody>
+                <tr th:each=" reserve : ${hotelReservation}">
+                    <td th:text="${reserve.id}">1</td>
+                    <td th:text="${reserve.tourId}">1</td>
+                    <td th:text="${reserve.roomCount}">1</td>
+                    <td th:text="${reserve.startDate}">1</td>
+                    <td th:text="${reserve.endDate}">1</td>
+                    <td th:text="${reserve.status}">1</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
     <!-- Chart.js and process full hotelReservation object in JS -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
