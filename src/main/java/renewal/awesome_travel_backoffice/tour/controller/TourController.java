@@ -272,7 +272,19 @@ public class TourController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteHotel(@PathVariable Long id) {
 
-        // 연결된 Air 예약 CANCELED로 변경
+        // 연결된 Air, Hotel 예약 CANCELED로 변경
+        List<AirReservation> airReserves = airReservationRepo.findByTourId(id);
+        for (AirReservation reserve : airReserves) {
+            reserve.setStatus(AirReservation.Status.CANCELLED);
+        }
+        airReservationRepo.saveAll(airReserves);
+
+        List<HotelReservation> hotelReserves = hotelReservationRepo.findByTourId(id);
+        for (HotelReservation reserve : hotelReserves) {
+            reserve.setStatus(HotelReservation.Status.CANCELLED);
+        }
+        hotelReservationRepo.saveAll(hotelReserves);
+        
         tourRepo.deleteById(id);
         
         return ResponseEntity.ok("삭제 완료");

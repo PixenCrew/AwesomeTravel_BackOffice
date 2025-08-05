@@ -8,4 +8,5 @@ import renewal.awesome_travel_backoffice.hotel.entity.HotelReservation;
 public interface HotelReservationRepository extends JpaRepository<HotelReservation, Long> {
 
     List<HotelReservation> findByHotelId(Long id);
+    List<HotelReservation> findByTourId(Long id);
 }
