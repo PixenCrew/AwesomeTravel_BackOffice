@@ -17,9 +17,11 @@ import org.springframework.data.domain.Sort;
 
 import renewal.awesome_travel_backoffice.air.dto.AirFilterDTO;
 import renewal.awesome_travel_backoffice.air.entity.Air;
+import renewal.awesome_travel_backoffice.air.entity.AirReservation;
 import renewal.awesome_travel_backoffice.air.entity.Airline;
 import renewal.awesome_travel_backoffice.air.entity.SeatClass;
 import renewal.awesome_travel_backoffice.air.repository.AirRepository;
+import renewal.awesome_travel_backoffice.air.repository.AirReservationRepository;
 import renewal.awesome_travel_backoffice.air.service.AirService;
 import renewal.awesome_travel_backoffice.air.utiles.AirStatus;
 import renewal.awesome_travel_backoffice.air.utiles.FlightType;
@@ -32,7 +34,8 @@ import renewal.awesome_travel_backoffice.code.CityCodeRepository;
 public class AirController {
 
     private final AirService airService;
-    private final AirRepository airRepository;
+    private final AirRepository airRepo;
+    private final AirReservationRepository airReservationRepo;
     private final CityCodeRepository cityRepo;
 
     // 항공 목록
@@ -114,7 +117,7 @@ public class AirController {
 
     @GetMapping("/{id}")
     public String selectAir(@PathVariable("id") Long id, Model model) {
-        Air air = airRepository.getReferenceById(id);
+        Air air = airRepo.getReferenceById(id);
 
         // 회사 목록 (드롭박스용)
         List<String> allAirlines = airService.getAllCompanies();
@@ -143,7 +146,7 @@ public class AirController {
         for (SeatClass seat : air.getSeatClasses()) {
             seat.setAir(air);
         }
-        airRepository.save(air);
+        airRepo.save(air);
 
         return "redirect:/air";
     }
@@ -203,5 +206,14 @@ public class AirController {
 
         // return "airSelect";
         return "components/air";
+    }
+
+    @GetMapping("/seat/{id}")
+    public String showReservation(@PathVariable Long id, Model model) {
+
+        List<AirReservation> reservations = airReservationRepo.findAllBySeatClassId(id);
+        model.addAttribute("reservations", reservations);
+        
+        return "components/airReservation";
     }
 }

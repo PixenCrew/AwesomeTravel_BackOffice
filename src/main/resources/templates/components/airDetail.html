@@ -96,13 +96,17 @@
 
             <label>잔여 좌석 수:</label>
             <input type="number" th:field="*{seatClasses[__${iterStat.index}__].availableSeats}" min="0" required />
+
+            <button type="button" th:onclick="window.open('/air/seat/[[${seat.id}]]', 'popup', 'width=400,height=600')">
+                예약 조회
+            </button>
         </div>
 
         <button type="submit" th:text="${air.id == null} ? '등록' : '수정' "></button>
     </form>
 
     <button th:if="${air.id != null}" th:onclick="deleteAir([[${air.id}]])">삭제</button>
-    
+
     <script src="/js/util.js"></script>
     <script>
         function deleteAir(id) {

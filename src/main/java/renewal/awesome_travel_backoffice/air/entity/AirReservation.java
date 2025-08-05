@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import renewal.awesome_travel_backoffice.config.AuditingFields;
 @Getter
 @Setter
 @RequiredArgsConstructor
+@NoArgsConstructor
 public class AirReservation extends AuditingFields {
 
     @Id
