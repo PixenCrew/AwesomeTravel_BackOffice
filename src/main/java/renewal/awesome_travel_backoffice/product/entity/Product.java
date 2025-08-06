@@ -1,9 +1,11 @@
 package renewal.awesome_travel_backoffice.product.entity;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -20,11 +22,11 @@ import renewal.awesome_travel_backoffice.tour.entity.Tour;
 
 @Entity
 @Table
-@Getter 
+@Getter
 @Setter
 @NoArgsConstructor
-public class Product extends AuditingFields{
-    
+public class Product extends AuditingFields {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
@@ -41,21 +43,49 @@ public class Product extends AuditingFields{
     private List<String> images = new ArrayList<>();
 
     // 상품정보
-    private LinkedHashMap<String,String> include;
-    private LinkedHashMap<String,String> exclude;
-    private LinkedHashMap<String,String> term;
+    @ElementCollection
+    private Map<String, String> info = new HashMap<>();
 
     // 일정표
 
     // 리뷰 요약
-    private Long totalReview; // 총 리뷰 수
-    private BigDecimal avgerageReview; // 평점 평균
-    private Long star1; // 1점 리뷰 수
-    private Long star2; // 2점 리뷰 수
-    private Long star3; // ...
-    private Long star4;
-    private Long star5;
+    private Long totalReview = 0L; // 총 리뷰 수
+    @Column(precision = 3, scale = 2)
+    private BigDecimal avgerageReview = new BigDecimal("0.00"); // 평점 평균
+    private Long star1 = 0L; // 1점 리뷰 수
+    private Long star2 = 0L; // 2점 리뷰 수
+    private Long star3 = 0L; // ...
+    private Long star4 = 0L;
+    private Long star5 = 0L;
 
-    
+    // private Long[] stars = new Long[]{0L,0L,0L,0L,0L};
+
+    public void UpdateAvg(int star) {
+        totalReview++;
+        switch (star) {
+            case 1:
+                star1++;
+                break;
+            case 2:
+                star2++;
+                break;
+            case 3:
+                star3++;
+                break;
+            case 4:
+                star4++;
+                break;
+            case 5:
+                star5++;
+                break;
+        }
+
+        Long sum = star1 + star2 * 2 + star3 * 3 + star4 * 4 + star5 * 5;
+        avgerageReview = BigDecimal.valueOf(sum)
+                .divide(
+                        BigDecimal.valueOf(totalReview),
+                        2,
+                        RoundingMode.HALF_UP);
+    }
 
 }
