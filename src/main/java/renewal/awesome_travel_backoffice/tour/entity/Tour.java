@@ -2,7 +2,7 @@ package renewal.awesome_travel_backoffice.tour.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import renewal.awesome_travel_backoffice.air.entity.AirReservation;
+import renewal.awesome_travel_backoffice.config.AuditingFields;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Tour {
+public class Tour extends AuditingFields{
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
