@@ -56,7 +56,7 @@ public class AirController {
         List<String> allAirlines = airService.getAllCompanies();
         model.addAttribute("allAirlines", allAirlines);
 
-        // 2) 페이징(10개 고정) + 필터링 로직
+        // 2) 페이징(50개 고정) + 필터링 로직
         Pageable pageable = PageRequest.of(page, 50, sort);
         Page<SeatClass> airPage = airService.searchAirs(filter, pageable);
 
