@@ -2,7 +2,6 @@ package renewal.awesome_travel_backoffice.air.controller;
 
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.Page;

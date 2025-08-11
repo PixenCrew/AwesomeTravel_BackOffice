@@ -1,10 +1,8 @@
 package renewal.awesome_travel_backoffice.specialRequest.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
 import renewal.awesome_travel_backoffice.specialRequest.dto.SpecialRequestDto;
 import renewal.awesome_travel_backoffice.specialRequest.entity.SpecialRequest;
 import renewal.awesome_travel_backoffice.specialRequest.repository.SpecialRequestRepository;

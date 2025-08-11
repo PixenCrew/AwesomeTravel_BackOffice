@@ -7,8 +7,6 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import renewal.awesome_travel_backoffice.config.AuditingFields;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Getter
 public class QnaAnswer extends AuditingFields {

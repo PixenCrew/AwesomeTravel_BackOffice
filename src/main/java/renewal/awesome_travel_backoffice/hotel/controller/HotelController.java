@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import renewal.awesome_travel_backoffice.hotel.entity.Hotel;
 import renewal.awesome_travel_backoffice.hotel.entity.HotelReservation;
 import renewal.awesome_travel_backoffice.hotel.utils.HotelType;
-import renewal.awesome_travel_backoffice.air.dto.AirFilterDTO;
-import renewal.awesome_travel_backoffice.air.entity.SeatClass;
 import renewal.awesome_travel_backoffice.code.CityCodeRepository;
 import renewal.awesome_travel_backoffice.hotel.dto.HotelFilterDTO;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelRepository;

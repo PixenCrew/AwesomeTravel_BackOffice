@@ -3,22 +3,16 @@ package renewal.awesome_travel_backoffice.qna.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import renewal.awesome_travel_backoffice.qna.dto.request.QnaAnswerRequestDto;
 import renewal.awesome_travel_backoffice.qna.dto.request.QnaAnswerUpdateRequestDto;
-import renewal.awesome_travel_backoffice.qna.dto.request.QnaRequestDto;
-import renewal.awesome_travel_backoffice.qna.dto.request.QnaUpdateRequestDto;
 import renewal.awesome_travel_backoffice.qna.dto.response.QnaAnswerResponseDto;
-import renewal.awesome_travel_backoffice.qna.dto.response.QnaDetailResponseDto;
 import renewal.awesome_travel_backoffice.qna.dto.response.QnaResponseDto;
 import renewal.awesome_travel_backoffice.qna.entity.Qna;
 import renewal.awesome_travel_backoffice.qna.entity.QnaAnswer;
 import renewal.awesome_travel_backoffice.qna.repository.QnaAnswerRepository;
 import renewal.awesome_travel_backoffice.qna.repository.QnaRepository;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
