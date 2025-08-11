@@ -1,7 +1,5 @@
 package renewal.awesome_travel_backoffice.product.entity;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,12 +29,13 @@ public class Product extends AuditingFields {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private Long id;
-    private String title;
-    private Long price;
-
+    
     @OneToOne
     @JoinColumn(name = "tour_id") // Product 테이블에 tour_id FK 생성
     private Tour tour;
+
+    private String title;
+    private Long price;
 
     // 이미지 URL들
     @ElementCollection
@@ -49,9 +48,9 @@ public class Product extends AuditingFields {
     // 일정표
 
     // 리뷰 요약
-    private Long totalReview = 0L; // 총 리뷰 수
-    @Column(precision = 3, scale = 2)
-    private BigDecimal avgerageReview = new BigDecimal("0.00"); // 평점 평균
+    // private Long totalReview = 0L; // 총 리뷰 수
+    // @Column(precision = 3, scale = 2)
+    // private BigDecimal avgerageReview = new BigDecimal("0.00"); // 평점 평균
     private Long star1 = 0L; // 1점 리뷰 수
     private Long star2 = 0L; // 2점 리뷰 수
     private Long star3 = 0L; // ...
@@ -61,7 +60,7 @@ public class Product extends AuditingFields {
     // private Long[] stars = new Long[]{0L,0L,0L,0L,0L};
 
     public void UpdateAvg(int star) {
-        totalReview++;
+        // totalReview++;
         switch (star) {
             case 1:
                 star1++;
@@ -80,12 +79,12 @@ public class Product extends AuditingFields {
                 break;
         }
 
-        Long sum = star1 + star2 * 2 + star3 * 3 + star4 * 4 + star5 * 5;
-        avgerageReview = BigDecimal.valueOf(sum)
-                .divide(
-                        BigDecimal.valueOf(totalReview),
-                        2,
-                        RoundingMode.HALF_UP);
+        // Long sum = star1 + star2 * 2 + star3 * 3 + star4 * 4 + star5 * 5;
+        // avgerageReview = BigDecimal.valueOf(sum)
+        //         .divide(
+        //                 BigDecimal.valueOf(totalReview),
+        //                 2,
+        //                 RoundingMode.HALF_UP);
     }
 
 }
