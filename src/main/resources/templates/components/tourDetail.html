@@ -42,6 +42,12 @@
         <label for="count">인원:</label>
         <input type="number" th:field="*{count}" min="1" required /><br>
 
+        <label for="airPriceSum">항공권 가격 합:</label>
+        <input type="number" th:field="*{airPriceSum}" min="1" disabled /><br>
+
+        <label for="hotelPriceSum">호텔 가격 합:</label>
+        <input type="number" th:field="*{hotelPriceSum}" min="1" disabled /><br>
+
         <fieldset id="fieldset">
             <legend>코스 스케줄 및 포인트/항공 정보</legend>
 

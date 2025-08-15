@@ -40,4 +40,7 @@ public class Tour extends AuditingFields{
   // @OneToMany(mappedBy = "seat_class", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   // private List<AirReservation> airReservations = new ArrayList<>();
 
+  private Long airPriceSum;
+  private Long hotelPriceSum;
+
 }

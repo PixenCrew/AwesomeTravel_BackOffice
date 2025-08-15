@@ -109,6 +109,8 @@
                 <!-- <th>코스 포인트</th> -->
                 <th>국가</th>
                 <th>인원</th>
+                <th>항공권 가격 합</th>
+                <th>호텔 가격 합</th>
             </tr>
 
         </thead>
@@ -131,6 +133,8 @@
                 </td> -->
                 <td th:text="${tour.country}">KR</td>
                 <td th:text="${tour.count}">1212</td>
+                <td th:text="${tour.airPriceSum}">1212</td>
+                <td th:text="${tour.hotelPriceSum}">1212</td>
             </tr>
         </tbody>
     </table>
