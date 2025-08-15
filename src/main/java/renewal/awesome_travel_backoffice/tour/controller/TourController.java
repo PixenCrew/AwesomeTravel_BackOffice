@@ -141,52 +141,7 @@ public class TourController {
         // tour.id 생성을 위한 1차 저장
         tourRepo.save(tour);
 
-        Long requiredPersons = tour.getCount(); // 인원수
-        Long hotelId = null; // 호텔
-        LocalDate startDate = null;
-        LocalDate endDate = null;
-
-        // Schedules 순회
-        for (Schedule schedule : tour.getSchedules()) {
-            LocalDate currentDate = schedule.getDate();
-
-            // Locations 순회
-            for (Location location : schedule.getLocations()) {
-                if (location.getLocationType() == Type.AIR) {
-                    SeatClass sc = location.getSeatClass();
-                    sc.reserveSeats(requiredPersons);
-                    location.setLocationType(Type.AIR);
-                    airReservationRepo.save(new AirReservation(sc,tour.getId(),requiredPersons,AirReservation.Status.BOOKED));
-                } else if(location.getLocationType() == Type.HOTEL) {
-                    location.setLocationType(Type.HOTEL);
-                    Long currentHotelId = location.getHotel().getId();
-
-                    if (hotelId==null) {
-                        hotelId = currentHotelId;
-                        startDate = currentDate;
-                    }
-                    if(!hotelId.equals(currentHotelId)){ // id 다르면
-                        // 전 호텔 끝
-                        Hotel hotel = hotelRepo.findById(hotelId).get();
-                        hotelReservationRepo.save(new HotelReservation(hotel,tour.getId(),requiredPersons,startDate,endDate,HotelReservation.Status.BOOKED));
-                        // 현 호텔 시작
-                        hotelId = currentHotelId;
-                        startDate = currentDate;
-                    }
-                } else{
-                    location.setLocationType(Type.POINT);
-
-                }
-            }
-            endDate = currentDate;
-        }
-        // 마지막 hotel 등록
-        if (hotelId != null) {
-            Hotel hotel = hotelRepo.findById(hotelId).get();
-            hotelReservationRepo.save(new HotelReservation(hotel,tour.getId(),requiredPersons,startDate,endDate,HotelReservation.Status.BOOKED));
-        }
-        
-        tourRepo.save(tour);
+        tourRepo.save(setTour(tour));
 
         return "redirect:/tour";
     }
@@ -217,53 +172,8 @@ public class TourController {
                 location.setSchedule(schedule);
             }
         };
-
-        Long requiredPersons = tour.getCount(); // 인원수
-        Long hotelId = null; // 호텔
-        LocalDate startDate = null;
-        LocalDate endDate = null;
-
-        // Schedules 순회
-        for (Schedule schedule : tour.getSchedules()) {
-            LocalDate currentDate = schedule.getDate();
-
-            // Locations 순회
-            for (Location location : schedule.getLocations()) {
-                if (location.getLocationType() == Type.AIR) {
-                    SeatClass sc = location.getSeatClass();
-                    sc.reserveSeats(requiredPersons);
-                    location.setLocationType(Type.AIR);
-                    airReservationRepo.save(new AirReservation(sc,tour.getId(),requiredPersons,AirReservation.Status.BOOKED));
-                } else if(location.getLocationType() == Type.HOTEL) {
-                    location.setLocationType(Type.HOTEL);
-                    Long currentHotelId = location.getHotel().getId();
-
-                    if (hotelId==null) {
-                        hotelId = currentHotelId;
-                        startDate = currentDate;
-                    }
-                    if(!hotelId.equals(currentHotelId)){ // id 다르면
-                        // 전 호텔 끝
-                        Hotel hotel = hotelRepo.findById(hotelId).get();
-                        hotelReservationRepo.save(new HotelReservation(hotel,tour.getId(),requiredPersons,startDate,endDate,HotelReservation.Status.BOOKED));
-                        // 현 호텔 시작
-                        hotelId = currentHotelId;
-                        startDate = currentDate;
-                    }
-                } else{
-                    location.setLocationType(Type.POINT);
-
-                }
-            }
-            endDate = currentDate;
-        }
-        // 마지막 hotel 등록
-        if (hotelId != null) {
-            Hotel hotel = hotelRepo.findById(hotelId).get();
-            hotelReservationRepo.save(new HotelReservation(hotel,tour.getId(),requiredPersons,startDate,endDate,HotelReservation.Status.BOOKED));
-        }
         
-        tourRepo.save(tour);
+        tourRepo.save(setTour(tour));
 
         return "redirect:/tour";
     }
@@ -288,5 +198,61 @@ public class TourController {
         tourRepo.deleteById(id);
         
         return ResponseEntity.ok("삭제 완료");
+    }
+
+    protected Tour setTour(Tour tour) throws Exception{
+        Long requiredPersons = tour.getCount(); // 인원수
+        Long hotelId = null; // 호텔
+        LocalDate startDate = null;
+        LocalDate endDate = null;
+
+        Long airPriceSum = 0L;
+        Long hotelPriceSum = 0L;
+
+        // Schedules 순회
+        for (Schedule schedule : tour.getSchedules()) {
+            LocalDate currentDate = schedule.getDate();
+
+            // Locations 순회
+            for (Location location : schedule.getLocations()) {
+                if (location.getLocationType() == Type.AIR) {
+                    SeatClass sc = location.getSeatClass();
+                    airPriceSum += sc.getPrice();
+                    sc.reserveSeats(requiredPersons);
+                    location.setLocationType(Type.AIR);
+                    airReservationRepo.save(new AirReservation(sc,tour.getId(),requiredPersons,AirReservation.Status.BOOKED));
+                } else if(location.getLocationType() == Type.HOTEL) {
+                    location.setLocationType(Type.HOTEL);
+                    Long currentHotelId = location.getHotel().getId();
+                    hotelPriceSum += location.getHotel().getPrice();
+                    if (hotelId==null) {
+                        hotelId = currentHotelId;
+                        startDate = currentDate;
+                    }
+                    if(!hotelId.equals(currentHotelId)){ // id 다르면
+                        // 전 호텔 끝
+                        Hotel hotel = hotelRepo.findById(hotelId).get();
+                        hotelReservationRepo.save(new HotelReservation(hotel,tour.getId(),requiredPersons,startDate,endDate,HotelReservation.Status.BOOKED));
+                        // 현 호텔 시작
+                        hotelId = currentHotelId;
+                        startDate = currentDate;
+                    }
+                } else{
+                    location.setLocationType(Type.POINT);
+
+                }
+            }
+            endDate = currentDate;
+        }
+        // 마지막 hotel 등록
+        if (hotelId != null) {
+            Hotel hotel = hotelRepo.findById(hotelId).get();
+            hotelReservationRepo.save(new HotelReservation(hotel,tour.getId(),requiredPersons,startDate,endDate,HotelReservation.Status.BOOKED));
+        }
+
+        tour.setAirPriceSum(airPriceSum);
+        tour.setHotelPriceSum(hotelPriceSum);
+        
+        return tour;
     }
 }
