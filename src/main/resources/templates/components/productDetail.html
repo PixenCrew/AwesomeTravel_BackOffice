@@ -1,0 +1,100 @@
+<div th:fragment="content">
+
+    <h1 th:text="${product.id} == null ? '패키지 등록' : '패키지 상세' "></h1>
+    
+    <form th:object="${product}" th:action="${product.id} == null ?
+               @{/product/new} :
+               @{/product/{id}(id=${product.id})}" method="post">
+
+        <!-- 수정 시에만 ID 표시 -->
+        <div th:if="${product.id} != null">
+            <label>ID:</label>
+            <input type="text" th:field="*{id}" readonly /><br>
+        </div>
+
+        <!-- 기본 Product 필드들 -->
+        <label for="product">Product ID:</label>
+        <input type="text" th:field="*{product.id}" required /><br>
+
+        <label for="title">이름:</label>
+        <input type="text" th:field="*{title}" required /><br>
+
+        <label for="price">가격:</label>
+        <input type="number" th:field="*{price}" required /><br>
+
+        <button type="submit" th:text="${product.id} == null ? '등록' : '수정'"></button>
+    </form>
+
+    <button th:if="${product.id != null}" th:onclick="deleteProduct([[${product.id}]])">삭제</button>
+
+    <script src="/js/util.js"></script>
+    <script>
+        let searchTarget;
+        
+        function searchHotel(input) {
+            console.log('Search Hotel for : '+input.value)
+            // 날짜, 도시, 인원 입력 후 호텔 목록 Popup
+            const locationDiv = input.closest(".location-point");
+
+            // 1. 형제 요소 city
+            const cityInput = locationDiv.querySelector("input[name$='.city']");
+
+            // 2. 상위 스케줄 블록의 date
+            const schedulePoint = input.closest('.schedule-point');
+            const dateInput = schedulePoint.querySelector('input[type="date"]');
+
+            // 3. 최상위 블록의 인원수 count
+            const countInput = document.querySelector('#count');
+
+            // 4. 값 읽기
+            const cityValue = cityInput?.value || null;
+            const dateValue = dateInput?.value || null;
+            const countValue = countInput?.value || null;
+
+            console.log("도시 (city):", cityValue);
+            console.log("날짜 (date):", dateValue);
+            console.log("인원수 (count):", countValue);
+
+            if (cityValue != null && dateValue != null && countValue != null) {
+                console.log("searchHotel called for:", input.value);
+                searchTarget = input;
+                const popup = window.open(
+                    '/hotel/search?city=' + cityValue + '&targetDate=' + dateValue + '&requiredPersons=' + countValue, // URL + 파라미터
+                    'hotelSearchPopup',
+                    'width=1200,height=800'
+                );
+            } else {
+                alert("인원수, 날짜, 도시를 모두 입력하세요")
+            }
+        }
+
+        function setId(id) {
+            searchTarget.value = id;
+            console.log("searchTarget updated:", searchTarget.value);
+        }
+
+        function deleteProduct(id) {
+            if (confirm('정말로 삭제하시겠습니까?')) {
+                fetch('/product/' + id, { method: 'DELETE' })
+                    .then(res => {
+                        if (res.ok) {
+                            alert('삭제 성공');
+                            window.location.href = '/product';
+                        } else {
+                            alert('삭제 실패');
+                        }
+                    });
+            }
+        }
+
+    </script>
+
+    <datalist id="countryList">
+        <option th:each="cc : ${countryCode}" th:value="${cc.code} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
+    </datalist>
+
+    <datalist id="cityList">
+        <option th:each="cc : ${cityCode}" th:value="${cc.code} + ' | ' + ${cc.country} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
+    </datalist>
+
+</div>

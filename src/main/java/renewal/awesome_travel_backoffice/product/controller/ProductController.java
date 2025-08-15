@@ -32,7 +32,7 @@ public class ProductController {
     private final ProductRepository productRepo;
     private final ProductService productService;
     private final CountryRepository countryRepo;
-    private final CityCodeRepository cityCodeRepo;
+    private final CityCodeRepository cityRepo;
 
     @GetMapping
     public String listAndFilter(
@@ -52,7 +52,7 @@ public class ProductController {
 
         // 3) View에서 쓸 속성들
         model.addAttribute("countryCode", countryRepo.findAll());
-        model.addAttribute("cityCode", cityCodeRepo.findAll());
+        model.addAttribute("cityCode", cityRepo.findAll());
         model.addAttribute("productPage", productPage);
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
@@ -62,6 +62,14 @@ public class ProductController {
         return "layout";
     }
     
+    @GetMapping("/new")
+    public String newProduct(Model model){
+        model.addAttribute("countryCode", countryRepo.findAll());
+        model.addAttribute("cityCode", cityRepo.findAll());
+        model.addAttribute("content", "components/productDetail");
+
+        return "layout";
+    }
 
     @GetMapping("/test")
     public ResponseEntity<Void> test() {
