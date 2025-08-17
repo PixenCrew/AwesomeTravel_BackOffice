@@ -209,7 +209,23 @@ public class TourController {
         Long airPriceSum = 0L;
         Long hotelPriceSum = 0L;
 
-        // TODO: 기존 항공권, 호텔 예약 CANCEL 처리
+        // 기존 항공권, 호텔 예약 CANCEL 처리
+        List<AirReservation> airReserveToCancel = airReservationRepo.findByTourId(tour.getId());
+        if(!airReserveToCancel.isEmpty()){
+            for (AirReservation reserve : airReserveToCancel) {
+                reserve.setStatus(AirReservation.Status.CANCELLED);
+            }
+            airReservationRepo.saveAllAndFlush(airReserveToCancel);
+        }
+
+        List<HotelReservation> hotelReserveToCancel = hotelReservationRepo.findByTourId(tour.getId());
+        if(!hotelReserveToCancel.isEmpty()){
+            for (HotelReservation reserve : hotelReserveToCancel) {
+                reserve.setStatus(HotelReservation.Status.CANCELLED);
+            }
+            hotelReservationRepo.saveAllAndFlush(hotelReserveToCancel);
+        }
+
         // Schedules 순회
         for (Schedule schedule : tour.getSchedules()) {
             LocalDate currentDate = schedule.getDate();
