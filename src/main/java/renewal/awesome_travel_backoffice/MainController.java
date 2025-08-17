@@ -21,7 +21,7 @@ public class MainController {
     private final AdminService adminService;
 
     // 로그인 페이지
-    @GetMapping("/login")
+    @GetMapping("login")
     public String loginPage(@RequestParam(value = "error", required = false) String error) {
         return "login";
     }
@@ -36,7 +36,7 @@ public class MainController {
     }
     
     // TEST 테스트용 가입 TEST
-    @PostMapping("/admin")
+    @PostMapping("admin")
     public String newAdmin(Admin admin) {
         System.out.println(admin.getId());
         System.out.println(admin.getPassword());

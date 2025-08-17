@@ -209,10 +209,11 @@ public class TourController {
         Long airPriceSum = 0L;
         Long hotelPriceSum = 0L;
 
+        // TODO: 기존 항공권, 호텔 예약 CANCEL 처리
         // Schedules 순회
         for (Schedule schedule : tour.getSchedules()) {
             LocalDate currentDate = schedule.getDate();
-
+            
             // Locations 순회
             for (Location location : schedule.getLocations()) {
                 if (location.getLocationType() == Type.AIR) {
@@ -250,8 +251,8 @@ public class TourController {
             hotelReservationRepo.save(new HotelReservation(hotel,tour.getId(),requiredPersons,startDate,endDate,HotelReservation.Status.BOOKED));
         }
 
-        tour.setAirPriceSum(airPriceSum);
-        tour.setHotelPriceSum(hotelPriceSum);
+        tour.setAirPriceSum(airPriceSum*tour.getCount()); // 가격 총합 x 인원수
+        tour.setHotelPriceSum(hotelPriceSum*tour.getCount());
         
         return tour;
     }
