@@ -43,4 +43,7 @@ public class Tour extends AuditingFields{
   private Long airPriceSum;
   private Long hotelPriceSum;
 
+  // 패키지 상품과 연결된 경우 패키지 ID
+  private Long productId;
+
 }

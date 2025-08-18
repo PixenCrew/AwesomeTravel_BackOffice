@@ -25,6 +25,7 @@ import org.springframework.ui.Model;
 import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.code.CityCodeRepository;
 import renewal.awesome_travel_backoffice.code.CountryCodeRepository;
+import renewal.awesome_travel_backoffice.hotel.dto.HotelFilterDTO;
 import renewal.awesome_travel_backoffice.hotel.entity.Hotel;
 import renewal.awesome_travel_backoffice.hotel.entity.HotelReservation;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelRepository;
@@ -198,6 +199,34 @@ public class TourController {
         tourRepo.deleteById(id);
         
         return ResponseEntity.ok("삭제 완료");
+    }
+
+    // 투어 검색용
+    @GetMapping("/search")
+    public String searchTour(
+            @ModelAttribute("filter") TourFilterDTO filter, // 필터 DTO를 바인딩
+            @RequestParam(defaultValue = "id") String sortField,
+            @RequestParam(defaultValue = "asc") String sortDir,
+            @RequestParam(defaultValue = "0") int page, // 페이지 번호
+            Model model) {
+        Sort sort = sortDir.equalsIgnoreCase("asc")
+                ? Sort.by(sortField).ascending()
+                : Sort.by(sortField).descending();
+
+        Pageable pageable = PageRequest.of(page, 50, sort);
+
+        Page<Tour> tourPage = tourService.searchTours(filter, pageable);
+
+        // View에서 쓸 속성들
+        model.addAttribute("tourPage", tourPage);
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDir", sortDir);
+        model.addAttribute("title", "Tour Select");
+        
+        // 투어선택 플래그
+        model.addAttribute("isSelectionPage", true);
+
+        return "components/tour";
     }
 
     protected Tour setTour(Tour tour) throws Exception{

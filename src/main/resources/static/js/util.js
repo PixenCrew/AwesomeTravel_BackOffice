@@ -16,3 +16,14 @@ function returnNumber(id) {
         console.log('returnNumber 오류')
     }
 }
+
+// 선택 팝업에서 특정 튜플 선택시 부모창에 가격정보 전달하고 팝업 닫음
+function returnPrice(id, tourPrice, airPrice, hotelPrice) {
+    console.log(`returnPrice : ${id}, ${tourPrice}, ${airPrice}, ${hotelPrice}, `)
+    if (window.opener && !window.opener.closed) {
+        window.opener.setPrice(id, tourPrice, airPrice, hotelPrice);  // 부모 setPrice 함수 호출
+        window.close(); // 팝업 닫기
+    } else {
+        console.log('returnPrice 오류')
+    }
+}

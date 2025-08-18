@@ -1,7 +1,7 @@
 <div th:fragment="content">
 
     <h1 th:text="${product.id} == null ? '패키지 등록' : '패키지 상세' "></h1>
-    
+
     <form th:object="${product}" th:action="${product.id} == null ?
                @{/product/new} :
                @{/product/{id}(id=${product.id})}" method="post">
@@ -13,15 +13,53 @@
         </div>
 
         <!-- 기본 Product 필드들 -->
-        <label for="product">Product ID:</label>
-        <input type="text" th:field="*{product.id}" required /><br>
-
         <label for="title">이름:</label>
         <input type="text" th:field="*{title}" required /><br>
+
+        <!-- Tour 필드 -->
+        <div style="border: 1px, solid, black;">
+            <label for="tour">투어 ID :</label>
+            <input type="text" th:field="*{tour.id}" onclick="searchTour(this)" readonly /><br>
+
+            <label for="tourPrice">투어 가격 :</label>
+            <input type="text" th:field="*{tour.price}" disabled /><br>
+
+            <label for="tourPrice">항공권 가격 :</label>
+            <input type="text" th:field="*{tour.airPriceSum}" disabled /><br>
+
+            <label for="tourPrice">호텔 가격 :</label>
+            <input type="text" th:field="*{tour.hotelPriceSum}" disabled /><br>
+
+        </div>
 
         <label for="price">가격:</label>
         <input type="number" th:field="*{price}" required /><br>
 
+        <!-- 이미지 URL List -->
+        <div>
+            <label>이미지 URL:</label>
+            <div id="images-container">
+                <div th:each="img, iterStat : *{images}">
+                    <input type="text" th:field="*{images[__${iterStat.index}__]}" />
+                    <button type="button" onclick="removeField(this)">삭제</button>
+                </div>
+            </div>
+            <button type="button" onclick="addImageField()">이미지 추가</button>
+        </div>
+
+        <!-- 상품 정보 Map -->
+        <div>
+            <label>상품 정보:</label>
+            <div id="info-container">
+                <div th:each="entry, iterStat : *{info}">
+                    Key: <input type="text" th:name="|info[${entry.key}]|" th:value="${entry.key}" readonly />
+                    Value: <input type="text" th:name="|info[${entry.key}]|" th:value="${entry.value}" />
+                    <button type="button" onclick="removeField(this)">삭제</button>
+                </div>
+            </div>
+            <button type="button" onclick="addInfoField()">정보 추가</button>
+
+        </div>
         <button type="submit" th:text="${product.id} == null ? '등록' : '수정'"></button>
     </form>
 
@@ -29,48 +67,21 @@
 
     <script src="/js/util.js"></script>
     <script>
-        let searchTarget;
-        
-        function searchHotel(input) {
-            console.log('Search Hotel for : '+input.value)
-            // 날짜, 도시, 인원 입력 후 호텔 목록 Popup
-            const locationDiv = input.closest(".location-point");
 
-            // 1. 형제 요소 city
-            const cityInput = locationDiv.querySelector("input[name$='.city']");
-
-            // 2. 상위 스케줄 블록의 date
-            const schedulePoint = input.closest('.schedule-point');
-            const dateInput = schedulePoint.querySelector('input[type="date"]');
-
-            // 3. 최상위 블록의 인원수 count
-            const countInput = document.querySelector('#count');
-
-            // 4. 값 읽기
-            const cityValue = cityInput?.value || null;
-            const dateValue = dateInput?.value || null;
-            const countValue = countInput?.value || null;
-
-            console.log("도시 (city):", cityValue);
-            console.log("날짜 (date):", dateValue);
-            console.log("인원수 (count):", countValue);
-
-            if (cityValue != null && dateValue != null && countValue != null) {
-                console.log("searchHotel called for:", input.value);
-                searchTarget = input;
-                const popup = window.open(
-                    '/hotel/search?city=' + cityValue + '&targetDate=' + dateValue + '&requiredPersons=' + countValue, // URL + 파라미터
-                    'hotelSearchPopup',
-                    'width=1200,height=800'
-                );
-            } else {
-                alert("인원수, 날짜, 도시를 모두 입력하세요")
-            }
+        function searchTour() {
+            const popup = window.open(
+                '/tour/search', // URL
+                'tourSearchPopup',
+                'width=1200,height=800'
+            );
         }
 
-        function setId(id) {
-            searchTarget.value = id;
-            console.log("searchTarget updated:", searchTarget.value);
+        function setPrice(id, tourPrice, airPrice, hotelPrice) {
+            console.log(`id, tourPrice, airPrice, hotelPrice: ${id}, ${tourPrice}, ${airPrice}, ${hotelPrice}`);
+            document.getElementById("tour.id").value = id;
+            document.getElementById("tour.price").value = tourPrice;
+            document.getElementById("tour.airPriceSum").value = airPrice;
+            document.getElementById("tour.hotelPriceSum").value = hotelPrice;
         }
 
         function deleteProduct(id) {
@@ -85,6 +96,77 @@
                         }
                     });
             }
+        }
+
+        // 공통 삭제 함수
+        function removeField(btn) {
+            btn.parentElement.remove();
+            reindexImages();
+        }
+
+        function reindexImages() {
+            const inputs = document.querySelectorAll("#images-container input");
+            inputs.forEach((input, idx) => {
+                input.name = `images[${idx}]`;
+            });
+        }
+
+        // 이미지 필드 추가
+        function addImageField() {
+            const container = document.getElementById("images-container");
+            const index = container.querySelectorAll("input").length;
+
+            const div = document.createElement("div");
+
+            const input = document.createElement("input");
+            input.type = "text";
+            input.name = `images[${index}]`;
+
+            const button = document.createElement("button");
+            button.type = "button";
+            button.textContent = "삭제";
+            button.addEventListener("click", () => removeField(button));
+
+            div.appendChild(input);
+            div.appendChild(button);
+
+            container.appendChild(div);
+        }
+
+        // Map 필드 추가 (Map<String,String>)
+        function addInfoField() {
+            const container = document.getElementById("info-container");
+
+            const div = document.createElement("div");
+
+            // Key
+            const keyLabel = document.createTextNode("Key: ");
+            const keyInput = document.createElement("input");
+            keyInput.type = "text";
+            keyInput.name = `info[newKey${Date.now()}]`;
+            keyInput.placeholder = "속성명";
+
+            // Value
+            const valueLabel = document.createTextNode(" Value: ");
+            const valueInput = document.createElement("input");
+            valueInput.type = "text";
+            valueInput.name = `info[newValue${Date.now()}]`;
+            valueInput.placeholder = "속성값";
+
+            // 삭제 버튼
+            const button = document.createElement("button");
+            button.type = "button";
+            button.textContent = "삭제";
+            button.addEventListener("click", () => removeField(button));
+
+            // div에 조립
+            div.appendChild(keyLabel);
+            div.appendChild(keyInput);
+            div.appendChild(valueLabel);
+            div.appendChild(valueInput);
+            div.appendChild(button);
+
+            container.appendChild(div);
         }
 
     </script>

@@ -111,12 +111,14 @@
                 <th>인원</th>
                 <th>항공권 가격 합</th>
                 <th>호텔 가격 합</th>
+                <th>패키지 상품 ID</th>
             </tr>
 
         </thead>
         <tbody>
-            <tr th:each="tour : ${tourPage.content}" th:onclick="|window.location.href='@{/tour/{id}(id=${tour.id})}'|"
-                style="cursor: pointer;">
+            <th:block th:each="tour : ${tourPage.content}">
+                <!-- <tr th:onclick="|window.location.href='@{/air/{id}(id=${seatClass.air.id})}'|" style="cursor:pointer;"> -->
+                <tr th:onclick="${isSelectionPage} ? |returnPrice(${tour.id},${tour.price},${tour.airPriceSum},${tour.hotelPriceSum})| : |window.location.href='@{/tour/{id}(id=${tour.id})}'|" style="cursor:pointer;">
                 <td th:text="${tour.id}">1</td>
                 <td th:text="${tour.startdate}">2000-01-01</td>
                 <td th:text="${tour.enddate}">2000-12-31</td>
@@ -135,6 +137,7 @@
                 <td th:text="${tour.count}">1212</td>
                 <td th:text="${tour.airPriceSum}">1212</td>
                 <td th:text="${tour.hotelPriceSum}">1212</td>
+                <td th:text="${tour.productId}">1212</td>
             </tr>
         </tbody>
     </table>
