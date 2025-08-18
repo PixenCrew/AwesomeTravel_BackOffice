@@ -133,7 +133,7 @@ public class HotelController {
     }
     
     @GetMapping("/search")
-    public String searchAir(
+    public String searchHotel(
             @ModelAttribute("filter") HotelFilterDTO filter, // 필터 DTO를 바인딩
             @RequestParam(defaultValue = "id") String sortField,
             @RequestParam(defaultValue = "asc") String sortDir,
