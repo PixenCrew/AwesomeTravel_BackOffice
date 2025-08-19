@@ -27,3 +27,52 @@ function returnPrice(id, tourPrice, airPrice, hotelPrice) {
         console.log('returnPrice 오류')
     }
 }
+
+function uploadImage(inputElement) {
+    const file = inputElement.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    fetch("/image", {  // 이미지 업로드 엔드포인트
+        method: "POST",
+        body: formData
+    })
+        .then(response => response.text())
+        .then(url => {
+            console.log("url : " + url)
+            // 서버에서 받은 URL을 해당 input 필드에 채우기
+            const imageInput = inputElement.previousElementSibling;  // input[type="text"]
+            imageInput.value = url;
+        })
+        .catch(error => {
+            alert("이미지 업로드 실패: " + error.message);
+        });
+}
+
+function removeImage(btn) {
+    const item = btn.closest(".image-item");
+    const imageUrlInput = item.querySelector('input[type="text"]');
+    const imageUrl = imageUrlInput.value;
+
+    if (imageUrl != null) {
+        if (confirm('정말로 삭제하시겠습니까?')) {
+
+            // 서버에 DELETE 요청
+            fetch(`/image?target=${encodeURIComponent(imageUrl)}`, {
+                method: 'DELETE'
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('서버에서 삭제 실패');
+                    }
+                    // 요소 제거
+                    item.remove();
+                })
+                .catch(error => {
+                    alert('이미지 삭제 실패: ' + error.message);
+                });
+        }
+    }
+}

@@ -30,18 +30,32 @@
             <label for="tourPrice">호텔 가격 :</label>
             <input type="text" th:field="*{tour.hotelPriceSum}" disabled /><br>
 
+            <label for="totalPrice">투어 가격 합 :</label>
+            <input type="text" id="totalPrice" disabled /><br>
+
         </div>
 
         <label for="price">가격:</label>
         <input type="number" th:field="*{price}" required /><br>
 
         <!-- 이미지 URL List -->
-        <div>
+        <!-- <div>
             <label>이미지 URL:</label>
             <div id="images-container">
                 <div th:each="img, iterStat : *{images}">
                     <input type="text" th:field="*{images[__${iterStat.index}__]}" />
-                    <button type="button" onclick="removeField(this)">삭제</button>
+                    <button type="button" onclick="removeImageField(this)">삭제</button>
+                </div>
+            </div>
+            <button type="button" onclick="addImageField()">이미지 추가</button>
+        </div> -->
+
+        <div>
+            <div id="images-container">
+                <label>이미지</label>
+                <div class="image-item" th:each="img, iterStat : *{images}">
+                    <input type="text" th:field="*{images[__${iterStat.index}__]}" placeholder="이미지 URL" />
+                    <button type="button" onclick="removeImageField(this)">제거</button>
                 </div>
             </div>
             <button type="button" onclick="addImageField()">이미지 추가</button>
@@ -52,8 +66,9 @@
             <label>상품 정보:</label>
             <div id="info-container">
                 <div th:each="entry, iterStat : *{info}">
-                    Key: <input type="text" th:name="|info[${entry.key}]|" th:value="${entry.key}" readonly />
-                    Value: <input type="text" th:name="|info[${entry.key}]|" th:value="${entry.value}" />
+                    title: <input type="text" th:name="|info[${entry.title}]|" th:value="${entry.title}" />
+                    content: <input type="text" th:name="|info[${entry.content}]|" th:value="${entry.content}" />
+                    appendix: <input type="text" th:name="|info[${entry.appendix}]|" th:value="${entry.appendix}" />
                     <button type="button" onclick="removeField(this)">삭제</button>
                 </div>
             </div>
@@ -82,6 +97,7 @@
             document.getElementById("tour.price").value = tourPrice;
             document.getElementById("tour.airPriceSum").value = airPrice;
             document.getElementById("tour.hotelPriceSum").value = hotelPrice;
+            document.getElementById("totalPrice").value = tourPrice + airPrice + hotelPrice;
         }
 
         function deleteProduct(id) {
@@ -102,56 +118,85 @@
         function removeField(btn) {
             btn.parentElement.remove();
             reindexImages();
+            reindexInfos();
+        }
+
+        function removeImageField(btn){
+            removeImage(btn);
+            removeField(btn);
         }
 
         function reindexImages() {
             const inputs = document.querySelectorAll("#images-container input");
             inputs.forEach((input, idx) => {
-                input.name = `images[${idx}]`;
+                input.name = `images[${idx%2}]`;
+            });
+        }
+
+        function reindexInfos() {
+            const divs = document.querySelectorAll("#info-container div");
+            divs.forEach((div, idx) => {
+                inputs = div.querySelectorAll("input");
+                inputs.forEach((input) => {
+                    input.name = `info[${idx}]`;
+                });
             });
         }
 
         // 이미지 필드 추가
         function addImageField() {
             const container = document.getElementById("images-container");
-            const index = container.querySelectorAll("input").length;
+            const index = container.querySelectorAll("div").length;
 
             const div = document.createElement("div");
+            div.className = "image-item";
 
             const input = document.createElement("input");
             input.type = "text";
             input.name = `images[${index}]`;
 
+            const input2 = document.createElement("input");
+            input2.type = "file";
+            input2.addEventListener("change", () => uploadImage(input2));
+
             const button = document.createElement("button");
             button.type = "button";
             button.textContent = "삭제";
-            button.addEventListener("click", () => removeField(button));
+            button.addEventListener("click", () => removeImageField(button));
 
             div.appendChild(input);
+            div.appendChild(input2);
             div.appendChild(button);
 
             container.appendChild(div);
         }
 
-        // Map 필드 추가 (Map<String,String>)
+        // Info 필드 추가 (List<Info>)
         function addInfoField() {
             const container = document.getElementById("info-container");
-
+            const index = container.querySelectorAll("div").length;
             const div = document.createElement("div");
 
-            // Key
-            const keyLabel = document.createTextNode("Key: ");
-            const keyInput = document.createElement("input");
-            keyInput.type = "text";
-            keyInput.name = `info[newKey${Date.now()}]`;
-            keyInput.placeholder = "속성명";
+            // 제목
+            const titleLabel = document.createTextNode("제목: ");
+            const titleInput = document.createElement("input");
+            titleInput.type = "text";
+            titleInput.name = `info[${index}].title`;
+            titleInput.placeholder = "제목";
 
-            // Value
-            const valueLabel = document.createTextNode(" Value: ");
-            const valueInput = document.createElement("input");
-            valueInput.type = "text";
-            valueInput.name = `info[newValue${Date.now()}]`;
-            valueInput.placeholder = "속성값";
+            // 내용
+            const contentLabel = document.createTextNode(" 내용: ");
+            const contentInput = document.createElement("input");
+            contentInput.type = "text";
+            contentInput.name = `info[${index}].content`;
+            contentInput.placeholder = "내용";
+
+            // 추가내용
+            const appendixLabel = document.createTextNode(" 추가내용: ");
+            const appendixInput = document.createElement("input");
+            appendixInput.type = "text";
+            appendixInput.name = `info[${index}].appendix`;
+            appendixInput.placeholder = "추가내용";
 
             // 삭제 버튼
             const button = document.createElement("button");
@@ -160,10 +205,12 @@
             button.addEventListener("click", () => removeField(button));
 
             // div에 조립
-            div.appendChild(keyLabel);
-            div.appendChild(keyInput);
-            div.appendChild(valueLabel);
-            div.appendChild(valueInput);
+            div.appendChild(titleLabel);
+            div.appendChild(titleInput);
+            div.appendChild(contentLabel);
+            div.appendChild(contentInput);
+            div.appendChild(appendixLabel);
+            div.appendChild(appendixInput);
             div.appendChild(button);
 
             container.appendChild(div);

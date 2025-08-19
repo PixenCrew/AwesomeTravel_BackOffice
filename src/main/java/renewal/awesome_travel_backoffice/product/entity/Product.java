@@ -1,12 +1,10 @@
 package renewal.awesome_travel_backoffice.product.entity;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -43,7 +41,7 @@ public class Product extends AuditingFields {
 
     // 상품정보
     @ElementCollection
-    private Map<String, String> info = new HashMap<>();
+    private List<Info> info = new ArrayList<>();
 
     // 일정표
 
@@ -58,6 +56,15 @@ public class Product extends AuditingFields {
     private Long star5 = 0L;
 
     // private Long[] stars = new Long[]{0L,0L,0L,0L,0L};
+    
+    @Embeddable
+    @Getter
+    @Setter
+    public static class Info {
+        private String title; // 제목 (굵게)
+        private String content; // 내용
+        private String appendix; // 추가내용 (흐리게)
+    }
 
     public void UpdateAvg(int star) {
         // totalReview++;
