@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,9 +15,13 @@ public class TourFilterDTO {
     private String name;
     private List<String> companies;
     private String country;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDateFrom;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDateTo;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDateFrom;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDateTo;
     private BigDecimal minPrice;
     private BigDecimal maxPrice;
