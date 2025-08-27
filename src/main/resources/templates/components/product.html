@@ -37,7 +37,7 @@
         <div style="border: 1px solid black;">
 
             <label>국가:</label>
-            <input type="number" th:field="*{country}" placeholder="국가 입력" list="countryList"/>
+            <input type="text" th:field="*{country}" placeholder="국가 입력" onchange="stripAfterPipe(this)" list="countryList"/>
             <br />
 
             <label>시작일 최소:</label>

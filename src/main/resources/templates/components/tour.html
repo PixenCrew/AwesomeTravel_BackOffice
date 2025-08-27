@@ -75,21 +75,21 @@
 
                 <!-- 시작일 -->
                 <th>
-                    <a href="#" data-sortfield="startdate"
-                        th:data-sortdir="${sortField=='startdate' and sortDir=='asc' ? 'asc' : 'desc'}"
+                    <a href="#" data-sortfield="startDate"
+                        th:data-sortdir="${sortField=='startDate' and sortDir=='asc' ? 'asc' : 'desc'}"
                         onclick="toggleSort(this, event)">
                         시작일
-                        <span th:if="${sortField=='startdate'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
+                        <span th:if="${sortField=='startDate'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
                     </a>
                 </th>
 
                 <!-- 종료일 -->
                 <th>
-                    <a href="#" data-sortfield="enddate"
-                        th:data-sortdir="${sortField=='enddate' and sortDir=='asc' ? 'asc' : 'desc'}"
+                    <a href="#" data-sortfield="endDate"
+                        th:data-sortdir="${sortField=='endDate' and sortDir=='asc' ? 'asc' : 'desc'}"
                         onclick="toggleSort(this, event)">
                         종료일
-                        <span th:if="${sortField=='enddate'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
+                        <span th:if="${sortField=='endDate'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
                     </a>
                 </th>
 
@@ -120,8 +120,8 @@
                 <!-- <tr th:onclick="|window.location.href='@{/air/{id}(id=${seatClass.air.id})}'|" style="cursor:pointer;"> -->
                 <tr th:onclick="${isSelectionPage} ? |returnPrice(${tour.id},${tour.price},${tour.airPriceSum},${tour.hotelPriceSum})| : |window.location.href='@{/tour/{id}(id=${tour.id})}'|" style="cursor:pointer;">
                 <td th:text="${tour.id}">1</td>
-                <td th:text="${tour.startdate}">2000-01-01</td>
-                <td th:text="${tour.enddate}">2000-12-31</td>
+                <td th:text="${tour.startDate}">2000-01-01</td>
+                <td th:text="${tour.endDate}">2000-12-31</td>
                 <td th:text="${tour.name}">투어</td>
                 <td th:text="${tour.company}">Awesome</td>
                 <td th:text="${tour.price}">100000</td>

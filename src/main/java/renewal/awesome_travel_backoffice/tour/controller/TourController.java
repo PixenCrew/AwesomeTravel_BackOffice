@@ -55,7 +55,7 @@ public class TourController {
     public String listAndFilter(
             @ModelAttribute("filter") TourFilterDTO filter, // 필터 DTO를 바인딩
             @RequestParam(defaultValue = "0") int page, // 페이지 번호
-            @RequestParam(defaultValue = "startdate") String sortField,
+            @RequestParam(defaultValue = "startDate") String sortField,
             @RequestParam(defaultValue = "asc") String sortDir,
             Model model) {
         // 1) 정렬 객체 설정

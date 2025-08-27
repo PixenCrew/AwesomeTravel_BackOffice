@@ -26,10 +26,10 @@ public class Tour extends AuditingFields{
   private Long count;
 
   @DateTimeFormat(pattern = "yyyy-MM-dd")
-  private LocalDate startdate;
+  private LocalDate startDate;
 
   @DateTimeFormat(pattern = "yyyy-MM-dd")
-  private LocalDate enddate;
+  private LocalDate endDate;
 
   private Long price;
 
