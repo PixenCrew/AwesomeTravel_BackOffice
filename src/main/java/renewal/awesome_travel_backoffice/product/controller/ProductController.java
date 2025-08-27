@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import renewal.awesome_travel_backoffice.code.CityCodeRepository;
+import renewal.awesome_travel_backoffice.code.CountryCodeRepository;
 import renewal.awesome_travel_backoffice.country.repository.CountryRepository;
 import renewal.awesome_travel_backoffice.product.dto.ProductFilterDTO;
 import renewal.awesome_travel_backoffice.product.entity.Product;
@@ -36,7 +37,7 @@ public class ProductController {
     private final ProductRepository productRepo;
     private final TourRepository tourRepo;
     private final ProductService productService;
-    private final CountryRepository countryRepo;
+    private final CountryCodeRepository countryRepo;
     private final CityCodeRepository cityRepo;
 
     @GetMapping
@@ -57,7 +58,7 @@ public class ProductController {
 
         // 3) View에서 쓸 속성들
         model.addAttribute("countryCode", countryRepo.findAll());
-        model.addAttribute("cityCode", cityRepo.findAll());
+        // model.addAttribute("cityCode", cityRepo.findAll());
         model.addAttribute("productPage", productPage);
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
