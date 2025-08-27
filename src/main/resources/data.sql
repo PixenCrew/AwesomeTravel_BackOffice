@@ -404,7 +404,7 @@ VALUES
 (79, 20, 'BUSINESS',       300000,  20,  20),
 (80, 20, 'FIRST',          500000,   5,   5);
 
-INSERT IGNORE INTO tour (id, company, name, country, count, startdate, enddate, price)
+INSERT IGNORE INTO tour (id, company, name, country, count, start_date, end_date, price)
 VALUES
 (1, 'GlobalTravel', 'Tour1', 'KR', 28, '2025-08-01', '2025-08-05', 1010000),
 (2, 'SkyTours', 'Tour2', 'US', 10, '2025-08-02', '2025-08-06', 1020000),
@@ -626,7 +626,7 @@ JOIN (
 SET t.air_price_sum= x.air_price_sum,
     t.hotel_price_sum = x.hotel_price_sum;
 
-INSERT INTO product (id, tour_id, title, price, star1, star2, star3, star4, star5, created_at, modified_at, created_by, modified_by) VALUES
+INSERT IGNORE INTO product (id, tour_id, title, price, star1, star2, star3, star4, star5, created_at, modified_at, created_by, modified_by) VALUES
 (1, 1, '서울 시티투어 1일', 55000, 2, 1, 5, 12, 20, NOW(), NOW(), 'test', 'test'),
 (2, 2, '경복궁 & 북촌 한옥마을 투어', 45000, 0, 2, 6, 8, 15, NOW(), NOW(), 'test', 'test'),
 (3, 3, '부산 야경 크루즈', 60000, 1, 0, 4, 10, 18, NOW(), NOW(), 'test', 'test'),
@@ -648,7 +648,7 @@ INSERT INTO product (id, tour_id, title, price, star1, star2, star3, star4, star
 (19, 19, '남해 독일마을 & 다랭이 마을', 95000, 0, 0, 4, 7, 9, NOW(), NOW(), 'test', 'test'),
 (20, 20, '거제도 바다전망 드라이브', 70000, 1, 1, 3, 6, 11, NOW(), NOW(), 'test', 'test');
 
-INSERT INTO product_images (product_id, images) VALUES
+INSERT IGNORE INTO product_images (product_id, images) VALUES
 (1, 'https://cdn.example.com/product/1-1.jpg'),
 (1, 'https://cdn.example.com/product/1-2.jpg'),
 (2, 'https://cdn.example.com/product/2-1.jpg'),
@@ -670,7 +670,7 @@ INSERT INTO product_images (product_id, images) VALUES
 (15, 'https://cdn.example.com/product/15-1.jpg'),
 (20, 'https://cdn.example.com/product/20-1.jpg');
 
-INSERT INTO product_info (product_id, title, content, appendix) VALUES
+INSERT IGNORE INTO product_info (product_id, title, content, appendix) VALUES
 -- Product 1
 (1, '포함사항', '버스투어 + 가이드', '점심 불포함'),
 (1, '출발시간', '매일 오전 9시', '서울역 집합'),
