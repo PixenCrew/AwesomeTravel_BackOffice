@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.product.dto.ProductFilterDTO;
 import renewal.awesome_travel_backoffice.product.entity.Product;
 import renewal.awesome_travel_backoffice.product.repository.ProductRepository;
+import renewal.awesome_travel_backoffice.product.repository.ProductSpecification;
+import renewal.awesome_travel_backoffice.tour.dto.TourFilterDTO;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,12 +18,33 @@ public class ProductService {
 
     private final ProductRepository productRepo;
 
-
     public Page<Product> searchProducts(ProductFilterDTO filter, Pageable pageable) {
         Specification<Product> spec = Specification.where(null);
-                return productRepo.findAll(spec, pageable);
-    }
 
+        if (filter.getTitle() != null && !filter.getTitle().isEmpty()) {
+            spec = spec.and(ProductSpecification.titleContains(filter.getTitle()));
+        }
+        if (filter.getMaxPrice() != null || filter.getMinPrice() != null) {
+            spec = spec.and(ProductSpecification.priceBetween(filter.getMinPrice(),filter.getMaxPrice()));
+        }
+        if (filter.getInfoKeyword() != null && !filter.getInfoKeyword().isEmpty()) {
+            spec = spec.and(ProductSpecification.infoContains(filter.getInfoKeyword()));
+        }
+        if (filter.getAvgFrom() != null || filter.getAvgTo() != null ) {
+            spec = spec.and(ProductSpecification.avgBetween(filter.getAvgFrom(),filter.getAvgTo()));
+        }
+        if (filter.getCountry() != null && !filter.getCountry().isEmpty()) {
+            spec = spec.and(ProductSpecification.tourCountryEquals(filter.getCountry()));
+        }
+        if (filter.getStartDateFrom() != null && filter.getStartDateTo() != null) {
+            spec = spec.and(ProductSpecification.tourStartDateBetween(filter.getStartDateFrom(), filter.getStartDateTo()));
+        }
+        if (filter.getEndDateFrom() != null && filter.getEndDateTo() != null) {
+            spec = spec.and(ProductSpecification.tourEndDateBetween(filter.getEndDateFrom(), filter.getEndDateTo()));
+        }
+
+        return productRepo.findAll(spec, pageable);
+    }
 }
 
 // private final HotelRepository hotelRepository;
