@@ -30,10 +30,10 @@ import renewal.awesome_travel_backoffice.hotel.repository.HotelReservationReposi
 import renewal.awesome_travel_backoffice.tour.TourService;
 import renewal.awesome_travel_backoffice.tour.dto.TourFilterDTO;
 import renewal.awesome_travel_backoffice.tour.entity.Location;
+import renewal.awesome_travel_backoffice.tour.entity.Location.Type;
 import renewal.awesome_travel_backoffice.tour.entity.Schedule;
 import renewal.awesome_travel_backoffice.tour.entity.Tour;
 import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
-import renewal.awesome_travel_backoffice.tour.utiles.Type;
 
 import lombok.RequiredArgsConstructor;
 
