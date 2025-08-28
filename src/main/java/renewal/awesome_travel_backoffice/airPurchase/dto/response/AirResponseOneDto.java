@@ -2,10 +2,11 @@ package renewal.awesome_travel_backoffice.airPurchase.dto.response;
 
 import java.time.LocalDateTime;
 
+import renewal.awesome_travel_backoffice.air.entity.Air.FlightType;
+import renewal.awesome_travel_backoffice.air.entity.SeatClass.SeatClassType;
+
 import lombok.Builder;
 import lombok.Getter;
-import renewal.awesome_travel_backoffice.air.utiles.FlightType;
-import renewal.awesome_travel_backoffice.air.utiles.SeatClassType;
 
 @Getter
 @Builder

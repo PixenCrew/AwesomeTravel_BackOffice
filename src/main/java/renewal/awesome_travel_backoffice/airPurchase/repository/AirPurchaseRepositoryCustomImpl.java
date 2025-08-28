@@ -1,16 +1,19 @@
 package renewal.awesome_travel_backoffice.airPurchase.repository;
 
+import java.util.List;
+
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+
 import renewal.awesome_travel_backoffice.airPurchase.dto.request.AirPurchaseSearchCondition;
 import renewal.awesome_travel_backoffice.airPurchase.entity.AirPurchase;
 import renewal.awesome_travel_backoffice.airPurchase.entity.QAirPurchase;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class AirPurchaseRepositoryCustomImpl implements AirPurchaseRepositoryCustom {

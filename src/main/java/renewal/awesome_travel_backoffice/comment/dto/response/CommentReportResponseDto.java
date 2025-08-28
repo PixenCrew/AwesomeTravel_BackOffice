@@ -1,10 +1,11 @@
 package renewal.awesome_travel_backoffice.comment.dto.response;
 
-import lombok.Builder;
+import java.time.LocalDateTime;
+
 import renewal.awesome_travel_backoffice.comment.utiles.ReportReason;
 
-import java.time.LocalDateTime;
 import lombok.Getter;
+import lombok.Builder;
 
 @Getter
 @Builder

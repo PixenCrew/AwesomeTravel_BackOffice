@@ -1,13 +1,22 @@
 package renewal.awesome_travel_backoffice.notice.entity;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+
 import renewal.awesome_travel_backoffice.config.AuditingFields;
 import renewal.awesome_travel_backoffice.notice.dto.request.NoticeRequestDto;
 import renewal.awesome_travel_backoffice.notice.utils.NoticeCategory;
 
-import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter

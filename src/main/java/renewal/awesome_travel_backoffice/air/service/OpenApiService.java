@@ -1,12 +1,13 @@
 package renewal.awesome_travel_backoffice.air.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +20,7 @@ public class OpenApiService {
         System.out.println("미리 인코딩된 키: " + encodedKey); // 미리 인코딩된 결과 확인
 
         URI uri = UriComponentsBuilder
-                .fromHttpUrl("https://api.odcloud.kr/api/15043890/v1/uddi:57dcf102-1447-49e9-bd2b-cfb32e869d5c")
+                .fromUriString("https://api.odcloud.kr/api/15043890/v1/uddi:57dcf102-1447-49e9-bd2b-cfb32e869d5c")
                 .queryParam("page", "1")
                 .queryParam("perPage", "10")
                 .queryParam("serviceKey", encodedKey)  // 여기서는 trim() 후, RestTemplate이 자동 인코딩하도록 함

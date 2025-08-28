@@ -1,4 +1,4 @@
-package renewal.awesome_travel_backoffice.admin.service;
+package renewal.awesome_travel_backoffice.admin;
 
 import java.util.Map;
 
@@ -13,7 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import renewal.awesome_travel_backoffice.admin.entity.Admin;
 
 @Service
 @RequiredArgsConstructor

@@ -1,9 +1,9 @@
 package renewal.awesome_travel_backoffice.inquiry.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import renewal.awesome_travel_backoffice.inquiry.dto.request.InquiryAnswerRequestDto;
 import renewal.awesome_travel_backoffice.inquiry.dto.response.InquiryResponseDto;
 import renewal.awesome_travel_backoffice.inquiry.entity.Inquiry;
@@ -12,6 +12,8 @@ import renewal.awesome_travel_backoffice.inquiry.repository.InquiryAnswerReposit
 import renewal.awesome_travel_backoffice.inquiry.repository.InquiryRepository;
 import renewal.awesome_travel_backoffice.notification.entity.Notification;
 import renewal.awesome_travel_backoffice.notification.repository.NotificationRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor

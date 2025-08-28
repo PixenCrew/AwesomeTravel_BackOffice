@@ -1,11 +1,10 @@
 package renewal.awesome_travel_backoffice.country.repository;
 
-
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import renewal.awesome_travel_backoffice.country.entity.Country;
 
-import java.util.Optional;
+import renewal.awesome_travel_backoffice.country.entity.Country;
 
 public interface CountryRepository extends JpaRepository<Country, String> {
 

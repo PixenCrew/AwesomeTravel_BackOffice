@@ -6,8 +6,6 @@ public enum NoticeCategory {
     SYSTEM("점검"),
     GUIDE("안내");
 
-
-
     private final String displayName;
 
     NoticeCategory(String displayName) {

@@ -1,14 +1,22 @@
 package renewal.awesome_travel_backoffice.airPurchase.entity;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import renewal.awesome_travel_backoffice.air.entity.SeatClass;
-import renewal.awesome_travel_backoffice.airPurchase.utiles.PurchaseStatus;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.CascadeType;
+
+import renewal.awesome_travel_backoffice.air.entity.SeatClass;
+import renewal.awesome_travel_backoffice.airPurchase.utiles.PurchaseStatus;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter

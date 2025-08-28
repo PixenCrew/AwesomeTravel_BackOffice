@@ -9,12 +9,12 @@ import org.springframework.util.StringUtils;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+
 import renewal.awesome_travel_backoffice.air.entity.Air;
+import renewal.awesome_travel_backoffice.air.entity.Air.AirStatus;
+import renewal.awesome_travel_backoffice.air.entity.Air.FlightType;
 import renewal.awesome_travel_backoffice.air.entity.Airline;
 import renewal.awesome_travel_backoffice.air.entity.SeatClass;
-import renewal.awesome_travel_backoffice.air.utiles.AirStatus;
-import renewal.awesome_travel_backoffice.air.utiles.FlightType;
-import renewal.awesome_travel_backoffice.air.utiles.SeatClassType;
 
 public class AirSpecification {
 
@@ -118,7 +118,7 @@ public class AirSpecification {
     // stopovers BETWEEN from AND to
     public static Specification<SeatClass> stopoversBetween(Long minStopovers, Long maxStopovers) {
         return (root, query, builder) -> {
-            Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT); 
+            Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT);
             if (minStopovers != null && maxStopovers != null) {
                 return builder.between(seatJoin.get("stopovers"), minStopovers, maxStopovers);
             } else if (minStopovers != null) {
@@ -134,7 +134,7 @@ public class AirSpecification {
     // flightType == value
     public static Specification<SeatClass> flightTypeEquals(FlightType type) {
         return (root, query, builder) -> {
-            Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT); 
+            Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT);
             if (type == null)
                 return null;
             return builder.equal(seatJoin.get("flightType"), type);
@@ -144,7 +144,7 @@ public class AirSpecification {
     // status == value
     public static Specification<SeatClass> statusEquals(AirStatus status) {
         return (root, query, builder) -> {
-            Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT); 
+            Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT);
             if (status == null)
                 return null;
             return builder.equal(seatJoin.get("status"), status);
@@ -156,7 +156,7 @@ public class AirSpecification {
         return (root, query, builder) -> {
             if (min == null && max == null || query == null)
                 return null;
-            // Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT); 
+            // Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT);
             if (min != null && max != null) {
                 query.distinct(true);
                 return builder.between(root.get("price"), min, max);
@@ -175,20 +175,21 @@ public class AirSpecification {
         return (root, query, builder) -> {
             if (more == null || query == null)
                 return null;
-            // Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT); 
+            // Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT);
             // query.distinct(true);
             return builder.greaterThanOrEqualTo(root.get("availableSeats"), more);
         };
     }
 
     // SeatClassType == value
-    public static Specification<SeatClass> seatClassEquals(SeatClassType type) {
+    public static Specification<SeatClass> seatClassEquals(SeatClass.SeatClassType type) {
         return (root, query, builder) -> {
-            query.distinct(true);
-            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+type);
+            if (query != null) {
+                query.distinct(true);
+            }
             // SeatClass 조인
-            // Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT); 
+            // Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT);
             return builder.equal(root.get("classType"), type);
         };
-    }  
+    }
 }

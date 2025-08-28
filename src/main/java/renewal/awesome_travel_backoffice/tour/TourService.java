@@ -1,6 +1,5 @@
 package renewal.awesome_travel_backoffice.tour;
 
-// TourService.java
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;

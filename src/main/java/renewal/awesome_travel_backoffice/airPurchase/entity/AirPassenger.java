@@ -1,16 +1,22 @@
 package renewal.awesome_travel_backoffice.airPurchase.entity;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import renewal.awesome_travel_backoffice.airPurchase.utiles.Sex;
-import renewal.awesome_travel_backoffice.country.entity.Country;
-import renewal.awesome_travel_backoffice.specialRequest.entity.SpecialRequest;
-
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+
+import renewal.awesome_travel_backoffice.airPurchase.utiles.Sex;
+import renewal.awesome_travel_backoffice.country.entity.Country;
+import renewal.awesome_travel_backoffice.specialRequest.entity.SpecialRequest;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor

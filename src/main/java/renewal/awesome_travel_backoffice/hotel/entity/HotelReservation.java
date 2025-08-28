@@ -1,14 +1,24 @@
 package renewal.awesome_travel_backoffice.hotel.entity;
+
+import java.time.LocalDate;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+
 import renewal.awesome_travel_backoffice.config.AuditingFields;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDate;
 
 @Entity
 @Table
@@ -51,4 +61,5 @@ public class HotelReservation extends AuditingFields {
         CANCELLED,
         COMPLETED
     }
+    
 }

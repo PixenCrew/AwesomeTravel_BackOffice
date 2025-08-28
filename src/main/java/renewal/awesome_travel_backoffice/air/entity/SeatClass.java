@@ -3,11 +3,21 @@ package renewal.awesome_travel_backoffice.air.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import renewal.awesome_travel_backoffice.air.utiles.SeatClassType;
 
 @Entity
 @NoArgsConstructor
@@ -39,12 +49,19 @@ public class SeatClass {
         this.availableSeats = availableSeats;
     }
 
-    public void reserveSeats(Long requiredPersons) throws Exception{
-        if (availableSeats>=requiredPersons) {
+    public void reserveSeats(Long requiredPersons) throws Exception {
+        if (availableSeats >= requiredPersons) {
             availableSeats -= requiredPersons;
-        } else{
+        } else {
             throw new Exception("잔여 좌석 에러");
         }
+    }
+
+    public enum SeatClassType {
+        ECONOMY,
+        PREMIUMECONOMY,
+        BUSINESS,
+        FIRST
     }
 
 }

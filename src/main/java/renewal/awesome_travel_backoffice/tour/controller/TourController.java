@@ -1,28 +1,26 @@
 package renewal.awesome_travel_backoffice.tour.controller;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import renewal.awesome_travel_backoffice.air.entity.AirReservation;
-import renewal.awesome_travel_backoffice.air.entity.SeatClass;
-import renewal.awesome_travel_backoffice.air.repository.AirReservationRepository;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-
-import java.time.LocalDate;
-import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
-import lombok.RequiredArgsConstructor;
+import renewal.awesome_travel_backoffice.air.entity.AirReservation;
+import renewal.awesome_travel_backoffice.air.entity.SeatClass;
+import renewal.awesome_travel_backoffice.air.repository.AirReservationRepository;
 import renewal.awesome_travel_backoffice.code.CityCodeRepository;
 import renewal.awesome_travel_backoffice.code.CountryCodeRepository;
 import renewal.awesome_travel_backoffice.hotel.entity.Hotel;
@@ -36,6 +34,8 @@ import renewal.awesome_travel_backoffice.tour.entity.Schedule;
 import renewal.awesome_travel_backoffice.tour.entity.Tour;
 import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
 import renewal.awesome_travel_backoffice.tour.utiles.Type;
+
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RequestMapping("/tour")

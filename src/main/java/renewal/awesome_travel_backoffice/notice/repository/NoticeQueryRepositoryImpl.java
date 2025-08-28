@@ -1,22 +1,24 @@
 package renewal.awesome_travel_backoffice.notice.repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+
 import renewal.awesome_travel_backoffice.notice.dto.request.NoticeSearchRequest;
 import renewal.awesome_travel_backoffice.notice.dto.response.NoticeResponseDto;
 import renewal.awesome_travel_backoffice.notice.dto.response.QNoticeResponseDto;
 import renewal.awesome_travel_backoffice.notice.utils.NoticeCategory;
 import renewal.awesome_travel_backoffice.notice.utils.SearchType;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
 import static renewal.awesome_travel_backoffice.notice.entity.QNotice.notice;
+
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor

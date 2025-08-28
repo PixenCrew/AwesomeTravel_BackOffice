@@ -1,7 +1,5 @@
 package renewal.awesome_travel_backoffice.air.service;
 
-import lombok.RequiredArgsConstructor;
-
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -13,13 +11,14 @@ import org.springframework.util.StringUtils;
 
 import renewal.awesome_travel_backoffice.air.dto.AirFilterDTO;
 import renewal.awesome_travel_backoffice.air.entity.Air;
+import renewal.awesome_travel_backoffice.air.entity.Air.AirStatus;
 import renewal.awesome_travel_backoffice.air.entity.SeatClass;
 import renewal.awesome_travel_backoffice.air.repository.AirRepository;
-// import renewal.awesome_travel_backoffice.air.repository.AirRepositoryCustomImpl;
 import renewal.awesome_travel_backoffice.air.repository.AirSpecification;
 import renewal.awesome_travel_backoffice.air.repository.AirlineRepository;
 import renewal.awesome_travel_backoffice.air.repository.SeatClassRepository;
-import renewal.awesome_travel_backoffice.air.utiles.AirStatus;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor

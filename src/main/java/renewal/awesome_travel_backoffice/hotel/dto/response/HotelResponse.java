@@ -2,7 +2,7 @@ package renewal.awesome_travel_backoffice.hotel.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import renewal.awesome_travel_backoffice.hotel.utils.HotelType;
+import renewal.awesome_travel_backoffice.hotel.entity.Hotel.HotelType;
 
 import java.util.List;
 

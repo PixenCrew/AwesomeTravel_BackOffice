@@ -11,20 +11,27 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.data.domain.Sort;
 
 import renewal.awesome_travel_backoffice.air.dto.AirFilterDTO;
 import renewal.awesome_travel_backoffice.air.entity.Air;
+import renewal.awesome_travel_backoffice.air.entity.Air.AirStatus;
+import renewal.awesome_travel_backoffice.air.entity.Air.FlightType;
 import renewal.awesome_travel_backoffice.air.entity.AirReservation;
 import renewal.awesome_travel_backoffice.air.entity.Airline;
 import renewal.awesome_travel_backoffice.air.entity.SeatClass;
+import renewal.awesome_travel_backoffice.air.entity.SeatClass.SeatClassType;
 import renewal.awesome_travel_backoffice.air.repository.AirRepository;
 import renewal.awesome_travel_backoffice.air.repository.AirReservationRepository;
 import renewal.awesome_travel_backoffice.air.service.AirService;
-import renewal.awesome_travel_backoffice.air.utiles.AirStatus;
-import renewal.awesome_travel_backoffice.air.utiles.FlightType;
-import renewal.awesome_travel_backoffice.air.utiles.SeatClassType;
 import renewal.awesome_travel_backoffice.code.CityCodeRepository;
 
 @Controller
@@ -81,7 +88,7 @@ public class AirController {
         // 빈 Airline 객체
         air.setAirline(new Airline());
         // 빈 SeatClasses 배열
-        for (SeatClassType seatType : SeatClassType.values()) {
+        for (SeatClass.SeatClassType seatType : SeatClassType.values()) {
             // SeatClass 종류만큼 SeatClass 객체 추가
             air.getSeatClasses().add(new SeatClass(air, seatType, 0L, 0L, 0L));
         }

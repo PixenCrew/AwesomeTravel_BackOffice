@@ -1,9 +1,14 @@
 package renewal.awesome_travel_backoffice.inquiry.entity;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
+
+import lombok.Getter;
 
 @Entity
 @Getter

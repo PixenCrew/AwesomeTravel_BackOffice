@@ -4,8 +4,9 @@ import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import renewal.awesome_travel_backoffice.hotel.entity.Hotel.HotelType;
+
 import lombok.Data;
-import renewal.awesome_travel_backoffice.hotel.utils.HotelType;
 
 @Data
 public class HotelFilterDTO {

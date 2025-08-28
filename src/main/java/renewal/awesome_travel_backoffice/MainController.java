@@ -6,12 +6,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.security.core.Authentication;
-
 import org.springframework.ui.Model;
 
+import renewal.awesome_travel_backoffice.admin.Admin;
+import renewal.awesome_travel_backoffice.admin.AdminService;
+
 import lombok.RequiredArgsConstructor;
-import renewal.awesome_travel_backoffice.admin.entity.Admin;
-import renewal.awesome_travel_backoffice.admin.service.AdminService;
 
 @RequiredArgsConstructor
 @Controller

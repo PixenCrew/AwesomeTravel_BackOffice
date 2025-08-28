@@ -2,6 +2,7 @@ package renewal.awesome_travel_backoffice.product.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embeddable;
@@ -12,9 +13,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.*;
+
 import renewal.awesome_travel_backoffice.config.AuditingFields;
 import renewal.awesome_travel_backoffice.tour.entity.Tour;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table

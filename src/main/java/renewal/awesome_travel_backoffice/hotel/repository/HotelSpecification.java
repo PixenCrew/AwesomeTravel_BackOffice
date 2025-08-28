@@ -5,13 +5,13 @@ import java.time.LocalDate;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
-import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
+
 import renewal.awesome_travel_backoffice.hotel.entity.Hotel;
+import renewal.awesome_travel_backoffice.hotel.entity.Hotel.HotelType;
 import renewal.awesome_travel_backoffice.hotel.entity.HotelReservation;
-import renewal.awesome_travel_backoffice.hotel.utils.HotelType;
 
 public class HotelSpecification {
 

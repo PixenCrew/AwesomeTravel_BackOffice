@@ -1,12 +1,13 @@
 package renewal.awesome_travel_backoffice.airPurchase.repository;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+
 import renewal.awesome_travel_backoffice.airPurchase.entity.AirPurchase;
 import renewal.awesome_travel_backoffice.airPurchase.utiles.PurchaseStatus;
-
-import java.time.LocalDateTime;
 
 public interface AirPurchaseRepository extends JpaRepository<AirPurchase, Long>, AirPurchaseRepositoryCustom {
 

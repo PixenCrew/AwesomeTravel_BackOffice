@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.Join;
+
 import renewal.awesome_travel_backoffice.tour.entity.Location;
 import renewal.awesome_travel_backoffice.tour.entity.Schedule;
 import renewal.awesome_travel_backoffice.tour.entity.Tour;

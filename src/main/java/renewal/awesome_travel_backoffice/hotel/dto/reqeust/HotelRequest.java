@@ -1,10 +1,11 @@
 package renewal.awesome_travel_backoffice.hotel.dto.reqeust;
 
+import java.util.List;
+
+import renewal.awesome_travel_backoffice.hotel.entity.Hotel.HotelType;
+
 import lombok.Builder;
 import lombok.Getter;
-import renewal.awesome_travel_backoffice.hotel.utils.HotelType;
-
-import java.util.List;
 
 @Getter
 @Builder

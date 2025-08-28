@@ -2,14 +2,15 @@ package renewal.awesome_travel_backoffice.product.repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+
 import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+
 import renewal.awesome_travel_backoffice.product.entity.Product;
 import renewal.awesome_travel_backoffice.tour.entity.Tour;
-
-import jakarta.persistence.criteria.JoinType;
 
 public class ProductSpecification {
 

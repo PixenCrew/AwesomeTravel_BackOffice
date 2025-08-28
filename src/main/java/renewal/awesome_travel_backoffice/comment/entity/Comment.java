@@ -1,21 +1,33 @@
 package renewal.awesome_travel_backoffice.comment.entity;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import renewal.awesome_travel_backoffice.product.entity.Product;
-import renewal.awesome_travel_backoffice.user.entity.User;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Column;
+import jakarta.persistence.CascadeType;
+
+import renewal.awesome_travel_backoffice.product.entity.Product;
+import renewal.awesome_travel_backoffice.user.entity.User;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Entity
 @Getter
 @RequiredArgsConstructor
 public class Comment {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

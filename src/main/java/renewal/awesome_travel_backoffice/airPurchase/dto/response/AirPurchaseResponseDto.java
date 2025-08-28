@@ -1,13 +1,14 @@
 package renewal.awesome_travel_backoffice.airPurchase.dto.response;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import renewal.awesome_travel_backoffice.airPurchase.utiles.PurchaseStatus;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import renewal.awesome_travel_backoffice.airPurchase.utiles.PurchaseStatus;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter

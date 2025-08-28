@@ -1,6 +1,7 @@
 package renewal.awesome_travel_backoffice.product.repository;
 
 import renewal.awesome_travel_backoffice.product.entity.Product;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

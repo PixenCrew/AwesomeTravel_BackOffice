@@ -1,11 +1,17 @@
 package renewal.awesome_travel_backoffice.faq.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+
+import renewal.awesome_travel_backoffice.config.AuditingFields;
+import renewal.awesome_travel_backoffice.faq.utils.FaqCategory;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import renewal.awesome_travel_backoffice.config.AuditingFields;
-import renewal.awesome_travel_backoffice.faq.dto.response.FaqResponseDto;
-import renewal.awesome_travel_backoffice.faq.utils.FaqCategory;
 
 @Entity
 @Getter

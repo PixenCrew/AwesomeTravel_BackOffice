@@ -6,11 +6,12 @@ import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import renewal.awesome_travel_backoffice.air.entity.Air.AirStatus;
+import renewal.awesome_travel_backoffice.air.entity.Air.FlightType;
+import renewal.awesome_travel_backoffice.air.entity.SeatClass.SeatClassType;
+
 import lombok.Getter;
 import lombok.Setter;
-import renewal.awesome_travel_backoffice.air.utiles.AirStatus;
-import renewal.awesome_travel_backoffice.air.utiles.FlightType;
-import renewal.awesome_travel_backoffice.air.utiles.SeatClassType;
 
 @Getter
 @Setter

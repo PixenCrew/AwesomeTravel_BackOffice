@@ -1,11 +1,13 @@
 package renewal.awesome_travel_backoffice.notice.dto.response;
 
+import java.time.LocalDateTime;
+
 import com.querydsl.core.annotations.QueryProjection;
-import lombok.Builder;
-import lombok.Getter;
+
 import renewal.awesome_travel_backoffice.notice.utils.NoticeCategory;
 
-import java.time.LocalDateTime;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
 @Builder

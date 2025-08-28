@@ -1,17 +1,18 @@
 package renewal.awesome_travel_backoffice.hotel.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
+import java.util.List;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import renewal.awesome_travel_backoffice.air.entity.Air;
 import renewal.awesome_travel_backoffice.hotel.dto.HotelFilterDTO;
 import renewal.awesome_travel_backoffice.hotel.entity.Hotel;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelRepository;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelSpecification;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor

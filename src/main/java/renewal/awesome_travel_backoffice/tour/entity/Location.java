@@ -11,24 +11,25 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+
+import renewal.awesome_travel_backoffice.air.entity.SeatClass;
+import renewal.awesome_travel_backoffice.hotel.entity.Hotel;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import renewal.awesome_travel_backoffice.air.entity.SeatClass;
-import renewal.awesome_travel_backoffice.hotel.entity.Hotel;
-import renewal.awesome_travel_backoffice.tour.utiles.Type;
 
 @Entity
 @Table
 @Getter
 @Setter
 @NoArgsConstructor
-public class Location{
-    
+public class Location {
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "schedule_id", nullable = false)
     private Schedule schedule;
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -40,7 +41,7 @@ public class Location{
     private String city;
     // @DateTimeFormat(pattern = "yyyy-MM-dd")
     // private LocalDate date;
-    
+
     // ==============Type이 AIR면 사용할 필드===============
     @ManyToOne
     @JoinColumn(name = "seatClass_id")
@@ -50,9 +51,14 @@ public class Location{
     // ==============Type이 POINT면 사용할 필드===============
     // private String country;
 
-    
     // ==============Type이 HOTEL이면 사용할 필드===============
     @ManyToOne
     @JoinColumn(name = "hotel_id")
     private Hotel hotel;
+
+    public enum Type {
+        POINT,
+        AIR,
+        HOTEL
+    }
 }

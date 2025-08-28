@@ -1,6 +1,7 @@
 package renewal.awesome_travel_backoffice.airPurchase.service;
 
-import lombok.RequiredArgsConstructor;
+import java.time.LocalDateTime;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -11,7 +12,8 @@ import renewal.awesome_travel_backoffice.airPurchase.dto.request.AirPurchaseSear
 import renewal.awesome_travel_backoffice.airPurchase.entity.AirPurchase;
 import renewal.awesome_travel_backoffice.airPurchase.repository.AirPurchaseRepository;
 import renewal.awesome_travel_backoffice.airPurchase.utiles.PurchaseStatus;
-import java.time.LocalDateTime;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor

@@ -1,19 +1,32 @@
 package renewal.awesome_travel_backoffice.air.entity;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import renewal.awesome_travel_backoffice.air.utiles.AirStatus;
-import renewal.awesome_travel_backoffice.air.utiles.FlightType;
-import renewal.awesome_travel_backoffice.config.AuditingFields;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.CascadeType;
+
 import org.springframework.format.annotation.DateTimeFormat;
+
+import renewal.awesome_travel_backoffice.config.AuditingFields;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table
@@ -47,7 +60,7 @@ public class Air extends AuditingFields {
 
     @Column(nullable = false)
     private String arriveAirport;
-    
+
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(nullable = false)
     private LocalDate arriveDate;
@@ -73,8 +86,9 @@ public class Air extends AuditingFields {
     @OneToMany(mappedBy = "air", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SeatClass> seatClasses = new ArrayList<>();
 
-    //공공데이터용 생성자
-    public Air(String flightNumber, Airline airline, String departAirport, LocalDate departDate, LocalTime departTime, String arriveAirport, LocalDate arriveDate, LocalTime arriveTime) {
+    // 공공데이터용 생성자
+    public Air(String flightNumber, Airline airline, String departAirport, LocalDate departDate, LocalTime departTime,
+            String arriveAirport, LocalDate arriveDate, LocalTime arriveTime) {
         this.flightNumber = flightNumber;
         this.airline = airline;
         this.departAirport = departAirport;
@@ -85,10 +99,10 @@ public class Air extends AuditingFields {
         this.arriveTime = arriveTime;
     }
 
-    public Air updateAir(Integer stopovers, List<SeatClass> seatClasses){
+    public Air updateAir(Integer stopovers, List<SeatClass> seatClasses) {
         this.status = AirStatus.ACTIVE;
         this.stopovers = stopovers;
-        if(stopovers == 0){
+        if (stopovers == 0) {
             this.flightType = FlightType.DIRECT;
         } else {
             this.flightType = FlightType.STOP_OVER;
@@ -96,4 +110,16 @@ public class Air extends AuditingFields {
         this.seatClasses = seatClasses;
         return this;
     }
+
+    public enum AirStatus {
+        ACTIVE, // 사용 가능
+        INACTIVE, // 비활성 (운항 종료)
+        HIDDEN // 프론트에 노출되지 않음
+    }
+
+    public enum FlightType {
+        DIRECT,
+        STOP_OVER
+    }
+
 }
