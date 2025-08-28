@@ -2,6 +2,7 @@ package renewal.awesome_travel_backoffice.product.repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Objects;
 
 import org.springframework.data.jpa.domain.Specification;
 
@@ -38,6 +39,10 @@ public class ProductSpecification {
     // info LIKE %keyword%
     public static Specification<Product> infoContains(String keyword) {
         return (root, query, builder) -> {
+            
+            // null 체크 명시
+            Objects.requireNonNull(query, "CriteriaQuery must not be null");
+
             if (keyword == null || keyword.isEmpty())
                 return null;
             query.distinct(true); // 중복 Product 방지

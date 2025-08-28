@@ -1,6 +1,7 @@
 package renewal.awesome_travel_backoffice.hotel.repository;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
@@ -95,15 +96,18 @@ public class HotelSpecification {
     // };
     // }
 
-    // TODO : 남은 객실 수 계산 로직 필요
     public static Specification<Hotel> availableBetweenAndCapacity(
             LocalDate startDate,
             LocalDate endDate,
             Long requiredPersons) {
         return (root, query, builder) -> {
+            
+            // null 체크 명시
+            Objects.requireNonNull(query, "CriteriaQuery must not be null");
+
             // 중복 결과 방지를 위해 distinct 설정
             query.distinct(true);
-
+                            
             // 1) 이 호텔에 대해 BOOKED 상태로 겹치는 기간의 roomCount 합을 구하는 서브쿼리
             Subquery<Long> sq = query.subquery(Long.class);
             Root<HotelReservation> r = sq.from(HotelReservation.class);
@@ -129,6 +133,10 @@ public class HotelSpecification {
 
     public static Specification<Hotel> availableOnDateAndRooms(LocalDate date, Long requiredRooms) {
         return (root, query, builder) -> {
+            
+            // null 체크 명시
+            Objects.requireNonNull(query, "CriteriaQuery must not be null");
+
             // 서브쿼리: 해당 날짜에 BOOKED 상태인 예약 합계(roomCount)
             Subquery<Long> sumSub = query.subquery(Long.class);
             Root<HotelReservation> res = sumSub.from(HotelReservation.class);
