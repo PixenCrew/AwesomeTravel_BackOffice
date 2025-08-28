@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import renewal.awesome_travel_backoffice.qna.dto.request.QnaAnswerRequestDto;
 import renewal.awesome_travel_backoffice.qna.dto.request.QnaAnswerUpdateRequestDto;
-import renewal.awesome_travel_backoffice.qna.dto.response.QnaAnswerResponseDto;
+// import renewal.awesome_travel_backoffice.qna.dto.response.QnaAnswerResponseDto;
 import renewal.awesome_travel_backoffice.qna.dto.response.QnaResponseDto;
 import renewal.awesome_travel_backoffice.qna.entity.Qna;
 import renewal.awesome_travel_backoffice.qna.entity.QnaAnswer;
@@ -79,15 +79,15 @@ public class QnaService {
                 .build();
     }
 
-    private QnaAnswerResponseDto toAnswerDto(QnaAnswer answer) {
-        return QnaAnswerResponseDto.builder()
-                .id(answer.getId())
-                .qnaId(answer.getQnaId())
-                .responderId(answer.getResponderId())
-                .content(answer.getContent())
-                .createdAt(answer.getCreatedAt())
-                .build();
-    }
+    // private QnaAnswerResponseDto toAnswerDto(QnaAnswer answer) {
+    //     return QnaAnswerResponseDto.builder()
+    //             .id(answer.getId())
+    //             .qnaId(answer.getQnaId())
+    //             .responderId(answer.getResponderId())
+    //             .content(answer.getContent())
+    //             .createdAt(answer.getCreatedAt())
+    //             .build();
+    // }
 }
 
 
