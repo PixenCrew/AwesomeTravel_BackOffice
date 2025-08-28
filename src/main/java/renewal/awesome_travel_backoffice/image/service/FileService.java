@@ -2,10 +2,14 @@ package renewal.awesome_travel_backoffice.image.service;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
+import java.awt.image.BufferedImage;
+
+import javax.imageio.ImageIO;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -27,21 +31,41 @@ public class FileService {
             dir.mkdirs();
         }
 
-        UUID uuid = UUID.randomUUID();
-        String extension = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
-        String savedFileName = uuid.toString() + extension;
+        // 2. 원본 파일명 확인 및 확장자 추출
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename == null || !originalFilename.contains(".")) {
+            throw new IllegalArgumentException("파일 확장자를 확인할 수 없습니다: " + originalFilename);
+        }
+        String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        if (extension.isBlank()) {
+            throw new IllegalArgumentException("파일 확장자를 확인할 수 없습니다: " + originalFilename);
+        }
+
+        // 3. 파일 내용 이미지 검증
+        try (InputStream is = file.getInputStream()) {
+            BufferedImage image = ImageIO.read(is);
+            if (image == null) {
+                throw new IllegalArgumentException("실제 이미지 파일이 아닙니다: " + originalFilename);
+            }
+        }
+        
+        // 4. UUID 기반 파일명 생성
+        String savedFileName = UUID.randomUUID().toString() + extension;
         String fileUploadFullUrl = uploadDir + "/" + savedFileName;
         log.info(fileUploadFullUrl);
 
+        // 5. 상위 폴더 생성
         Path path = Paths.get(fileUploadFullUrl);
         Path parentDir = path.getParent();
         if (parentDir != null && !Files.exists(parentDir)) {
             Files.createDirectories(parentDir);
         }
 
-        FileOutputStream fos = new FileOutputStream(fileUploadFullUrl);
-        fos.write(file.getBytes());
-        fos.close();
+        // 6. 파일 저장 (try-with-resources)
+        try (FileOutputStream fos = new FileOutputStream(fileUploadFullUrl)) {
+            fos.write(file.getBytes());
+        }
+        
         return savedFileName;
     }
 
