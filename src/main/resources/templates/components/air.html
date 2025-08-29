@@ -21,7 +21,7 @@
         <label>좌석등급:</label>
         <select th:field="*{seatClassType}">
             <option value=""> ALL </option>
-            <option th:each="type : ${T(renewal.awesome_travel_backoffice.air.utiles.SeatClassType).values()}" th:value="${type}" th:text="${type}">TYPE</option>
+            <option th:each="type : ${T(renewal.awesome_travel_backoffice.air.entity.SeatClass.SeatClassType).values()}" th:value="${type}" th:text="${type}">TYPE</option>
         </select>
         <br />
 
@@ -81,7 +81,7 @@
         <label>비행 타입:</label>
         <select th:field="*{flightType}">
             <option value=""> ALL </option>
-            <option th:each="type : ${T(renewal.awesome_travel_backoffice.air.utiles.FlightType).values()}" th:value="${type}" th:text="${type}">TYPE</option>
+            <option th:each="type : ${T(renewal.awesome_travel_backoffice.air.entity.Air.FlightType).values()}" th:value="${type}" th:text="${type}">TYPE</option>
         </select>
         <br />
 
@@ -89,7 +89,7 @@
         <label>상태:</label>
         <select th:field="*{status}">
             <option value=""> ALL </option>
-            <option th:each="st : ${T(renewal.awesome_travel_backoffice.air.utiles.AirStatus).values()}" th:value="${st}" th:text="${st}">STATUS</option>
+            <option th:each="st : ${T(renewal.awesome_travel_backoffice.air.entity.Air.AirStatus).values()}" th:value="${st}" th:text="${st}">STATUS</option>
         </select>
         <br />
 

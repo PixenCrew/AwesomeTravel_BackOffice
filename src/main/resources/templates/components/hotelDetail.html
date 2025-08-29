@@ -36,7 +36,7 @@
 
         <label>호텔 유형:</label>
         <select th:field="*{hotelType}">
-            <option th:each="type : ${T(renewal.awesome_travel_backoffice.hotel.utils.HotelType).values()}"
+            <option th:each="type : ${T(renewal.awesome_travel_backoffice.hotel.entity.Hotel.HotelType).values()}"
                 th:value="${type}" th:text="${type}"></option>
         </select><br>
 
