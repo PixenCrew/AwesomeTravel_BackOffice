@@ -1,0 +1,3 @@
+[submodule "src/main/java/renewal/common"]
+	path = src/main/java/renewal/common
+	url = https://github.com/asTravelVoyage/AwesomeTravel_Common.git
