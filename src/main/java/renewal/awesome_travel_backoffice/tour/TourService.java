@@ -10,14 +10,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import renewal.awesome_travel_backoffice.air.entity.AirReservation;
+import renewal.common.entity.AirReservation;
 import renewal.awesome_travel_backoffice.air.repository.AirReservationRepository;
-import renewal.awesome_travel_backoffice.hotel.entity.HotelReservation;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelReservationRepository;
 import renewal.awesome_travel_backoffice.tour.dto.TourFilterDTO;
-import renewal.awesome_travel_backoffice.tour.entity.Tour;
 import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
 import renewal.awesome_travel_backoffice.tour.repository.TourSpecification;
+import renewal.common.entity.HotelReservation;
+import renewal.common.entity.Tour;
 
 @Service
 @RequiredArgsConstructor

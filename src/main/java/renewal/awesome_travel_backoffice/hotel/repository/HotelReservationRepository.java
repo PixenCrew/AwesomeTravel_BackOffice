@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import renewal.awesome_travel_backoffice.hotel.entity.HotelReservation;
+import renewal.common.entity.HotelReservation;
 
 public interface HotelReservationRepository extends JpaRepository<HotelReservation, Long> {
 

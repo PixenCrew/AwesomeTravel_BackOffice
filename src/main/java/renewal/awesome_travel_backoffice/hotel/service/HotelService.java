@@ -8,10 +8,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import renewal.awesome_travel_backoffice.hotel.dto.HotelFilterDTO;
-import renewal.awesome_travel_backoffice.hotel.entity.Hotel;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelRepository;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelSpecification;
-
+import renewal.common.entity.Hotel;
 import lombok.RequiredArgsConstructor;
 
 @Service

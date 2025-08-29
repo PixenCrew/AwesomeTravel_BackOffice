@@ -10,11 +10,11 @@ import org.springframework.util.StringUtils;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 
-import renewal.awesome_travel_backoffice.air.entity.Air;
-import renewal.awesome_travel_backoffice.air.entity.Air.AirStatus;
-import renewal.awesome_travel_backoffice.air.entity.Air.FlightType;
-import renewal.awesome_travel_backoffice.air.entity.Airline;
-import renewal.awesome_travel_backoffice.air.entity.SeatClass;
+import renewal.common.entity.Air;
+import renewal.common.entity.Air.AirStatus;
+import renewal.common.entity.Air.FlightType;
+import renewal.common.entity.Airline;
+import renewal.common.entity.SeatClass;
 
 public class AirSpecification {
 

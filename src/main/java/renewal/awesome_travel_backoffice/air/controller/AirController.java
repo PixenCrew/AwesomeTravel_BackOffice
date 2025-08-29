@@ -22,17 +22,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.data.domain.Sort;
 
 import renewal.awesome_travel_backoffice.air.dto.AirFilterDTO;
-import renewal.awesome_travel_backoffice.air.entity.Air;
-import renewal.awesome_travel_backoffice.air.entity.Air.AirStatus;
-import renewal.awesome_travel_backoffice.air.entity.Air.FlightType;
-import renewal.awesome_travel_backoffice.air.entity.AirReservation;
-import renewal.awesome_travel_backoffice.air.entity.Airline;
-import renewal.awesome_travel_backoffice.air.entity.SeatClass;
-import renewal.awesome_travel_backoffice.air.entity.SeatClass.SeatClassType;
+import renewal.common.entity.Air;
+import renewal.common.entity.Air.AirStatus;
+import renewal.common.entity.Air.FlightType;
+import renewal.common.entity.AirReservation;
+import renewal.common.entity.Airline;
+import renewal.common.entity.SeatClass;
+import renewal.common.entity.SeatClass.SeatClassType;
 import renewal.awesome_travel_backoffice.air.repository.AirRepository;
 import renewal.awesome_travel_backoffice.air.repository.AirReservationRepository;
 import renewal.awesome_travel_backoffice.air.service.AirService;
-import renewal.awesome_travel_backoffice.code.CityCodeRepository;
+import renewal.common.repository.CityCodeRepository;
 
 @Controller
 @RequestMapping("/air")

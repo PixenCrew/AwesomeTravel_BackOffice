@@ -7,9 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import renewal.awesome_travel_backoffice.specialRequest.dto.SpecialRequestDto;
-import renewal.awesome_travel_backoffice.specialRequest.entity.SpecialRequest;
 import renewal.awesome_travel_backoffice.specialRequest.repository.SpecialRequestRepository;
-
+import renewal.common.entity.SpecialRequest;
 import lombok.RequiredArgsConstructor;
 
 @Service

@@ -17,14 +17,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import renewal.awesome_travel_backoffice.hotel.entity.Hotel;
-import renewal.awesome_travel_backoffice.hotel.entity.HotelReservation;
-import renewal.awesome_travel_backoffice.hotel.entity.Hotel.HotelType;
-import renewal.awesome_travel_backoffice.code.CityCodeRepository;
 import renewal.awesome_travel_backoffice.hotel.dto.HotelFilterDTO;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelRepository;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelReservationRepository;
 import renewal.awesome_travel_backoffice.hotel.service.HotelService;
+import renewal.common.entity.Hotel;
+import renewal.common.entity.HotelReservation;
+import renewal.common.entity.Hotel.HotelType;
+import renewal.common.repository.CityCodeRepository;
 import renewal.awesome_travel_backoffice.hotel.repository.AmenityRepository;
 
 import lombok.RequiredArgsConstructor;

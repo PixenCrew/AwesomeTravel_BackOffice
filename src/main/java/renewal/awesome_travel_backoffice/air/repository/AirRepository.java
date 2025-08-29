@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.lang.Nullable;
 import org.springframework.lang.NonNull;
 
-import renewal.awesome_travel_backoffice.air.entity.Air;
+import renewal.common.entity.Air;
 
 public interface AirRepository extends JpaRepository<Air, Long>, JpaSpecificationExecutor<Air>  {
     @Override

@@ -19,24 +19,23 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
-import renewal.awesome_travel_backoffice.air.entity.AirReservation;
-import renewal.awesome_travel_backoffice.air.entity.SeatClass;
+import renewal.common.entity.AirReservation;
+import renewal.common.entity.SeatClass;
 import renewal.awesome_travel_backoffice.air.repository.AirReservationRepository;
-import renewal.awesome_travel_backoffice.code.CityCodeRepository;
-import renewal.awesome_travel_backoffice.code.CountryCodeRepository;
-import renewal.awesome_travel_backoffice.hotel.entity.Hotel;
-import renewal.awesome_travel_backoffice.hotel.entity.HotelReservation;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelRepository;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelReservationRepository;
 import renewal.awesome_travel_backoffice.product.repository.ProductRepository;
 import renewal.awesome_travel_backoffice.tour.TourService;
 import renewal.awesome_travel_backoffice.tour.dto.TourFilterDTO;
-import renewal.awesome_travel_backoffice.tour.entity.Location;
-import renewal.awesome_travel_backoffice.tour.entity.Location.Type;
-import renewal.awesome_travel_backoffice.tour.entity.Schedule;
-import renewal.awesome_travel_backoffice.tour.entity.Tour;
 import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
-
+import renewal.common.entity.Hotel;
+import renewal.common.entity.HotelReservation;
+import renewal.common.entity.Location;
+import renewal.common.entity.Schedule;
+import renewal.common.entity.Tour;
+import renewal.common.entity.Location.Type;
+import renewal.common.repository.CityCodeRepository;
+import renewal.common.repository.CountryCodeRepository;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

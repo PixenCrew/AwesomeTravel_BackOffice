@@ -6,10 +6,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import renewal.awesome_travel_backoffice.product.dto.ProductFilterDTO;
-import renewal.awesome_travel_backoffice.product.entity.Product;
 import renewal.awesome_travel_backoffice.product.repository.ProductRepository;
 import renewal.awesome_travel_backoffice.product.repository.ProductSpecification;
-
+import renewal.common.entity.Product;
 import lombok.RequiredArgsConstructor;
 
 @Service

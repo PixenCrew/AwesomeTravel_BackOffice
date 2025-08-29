@@ -6,10 +6,9 @@ import org.springframework.stereotype.Service;
 
 import renewal.awesome_travel_backoffice.faq.dto.request.FaqRequestDto;
 import renewal.awesome_travel_backoffice.faq.dto.response.FaqResponseDto;
-import renewal.awesome_travel_backoffice.faq.entity.Faq;
 import renewal.awesome_travel_backoffice.faq.repositiry.FaqRepository;
 import renewal.awesome_travel_backoffice.faq.utils.FaqCategory;
-
+import renewal.common.entity.Faq;
 import lombok.RequiredArgsConstructor;
 
 @Service

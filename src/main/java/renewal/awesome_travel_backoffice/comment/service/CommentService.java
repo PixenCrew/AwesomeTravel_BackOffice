@@ -6,9 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import renewal.awesome_travel_backoffice.comment.dto.response.CommentResponseDto;
-import renewal.awesome_travel_backoffice.comment.entity.Comment;
 import renewal.awesome_travel_backoffice.comment.repository.CommentRepository;
-
+import renewal.common.entity.Comment;
 import lombok.RequiredArgsConstructor;
 
 @Service

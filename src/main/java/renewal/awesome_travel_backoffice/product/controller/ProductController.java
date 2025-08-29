@@ -17,16 +17,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import renewal.awesome_travel_backoffice.code.CityCodeRepository;
-import renewal.awesome_travel_backoffice.code.CountryCodeRepository;
 import renewal.awesome_travel_backoffice.product.dto.ProductFilterDTO;
-import renewal.awesome_travel_backoffice.product.entity.Product;
-import renewal.awesome_travel_backoffice.product.entity.Product.Info;
 import renewal.awesome_travel_backoffice.product.repository.ProductRepository;
 import renewal.awesome_travel_backoffice.product.service.ProductService;
-import renewal.awesome_travel_backoffice.tour.entity.Tour;
 import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
-
+import renewal.common.entity.Product;
+import renewal.common.entity.Tour;
+import renewal.common.entity.Product.Info;
+import renewal.common.repository.CityCodeRepository;
+import renewal.common.repository.CountryCodeRepository;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -91,12 +90,13 @@ public class ProductController {
     @PostMapping("/new")
     public String submitProduct(@ModelAttribute Product product) throws Exception {
         
-        productRepo.save(product);
-
         // 투어 productId 업데이트
-        Tour tour = product.getTour();
+        Tour tour = tourRepo.findById(product.getTour().getId()).get();
         tour.setProductId(product.getId());
         tourRepo.save(tour);
+
+        // product 등록
+        productRepo.save(product);
 
         return "redirect:/product";
     }
@@ -124,7 +124,7 @@ public class ProductController {
         tourRepo.save(lastTour);
 
         // 투어 productId 업데이트
-        Tour tour = product.getTour();
+        Tour tour = tourRepo.findById(product.getTour().getId()).get();
         tour.setProductId(product.getId());
         tourRepo.save(tour);
 

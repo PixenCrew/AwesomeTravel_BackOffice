@@ -7,12 +7,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import renewal.awesome_travel_backoffice.air.entity.SeatClass;
+import renewal.common.entity.SeatClass;
 import renewal.awesome_travel_backoffice.airPurchase.dto.request.AirPurchaseSearchCondition;
-import renewal.awesome_travel_backoffice.airPurchase.entity.AirPurchase;
 import renewal.awesome_travel_backoffice.airPurchase.repository.AirPurchaseRepository;
 import renewal.awesome_travel_backoffice.airPurchase.utiles.PurchaseStatus;
-
+import renewal.common.entity.AirPurchase;
 import lombok.RequiredArgsConstructor;
 
 @Service

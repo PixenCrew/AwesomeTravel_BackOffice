@@ -6,13 +6,12 @@ import org.springframework.stereotype.Service;
 
 import renewal.awesome_travel_backoffice.inquiry.dto.request.InquiryAnswerRequestDto;
 import renewal.awesome_travel_backoffice.inquiry.dto.response.InquiryResponseDto;
-import renewal.awesome_travel_backoffice.inquiry.entity.Inquiry;
-import renewal.awesome_travel_backoffice.inquiry.entity.InquiryAnswer;
 import renewal.awesome_travel_backoffice.inquiry.repository.InquiryAnswerRepository;
 import renewal.awesome_travel_backoffice.inquiry.repository.InquiryRepository;
-import renewal.awesome_travel_backoffice.notification.entity.Notification;
 import renewal.awesome_travel_backoffice.notification.repository.NotificationRepository;
-
+import renewal.common.entity.Inquiry;
+import renewal.common.entity.InquiryAnswer;
+import renewal.common.entity.Notification;
 import lombok.RequiredArgsConstructor;
 
 @Service

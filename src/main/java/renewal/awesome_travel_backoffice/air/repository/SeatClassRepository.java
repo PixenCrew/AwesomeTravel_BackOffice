@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
-import renewal.awesome_travel_backoffice.air.entity.SeatClass;
+import renewal.common.entity.SeatClass;
 
 public interface SeatClassRepository extends JpaRepository<SeatClass, Long>, JpaSpecificationExecutor<SeatClass>   {
     @NonNull Page<SeatClass> findAll(@Nullable Specification<SeatClass> spec, @NonNull Pageable pageable);

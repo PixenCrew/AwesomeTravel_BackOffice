@@ -14,10 +14,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import renewal.awesome_travel_backoffice.airPurchase.dto.request.AirPurchaseSearchCondition;
-import renewal.awesome_travel_backoffice.airPurchase.entity.AirPurchase;
 import renewal.awesome_travel_backoffice.airPurchase.service.AirPurchaseService;
 import renewal.awesome_travel_backoffice.airPurchase.utiles.PurchaseStatus;
-
+import renewal.common.entity.AirPurchase;
 import lombok.RequiredArgsConstructor;
 
 @RestController

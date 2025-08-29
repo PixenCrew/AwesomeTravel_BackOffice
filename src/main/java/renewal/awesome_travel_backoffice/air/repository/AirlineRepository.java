@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import renewal.awesome_travel_backoffice.air.entity.Airline;
+import renewal.common.entity.Airline;
 
 public interface AirlineRepository extends JpaRepository<Airline,String> {
     // 항공사명(한글) 기준 조회

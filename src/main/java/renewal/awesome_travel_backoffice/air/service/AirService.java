@@ -10,9 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import renewal.awesome_travel_backoffice.air.dto.AirFilterDTO;
-import renewal.awesome_travel_backoffice.air.entity.Air;
-import renewal.awesome_travel_backoffice.air.entity.Air.AirStatus;
-import renewal.awesome_travel_backoffice.air.entity.SeatClass;
+import renewal.common.entity.Air;
+import renewal.common.entity.Air.AirStatus;
+import renewal.common.entity.SeatClass;
 import renewal.awesome_travel_backoffice.air.repository.AirRepository;
 import renewal.awesome_travel_backoffice.air.repository.AirSpecification;
 import renewal.awesome_travel_backoffice.air.repository.AirlineRepository;
