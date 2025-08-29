@@ -2,23 +2,31 @@ package renewal.awesome_travel_backoffice.tour;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import renewal.awesome_travel_backoffice.air.entity.AirReservation;
+import renewal.awesome_travel_backoffice.air.repository.AirReservationRepository;
+import renewal.awesome_travel_backoffice.hotel.entity.HotelReservation;
+import renewal.awesome_travel_backoffice.hotel.repository.HotelReservationRepository;
 import renewal.awesome_travel_backoffice.tour.dto.TourFilterDTO;
 import renewal.awesome_travel_backoffice.tour.entity.Tour;
 import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
 import renewal.awesome_travel_backoffice.tour.repository.TourSpecification;
 
 @Service
+@RequiredArgsConstructor
 public class TourService {
 
-    @Autowired
-    private TourRepository tourRepository;
-
+    private final TourRepository tourRepository;
+    private final AirReservationRepository airReservationRepo;
+    private final HotelReservationRepository hotelReservationRepo;
+    
     public List<String> getAllCompanies() {
         return tourRepository.findDistinctCompanies();
     }
@@ -52,6 +60,24 @@ public class TourService {
         }
 
         return tourRepository.findAll(spec, pageable);
+    }
+
+    public void cancelHotelAir(Long tourId) throws Exception{
+
+        // 연결된 Air, Hotel 예약 CANCELED로 변경
+        List<AirReservation> airReserves = airReservationRepo.findByTourId(tourId);
+        for (AirReservation reserve : airReserves) {
+            reserve.setStatus(AirReservation.Status.CANCELLED);
+            // SeatClass 잔여좌석 복원
+            reserve.getSeatClass().cancelSeats(reserve.getSeatCount());
+        }
+        airReservationRepo.saveAll(airReserves);
+
+        List<HotelReservation> hotelReserves = hotelReservationRepo.findByTourId(tourId);
+        for (HotelReservation reserve : hotelReserves) {
+            reserve.setStatus(HotelReservation.Status.CANCELLED);
+        }
+        hotelReservationRepo.saveAll(hotelReserves);
     }
 
 }

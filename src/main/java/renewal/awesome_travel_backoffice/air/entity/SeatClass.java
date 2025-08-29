@@ -57,6 +57,12 @@ public class SeatClass {
         }
     }
 
+    public void cancelSeats(Long canceledPersons) throws Exception {
+        if ((availableSeats+canceledPersons) <= maxSeats) {
+            availableSeats += canceledPersons;
+        }
+    }
+
     public enum SeatClassType {
         ECONOMY,
         PREMIUMECONOMY,
