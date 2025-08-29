@@ -3,7 +3,7 @@ package renewal.awesome_travel_backoffice.airPurchase.dto.response;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import renewal.awesome_travel_backoffice.airPurchase.utiles.PurchaseStatus;
+import renewal.common.entity.BasePurchase.PurchaseStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 import renewal.awesome_travel_backoffice.airPurchase.dto.request.AirPurchaseSearchCondition;
 import renewal.awesome_travel_backoffice.airPurchase.service.AirPurchaseService;
-import renewal.awesome_travel_backoffice.airPurchase.utiles.PurchaseStatus;
+import renewal.common.entity.BasePurchase.PurchaseStatus;
 import renewal.common.entity.AirPurchase;
 import lombok.RequiredArgsConstructor;
 

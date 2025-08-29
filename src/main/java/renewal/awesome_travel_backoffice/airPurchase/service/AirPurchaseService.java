@@ -10,8 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import renewal.common.entity.SeatClass;
 import renewal.awesome_travel_backoffice.airPurchase.dto.request.AirPurchaseSearchCondition;
 import renewal.awesome_travel_backoffice.airPurchase.repository.AirPurchaseRepository;
-import renewal.awesome_travel_backoffice.airPurchase.utiles.PurchaseStatus;
 import renewal.common.entity.AirPurchase;
+import renewal.common.entity.BasePurchase.PurchaseStatus;
 import lombok.RequiredArgsConstructor;
 
 @Service

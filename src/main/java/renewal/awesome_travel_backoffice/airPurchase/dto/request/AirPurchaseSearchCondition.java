@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import renewal.awesome_travel_backoffice.airPurchase.utiles.PurchaseStatus;
+import renewal.common.entity.BasePurchase.PurchaseStatus;
 
 import lombok.Getter;
 import lombok.Setter;
