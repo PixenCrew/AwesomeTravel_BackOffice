@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class LocalUploader {
 
-    @Value("${file.upload-dir}")
+    @Value("${imageLocation}")
     private String uploadDir;
 
     public String upload(MultipartFile file) {
