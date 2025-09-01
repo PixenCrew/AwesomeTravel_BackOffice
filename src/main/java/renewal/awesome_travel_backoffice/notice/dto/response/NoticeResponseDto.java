@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 import com.querydsl.core.annotations.QueryProjection;
 
-import renewal.awesome_travel_backoffice.notice.utils.NoticeCategory;
+import renewal.common.entity.Notice.NoticeCategory;
 
 import lombok.Builder;
 import lombok.Getter;

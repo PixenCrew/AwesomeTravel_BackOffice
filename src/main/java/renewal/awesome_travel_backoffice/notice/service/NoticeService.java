@@ -34,8 +34,7 @@ public class NoticeService {
                 dto.getImageUrl(),
                 dto.getCategory(),
                 dto.getStartAt(),
-                dto.getEndAt()
-        );
+                dto.getEndAt());
         return noticeRepository.save(notice).getId();
     }
 
@@ -57,28 +56,34 @@ public class NoticeService {
         return noticeQueryRepository.search(noticeSearchRequest, pageable);
     }
 
-
     @Transactional
     public void update(Long id, NoticeRequestDto dto) {
         Notice notice = noticeRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("공지사항이 존재하지 않습니다."));
-        notice.update(dto);
+
+        if (dto.getTitle() != null)     notice.updateTitle(dto.getTitle());
+        if (dto.getContent() != null)   notice.updateContent(dto.getContent());
+        if (dto.getFix() != null)       notice.updateFix(dto.getFix());
+        if (dto.getPriority() != null)  notice.updatePriority(dto.getPriority());
+        if (dto.getImageUrl() != null)  notice.updateImageUrl(dto.getImageUrl());
+        if (dto.getCategory() != null)  notice.updateCategory(dto.getCategory());
+        if (dto.getStartAt() != null)   notice.updateStartAt(dto.getStartAt());
+        if (dto.getEndAt() != null)     notice.updateEndAt(dto.getEndAt());
     }
 
-    @Transactional
-    public void partialUpdate(Long id, NoticeRequestDto dto) {
-        Notice notice = noticeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("공지사항이 존재하지 않습니다."));
-        notice.updatePartially(dto);
-    }
-
+    // @Transactional
+    // public void partialUpdate(Long id, NoticeRequestDto dto) {
+    // Notice notice = noticeRepository.findById(id)
+    // .orElseThrow(() -> new IllegalArgumentException("공지사항이 존재하지 않습니다."));
+    // notice.updatePartially(dto);
+    // }
 
     @Transactional
     public void toggleFix(Long noticeId) {
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new IllegalArgumentException("공지사항이 존재하지 않습니다."));
 
-        notice.setFix(!notice.getFix()); // true → false, false → true
+        notice.updateFix(!notice.getFix()); // true → false, false → true
     }
 
     @Transactional
@@ -103,4 +108,3 @@ public class NoticeService {
     }
 
 }
-
