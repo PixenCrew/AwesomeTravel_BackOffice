@@ -23,7 +23,7 @@
         <label>호텔 유형:</label>
         <select th:field="*{hotelType}">
             <option value="">-- 선택 --</option>
-            <option th:each="type : ${T(renewal.awesome_travel_backoffice.hotel.entity.Hotel.HotelType).values()}" th:value="${type}" th:text="${type}"></option>
+            <option th:each="type : ${T(renewal.common.entity.Hotel.HotelType).values()}" th:value="${type}" th:text="${type}"></option>
         </select><br>
 
         <label>사용 가능:</label>

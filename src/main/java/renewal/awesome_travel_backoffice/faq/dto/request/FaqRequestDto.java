@@ -1,6 +1,6 @@
 package renewal.awesome_travel_backoffice.faq.dto.request;
 
-import renewal.awesome_travel_backoffice.faq.utils.FaqCategory;
+import renewal.common.entity.Faq.FaqCategory;
 
 import lombok.Getter;
 import lombok.Setter;

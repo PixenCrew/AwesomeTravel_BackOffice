@@ -7,8 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import renewal.awesome_travel_backoffice.comment.dto.response.CommentReportResponseDto;
 import renewal.awesome_travel_backoffice.comment.repository.CommentReportRepository;
-import renewal.awesome_travel_backoffice.comment.utiles.ReportReason;
 import renewal.common.entity.CommentReport;
+import renewal.common.entity.CommentReport.ReportReason;
 import lombok.RequiredArgsConstructor;
 
 @Service

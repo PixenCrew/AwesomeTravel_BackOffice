@@ -61,21 +61,21 @@ public class NoticeService {
         Notice notice = noticeRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("공지사항이 존재하지 않습니다."));
 
-        if (dto.getTitle() != null)     notice.updateTitle(dto.getTitle());
-        if (dto.getContent() != null)   notice.updateContent(dto.getContent());
-        if (dto.getFix() != null)       notice.updateFix(dto.getFix());
-        if (dto.getPriority() != null)  notice.updatePriority(dto.getPriority());
-        if (dto.getImageUrl() != null)  notice.updateImageUrl(dto.getImageUrl());
-        if (dto.getCategory() != null)  notice.updateCategory(dto.getCategory());
-        if (dto.getStartAt() != null)   notice.updateStartAt(dto.getStartAt());
-        if (dto.getEndAt() != null)     notice.updateEndAt(dto.getEndAt());
+        if (dto.getTitle() != null)     notice.setTitle(dto.getTitle());
+        if (dto.getContent() != null)   notice.setContent(dto.getContent());
+        if (dto.getFix() != null)       notice.setFix(dto.getFix());
+        if (dto.getPriority() != null)  notice.setPriority(dto.getPriority());
+        if (dto.getImageUrl() != null)  notice.setImageUrl(dto.getImageUrl());
+        if (dto.getCategory() != null)  notice.setCategory(dto.getCategory());
+        if (dto.getStartAt() != null)   notice.setStartAt(dto.getStartAt());
+        if (dto.getEndAt() != null)     notice.setEndAt(dto.getEndAt());
     }
 
     // @Transactional
     // public void partialUpdate(Long id, NoticeRequestDto dto) {
     // Notice notice = noticeRepository.findById(id)
     // .orElseThrow(() -> new IllegalArgumentException("공지사항이 존재하지 않습니다."));
-    // notice.updatePartially(dto);
+    // notice.setPartially(dto);
     // }
 
     @Transactional
@@ -83,7 +83,7 @@ public class NoticeService {
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new IllegalArgumentException("공지사항이 존재하지 않습니다."));
 
-        notice.updateFix(!notice.getFix()); // true → false, false → true
+        notice.setFix(!notice.getFix()); // true → false, false → true
     }
 
     @Transactional

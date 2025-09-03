@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import renewal.awesome_travel_backoffice.comment.utiles.ReportReason;
 import renewal.common.entity.CommentReport;
+import renewal.common.entity.CommentReport.ReportReason;
 
 public interface CommentReportRepository extends JpaRepository<CommentReport, Long> {
 

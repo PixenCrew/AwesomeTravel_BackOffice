@@ -2,7 +2,7 @@ package renewal.awesome_travel_backoffice.faq.dto.response;
 
 import java.time.LocalDateTime;
 
-import renewal.awesome_travel_backoffice.faq.utils.FaqCategory;
+import renewal.common.entity.Faq.FaqCategory;
 
 import lombok.Builder;
 import lombok.Getter;
