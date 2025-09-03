@@ -20,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
 import renewal.common.entity.AirReservation;
+import renewal.common.entity.AirReservation.AirReservationStatus;
 import renewal.common.entity.SeatClass;
 import renewal.awesome_travel_backoffice.air.repository.AirReservationRepository;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelRepository;
@@ -30,10 +31,11 @@ import renewal.awesome_travel_backoffice.tour.dto.TourFilterDTO;
 import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
 import renewal.common.entity.Hotel;
 import renewal.common.entity.HotelReservation;
+import renewal.common.entity.HotelReservation.HotelReservationStatus;
 import renewal.common.entity.Location;
+import renewal.common.entity.Location.LocationType;
 import renewal.common.entity.Schedule;
 import renewal.common.entity.Tour;
-import renewal.common.entity.Location.Type;
 import renewal.common.repository.CityCodeRepository;
 import renewal.common.repository.CountryCodeRepository;
 import lombok.RequiredArgsConstructor;
@@ -105,7 +107,7 @@ public class TourController {
         // 역순으로 구조 생성
         // 3. Location
         Location blankLocation = new Location();
-        blankLocation.setLocationType(Type.POINT);
+        blankLocation.setLocationType(LocationType.POINT);
 
         // 2. Schedule
         Schedule blankSchedule = new Schedule();
@@ -120,7 +122,7 @@ public class TourController {
         // defaultLocation.setType(Type.POINT);
         // blank.getLocations().add(defaultLocation);
 
-        model.addAttribute("types", Type.values());
+        model.addAttribute("types", LocationType.values());
         model.addAttribute("countryCode", countryRepo.findAll());
         model.addAttribute("cityCode", cityRepo.findAll());
         model.addAttribute("tour", blankTour);
@@ -138,10 +140,9 @@ public class TourController {
             schedule.setTour(tour);
             // 모든 location 객체에 schedule 참조를 세팅
             for (Location location : schedule.getLocations()) {
-                location.setSchedule(schedule);
+                location.updateSchedule(schedule);
             }
         }
-        ;
 
         // tour.id 생성을 위한 1차 저장
         tourRepo.save(tour);
@@ -156,7 +157,7 @@ public class TourController {
     public String selectTravel(@PathVariable("id") Long id, Model model) {
 
         Tour tour = tourRepo.getReferenceById(id);
-        model.addAttribute("types", Type.class);
+        model.addAttribute("types", LocationType.class);
         model.addAttribute("countryCode", countryRepo.findAll());
         model.addAttribute("cityCode", cityRepo.findAll());
         model.addAttribute("tour", tour);
@@ -174,7 +175,7 @@ public class TourController {
             schedule.setTour(tour);
             // 모든 location 객체에 schedule 참조를 세팅
             for (Location location : schedule.getLocations()) {
-                location.setSchedule(schedule);
+                location.updateSchedule(schedule);
             }
         }
         ;
@@ -218,9 +219,9 @@ public class TourController {
     @GetMapping("/search")
     public String searchTour(
             @ModelAttribute("filter") TourFilterDTO filter, // 필터 DTO를 바인딩
-            @RequestParam(defaultValue = "id") String sortField,
-            @RequestParam(defaultValue = "asc") String sortDir,
             @RequestParam(defaultValue = "0") int page, // 페이지 번호
+            @RequestParam(defaultValue = "startDate") String sortField,
+            @RequestParam(defaultValue = "asc") String sortDir,
             Model model) {
         Sort sort = sortDir.equalsIgnoreCase("asc")
                 ? Sort.by(sortField).ascending()
@@ -228,6 +229,8 @@ public class TourController {
 
         Pageable pageable = PageRequest.of(page, 50, sort);
 
+        // 연결된 Product가 없는 Tour만 검색하도록 지정
+        filter.setFindOrphan(true);
         Page<Tour> tourPage = tourService.searchTours(filter, pageable);
 
         // View에서 쓸 속성들
@@ -242,6 +245,7 @@ public class TourController {
         return "components/tour";
     }
 
+    // 투어 공용함수 분리
     protected Tour setTour(Tour tour) throws Exception {
         Long requiredPersons = tour.getCount(); // 인원수
         Long hotelId = null; // 호텔
@@ -260,15 +264,15 @@ public class TourController {
 
             // Locations 순회
             for (Location location : schedule.getLocations()) {
-                if (location.getLocationType() == Type.AIR) {
+                if (location.getLocationType() == LocationType.AIR) {
                     SeatClass sc = location.getSeatClass();
                     airPriceSum += sc.getPrice();
                     sc.reserveSeats(requiredPersons);
-                    location.setLocationType(Type.AIR);
+                    location.setLocationType(LocationType.AIR);
                     airReservationRepo
-                            .save(new AirReservation(sc, tour.getId(), requiredPersons, AirReservation.Status.BOOKED));
-                } else if (location.getLocationType() == Type.HOTEL) {
-                    location.setLocationType(Type.HOTEL);
+                            .save(new AirReservation(sc, tour.getId(), requiredPersons, AirReservationStatus.BOOKED));
+                } else if (location.getLocationType() == LocationType.HOTEL) {
+                    location.setLocationType(LocationType.HOTEL);
                     Long currentHotelId = location.getHotel().getId();
                     hotelPriceSum += location.getHotel().getPrice();
                     if (hotelId == null) {
@@ -279,13 +283,13 @@ public class TourController {
                         // 전 호텔 끝
                         Hotel hotel = hotelRepo.findById(hotelId).get();
                         hotelReservationRepo.save(new HotelReservation(hotel, tour.getId(), requiredPersons, startDate,
-                                endDate, HotelReservation.Status.BOOKED));
+                                endDate, HotelReservationStatus.BOOKED));
                         // 현 호텔 시작
                         hotelId = currentHotelId;
                         startDate = currentDate;
                     }
                 } else {
-                    location.setLocationType(Type.POINT);
+                    location.setLocationType(LocationType.POINT);
 
                 }
             }
@@ -295,11 +299,11 @@ public class TourController {
         if (hotelId != null) {
             Hotel hotel = hotelRepo.findById(hotelId).get();
             hotelReservationRepo.save(new HotelReservation(hotel, tour.getId(), requiredPersons, startDate, endDate,
-                    HotelReservation.Status.BOOKED));
+                    HotelReservationStatus.BOOKED));
         }
 
-        tour.setAirPriceSum(airPriceSum * tour.getCount()); // 가격 총합 x 인원수
-        tour.setHotelPriceSum(hotelPriceSum * tour.getCount());
+        tour.updateAirPriceSum(airPriceSum * tour.getCount()); // 가격 총합 x 인원수
+        tour.updateHotelPriceSum(hotelPriceSum * tour.getCount());
 
         return tour;
     }

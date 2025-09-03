@@ -11,12 +11,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import renewal.common.entity.AirReservation;
+import renewal.common.entity.AirReservation.AirReservationStatus;
 import renewal.awesome_travel_backoffice.air.repository.AirReservationRepository;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelReservationRepository;
 import renewal.awesome_travel_backoffice.tour.dto.TourFilterDTO;
 import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
 import renewal.awesome_travel_backoffice.tour.repository.TourSpecification;
 import renewal.common.entity.HotelReservation;
+import renewal.common.entity.HotelReservation.HotelReservationStatus;
 import renewal.common.entity.Tour;
 
 @Service
@@ -32,7 +34,7 @@ public class TourService {
     }
 
     public Page<Tour> searchTours(TourFilterDTO filter, Pageable pageable) {
-        Specification<Tour> spec = Specification.where(null);
+        Specification<Tour> spec = Specification.where(TourSpecification.withProductJoin()); // 기본적으로 Product와 JOIN
 
         if (filter.getName() != null && !filter.getName().isEmpty()) {
             spec = spec.and(TourSpecification.nameContains(filter.getName()));
@@ -58,6 +60,9 @@ public class TourService {
         if (filter.getStartCount() != null || filter.getEndCount() != null) {
             spec = spec.and(TourSpecification.countBetween(filter.getStartCount(), filter.getEndCount()));
         }
+        if (filter.isFindOrphan()) {
+            spec = spec.and(TourSpecification.productIsEmptyOrNull());
+        }
 
         return tourRepository.findAll(spec, pageable);
     }
@@ -67,7 +72,7 @@ public class TourService {
         // 연결된 Air, Hotel 예약 CANCELED로 변경
         List<AirReservation> airReserves = airReservationRepo.findByTourId(tourId);
         for (AirReservation reserve : airReserves) {
-            reserve.setStatus(AirReservation.Status.CANCELLED);
+            reserve.setStatus(AirReservationStatus.CANCELLED);
             // SeatClass 잔여좌석 복원
             reserve.getSeatClass().cancelSeats(reserve.getSeatCount());
         }
@@ -75,7 +80,7 @@ public class TourService {
 
         List<HotelReservation> hotelReserves = hotelReservationRepo.findByTourId(tourId);
         for (HotelReservation reserve : hotelReserves) {
-            reserve.setStatus(HotelReservation.Status.CANCELLED);
+            reserve.setStatus(HotelReservationStatus.CANCELLED);
         }
         hotelReservationRepo.saveAll(hotelReserves);
     }

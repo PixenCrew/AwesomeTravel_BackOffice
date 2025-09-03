@@ -28,4 +28,8 @@ public class TourFilterDTO {
     private String pointLocation;
     private Long startCount;
     private Long endCount;
+
+    // 연결된 Product 번호 있는지
+    private boolean findOrphan = false;
+
 }

@@ -7,7 +7,9 @@ import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import renewal.common.entity.Location;
+import renewal.common.entity.Product;
 import renewal.common.entity.Schedule;
 import renewal.common.entity.Tour;
 
@@ -106,4 +108,22 @@ public class TourSpecification {
         };
     }
 
+    // Tour.product_id == NULL Product가 연결 안된 Tour만 찾기
+    public static Specification<Tour> productIsEmptyOrNull() {
+        return (root, query, cb) -> {
+            // Tour LEFT JOIN Product
+            Join<Tour, Product> productJoin = root.join("product", JoinType.LEFT);
+            // Product가 없는 Tour만
+            return cb.isNull(productJoin.get("id"));
+        };
+    }
+
+    // Product와 연결 여부 확인용
+    public static Specification<Tour> withProductJoin() {
+    return (root, query, cb) -> {
+        // fetch join 설정 (JPA가 Tour.product를 조회할 수 있도록)
+        root.fetch("product", JoinType.LEFT);
+        return cb.conjunction(); // 아무 조건 없는 기본 쿼리
+    };
+}
 }
