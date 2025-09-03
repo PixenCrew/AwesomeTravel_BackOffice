@@ -75,9 +75,9 @@
             <label>상품 정보:</label>
             <div id="info-container">
                 <div th:each="entry, iterStat : *{info}">
-                    title: <input type="text" th:name="|info[${entry.title}]|" th:value="${entry.title}" />
-                    content: <input type="text" th:name="|info[${entry.content}]|" th:value="${entry.content}" />
-                    appendix: <input type="text" th:name="|info[${entry.appendix}]|" th:value="${entry.appendix}" />
+                    제목: <input type="text" th:name="|info[__${iterStat.index}__].title|" th:value="${entry.title}" />
+                    내용: <input type="text" th:name="|info[__${iterStat.index}__].content|" th:value="${entry.content}" />
+                    추가내용: <input type="text" th:name="|info[__${iterStat.index}__].appendix|" th:value="${entry.appendix}" />
                     <button type="button" onclick="removeField(this)">삭제</button>
                 </div>
             </div>

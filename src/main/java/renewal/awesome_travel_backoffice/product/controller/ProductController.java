@@ -42,9 +42,9 @@ public class ProductController {
     @GetMapping
     public String listAndFilter(
             @ModelAttribute("filter") ProductFilterDTO filter, // 필터 DTO를 바인딩
-            @RequestParam(defaultValue = "0") int page, // 페이지 번호
-            @RequestParam(defaultValue = "id") String sortField,
-            @RequestParam(defaultValue = "asc") String sortDir,
+            @RequestParam(name = "page", defaultValue = "0") int page, // 페이지 번호
+            @RequestParam(name = "sortField", defaultValue = "id") String sortField,
+            @RequestParam(name = "sortDir", defaultValue = "asc") String sortDir,
             Model model) {
         // 1) 정렬 객체 설정
         Sort sort = sortDir.equalsIgnoreCase("asc")
@@ -69,7 +69,7 @@ public class ProductController {
 
     // 새 패키지
     @GetMapping("/new")
-    public String newProduct(Model model){
+    public String newProduct(Model model) {
 
         Product blankProduct = new Product();
         Tour blankTour = new Tour();
@@ -89,13 +89,10 @@ public class ProductController {
     // 새 패키지 등록
     @PostMapping("/new")
     public String submitProduct(@ModelAttribute Product product) throws Exception {
-        
+
         // 투어 productId 업데이트
         Tour tour = tourRepo.findById(product.getTour().getId()).get();
-        tour.setProductId(product.getId());
-        tourRepo.save(tour);
-
-        // product 등록
+        product.setTour(tour);
         productRepo.save(product);
 
         return "redirect:/product";
@@ -116,30 +113,38 @@ public class ProductController {
     // 특정 패키지 수정
     @PostMapping("/{id}")
     public String submitSelectedProduct(@ModelAttribute Product product) {
-        
+
         // 기존 Tour productId 삭제
         Long lastTourId = productRepo.findById(product.getId()).get().getTour().getId();
         Tour lastTour = tourRepo.findById(lastTourId).get();
-        lastTour.setProductId(null);
+        lastTour.setProduct(null);
         tourRepo.save(lastTour);
 
         // 투어 productId 업데이트
         Tour tour = tourRepo.findById(product.getTour().getId()).get();
-        tour.setProductId(product.getId());
+        tour.setProduct(product);
         tourRepo.save(tour);
 
         // Product 저장
         productRepo.save(product);
-        
+
         return "redirect:/product";
     }
 
     // 패키지 삭제 처리
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
-
-        productRepo.deleteById(id);
         
+        // Product와 연결된 Tour가 있으면 연결 해제
+        Product product = productRepo.findById(id).get();
+        Tour tour = product.getTour();
+        if (tour != null) {
+            tour.setProduct(null); // FK를 null로 만들어서 참조 끊기
+            tourRepo.save(tour); // 업데이트 필요
+        }
+        
+        productRepo.deleteById(id);
+
         return ResponseEntity.ok("삭제 완료");
     }
 

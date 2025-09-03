@@ -48,8 +48,8 @@
         <label for="hotelPriceSum">호텔 가격 합:</label>
         <input type="number" th:field="*{hotelPriceSum}" min="0" disabled /><br>
 
-        <label for="productId">패키지 상품 ID:</label>
-        <input type="number" th:field="*{productId}" disabled /><br>
+        <label for="product.id">패키지 상품 ID:</label>
+        <input type="number" th:field="*{product.id}" disabled /><br>
 
         <fieldset id="fieldset">
             <legend>코스 스케줄 및 포인트/항공 정보</legend>
@@ -79,19 +79,19 @@
                                 <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].description}" placeholder="설명 입력" />
                             </div>
 
-                            <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType == T(renewal.common.entity.Location.Type).AIR}">
+                            <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType == T(renewal.common.entity.Location.LocationType).AIR}">
                                 항공편 번호
                                 <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].departAirport}" placeholder="출발지 선택" list="cityList" onchange="stripAfterPipe(this)" />
                                 <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].arriveAirport}" placeholder="도착지 선택" list="cityList" onchange="stripAfterPipe(this)" />
                                 <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].seatClass}" placeholder="항공편 ID 입력" onclick="searchAir(this)" />
                             </div>
 
-                            <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType != T(renewal.common.entity.Location.Type).AIR}">
+                            <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType != T(renewal.common.entity.Location.LocationType).AIR}">
                                 도시
                                 <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].city}" placeholder="예: KR | South Korea | 대한민국" list="cityList" />
                             </div>
 
-                            <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType == T(renewal.common.entity.Location.Type).HOTEL}">
+                            <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType == T(renewal.common.entity.Location.LocationType).HOTEL}">
                                 호텔 번호
                                 <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].hotel}" placeholder="호텔 ID 입력" onclick="searchHotel(this)" />
                             </div>
