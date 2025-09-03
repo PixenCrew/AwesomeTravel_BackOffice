@@ -14,8 +14,8 @@ import org.springframework.stereotype.Repository;
 import renewal.awesome_travel_backoffice.notice.dto.request.NoticeSearchRequest;
 import renewal.awesome_travel_backoffice.notice.dto.response.NoticeResponseDto;
 import renewal.awesome_travel_backoffice.notice.dto.response.QNoticeResponseDto;
-import renewal.awesome_travel_backoffice.notice.utils.NoticeCategory;
-import renewal.awesome_travel_backoffice.notice.utils.SearchType;
+import renewal.common.entity.Notice.NoticeCategory;
+import renewal.common.entity.Notice.SearchType;
 import static renewal.common.entity.QNotice.notice;
 
 import lombok.RequiredArgsConstructor;
