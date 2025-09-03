@@ -137,7 +137,7 @@
                 <td th:text="${tour.count}">1212</td>
                 <td th:text="${tour.airPriceSum}">1212</td>
                 <td th:text="${tour.hotelPriceSum}">1212</td>
-                <td th:text="${tour.productId}">1212</td>
+                <td th:text="${tour.product != null} ? ${tour.product.id} : '-'"></td>
             </tr>
         </tbody>
     </table>
