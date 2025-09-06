@@ -15,9 +15,9 @@
 
         <div>
             <label for="airlineCode">항공사 코드:</label>
-            <select id="airlineCode" th:field="*{airline.code}" required>
+            <select id="airlineCode" th:field="*{airline}" required>
                 <option value="" disabled>-- 항공사 선택 --</option>
-                <option th:each="code : ${allAirlines}" th:value="${code}" th:text="${code}">
+                <option th:each="airline : ${allAirlines}" th:value="${airline.code}" th:text="${airline.code}">
                 </option>
             </select>
         </div>

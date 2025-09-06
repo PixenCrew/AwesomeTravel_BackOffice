@@ -1,6 +1,3 @@
-INSERT IGNORE INTO airline (`code`,`infant_seats_required`,`name_eng`,`name_kor`) 
-VALUES ('A123',0,'AAir','에이항공'),('B001',1,'BTravel','비여행');
-
 INSERT IGNORE INTO amenity (`id`,`name`) 
 VALUES (21,'24시간 보안 서비스'),(2,'24시간 프런트 데스크'),(44,'VIP 라운지'),(50,'골프 카트 대여'),(18,'골프장'),(29,'공항 셔틀'),(28,'기차역 셔틀'),(42,'다국어 구사 직원'),(36,'다리미 서비스'),(24,'도시 관광'),(47,'룸 내 다리미판'),(7,'룸 서비스'),(16,'마사지 서비스'),(1,'무료 Wi-Fi'),(38,'미니 냉장고'),(9,'미니바'),(19,'바비큐 시설'),(40,'발레파킹 서비스'),(27,'버스 정류장 셔틀'),(14,'비즈니스 센터'),(17,'사우나'),(34,'샤워실'),(20,'세면도구 제공'),(12,'세탁 서비스'),(5,'수영장'),(49,'스키 보관소'),(15,'스파'),(35,'아기 침대 제공'),(8,'애완동물 동반 가능'),(10,'에어컨'),(43,'외국어 신문 제공'),(33,'욕조'),(46,'운동장'),(41,'인쇄 서비스'),(39,'인터넷 사용 가능'),(45,'일일 청소 서비스'),(22,'자동판매기'),(37,'전용 욕실'),(30,'전자레인지'),(4,'조식 포함'),(3,'주차장'),(31,'커피 머신'),(26,'컨시어지 서비스'),(23,'택시 서비스'),(48,'피아노'),(6,'피트니스 센터'),(32,'헤어 드라이어'),(11,'헬스장'),(25,'현금 인출기'),(13,'회의실');
 
@@ -216,24 +213,24 @@ VALUES
 (5, 22, '2025-06-25', '2025-06-27', '2025-06-25 16:19:13', 'COMPLETED'),
 (5, 14, '2025-06-04', '2025-06-06', '2025-06-04 12:06:12', 'COMPLETED');
 
-INSERT IGNORE INTO airline (code, name_kor, name_eng, infant_seats_required) VALUES
-('AA', '아메리칸 항공',        'American Airlines',           false),
-('BA', '영국항공',            'British Airways',             false),
-('DL', '델타 항공',           'Delta Air Lines',             false),
-('EK', '에미레이트 항공',     'Emirates',                    false),
-('JL', '일본항공',            'Japan Airlines',              false),
-('AF', '에어프랑스',          'Air France',                  false),
-('LH', '루프트한자',          'Lufthansa',                   false),
-('SQ', '싱가포르항공',        'Singapore Airlines',          false),
-('CX', '캐세이퍼시픽',        'Cathay Pacific',              false),
-('UA', '유나이티드항공',      'United Airlines',             false),
-('QR', '카타르항공',          'Qatar Airways',               false),
-('EY', '에티하드항공',        'Etihad Airways',              false),
-('QF', '콴타스항공',          'Qantas',                      false),
-('NZ', '에어뉴질랜드',        'Air New Zealand',             false),
-('AC', '에어캐나다',          'Air Canada',                  false),
-('TK', '터키항공',            'Turkish Airlines',            false),
-('KL', 'KLM 네덜란드항공',    'KLM Royal Dutch Airlines',    false);
+INSERT IGNORE INTO airline (code, name_kor, name_eng, infant_seats_required, icon_url) VALUES
+('AA', '아메리칸 항공',        'American Airlines',           false, 'icon/AA.ico'),
+('BA', '영국항공',            'British Airways',             false, 'icon/BA.ico'),
+('DL', '델타 항공',           'Delta Air Lines',             false, 'icon/DL.ico'),
+('EK', '에미레이트 항공',     'Emirates',                    false, 'icon/EK.ico'),
+('JL', '일본항공',            'Japan Airlines',              false, 'icon/JL.ico'),
+('AF', '에어프랑스',          'Air France',                  false, 'icon/AF.ico'),
+('LH', '루프트한자',          'Lufthansa',                   false, 'icon/LH.ico'),
+('SQ', '싱가포르항공',        'Singapore Airlines',          false, 'icon/SQ.ico'),
+('CX', '캐세이퍼시픽',        'Cathay Pacific',              false, 'icon/CX.ico'),
+('UA', '유나이티드항공',      'United Airlines',             false, 'icon/UA.ico'),
+('QR', '카타르항공',          'Qatar Airways',               false, 'icon/QR.ico'),
+('EY', '에티하드항공',        'Etihad Airways',              false, 'icon/EY.ico'),
+('QF', '콴타스항공',          'Qantas',                      false, 'icon/QF.ico'),
+('NZ', '에어뉴질랜드',        'Air New Zealand',             false, 'icon/NZ.ico'),
+('AC', '에어캐나다',          'Air Canada',                  false, 'icon/AC.ico'),
+('TK', '터키항공',            'Turkish Airlines',            false, 'icon/TK.ico'),
+('KL', 'KLM 네덜란드항공',    'KLM Royal Dutch Airlines',    false, 'icon/KL.ico');
 
 INSERT IGNORE INTO air (id, flight_number, airline_code, depart_airport, depart_time, depart_date, arrive_airport, arrive_time, arrive_date, stopovers, status, flight_type, created_at, created_by, modified_at, modified_by)
 VALUES 

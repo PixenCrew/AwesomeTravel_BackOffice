@@ -46,9 +46,6 @@ public class AirService {
 
         airRepository.save(air);
     }
-    public List<String> getAllCompanies() {
-            return airlineRepository.findDistinctAirlines();
-    }
 
     @Transactional
     public void changeStatus(Long id, AirStatus status) {

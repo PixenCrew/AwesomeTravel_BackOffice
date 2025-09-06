@@ -12,8 +12,9 @@
         <label>항공사 선택:</label><br />
         <div style="height: 100px; padding: 5px; border: 1px solid black; overflow-y:scroll">
             <div th:each="airline : ${allAirlines}">
-                <input type="checkbox" th:field="*{airlines}" th:value="${airline}" th:id="${'air_' + airline}" />
-                <label th:for="${'air_' + airline}" th:text="${airline}"></label>
+                <input type="checkbox" th:field="*{airlines}" th:value="${airline.code}" th:id="${'air_' + airline.code}" />
+                <img th:src="${airline.iconUrl}" alt="" style="width:24px; height:24px; vertical-align:middle; margin-right:5px;" />
+                <label th:for="${'air_' + airline.code}" th:text="${airline.nameKor}"></label>
             </div>
         </div>
 

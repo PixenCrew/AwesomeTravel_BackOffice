@@ -31,6 +31,7 @@ import renewal.common.entity.SeatClass;
 import renewal.common.entity.SeatClass.SeatClassType;
 import renewal.awesome_travel_backoffice.air.repository.AirRepository;
 import renewal.awesome_travel_backoffice.air.repository.AirReservationRepository;
+import renewal.awesome_travel_backoffice.air.repository.AirlineRepository;
 import renewal.awesome_travel_backoffice.air.service.AirService;
 import renewal.common.repository.CityCodeRepository;
 
@@ -41,6 +42,7 @@ public class AirController {
 
     private final AirService airService;
     private final AirRepository airRepo;
+    private final AirlineRepository airlineRepo;
     private final AirReservationRepository airReservationRepo;
     private final CityCodeRepository cityRepo;
 
@@ -59,7 +61,8 @@ public class AirController {
                 : Sort.by(sortField).descending();
 
         // 1) 회사 목록 (체크박스용)
-        List<String> allAirlines = airService.getAllCompanies();
+        // List<String> allAirlines = airService.getAllCompanies();
+        List<Airline> allAirlines = airlineRepo.findAll();
         model.addAttribute("allAirlines", allAirlines);
 
         // 2) 페이징(50개 고정) + 필터링 로직
@@ -94,7 +97,7 @@ public class AirController {
         }
 
         // 회사 목록 (드롭박스용)
-        List<String> allAirlines = airService.getAllCompanies();
+        List<Airline> allAirlines = airlineRepo.findAll();
         model.addAttribute("allAirlines", allAirlines);
 
         // 도시코드
@@ -126,7 +129,7 @@ public class AirController {
         Air air = airRepo.getReferenceById(id);
 
         // 회사 목록 (드롭박스용)
-        List<String> allAirlines = airService.getAllCompanies();
+        List<Airline> allAirlines = airlineRepo.findAll();
         model.addAttribute("allAirlines", allAirlines);
 
         // 도시코드
