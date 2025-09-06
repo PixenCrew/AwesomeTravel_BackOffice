@@ -12,11 +12,19 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${imageLocation}")
     private String uploadDir;
 
+    @Value("${iconLocation}")
+    private String iconDir;
+
     @Override
     public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
         String fullPath = "file:" + uploadDir + "/";
         // System.out.println("fullPath : "+fullPath);
         registry.addResourceHandler("/images/**")
                 .addResourceLocations(fullPath);
+
+        // 항공사 아이콘 (공용)
+        String iconPath = "file:" + iconDir + "/";
+        registry.addResourceHandler("/icon/**")
+                .addResourceLocations(iconPath);
     }
 }
