@@ -3,7 +3,7 @@ package renewal.awesome_travel_backoffice.airPurchase.dto.response;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import renewal.common.entity.BasePurchase.PurchaseStatus;
+import renewal.common.entity.PurchaseBase.PurchaseStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AirPurchaseResponseDto {
+public class PurchaseAirResponseDto {
 
     private Long id;
 

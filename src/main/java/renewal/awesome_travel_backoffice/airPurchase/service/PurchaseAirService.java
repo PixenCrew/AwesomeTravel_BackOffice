@@ -8,22 +8,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import renewal.common.entity.SeatClass;
-import renewal.awesome_travel_backoffice.airPurchase.dto.request.AirPurchaseSearchCondition;
-import renewal.awesome_travel_backoffice.airPurchase.repository.AirPurchaseRepository;
-import renewal.common.entity.AirPurchase;
-import renewal.common.entity.BasePurchase.PurchaseStatus;
+import renewal.awesome_travel_backoffice.airPurchase.dto.request.PurchaseAirSearchCondition;
+import renewal.awesome_travel_backoffice.airPurchase.repository.PurchaseAirRepository;
+import renewal.common.entity.PurchaseAir;
+import renewal.common.entity.PurchaseBase.PurchaseStatus;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class AirPurchaseService {
+public class PurchaseAirService {
 
-    private final AirPurchaseRepository airPurchaseRepository;
+    private final PurchaseAirRepository airPurchaseRepository;
 
     /**
      *  어드민 - 전체 항공 예약 목록 조회 (페이징 + 정렬)
      */
-    public Page<AirPurchase> getAllPurchases(AirPurchaseSearchCondition condition, Pageable pageable) {
+    public Page<PurchaseAir> getAllPurchases(PurchaseAirSearchCondition condition, Pageable pageable) {
         return airPurchaseRepository.searchByCondition(condition, pageable);
     }
 
@@ -31,8 +31,8 @@ public class AirPurchaseService {
     /**
      *  어드민 - 단건 예약 상세 조회
      */
-    public AirPurchase getPurchase(Long id) {
-        AirPurchase purchase = airPurchaseRepository.findById(id)
+    public PurchaseAir getPurchase(Long id) {
+        PurchaseAir purchase = airPurchaseRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("구매 내역 없음"));
         return purchase;
     }
@@ -40,7 +40,7 @@ public class AirPurchaseService {
     // 관리자용 - 상태 변경
     @Transactional
     public void changePurchaseStatus(Long id, PurchaseStatus newStatus) {
-        AirPurchase purchase = airPurchaseRepository.findById(id)
+        PurchaseAir purchase = airPurchaseRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("구매 내역 없음"));
 
         PurchaseStatus currentStatus = purchase.getPurchaseStatus();
@@ -78,7 +78,7 @@ public class AirPurchaseService {
     /**
      *  내부 변환 메서드 (응답용 DTO로 변환)
      */
-    // private AirPurchaseResponseDto toDto(AirPurchase purchase) {
+    // private PurchaseAirResponseDto toDto(PurchaseAir purchase) {
     //     SeatClass seatClass = purchase.getSeatClass();
     //     Air air = seatClass.getAir();
 
@@ -122,7 +122,7 @@ public class AirPurchaseService {
     //                 );
     //             }).toList();
 
-    //     return new AirPurchaseResponseDto(
+    //     return new PurchaseAirResponseDto(
     //             purchase.getId(),
     //             airDto,
     //             purchase.getPurchaseStatus(),
