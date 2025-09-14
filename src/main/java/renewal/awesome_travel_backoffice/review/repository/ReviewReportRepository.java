@@ -1,4 +1,4 @@
-package renewal.awesome_travel_backoffice.comment.repository;
+package renewal.awesome_travel_backoffice.review.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -6,16 +6,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import renewal.common.entity.CommentReport;
-import renewal.common.entity.CommentReport.ReportReason;
+import renewal.common.entity.ReviewReport;
+import renewal.common.entity.ReviewReport.ReportReason;
 
-public interface CommentReportRepository extends JpaRepository<CommentReport, Long> {
+public interface ReviewReportRepository extends JpaRepository<ReviewReport, Long> {
 
-    @Query("SELECT r FROM CommentReport r " +
+    @Query("SELECT r FROM ReviewReport r " +
             "JOIN FETCH r.comment c " +
             "JOIN FETCH c.writer w " +
             "JOIN FETCH r.reporter u " +
             "WHERE (:reason IS NULL OR r.reason = :reason)")
-    Page<CommentReport> searchReports(@Param("reason") ReportReason reason, Pageable pageable);
+    Page<ReviewReport> searchReports(@Param("reason") ReportReason reason, Pageable pageable);
 
 }
