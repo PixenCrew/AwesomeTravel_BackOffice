@@ -93,7 +93,9 @@ public class AirController {
         // 빈 SeatClasses 배열
         for (SeatClass.SeatClassType seatType : SeatClassType.values()) {
             // SeatClass 종류만큼 SeatClass 객체 추가
-            air.getSeatClasses().add(new SeatClass(air, seatType, 0L, 0L, 0L));
+            SeatClass seat = new SeatClass();
+            seat.setClassType(seatType);
+            air.getSeatClasses().add(seat);
         }
 
         // 회사 목록 (드롭박스용)

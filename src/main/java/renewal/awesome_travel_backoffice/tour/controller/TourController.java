@@ -266,7 +266,9 @@ public class TourController {
             for (Location location : schedule.getLocations()) {
                 if (location.getLocationType() == LocationType.AIR) {
                     SeatClass sc = location.getSeatClass();
-                    airPriceSum += sc.getPrice();
+                    airPriceSum += sc.getPriceAdult();
+                    airPriceSum += sc.getPriceYouth();
+                    airPriceSum += sc.getPriceInfant();
                     sc.reserveSeats(requiredPersons);
                     location.setLocationType(LocationType.AIR);
                     airReservationRepo
