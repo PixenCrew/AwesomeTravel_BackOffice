@@ -12,7 +12,7 @@ import renewal.common.entity.ReviewReport.ReportReason;
 public interface ReviewReportRepository extends JpaRepository<ReviewReport, Long> {
 
     @Query("SELECT r FROM ReviewReport r " +
-            "JOIN FETCH r.comment c " +
+            "JOIN FETCH r.review c " +
             "JOIN FETCH c.writer w " +
             "JOIN FETCH r.reporter u " +
             "WHERE (:reason IS NULL OR r.reason = :reason)")
