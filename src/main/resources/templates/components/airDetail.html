@@ -65,7 +65,14 @@
         <div id="stopoverContainer">
             <div th:each="stop, iterStat : *{stopoverList}">
                 <div class="stopover-entry">
-                    <input type="text" th:field="*{stopoverList[__${iterStat.index}__]}" list="cityList" onchange="stripAfterPipe(this)" required />
+                    <input type="text" th:field="*{stopoverList[__${iterStat.index}__].arriveAirportCode}"
+                        list="cityList" onchange="stripAfterPipe(this)" required />
+                    <input type="datetime" th:field="*{stopoverList[__${iterStat.index}__].arriveTime}"
+                        onchange="calculateDuration(this)" required />
+                    <input type="number" th:field="*{stopoverList[__${iterStat.index}__].stopDurationMin}" required
+                        readonly />
+                    <input type="datetime" th:field="*{stopoverList[__${iterStat.index}__].departTime}"
+                        onchange="calculateDuration(this)" required />
                     <button type="button" onclick="removeStopover(this)">삭제</button>
                 </div>
             </div>
@@ -75,7 +82,8 @@
         <div>
             <label>상태:</label>
             <select th:field="*{status}">
-                <option th:each="st : ${T(renewal.common.entity.Air.AirStatus).values()}" th:value="${st}" th:text="${st}">STATUS</option>
+                <option th:each="st : ${T(renewal.common.entity.Air.AirStatus).values()}" th:value="${st}"
+                    th:text="${st}">STATUS</option>
             </select>
             <br />
         </div>
@@ -88,8 +96,14 @@
             <label>등급:</label>
             <input type="text" th:field="*{seatClasses[__${iterStat.index}__].classType}" readonly />
 
-            <label>가격:</label>
-            <input type="number" th:field="*{seatClasses[__${iterStat.index}__].price}" min="0" required />
+            <label>가격[성인]:</label>
+            <input type="number" th:field="*{seatClasses[__${iterStat.index}__].priceAdult}" min="0" required />
+
+            <label>가격[청소년]:</label>
+            <input type="number" th:field="*{seatClasses[__${iterStat.index}__].priceYouth}" min="0" required />
+
+            <label>가격[영유아]:</label>
+            <input type="number" th:field="*{seatClasses[__${iterStat.index}__].priceInfant}" min="0" required />
 
             <label>최대 좌석 수:</label>
             <input type="number" th:field="*{seatClasses[__${iterStat.index}__].maxSeats}" min="0" required />
@@ -128,31 +142,79 @@
 
         function addStopover() {
             const container = document.getElementById("stopoverContainer");
+            const idx = stopoverCount;
+
+            // wrapper div
             const stopoverDiv = document.createElement("div");
             stopoverDiv.className = "stopover-entry";
 
-            stopoverDiv.innerHTML = `
-            <input type="text"
-                   name="stopoverList[${stopoverCount}]"
-                   list="cityList"
-                   onchange="stripAfterPipe(this)"
-                   required />
-            <button type="button" onclick="removeStopover(this)">삭제</button>
-            `;
+            // === arriveAirportCode ===
+            const arriveInput = document.createElement("input");
+            arriveInput.type = "text";
+            arriveInput.name = `stopoverList[${idx}].arriveAirportCode`;
+            arriveInput.required = true;
+            arriveInput.setAttribute("list", "cityList");
+            arriveInput.addEventListener("change", () => stripAfterPipe(arriveInput));
+
+            // === arriveTime ===
+            const arriveTimeInput = document.createElement("input");
+            arriveTimeInput.type = "datetime-local";
+            arriveTimeInput.name = `stopoverList[${idx}].arriveTime`;
+            arriveTimeInput.required = true;
+            arriveTimeInput.addEventListener("change", () => calculateDuration(arriveTimeInput));
+
+            // === stopDurationMin ===
+            const durationInput = document.createElement("input");
+            durationInput.type = "number";
+            durationInput.name = `stopoverList[${idx}].stopDurationMin`;
+            durationInput.required = true;
+            durationInput.readOnly = true;
+
+            // === departTime ===
+            const departTimeInput = document.createElement("input");
+            departTimeInput.type = "datetime-local";
+            departTimeInput.name = `stopoverList[${idx}].departTime`;
+            departTimeInput.required = true;
+            departTimeInput.addEventListener("change", () => calculateDuration(departTimeInput));
+
+            // === 삭제 버튼 ===
+            const removeBtn = document.createElement("button");
+            removeBtn.type = "button";
+            removeBtn.textContent = "삭제";
+            removeBtn.addEventListener("click", () => removeStopover(removeBtn));
+
+            stopoverDiv.append(
+                arriveInput,
+                arriveTimeInput,
+                durationInput,
+                departTimeInput,
+                removeBtn
+            );
 
             container.appendChild(stopoverDiv);
             stopoverCount++;
-            updateStopoverCount();
+            updateStopoverCountField();
         }
 
         function removeStopover(button) {
             button.parentElement.remove();
-            stopoverCount = Math.max(0, stopoverCount - 1);
-            updateStopoverCount();
+            stopoverCount--;
+            updateStopoverCountField();
+            reIndexStopovers();
         }
 
-        function updateStopoverCount() {
+        function updateStopoverCountField() {
             document.getElementById("stopovers").value = stopoverCount;
+        }
+
+        function reIndexStopovers() {
+            const entries = document.querySelectorAll("#stopoverContainer .stopover-entry");
+            entries.forEach((entry, idx) => {
+                entry.querySelectorAll("input").forEach(input => {
+                    input.name = input.name.replace(/stopoverList\[\d+\]/,
+                        `stopoverList[${idx}]`);
+                });
+            });
         }
 
         function searchAir(button) {
@@ -173,9 +235,36 @@
                 window.__lastSeatInput__.value = selectedId;
             }
         }
+
+        function calculateDuration(changedInput) {
+            const entry = changedInput.closest('.stopover-entry');
+            if (!entry) return;
+
+            const arriveEl = entry.querySelector('input[name$=".arriveTime"]');
+            const departEl = entry.querySelector('input[name$=".departTime"]');
+            const durationEl = entry.querySelector('input[name$=".stopDurationMin"]');
+
+            if (!arriveEl?.value || !departEl?.value) return;
+
+            // 브라우저 호환성을 위해 type="datetime-local"을 권장
+            const arriveDate = new Date(arriveEl.value);
+            const departDate = new Date(departEl.value);
+
+            if (isNaN(arriveDate) || isNaN(departDate)) return;
+
+            // 출발 - 도착 (분 단위)
+            let diffMin = Math.round((departDate - arriveDate) / 60000);
+
+            // 출발이 도착보다 빠르거나 같으면 0으로 고정
+            if (diffMin < 0) diffMin = 0;
+
+            durationEl.value = diffMin;
+        }
+
     </script>
 
     <datalist id="cityList">
-        <option th:each="cc : ${cityCode}" th:value="${cc.code} + ' | ' + ${cc.country} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
+        <option th:each="cc : ${cityCode}"
+            th:value="${cc.code} + ' | ' + ${cc.country} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
     </datalist>
 </div>
