@@ -180,7 +180,7 @@
                     <td th:text="${seatClass.air.status}">ACTIVE</td>
                     <td th:text="${seatClass.id}">123</td>
                     <td th:text="${seatClass.classType}">FIRST</td>
-                    <td th:text="${seatClass.price}">50000</td>
+                    <td th:text="${seatClass.priceAdult}">50000</td>
                     <td th:text="${seatClass.maxSeats}">100</td>
                     <td th:text="${seatClass.availableSeats}">10</td>
                 </tr>
@@ -212,7 +212,7 @@
     <script src="/js/util.js"></script>
 
     <datalist id="cityList">
-        <option th:each="cc : ${cityCode}" th:value="${cc.code} + ' | ' + ${cc.country} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
+        <option th:each="cc : ${cityCode}" th:value="${cc.airportCode} + ' | ' + ${cc.airportEng} + ' | ' + ${cc.countryCode} + ' | ' + ${cc.countryKor}"></option>
     </datalist>
 
     <datalist id="seatClassList">

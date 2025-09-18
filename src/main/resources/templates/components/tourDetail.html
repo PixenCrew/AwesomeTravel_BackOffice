@@ -33,17 +33,23 @@
         <label for="endDate">종료일:</label>
         <input type="date" th:field="*{endDate}" min="2000-04-01" required /><br>
 
-        <label for="price">가격:</label>
-        <input type="number" th:field="*{price}" min="1" required /><br>
+        <label for="price">가격[성인]:</label>
+        <input type="number" th:field="*{priceAdult}" min="1" required /><br>
+
+        <label for="price">가격[청소년]:</label>
+        <input type="number" th:field="*{priceYouth}" min="1" required /><br>
+
+        <label for="price">가격[영유아]:</label>
+        <input type="number" th:field="*{priceInfant}" min="1" required /><br>
 
         <label for="country">국가:</label>
         <input type="text" th:field="*{country}" onchange="stripAfterPipe(this)" list="countryList" required /><br>
 
-        <label for="count">인원:</label>
-        <input type="number" th:field="*{count}" min="1" required /><br>
+        <label for="count">최대 인원:</label>
+        <input type="number" th:field="*{maxCapacity}" min="1" required /><br>
 
-        <label for="airPriceSum">항공권 가격 합:</label>
-        <input type="number" th:field="*{airPriceSum}" min="0" disabled /><br>
+        <label for="count">최소 인원:</label>
+        <input type="number" th:field="*{minCapacity}" min="1" required /><br>
 
         <label for="hotelPriceSum">호텔 가격 합:</label>
         <input type="number" th:field="*{hotelPriceSum}" min="0" disabled /><br>
@@ -358,24 +364,24 @@
             // const dateInput = containerDiv.closest("div").querySelector("input[name$='.date']");
 
             // 3. 최상위 블록의 인원수 count
-            const countInput = document.querySelector('#count');
+            // const countInput = document.querySelector('#count');
 
             // 4. 값 읽기
             const fromValue = fromInput?.value || null;
             const toValue = toInput?.value || null;
             const dateValue = dateInput?.value || null;
-            const countValue = countInput?.value || null;
+            // const countValue = countInput?.value || null;
 
             console.log("출발지 (from):", fromValue);
             console.log("도착지 (to):", toValue);
             console.log("날짜 (date):", dateValue);
-            console.log("인원수 (count):", countValue);
+            // console.log("인원수 (count):", countValue);
 
-            if (fromValue != null && toValue != null && dateValue != null && countValue != null) {
+            if (fromValue != null && toValue != null && dateValue != null) {
                 console.log("searchAir called for:", input.value);
                 searchTarget = input;
                 const popup = window.open(
-                    '/air/search?departAirport=' + fromValue + '&arriveAirport=' + toValue + '&departDateFrom=' + dateValue + '&departDateTo=' + dateValue + '&availableSeats=' + countValue, // URL + 파라미터
+                    '/air/search?departAirport=' + fromValue + '&arriveAirport=' + toValue + '&departDateFrom=' + dateValue + '&departDateTo=' + dateValue, // URL + 파라미터
                     'airSearchPopup',
                     'width=1200,height=800'
                 );
@@ -397,22 +403,22 @@
             const dateInput = schedulePoint.querySelector('input[type="date"]');
 
             // 3. 최상위 블록의 인원수 count
-            const countInput = document.querySelector('#count');
+            // const countInput = document.querySelector('#count');
 
             // 4. 값 읽기
             const cityValue = cityInput?.value || null;
             const dateValue = dateInput?.value || null;
-            const countValue = countInput?.value || null;
+            // const countValue = countInput?.value || null;
 
             console.log("도시 (city):", cityValue);
             console.log("날짜 (date):", dateValue);
-            console.log("인원수 (count):", countValue);
+            // console.log("인원수 (count):", countValue);
 
-            if (cityValue != null && dateValue != null && countValue != null) {
+            if (cityValue != null && dateValue != null) {
                 console.log("searchHotel called for:", input.value);
                 searchTarget = input;
                 const popup = window.open(
-                    '/hotel/search?city=' + cityValue + '&targetDate=' + dateValue + '&requiredPersons=' + countValue, // URL + 파라미터
+                    '/hotel/search?city=' + cityValue + '&targetDate=' + dateValue, // URL + 파라미터
                     'hotelSearchPopup',
                     'width=1200,height=800'
                 );
@@ -458,7 +464,7 @@
     </datalist>
 
     <datalist id="cityList">
-        <option th:each="cc : ${cityCode}" th:value="${cc.code} + ' | ' + ${cc.country} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
+        <option th:each="cc : ${cityCode}" th:value="${cc.airportCode} + ' | ' + ${cc.airportEng} + ' | ' + ${cc.countryCode} + ' | ' + ${cc.countryKor}"></option>
     </datalist>
 
     <datalist id="types">

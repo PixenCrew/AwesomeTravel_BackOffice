@@ -126,6 +126,6 @@
     
     <datalist id="cityList">
         <option th:each="cc : ${cityCode}"
-            th:value="${cc.code} + ' | ' + ${cc.country} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
+            th:value="${cc.airportCode} + ' | ' + ${cc.countryCode} + ' | ' + ${cc.countryEng} + ' | ' + ${cc.countryKor}"></option>
     </datalist>
 </div>
