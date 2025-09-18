@@ -109,7 +109,6 @@
                 <!-- <th>코스 포인트</th> -->
                 <th>국가</th>
                 <th>인원</th>
-                <th>항공권 가격 합</th>
                 <th>호텔 가격 합</th>
                 <th>패키지 상품 ID</th>
             </tr>
@@ -118,13 +117,13 @@
         <tbody>
             <th:block th:each="tour : ${tourPage.content}">
                 <!-- <tr th:onclick="|window.location.href='@{/air/{id}(id=${seatClass.air.id})}'|" style="cursor:pointer;"> -->
-                <tr th:onclick="${isSelectionPage} ? |returnPrice(${tour.id},${tour.price},${tour.airPriceSum},${tour.hotelPriceSum})| : |window.location.href='@{/tour/{id}(id=${tour.id})}'|" style="cursor:pointer;">
+                <tr th:onclick="${isSelectionPage} ? |returnPrice(${tour.id},${tour.priceAdult},${tour.hotelPriceSum})| : |window.location.href='@{/tour/{id}(id=${tour.id})}'|" style="cursor:pointer;">
                 <td th:text="${tour.id}">1</td>
                 <td th:text="${tour.startDate}">2000-01-01</td>
                 <td th:text="${tour.endDate}">2000-12-31</td>
                 <td th:text="${tour.name}">투어</td>
                 <td th:text="${tour.company}">Awesome</td>
-                <td th:text="${tour.price}">100000</td>
+                <td th:text="${tour.priceAdult}">100000</td>
                 <!-- <td>
                     <ul>
                         <li th:each="pt : ${tour.schedules}" type="none">
@@ -134,8 +133,7 @@
                     </ul>
                 </td> -->
                 <td th:text="${tour.country}">KR</td>
-                <td th:text="${tour.count}">1212</td>
-                <td th:text="${tour.airPriceSum}">1212</td>
+                <td th:text="${tour.maxCapacity}">1212</td>
                 <td th:text="${tour.hotelPriceSum}">1212</td>
                 <td th:text="${tour.product != null} ? ${tour.product.id} : '-'"></td>
             </tr>
@@ -169,7 +167,7 @@
     <script src="/js/util.js"></script>
 
     <datalist id="cityList">
-        <option th:each="cc : ${cityCode}" th:value="${cc.code} + ' | ' + ${cc.country} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
+        <option th:each="cc : ${cityCode}" th:value="${cc.airportCode} + ' | ' + ${cc.airportEng} + ' | ' + ${cc.countryCode} + ' | ' + ${cc.countryKor}"></option>
     </datalist>
 
     <datalist id="countryList">

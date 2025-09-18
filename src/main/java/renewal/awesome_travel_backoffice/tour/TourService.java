@@ -67,22 +67,33 @@ public class TourService {
         return tourRepository.findAll(spec, pageable);
     }
 
-    public void cancelHotelAir(Long tourId) throws Exception{
+    // public void cancelHotelAir(Long tourId) throws Exception{
 
-        // 연결된 Air, Hotel 예약 CANCELED로 변경
-        List<AirReservation> airReserves = airReservationRepo.findByTourId(tourId);
-        for (AirReservation reserve : airReserves) {
-            reserve.setStatus(AirReservationStatus.CANCELLED);
-            // SeatClass 잔여좌석 복원
-            reserve.getSeatClass().cancelSeats(reserve.getSeatCount());
-        }
-        airReservationRepo.saveAll(airReserves);
+    //     // 연결된 Air, Hotel 예약 CANCELED로 변경
+    //     List<AirReservation> airReserves = airReservationRepo.findByTourId(tourId);
+    //     for (AirReservation reserve : airReserves) {
+    //         reserve.setStatus(AirReservationStatus.CANCELLED);
+    //         // SeatClass 잔여좌석 복원
+    //         reserve.getSeatClass().cancelSeats(reserve.getSeatCount());
+    //     }
+    //     airReservationRepo.saveAll(airReserves);
 
+    //     List<HotelReservation> hotelReserves = hotelReservationRepo.findByTourId(tourId);
+    //     for (HotelReservation reserve : hotelReserves) {
+    //         reserve.setStatus(HotelReservationStatus.CANCELLED);
+    //     }
+    //     hotelReservationRepo.saveAll(hotelReserves);
+    // }
+
+    public void cancelHotel(Long tourId) throws Exception{
+
+        // 연결된 Hotel 예약 CANCELED로 변경
         List<HotelReservation> hotelReserves = hotelReservationRepo.findByTourId(tourId);
         for (HotelReservation reserve : hotelReserves) {
             reserve.setStatus(HotelReservationStatus.CANCELLED);
         }
         hotelReservationRepo.saveAll(hotelReserves);
+
     }
 
 }

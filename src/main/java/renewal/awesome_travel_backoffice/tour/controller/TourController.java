@@ -19,10 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
-import renewal.common.entity.AirReservation;
-import renewal.common.entity.AirReservation.AirReservationStatus;
-import renewal.common.entity.SeatClass;
-import renewal.awesome_travel_backoffice.air.repository.AirReservationRepository;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelRepository;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelReservationRepository;
 import renewal.awesome_travel_backoffice.product.repository.ProductRepository;
@@ -49,7 +45,6 @@ public class TourController {
     private final TourService tourService;
     private final HotelRepository hotelRepo;
     private final HotelReservationRepository hotelReservationRepo;
-    private final AirReservationRepository airReservationRepo;
     private final ProductRepository productRepo;
 
     private final CountryCodeRepository countryRepo;
@@ -200,7 +195,8 @@ public class TourController {
         try {
 
             // 호텔 취소, 항공 취소 및 잔여좌석 복원
-            tourService.cancelHotelAir(id);
+            // tourService.cancelHotelAir(id);
+            tourService.cancelHotel(id);
 
             // 투어 삭제처리
             tourRepo.deleteById(id);
@@ -247,16 +243,19 @@ public class TourController {
 
     // 투어 공용함수 분리
     protected Tour setTour(Tour tour) throws Exception {
-        Long requiredPersons = tour.getCount(); // 인원수
+        Long requiredPersons = tour.getMaxCapacity(); // 최대 인원수
         Long hotelId = null; // 호텔
         LocalDate startDate = null;
         LocalDate endDate = null;
 
-        Long airPriceSum = 0L;
+        // Long airPriceSum = 0L;
         Long hotelPriceSum = 0L;
 
         // 기존 항공권, 호텔 예약 CANCEL 처리
-        tourService.cancelHotelAir(tour.getId());
+        // tourService.cancelHotelAir(tour.getId());
+
+        // 호텔 예약 CANCEL 처리
+        tourService.cancelHotel(tour.getId());
 
         // Schedules 순회
         for (Schedule schedule : tour.getSchedules()) {
@@ -265,14 +264,14 @@ public class TourController {
             // Locations 순회
             for (Location location : schedule.getLocations()) {
                 if (location.getLocationType() == LocationType.AIR) {
-                    SeatClass sc = location.getSeatClass();
-                    airPriceSum += sc.getPriceAdult();
-                    airPriceSum += sc.getPriceYouth();
-                    airPriceSum += sc.getPriceInfant();
-                    sc.reserveSeats(requiredPersons);
-                    location.setLocationType(LocationType.AIR);
-                    airReservationRepo
-                            .save(new AirReservation(sc, tour.getId(), requiredPersons, AirReservationStatus.BOOKED));
+                    // SeatClass sc = location.getSeatClass();
+                    // airPriceSum += sc.getPriceAdult();
+                    // airPriceSum += sc.getPriceYouth();
+                    // airPriceSum += sc.getPriceInfant();
+                    // sc.reserveSeats(requiredPersons);
+                    // location.setLocationType(LocationType.AIR);
+                    // airReservationRepo
+                    //         .save(new AirReservation(sc, tour.getId(), requiredPersons, AirReservationStatus.BOOKED));
                 } else if (location.getLocationType() == LocationType.HOTEL) {
                     location.setLocationType(LocationType.HOTEL);
                     Long currentHotelId = location.getHotel().getId();
@@ -297,6 +296,7 @@ public class TourController {
             }
             endDate = currentDate;
         }
+
         // 마지막 hotel 등록
         if (hotelId != null) {
             Hotel hotel = hotelRepo.findById(hotelId).get();
@@ -304,8 +304,8 @@ public class TourController {
                     HotelReservationStatus.BOOKED));
         }
 
-        tour.updateAirPriceSum(airPriceSum * tour.getCount()); // 가격 총합 x 인원수
-        tour.updateHotelPriceSum(hotelPriceSum * tour.getCount());
+        // tour.updateAirPriceSum(airPriceSum * tour.getCount()); // 가격 총합 x 인원수
+        tour.updateHotelPriceSum(hotelPriceSum * tour.getMaxCapacity());
 
         return tour;
     }

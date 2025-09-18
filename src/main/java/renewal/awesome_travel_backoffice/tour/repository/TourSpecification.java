@@ -64,15 +64,15 @@ public class TourSpecification {
         };
     }
 
-    // Tour.price BETWEEN min AND max
+    // tour.priceAdult BETWEEN min AND max
     public static Specification<Tour> priceBetween(BigDecimal min, BigDecimal max) {
         return (root, query, builder) -> {
             if (min != null && max != null) {
-                return builder.between(root.get("price"), min, max);
+                return builder.between(root.get("priceAdult"), min, max);
             } else if (min != null) {
-                return builder.greaterThanOrEqualTo(root.get("price"), min);
+                return builder.greaterThanOrEqualTo(root.get("priceAdult"), min);
             } else if (max != null) {
-                return builder.lessThanOrEqualTo(root.get("price"), max);
+                return builder.lessThanOrEqualTo(root.get("priceAdult"), max);
             } else {
                 return null;
             }
@@ -94,14 +94,14 @@ public class TourSpecification {
     }
 
     // Tour.count BETWEEN min AND max
-    public static Specification<Tour> countBetween(Long min, Long max) {
+    public static Specification<Tour> maxCapacityBetween(Long min, Long max) {
         return (root, query, builder) -> {
             if (min != null && max != null) {
-                return builder.between(root.get("count"), min, max);
+                return builder.between(root.get("maxCapacity"), min, max);
             } else if (min != null) {
-                return builder.greaterThanOrEqualTo(root.get("count"), min);
+                return builder.greaterThanOrEqualTo(root.get("maxCapacity"), min);
             } else if (max != null) {
-                return builder.lessThanOrEqualTo(root.get("count"), max);
+                return builder.lessThanOrEqualTo(root.get("maxCapacity"), max);
             } else {
                 return null;
             }

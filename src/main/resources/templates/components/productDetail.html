@@ -31,10 +31,7 @@
             <input type="text" th:field="*{tour.endDate}" disabled /><br>
 
             <label for="tourPrice">투어 가격 :</label>
-            <input type="text" th:field="*{tour.price}" disabled /><br>
-
-            <label for="tourPrice">항공권 가격 :</label>
-            <input type="text" th:field="*{tour.airPriceSum}" disabled /><br>
+            <input type="text" th:field="*{tour.priceAdult}" disabled /><br>
 
             <label for="tourPrice">호텔 가격 :</label>
             <input type="text" th:field="*{tour.hotelPriceSum}" disabled /><br>
@@ -93,10 +90,10 @@
     <script>
 
         // Tour가 지정된 Product인 경우 가격 합
-        let tourPrice = Number(document.getElementById("tour.price").value);
-        let airPriceSum = Number(document.getElementById("tour.airPriceSum").value);
+        let tourPrice = Number(document.getElementById("tour.priceAdult").value);
+        // let airPriceSum = Number(document.getElementById("tour.airPriceSum").value);
         let hotelPriceSum = Number(document.getElementById("tour.hotelPriceSum").value);
-        document.getElementById("totalPrice").value = tourPrice + airPriceSum + hotelPriceSum;
+        document.getElementById("totalPrice").value = tourPrice + hotelPriceSum;
 
 
         function searchTour() {
@@ -107,13 +104,12 @@
             );
         }
 
-        function setPrice(id, tourPrice, airPrice, hotelPrice) {
-            console.log(`id, tourPrice, airPrice, hotelPrice: ${id}, ${tourPrice}, ${airPrice}, ${hotelPrice}`);
+        function setPrice(id, tourPrice, hotelPrice) {
+            console.log(`id, tourPrice, airPrice, hotelPrice: ${id}, ${tourPrice}, ${hotelPrice}`);
             document.getElementById("tour.id").value = id;
-            document.getElementById("tour.price").value = tourPrice;
-            document.getElementById("tour.airPriceSum").value = airPrice;
+            document.getElementById("tour.priceAdult").value = tourPrice;
             document.getElementById("tour.hotelPriceSum").value = hotelPrice;
-            document.getElementById("totalPrice").value = tourPrice + airPrice + hotelPrice;
+            document.getElementById("totalPrice").value = tourPrice + hotelPrice;
         }
 
         function deleteProduct(id) {
@@ -239,7 +235,7 @@
     </datalist>
 
     <datalist id="cityList">
-        <option th:each="cc : ${cityCode}" th:value="${cc.code} + ' | ' + ${cc.country} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
+        <option th:each="cc : ${cityCode}" th:value="${cc.airportCode} + ' | ' + ${cc.airportEng} + ' | ' + ${cc.countryCode} + ' | ' + ${cc.countryKor}"></option>
     </datalist>
 
 </div>
