@@ -10,9 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import renewal.common.entity.AirReservation;
-import renewal.common.entity.AirReservation.AirReservationStatus;
-import renewal.awesome_travel_backoffice.air.repository.AirReservationRepository;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelReservationRepository;
 import renewal.awesome_travel_backoffice.tour.dto.TourFilterDTO;
 import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
@@ -26,7 +23,6 @@ import renewal.common.entity.Tour;
 public class TourService {
 
     private final TourRepository tourRepository;
-    private final AirReservationRepository airReservationRepo;
     private final HotelReservationRepository hotelReservationRepo;
     
     public List<String> getAllCompanies() {
@@ -58,7 +54,7 @@ public class TourService {
             spec = spec.and(TourSpecification.countryContains(filter.getCountry()));
         }
         if (filter.getStartCount() != null || filter.getEndCount() != null) {
-            spec = spec.and(TourSpecification.countBetween(filter.getStartCount(), filter.getEndCount()));
+            spec = spec.and(TourSpecification.maxCapacityBetween(filter.getStartCount(), filter.getEndCount()));
         }
         if (filter.isFindOrphan()) {
             spec = spec.and(TourSpecification.productIsEmptyOrNull());
