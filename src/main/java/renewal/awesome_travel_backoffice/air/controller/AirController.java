@@ -153,11 +153,7 @@ public class AirController {
             air.setFlightType(FlightType.STOP_OVER);
         }
 
-        // seatClass 지정
-        for (SeatClass seat : air.getSeatClasses()) {
-            seat.setAir(air);
-        }
-        airRepo.save(air);
+        airService.createAir(air);
 
         return "redirect:/air";
     }
@@ -194,7 +190,7 @@ public class AirController {
     @GetMapping("/search")
     public String searchAir(
             @ModelAttribute("filter") AirFilterDTO filter, // 필터 DTO를 바인딩
-            @RequestParam(defaultValue = "air.departDate") String sortField,
+            @RequestParam(defaultValue = "air.departDateTime") String sortField,
             @RequestParam(defaultValue = "asc") String sortDir,
             @RequestParam(defaultValue = "0") int page, // 페이지 번호
             Model model) {

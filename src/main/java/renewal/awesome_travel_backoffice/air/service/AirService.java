@@ -1,5 +1,11 @@
 package renewal.awesome_travel_backoffice.air.service;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -9,7 +15,10 @@ import org.springframework.util.StringUtils;
 
 import renewal.awesome_travel_backoffice.air.dto.AirFilterDTO;
 import renewal.common.entity.Air;
+import renewal.common.entity.CityCode;
+import renewal.common.entity.FlightItem;
 import renewal.common.entity.Air.AirStatus;
+import renewal.common.entity.Air.FlightSegment;
 import renewal.common.entity.SeatClass;
 import renewal.awesome_travel_backoffice.air.repository.AirRepository;
 import renewal.awesome_travel_backoffice.air.repository.AirSpecification;
@@ -40,6 +49,33 @@ public class AirService {
 
         for (SeatClass seat : air.getSeatClasses()) {
             seat.setAir(air);
+        }
+
+        // 1. 전체 소요시간 계산
+        air.setFlightDuration(
+            calcDuration(air.getDepartDateTime(), air.getDepartAirport(), air.getArriveDateTime(), air.getArriveAirport())
+            );
+
+        // 2. 각 segment별 소요시간 계산
+        for (FlightSegment segment : air.getFlightSegments()) {
+            segment.setFlightDuration(
+                calcDuration(segment.getDepartDateTime(), segment.getDepartAirport(), segment.getArriveDateTime(), segment.getArriveAirport())
+                );
+        }
+
+        // 3. segment 사이 대기시간 계산
+        List<FlightSegment> segments = air.getFlightSegments();
+
+        for (int i = 0; i < segments.size()-1; i++) {
+            FlightSegment currentSegment = segments.get(i);
+            LocalDateTime currentArriveTime = currentSegment.getArriveDateTime();
+            CityCode currentArriveAirport = currentSegment.getArriveAirport();
+            
+            FlightSegment nextSegment = segments.get(i+1);
+            LocalDateTime nextDepartTime = nextSegment.getDepartDateTime();
+            CityCode nextDepartAirport = nextSegment.getDepartAirport();
+
+            currentSegment.setWaitDuration(calcDuration(currentArriveTime, currentArriveAirport, nextDepartTime, nextDepartAirport));
         }
 
         airRepository.save(air);
@@ -83,10 +119,10 @@ public class AirService {
             spec = spec.and(AirSpecification.getInfantSeatsRequired(filter.getInfantSeatsRequired()));
         }
 
-        // departDate BETWEEN from AND to
-        if (filter.getDepartDateFrom() != null || filter.getDepartDateTo() != null) {
-            spec = spec.and(AirSpecification.departDateBetween(
-                filter.getDepartDateFrom(), filter.getDepartDateTo()));
+        // departDateTime BETWEEN from AND to
+        if (filter.getDepartDateTimeFrom() != null || filter.getDepartDateTimeTo() != null) {
+            spec = spec.and(AirSpecification.departDateTimeBetween(
+                filter.getDepartDateTimeFrom(), filter.getDepartDateTimeTo()));
         }
 
         // arriveDate BETWEEN from AND to
@@ -138,5 +174,17 @@ public class AirService {
         }
 
         return seatClassRepository.findAll(spec, pageable);
+    }
+
+    // (시간+도시코드)로 소요시간[분] 계산
+    public Long calcDuration(LocalDateTime departTime, CityCode departCode, LocalDateTime arriveTime, CityCode arriveCode){
+        ZoneOffset departOffset = ZoneOffset.ofTotalSeconds((int) (departCode.getUtcOffsetMins() * 60));
+        ZoneOffset arriveOffset = ZoneOffset.ofTotalSeconds((int) (arriveCode.getUtcOffsetMins() * 60));
+
+        Instant departUtc = departTime.toInstant(departOffset);
+        Instant arriveUtc = arriveTime.toInstant(arriveOffset);
+        
+        Long result = Duration.between(departUtc, arriveUtc).toMinutes();
+        return result;
     }
 }

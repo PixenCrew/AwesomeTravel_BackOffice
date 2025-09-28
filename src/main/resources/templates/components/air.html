@@ -28,9 +28,9 @@
 
         <!-- 출발일 범위 (isSelectionPage이면 수정 불가)-->
         <label>출발일 (From):</label>
-        <input type="date" th:field="*{departDateFrom}" th:attr="readonly=${isSelectionPage} ? 'readonly' : null" />
+        <input type="date" th:field="*{departDateTimeFrom}" th:attr="readonly=${isSelectionPage} ? 'readonly' : null" />
         <label>출발일 (To):</label>
-        <input type="date" th:field="*{departDateTo}" th:attr="readonly=${isSelectionPage} ? 'readonly' : null" />
+        <input type="date" th:field="*{departDateTimeTo}" th:attr="readonly=${isSelectionPage} ? 'readonly' : null" />
         <br />
 
         <!-- 도착일 범위 -->
@@ -124,12 +124,11 @@
                 <th>ID</th>
                 <th>출발지</th>
                 <th>
-                    <a href="#" data-sortfield="air.departDate" th:data-sortdir="${sortField=='air.departDate' and sortDir=='asc' ? 'asc' : 'desc'}" onclick="toggleSort(this, event)">
+                    <a href="#" data-sortfield="air.departDateTime" th:data-sortdir="${sortField=='air.departDateTime' and sortDir=='asc' ? 'asc' : 'desc'}" onclick="toggleSort(this, event)">
                         출발일
-                        <span th:if="${sortField=='air.departDate'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
+                        <span th:if="${sortField=='air.departDateTime'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
                     </a>
                 </th>
-                <th>출발시간</th>
                 <th>도착지</th>
                 <th>
                     <a href="#" data-sortfield="air.arriveDate" th:data-sortdir="${sortField=='air.arriveDate' and sortDir=='asc' ? 'asc' : 'desc'}" onclick="toggleSort(this, event)">
@@ -137,7 +136,6 @@
                         <span th:if="${sortField=='air.arriveDate'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
                     </a>
                 </th>
-                <th>도착시간</th>
                 <th>코드</th>
                 <th>항공사</th>
                 <th>항공사(한글)</th>
@@ -164,12 +162,10 @@
                 <!-- <tr th:onclick="|window.location.href='@{/air/{id}(id=${seatClass.air.id})}'|" style="cursor:pointer;"> -->
                 <tr th:onclick="${isSelectionPage} ? |returnNumber(${seatClass.id})| : |window.location.href='@{/air/{id}(id=${seatClass.air.id})}'|" style="cursor:pointer;">
                     <td th:text="${seatClass.air.id}">1</td>
-                    <td th:text="${seatClass.air.departAirport}">1</td>
-                    <td th:text="${seatClass.air.departDate}">2025-01-01</td>
-                    <td th:text="${seatClass.air.departTime}">01:00</td>
-                    <td th:text="${seatClass.air.arriveAirport}">1</td>
-                    <td th:text="${seatClass.air.arriveDate}">2025-01-02</td>
-                    <td th:text="${seatClass.air.arriveTime}">01:00</td>
+                    <td th:text="${seatClass.air.departAirport.airportCode}">1</td>
+                    <td th:text="${seatClass.air.departDateTime}">2025-01-02 01:00</td>
+                    <td th:text="${seatClass.air.arriveAirport.airportCode}">1</td>
+                    <td th:text="${seatClass.air.arriveDateTime}">2025-01-02 01:00</td>
                     <td th:text="${seatClass.air.flightNumber}">AB123</td>
                     <td th:text="${seatClass.air.airline.code}">AAA</td>
                     <td th:text="${seatClass.air.airline.nameKor}">좋은항공</td>

@@ -1,19 +1,25 @@
 package renewal.awesome_travel_backoffice.air.util;
 
 import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import renewal.awesome_travel_backoffice.air.repository.AirRepository;
 import renewal.awesome_travel_backoffice.air.repository.AirlineRepository;
 import renewal.awesome_travel_backoffice.air.repository.SeatClassRepository;
+import renewal.awesome_travel_backoffice.air.service.AirService;
 import renewal.common.entity.Air;
 import renewal.common.entity.Airline;
 import renewal.common.entity.CityCode;
 import renewal.common.entity.SeatClass;
+import renewal.common.entity.Air.FlightType;
 import renewal.common.repository.CityCodeRepository;
 
 @Configuration
@@ -24,8 +30,10 @@ public class RandomGenerator {
             AirRepository airRepo,
             AirlineRepository airlineRepo,
             CityCodeRepository cityRepo,
-            SeatClassRepository seatRepo) {
+            SeatClassRepository seatRepo,
+            AirService airService) {
         return args -> {
+            setDummyAuthentication();
             System.out.println(">>> RandomGenerator CommandLineRunner 실행됨!");
             Random random = new Random();
             List<Airline> airlines = airlineRepo.findAll();
@@ -41,14 +49,26 @@ public class RandomGenerator {
                     arrive = cities.get(random.nextInt(cities.size()));
                 } while (arrive.equals(depart));
 
-                // 출발/도착 LocalDateTime 생성
-                LocalDate departDate = LocalDate.now().plusDays(random.nextInt(60));
-                LocalTime departTime = LocalTime.of(random.nextInt(24), random.nextInt(60));
-                LocalDateTime departDateTime = LocalDateTime.of(departDate, departTime);
+                // 출발시간
+                LocalDateTime departDateTime = LocalDateTime.now()
+                        .plusDays(random.nextInt(60))
+                        .withHour(random.nextInt(24))
+                        .withMinute(random.nextInt(60));
 
-                LocalDate arriveDate = departDate.plusDays(random.nextInt(2));
-                LocalTime arriveTime = departTime.plusHours(2 + random.nextInt(10));
-                LocalDateTime arriveDateTime = LocalDateTime.of(arriveDate, arriveTime);
+                ZoneOffset departOffset = ZoneOffset.ofTotalSeconds((int) (depart.getUtcOffsetMins() * 60));
+                ZoneOffset arriveOffset = ZoneOffset.ofTotalSeconds((int) (arrive.getUtcOffsetMins() * 60));
+
+                // 목표 비행 시간 (분)
+                int flightMinutes = 120 + random.nextInt(600); // 2~12시간
+
+                // UTC 기준 출발시간
+                Instant departUtc = departDateTime.toInstant(departOffset);
+
+                // 도착 UTC 시간 = 출발 UTC + flightMinutes
+                Instant arriveUtc = departUtc.plus(flightMinutes, ChronoUnit.MINUTES);
+
+                // 도착 LocalDateTime = 도착 UTC 시간 + 도착 공항 offset
+                LocalDateTime arriveDateTime = LocalDateTime.ofInstant(arriveUtc, arriveOffset);
 
                 // stopovers 결정
                 int stopovers = 0;
@@ -58,39 +78,71 @@ public class RandomGenerator {
                 else if (rand < 0.3)
                     stopovers = 1;
 
+                // Air 객체 생성 및 필드 설정
+                Air air = new Air();
                 // FlightSegment 생성
                 List<Air.FlightSegment> segments = new ArrayList<>();
 
                 if (stopovers == 0) {
+                    air.setFlightType(FlightType.DIRECT);
                     Air.FlightSegment segment = new Air.FlightSegment();
                     segment.setDepartAirport(depart);
+                    segment.setDepartTerminal("T2");
                     segment.setDepartDateTime(departDateTime);
                     segment.setArriveAirport(arrive);
+                    segment.setArriveTerminal("T3");
                     segment.setArriveDateTime(arriveDateTime);
-                    segment.calculateFlightDuration(); // 비행시간 계산
+                    segment.setFlightDuration(airService.calcDuration(departDateTime, depart, arriveDateTime, arrive));
                     segments.add(segment);
                 } else {
+
+                    air.setFlightType(FlightType.STOP_OVER);
+
                     // stopovers > 0: 간단히 직항 + 경유 예시
+                    CityCode lastArrive = depart; // 이전 segment의 도착 공항, 첫 segment는 출발 공항
                     LocalDateTime segmentDepart = departDateTime;
                     for (int s = 0; s <= stopovers; s++) {
-                        CityCode segDepart = (s == 0) ? depart : cities.get(random.nextInt(cities.size()));
-                        CityCode segArrive = (s == stopovers) ? arrive : cities.get(random.nextInt(cities.size()));
+                        CityCode segDepart = lastArrive; // 이전 segment 도착 = 현재 segment 출발
+                        CityCode segArrive;
+
+                        if (s == stopovers) {
+                            segArrive = arrive; // 마지막 segment 도착은 최종 도착
+                        } else {
+                            // 랜덤 경유 공항 선택, 이전 segment 도착와 중복되지 않게
+                            do {
+                                segArrive = cities.get(random.nextInt(cities.size()));
+                            } while (segArrive.equals(segDepart));
+                        }
+
                         LocalDateTime segArriveTime = segmentDepart.plusHours(2 + random.nextInt(3));
 
                         Air.FlightSegment segment = new Air.FlightSegment();
                         segment.setDepartAirport(segDepart);
+                        segment.setDepartTerminal("T2");
                         segment.setDepartDateTime(segmentDepart);
                         segment.setArriveAirport(segArrive);
+                        segment.setArriveTerminal("T3");
                         segment.setArriveDateTime(segArriveTime);
-                        segment.calculateFlightDuration();
+                        segment.setFlightDuration(
+                                airService.calcDuration(departDateTime, depart, arriveDateTime, arrive));
+
+                        if (s != 0) {
+                            Air.FlightSegment lastSegment = segments.get(segments.size() - 1); // getLast() 대신
+                            lastSegment.setWaitDuration(airService.calcDuration(
+                                    lastSegment.getArriveDateTime(),
+                                    lastSegment.getArriveAirport(),
+                                    segmentDepart,
+                                    segDepart));
+                        }
+
                         segments.add(segment);
 
+                        // 다음 segment를 위해 준비
                         segmentDepart = segArriveTime.plusHours(1); // 대기 1시간 가정
+                        lastArrive = segArrive; // 이번 segment 도착을 다음 segment 출발로
                     }
                 }
 
-                // Air 객체 생성 및 필드 설정
-                Air air = new Air();
                 air.setFlightNumber("FAKE" + i);
                 air.setAirline(airline);
                 air.setDepartAirport(depart);
@@ -100,7 +152,7 @@ public class RandomGenerator {
                 air.setArriveTerminal("T1");
                 air.setArriveDateTime(arriveDateTime);
                 air.setStopovers(stopovers);
-                air.setFlightSegmentList(segments);
+                air.setFlightSegments(segments);
 
                 // 총 비행시간 계산
                 long totalDuration = segments.stream()
@@ -122,7 +174,8 @@ public class RandomGenerator {
                 try {
                     airRepo.save(air);
                 } catch (Exception e) {
-                    System.out.println(">>> 중복 또는 저장 오류 발생, 건너뜀: " + e.getMessage());
+                    System.out.println(">>> 중복 또는 저장 오류 발생, break: " + e.getMessage());
+                    break;
                 }
             }
         };
@@ -137,5 +190,18 @@ public class RandomGenerator {
         seat.setMaxSeats(maxSeats);
         seat.setAvailableSeats(maxSeats - r.nextLong(maxSeats / 4 + 1));
         return seat;
+    }
+
+    public void setDummyAuthentication() {
+        // 1. 권한 리스트 생성 (필요한 역할만 넣으면 됨)
+        List<SimpleGrantedAuthority> authorities = List.of(
+                new SimpleGrantedAuthority("ROLE_ADMIN"));
+
+        // 2. UsernamePasswordAuthenticationToken 생성
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken("system", "N/A",
+                authorities);
+
+        // 3. SecurityContextHolder에 세팅
+        SecurityContextHolder.getContext().setAuthentication(auth);
     }
 }

@@ -19,9 +19,9 @@ public class AirFilterDTO {
     private String code;
     private List<String> airlines;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate departDateFrom;
+    private LocalDate departDateTimeFrom;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate departDateTo;
+    private LocalDate departDateTimeTo;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate arriveDateFrom;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
