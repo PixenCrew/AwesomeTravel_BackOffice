@@ -41,12 +41,14 @@
 
         <!-- Point.Schedule.location 포함 검색 -->
         <label>Point 위치:</label>
-        <input type="text" th:field="*{pointLocation}" placeholder="Enter location text" onclick="stripAfterPipe(this)" list="cityList"/>
+        <input type="text" th:field="*{pointLocation}" placeholder="Enter location text" onclick="stripAfterPipe(this)"
+            list="cityList" />
         <br />
 
-        <!-- 국가 -->
-        <label> 국가:</label>
-        <input type="text" th:field="*{country}" placeholder="Enter country" onclick="stripAfterPipe(this)" list="countryList"/><br>
+        <!-- 도시 -->
+        <label> 도시:</label>
+        <input type="text" th:field="*{city}" placeholder="Enter city" onclick="stripAfterPipe(this)"
+            list="cityList" /><br>
 
         <!-- 인원 범위 -->
         <label>최소 인원:</label>
@@ -117,26 +119,23 @@
         <tbody>
             <th:block th:each="tour : ${tourPage.content}">
                 <!-- <tr th:onclick="|window.location.href='@{/air/{id}(id=${seatClass.air.id})}'|" style="cursor:pointer;"> -->
-                <tr th:onclick="${isSelectionPage} ? |returnPrice(${tour.id},${tour.priceAdult},${tour.hotelPriceSum})| : |window.location.href='@{/tour/{id}(id=${tour.id})}'|" style="cursor:pointer;">
-                <td th:text="${tour.id}">1</td>
-                <td th:text="${tour.startDate}">2000-01-01</td>
-                <td th:text="${tour.endDate}">2000-12-31</td>
-                <td th:text="${tour.name}">투어</td>
-                <td th:text="${tour.company}">Awesome</td>
-                <td th:text="${tour.priceAdult}">100000</td>
-                <!-- <td>
-                    <ul>
-                        <li th:each="pt : ${tour.schedules}" type="none">
-                            <span th:text="${pt.locations[0].city}">서울</span>
-                            (종료: <span th:text="${pt.date}">2000-12-31</span>)
-                        </li>
-                    </ul>
-                </td> -->
-                <td th:text="${tour.country}">KR</td>
-                <td th:text="${tour.maxCapacity}">1212</td>
-                <td th:text="${tour.hotelPriceSum}">1212</td>
-                <td th:text="${tour.product != null} ? ${tour.product.id} : '-'"></td>
-            </tr>
+                <tr th:data-id="${tour.id}" th:data-price-adult="${tour.priceAdult}"
+                    th:data-hotel-price="${tour.hotelPriceSum}" th:data-city="${tour.city.cityCode}"
+                    th:data-start="${tour.startDate}" th:data-end="${tour.endDate}"
+                    th:onclick="${isSelectionPage} ? 'returnData(this)' : |window.location.href=\'@{/tour/{id}(id=${tour.id})}\'|"
+                    style="cursor:pointer;">
+                    <td th:text="${tour.id}">1</td>
+                    <td th:text="${tour.startDate}">2000-01-01</td>
+                    <td th:text="${tour.endDate}">2000-12-31</td>
+                    <td th:text="${tour.name}">투어</td>
+                    <td th:text="${tour.company}">Awesome</td>
+                    <td th:text="${tour.priceAdult}">100000</td>
+                    <td th:text="${tour.city.cityCode}">KR</td>
+                    <td th:text="${tour.maxCapacity}">1212</td>
+                    <td th:text="${tour.hotelPriceSum}">1212</td>
+                    <td th:text="${tour.product != null} ? ${tour.product.id} : ' -'"></td>
+                </tr>
+
         </tbody>
     </table>
 
@@ -167,11 +166,13 @@
     <script src="/js/util.js"></script>
 
     <datalist id="cityList">
-        <option th:each="cc : ${cityCode}" th:value="${cc.airportCode} + ' | ' + ${cc.airportEng} + ' | ' + ${cc.countryCode} + ' | ' + ${cc.countryKor}"></option>
+        <option th:each="cc : ${cityCode}"
+            th:value="${cc.airportCode} + ' | ' + ${cc.airportEng} + ' | ' + ${cc.countryCode} + ' | ' + ${cc.countryKor}">
+        </option>
     </datalist>
-
+    <!-- 
     <datalist id="countryList">
         <option th:each="cc : ${countryCode}" th:value="${cc.code} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
-    </datalist>
+    </datalist> -->
 
 </div>
