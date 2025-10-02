@@ -14,7 +14,7 @@ import lombok.Setter;
 public class TourFilterDTO {
     private String name;
     private List<String> companies;
-    private String country;
+    private String city;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDateFrom;
     @DateTimeFormat(pattern = "yyyy-MM-dd")

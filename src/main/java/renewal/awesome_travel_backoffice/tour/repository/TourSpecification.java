@@ -89,8 +89,8 @@ public class TourSpecification {
     }
 
     // Tour.name LIKE %name%
-    public static Specification<Tour> countryContains(String country) {
-        return (root, query, builder) -> builder.like(root.get("country"), "%" + country + "%");
+    public static Specification<Tour> cityContains(String city) {
+        return (root, query, builder) -> builder.like(root.get("city"), "%" + city + "%");
     }
 
     // Tour.count BETWEEN min AND max
