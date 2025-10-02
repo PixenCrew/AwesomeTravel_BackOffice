@@ -1,17 +1,11 @@
 package renewal.awesome_travel_backoffice.hotel.repository;
 
-import java.time.LocalDate;
-import java.util.Objects;
-
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Root;
-import jakarta.persistence.criteria.Subquery;
 import renewal.common.entity.Hotel;
-import renewal.common.entity.HotelReservation;
-import renewal.common.entity.HotelReservation.HotelReservationStatus;
+// import renewal.common.entity.HotelReservation;
+// import renewal.common.entity.HotelReservation.HotelReservationStatus;
 import renewal.common.entity.Hotel.HotelType;
 
 public class HotelSpecification {
@@ -96,66 +90,66 @@ public class HotelSpecification {
     // };
     // }
 
-    public static Specification<Hotel> availableBetweenAndCapacity(
-            LocalDate startDate,
-            LocalDate endDate,
-            Long requiredPersons) {
-        return (root, query, builder) -> {
+    // public static Specification<Hotel> availableBetweenAndCapacity(
+    //         LocalDate startDate,
+    //         LocalDate endDate,
+    //         Long requiredPersons) {
+    //     return (root, query, builder) -> {
             
-            // null 체크 명시
-            Objects.requireNonNull(query, "CriteriaQuery must not be null");
+    //         // null 체크 명시
+    //         Objects.requireNonNull(query, "CriteriaQuery must not be null");
 
-            // 중복 결과 방지를 위해 distinct 설정
-            query.distinct(true);
+    //         // 중복 결과 방지를 위해 distinct 설정
+    //         query.distinct(true);
                             
-            // 1) 이 호텔에 대해 BOOKED 상태로 겹치는 기간의 roomCount 합을 구하는 서브쿼리
-            Subquery<Long> sq = query.subquery(Long.class);
-            Root<HotelReservation> r = sq.from(HotelReservation.class);
+    //         // 1) 이 호텔에 대해 BOOKED 상태로 겹치는 기간의 roomCount 합을 구하는 서브쿼리
+    //         Subquery<Long> sq = query.subquery(Long.class);
+    //         Root<HotelReservation> r = sq.from(HotelReservation.class);
 
-            sq.select(builder.coalesce(builder.sum(r.get("roomCount")), 0L))
-                    .where(
-                            // HotelReservation.hotel 필드를 바깥 root(Hotel)와 연관시킴
-                            builder.equal(r.get("hotel").get("id"), root.get("id")),
-                            builder.equal(r.get("status"), HotelReservationStatus.BOOKED),
-                            builder.and(
-                                    builder.lessThan(r.get("startDate"), endDate),
-                                    builder.greaterThan(r.get("endDate"), startDate)));
+    //         sq.select(builder.coalesce(builder.sum(r.get("roomCount")), 0L))
+    //                 .where(
+    //                         // HotelReservation.hotel 필드를 바깥 root(Hotel)와 연관시킴
+    //                         builder.equal(r.get("hotel").get("id"), root.get("id")),
+    //                         builder.equal(r.get("status"), HotelReservationStatus.BOOKED),
+    //                         builder.and(
+    //                                 builder.lessThan(r.get("startDate"), endDate),
+    //                                 builder.greaterThan(r.get("endDate"), startDate)));
 
-            // 2) availableRooms = maxRoomCount – 이미 예약된 방 수
-            Expression<Long> availableRooms = builder.diff(
-                    root.get("maxRoomCount").as(Long.class),
-                    sq);
+    //         // 2) availableRooms = maxRoomCount – 이미 예약된 방 수
+    //         Expression<Long> availableRooms = builder.diff(
+    //                 root.get("maxRoomCount").as(Long.class),
+    //                 sq);
 
-            // 3) 사용 가능 방 수가 requiredPersons 이상인지 비교
-            return builder.greaterThanOrEqualTo(availableRooms, requiredPersons.longValue());
-        };
-    }
+    //         // 3) 사용 가능 방 수가 requiredPersons 이상인지 비교
+    //         return builder.greaterThanOrEqualTo(availableRooms, requiredPersons.longValue());
+    //     };
+    // }
 
-    public static Specification<Hotel> availableOnDateAndRooms(LocalDate date, Long requiredRooms) {
-        return (root, query, builder) -> {
+    // public static Specification<Hotel> availableOnDateAndRooms(LocalDate date, Long requiredRooms) {
+    //     return (root, query, builder) -> {
             
-            // null 체크 명시
-            Objects.requireNonNull(query, "CriteriaQuery must not be null");
+    //         // null 체크 명시
+    //         Objects.requireNonNull(query, "CriteriaQuery must not be null");
 
-            // 서브쿼리: 해당 날짜에 BOOKED 상태인 예약 합계(roomCount)
-            Subquery<Long> sumSub = query.subquery(Long.class);
-            Root<HotelReservation> res = sumSub.from(HotelReservation.class);
+    //         // 서브쿼리: 해당 날짜에 BOOKED 상태인 예약 합계(roomCount)
+    //         Subquery<Long> sumSub = query.subquery(Long.class);
+    //         Root<HotelReservation> res = sumSub.from(HotelReservation.class);
 
-            // SUM(roomCount) 결과가 null 이면 0L 로 대체하기 위해 COALESCE 사용
-            Expression<Long> sumRoomCount = builder.coalesce(builder.sum(res.get("roomCount")), 0L);
-            sumSub.select(sumRoomCount);
+    //         // SUM(roomCount) 결과가 null 이면 0L 로 대체하기 위해 COALESCE 사용
+    //         Expression<Long> sumRoomCount = builder.coalesce(builder.sum(res.get("roomCount")), 0L);
+    //         sumSub.select(sumRoomCount);
 
-            // subquery의 WHERE 절
-            sumSub.where(
-                    builder.equal(res.get("hotel").get("id"), root.get("id")),
-                    builder.equal(res.get("status"), HotelReservationStatus.BOOKED), // 예약 상태가 BOOKED
-                    builder.lessThanOrEqualTo(res.get("startDate"), date), // startDate <= date
-                    builder.greaterThanOrEqualTo(res.get("endDate"), date) // endDate >= date
-            );
+    //         // subquery의 WHERE 절
+    //         sumSub.where(
+    //                 builder.equal(res.get("hotel").get("id"), root.get("id")),
+    //                 builder.equal(res.get("status"), HotelReservationStatus.BOOKED), // 예약 상태가 BOOKED
+    //                 builder.lessThanOrEqualTo(res.get("startDate"), date), // startDate <= date
+    //                 builder.greaterThanOrEqualTo(res.get("endDate"), date) // endDate >= date
+    //         );
 
-            // 호텔의 총 객실 수 - 예약된 객실 수 >= requiredRooms
-            Expression<Long> availableRooms = builder.diff(root.get("maxRoomCount"), sumSub);
-            return builder.greaterThanOrEqualTo(availableRooms, requiredRooms);
-        };
-    }
+    //         // 호텔의 총 객실 수 - 예약된 객실 수 >= requiredRooms
+    //         Expression<Long> availableRooms = builder.diff(root.get("maxRoomCount"), sumSub);
+    //         return builder.greaterThanOrEqualTo(availableRooms, requiredRooms);
+    //     };
+    // }
 }

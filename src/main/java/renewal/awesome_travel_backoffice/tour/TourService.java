@@ -10,12 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import renewal.awesome_travel_backoffice.hotel.repository.HotelReservationRepository;
+// import renewal.awesome_travel_backoffice.hotel.repository.HotelReservationRepository;
 import renewal.awesome_travel_backoffice.tour.dto.TourFilterDTO;
 import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
 import renewal.awesome_travel_backoffice.tour.repository.TourSpecification;
-import renewal.common.entity.HotelReservation;
-import renewal.common.entity.HotelReservation.HotelReservationStatus;
+// import renewal.common.entity.HotelReservation;
+// import renewal.common.entity.HotelReservation.HotelReservationStatus;
 import renewal.common.entity.Tour;
 
 @Service
@@ -23,7 +23,7 @@ import renewal.common.entity.Tour;
 public class TourService {
 
     private final TourRepository tourRepository;
-    private final HotelReservationRepository hotelReservationRepo;
+    // private final HotelReservationRepository hotelReservationRepo;
     
     public List<String> getAllCompanies() {
         return tourRepository.findDistinctCompanies();
@@ -50,8 +50,8 @@ public class TourService {
         if (filter.getPointLocation() != null && !filter.getPointLocation().isEmpty()) {
             spec = spec.and(TourSpecification.scheduleLocationContains(filter.getPointLocation()));
         }
-        if (filter.getCountry() != null && !filter.getCountry().isEmpty()) {
-            spec = spec.and(TourSpecification.countryContains(filter.getCountry()));
+        if (filter.getCity() != null && !filter.getCity().isEmpty()) {
+            spec = spec.and(TourSpecification.cityContains(filter.getCity()));
         }
         if (filter.getStartCount() != null || filter.getEndCount() != null) {
             spec = spec.and(TourSpecification.maxCapacityBetween(filter.getStartCount(), filter.getEndCount()));
@@ -81,15 +81,15 @@ public class TourService {
     //     hotelReservationRepo.saveAll(hotelReserves);
     // }
 
-    public void cancelHotel(Long tourId) throws Exception{
+    // public void cancelHotel(Long tourId) throws Exception{
 
-        // 연결된 Hotel 예약 CANCELED로 변경
-        List<HotelReservation> hotelReserves = hotelReservationRepo.findByTourId(tourId);
-        for (HotelReservation reserve : hotelReserves) {
-            reserve.setStatus(HotelReservationStatus.CANCELLED);
-        }
-        hotelReservationRepo.saveAll(hotelReserves);
+    //     // 연결된 Hotel 예약 CANCELED로 변경
+    //     List<HotelReservation> hotelReserves = hotelReservationRepo.findByTourId(tourId);
+    //     for (HotelReservation reserve : hotelReserves) {
+    //         reserve.setStatus(HotelReservationStatus.CANCELLED);
+    //     }
+    //     hotelReservationRepo.saveAll(hotelReserves);
 
-    }
+    // }
 
 }
