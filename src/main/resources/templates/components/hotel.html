@@ -33,20 +33,18 @@
             <option value="false">No</option>
         </select><br>
 
-        <div style="border: 1px solid black; padding: 5px;">
-            <!-- 예약 조회용 -->
+        <!-- <div style="border: 1px solid black; padding: 5px;">
             <label>체크인:</label>
             <input type="date" th:field="*{startDate}" /><br>
 
             <label>체크아웃:</label>
             <input type="date" th:field="*{endDate}" /><br>
-
             <label>특정날짜:</label>
             <input type="date" th:field="*{targetDate}" th:attr="readonly=${isSelectionPage} ? 'readonly' : null" /><br>
 
             <label>필요 인원수:</label>
             <input type="number" min="1" th:field="*{requiredPersons}" th:attr="readonly=${isSelectionPage} ? 'readonly' : null" /><br>
-        </div>
+        </div> -->
         <br>
         <button type="button" onclick="get(0, event)">검색</button>
 
