@@ -39,7 +39,7 @@ public class RandomGenerator {
             List<Airline> airlines = airlineRepo.findAll();
             List<CityCode> cities = cityRepo.findByCountryCode("KR");
 
-            for (int i = 100; i < 600; i++) {
+            for (int i = 100; i < 10000; i++) {
                 Airline airline = airlines.get(random.nextInt(airlines.size()));
 
                 // 출/도착 공항은 다르게 선택
@@ -73,9 +73,9 @@ public class RandomGenerator {
                 // stopovers 결정
                 int stopovers = 0;
                 double rand = random.nextDouble();
-                if (rand < 0.1)
+                if (rand < 0.3)
                     stopovers = 2;
-                else if (rand < 0.3)
+                else if (rand < 0.6)
                     stopovers = 1;
 
                 // Air 객체 생성 및 필드 설정
