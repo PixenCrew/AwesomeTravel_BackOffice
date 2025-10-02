@@ -42,8 +42,8 @@
         <label for="price">가격[영유아]:</label>
         <input type="number" th:field="*{priceInfant}" min="1" required /><br>
 
-        <label for="country">국가:</label>
-        <input type="text" th:field="*{country}" onchange="stripAfterPipe(this)" list="countryList" required /><br>
+        <label for="country">도시:</label>
+        <input type="text" th:field="*{city}" onchange="stripAfterPipe(this)" list="cityList" required /><br>
 
         <label for="count">최대 인원:</label>
         <input type="number" th:field="*{maxCapacity}" min="1" required /><br>
@@ -65,41 +65,57 @@
 
             <!-- 1) Tour → Schedule 반복 -->
             <div id="scheduleContainer">
-                <div class="schedule-point" th:if="${tour.id != null}" th:each="sched, schedStat : *{schedules}" th:attr="data-sched-idx=${schedStat.index}">
-                    <label>날짜:</label>
-                    <input type="date" th:field="*{schedules[__${schedStat.index}__].date}" /><br>
+                <div class="schedule-point" th:if="${tour.id != null}" th:each="sched, schedStat : *{schedules}"
+                    th:attr="data-sched-idx=${schedStat.index}">
+                    <label>일차:</label>
+                    <input type="number" th:field="*{schedules[__${schedStat.index}__].day}" /><br>
                     <button type="button" onclick="removeSchedule(this)">스케줄 삭제</button>
 
                     <!-- 2) 하나의 LocationContainer에 여러 Location -->
                     <div class="location-container" th:attr="id=|locationContainer-${schedStat.index}|">
                         <!-- Schedule → Location 반복 -->
-                        <div class="location-point" th:each="loc, locStat : *{schedules[__${schedStat.index}__].locations}">
+                        <div class="location-point"
+                            th:each="loc, locStat : *{schedules[__${schedStat.index}__].locations}">
                             <!-- 위치 타입 -->
                             <div>
                                 타입
-                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType}" readonly />
+                                <input type="text"
+                                    th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType}"
+                                    readonly />
                             </div>
 
                             <div>
                                 설명
-                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].description}" placeholder="설명 입력" />
+                                <input type="text"
+                                    th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].description}"
+                                    placeholder="설명 입력" />
                             </div>
 
-                            <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType == T(renewal.common.entity.Location.LocationType).AIR}">
-                                항공편 번호
-                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].departAirport}" placeholder="출발지 선택" list="cityList" onchange="stripAfterPipe(this)" />
-                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].arriveAirport}" placeholder="도착지 선택" list="cityList" onchange="stripAfterPipe(this)" />
-                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].seatClass}" placeholder="항공편 ID 입력" onclick="searchAir(this)" />
+                            <div
+                                th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType == T(renewal.common.entity.Location.LocationType).AIR}">
+                                항공편
+                                <input type="text"
+                                    th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].departAirport}"
+                                    placeholder="출발지 선택" list="cityList" onchange="stripAfterPipe(this)" />
+                                <input type="text"
+                                    th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].arriveAirport}"
+                                    placeholder="도착지 선택" list="cityList" onchange="stripAfterPipe(this)" />
                             </div>
 
-                            <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType != T(renewal.common.entity.Location.LocationType).AIR}">
+                            <div
+                                th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType != T(renewal.common.entity.Location.LocationType).AIR}">
                                 도시
-                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].city}" placeholder="예: KR | South Korea | 대한민국" list="cityList" />
+                                <input type="text"
+                                    th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].city}"
+                                    placeholder="예: KR | South Korea | 대한민국" list="cityList" />
                             </div>
 
-                            <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType == T(renewal.common.entity.Location.LocationType).HOTEL}">
+                            <div
+                                th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType == T(renewal.common.entity.Location.LocationType).HOTEL}">
                                 호텔 번호
-                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].hotel}" placeholder="호텔 ID 입력" onclick="searchHotel(this)" />
+                                <input type="text"
+                                    th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].hotel}"
+                                    placeholder="호텔 ID 입력" onclick="searchHotel(this)" />
                             </div>
 
                             <!-- 삭제 -->
@@ -124,28 +140,52 @@
 
     <script src="/js/util.js"></script>
     <script>
-        // let airSearchTarget;
-        // let hotelSearchTarget;
-        let searchTarget;
-        // 전역 스케줄 인덱스 (초기값: 이미 렌더링된 .schedule-point 개수)
-        let scheduleIndex = document.querySelectorAll(
-            "#scheduleContainer .schedule-point"
-        ).length;
+        // 유틸 함수들
+        function createLabel(text) {
+            const label = document.createElement('label');
+            label.textContent = text;
+            return label;
+        }
 
-        // 1) 스케줄 추가
+        function createInput(type, name, placeholder = '', attrs = {}) {
+            const input = document.createElement('input');
+            input.type = type;
+            if (name) input.name = name;
+            if (placeholder) input.placeholder = placeholder;
+
+            Object.entries(attrs).forEach(([key, value]) => {
+                if (key === 'readonly') {
+                    input.readOnly = !!value;
+                } else {
+                    input.setAttribute(key, value);
+                }
+            });
+
+            return input;
+        }
+
+        function createHidden(name, value) {
+            const hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = name;
+            hidden.value = value;
+            return hidden;
+        }
+
+        // schedule 추가
         function addSchedule() {
-            const idx = scheduleIndex;
+            const idx = document.querySelectorAll("#scheduleContainer .schedule-point").length;
             const container = document.getElementById("scheduleContainer");
 
-            // 스케줄 래퍼 생성
             const schedDiv = document.createElement("div");
             schedDiv.className = "schedule-point";
             schedDiv.dataset.schedIdx = idx;
 
-            // 날짜 입력
-            schedDiv.appendChild(createLabel("날짜:"));
-            const dateInput = createInput("date", `schedules[${idx}].date`);
-            schedDiv.appendChild(dateInput);
+            // 일차 입력 (name 패턴 유지)
+            schedDiv.appendChild(createLabel("일차:"));
+            const dayInput = createInput("number", `schedules[${idx}].day`);
+            dayInput.value = idx;
+            schedDiv.appendChild(dayInput);
             schedDiv.appendChild(document.createElement("br"));
 
             // 스케줄 삭제 버튼
@@ -155,13 +195,13 @@
             removeBtn.addEventListener("click", () => removeSchedule(removeBtn));
             schedDiv.appendChild(removeBtn);
 
-            // 로케이션 컨테이너
+            // location container (id는 data-sched-idx에 연동)
             const locContainer = document.createElement("div");
             locContainer.id = `locationContainer-${idx}`;
             locContainer.className = "location-container";
             schedDiv.appendChild(locContainer);
 
-            // POINT/AIR/HOTEL 추가 버튼
+            // 추가 버튼들
             const pBtn = document.createElement("button");
             pBtn.type = "button";
             pBtn.textContent = "POINT 추가";
@@ -181,37 +221,60 @@
             schedDiv.appendChild(hBtn);
 
             container.appendChild(schedDiv);
-            scheduleIndex++;
         }
 
-        // 2) 스케줄 삭제 (인덱스 감소)
+        // schedule 삭제
         function removeSchedule(btn) {
-            btn.closest(".schedule-point").remove();
-            scheduleIndex--;
+            const schedDiv = btn.closest(".schedule-point");
+            if (!schedDiv) return;
+
+            // 삭제
+            schedDiv.remove();
+
+            // 남은 schedule 재인덱싱
+            const schedules = document.querySelectorAll("#scheduleContainer .schedule-point");
+            schedules.forEach((schedDiv, newIdx) => {
+                // dataset 갱신
+                schedDiv.dataset.schedIdx = newIdx;
+
+                // day input 갱신
+                const dayInput = schedDiv.querySelector('input[name*=".day"]');
+                if (dayInput) {
+                    dayInput.value = newIdx;
+                    dayInput.name = `schedules[${newIdx}].day`;
+                }
+
+                // location container id 갱신
+                const locContainer = schedDiv.querySelector('.location-container');
+                if (locContainer) {
+                    locContainer.id = `locationContainer-${newIdx}`;
+                }
+
+                // 모든 location 이름 재설정
+                reindexLocations(newIdx);
+            });
         }
 
-        // 3) Location 추가 type = 'POINT', 'AIR', 'HOTEL'
+        // location 추가 (POINT / AIR / HOTEL)
         function addLocation(btn, type) {
             const schedDiv = btn.closest('.schedule-point');
+            if (!schedDiv) {
+                console.warn('addLocation: parent schedule-point not found');
+                return;
+            }
+
             const schedIdx = parseInt(schedDiv.dataset.schedIdx, 10);
+
             const container = schedDiv.querySelector(`#locationContainer-${schedIdx}`);
+            if (!container) {
+                console.warn(`addLocation: location container not found for schedule ${schedIdx}`);
+                return;
+            }
+
             const locIdx = container.querySelectorAll('.location-point').length;
 
             const wrapper = document.createElement('div');
             wrapper.className = 'location-point';
-
-            // // 타입
-            // wrapper.appendChild(createLabel('타입 '));
-            // const typeSelect = document.createElement('select');
-            // const options = ['AIR','POINT','HOTEL'];
-            // for (const opt of options) {
-            //     const option = document.createElement('option');
-            //     option.value = opt;
-            //     option.textContent = opt;
-            //     typeSelect.appendChild(option);
-            // }
-            // typeSelect.value = type;
-            // wrapper.appendChild(typeSelect);
 
             // 타입
             const typeDiv = document.createElement('div');
@@ -231,7 +294,7 @@
             ));
             wrapper.appendChild(descDiv);
 
-            // 타입별 추가 필드
+            // 타입별 필드
             const addDiv = document.createElement('div');
             if (type === 'AIR') {
                 addDiv.appendChild(createLabel('출발지 '));
@@ -250,13 +313,13 @@
                     { list: 'cityList', onchange: 'stripAfterPipe(this)' }
                 ));
 
-                addDiv.appendChild(createLabel('항공편 번호 '));
-                addDiv.appendChild(createInput(
-                    'text',
-                    `schedules[${schedIdx}].locations[${locIdx}].seatClass`,
-                    '항공편 ID 입력',
-                    { onclick: 'searchAir(this)', readonly: true }
-                ));
+                // addDiv.appendChild(createLabel('항공편 번호 '));
+                // addDiv.appendChild(createInput(
+                //     'text',
+                //     `schedules[${schedIdx}].locations[${locIdx}].seatClass`,
+                //     '항공편 ID 입력',
+                //     { onclick: 'searchAir(this)', readonly: true }
+                // ));
             } else {
                 addDiv.appendChild(createLabel('도시 '));
                 addDiv.appendChild(createInput(
@@ -278,7 +341,7 @@
             }
             wrapper.appendChild(addDiv);
 
-            // 삭제 버튼
+            // 삭제 버튼 (location)
             const btnDel = document.createElement('button');
             btnDel.type = 'button';
             btnDel.textContent = '삭제';
@@ -288,159 +351,108 @@
             container.appendChild(wrapper);
         }
 
-        // 4) Location 삭제
+        // location 삭제
         function removeLocation(btn) {
             const wrapper = btn.closest(".location-point");
             const schedDiv = btn.closest(".schedule-point");
+            if (!wrapper || !schedDiv) return;
+
             const schedIdx = parseInt(schedDiv.dataset.schedIdx, 10);
 
-            // 1) 제거
+            // 제거
             wrapper.remove();
 
-            // 2) 남은 location-point 들을 0,1,2… 로 재인덱싱
+            // 동일 스케줄 내 location들 재인덱싱
             reindexLocations(schedIdx);
         }
 
-        // 삭제시 재인덱싱 함수
+        // 재인덱싱 함수
         function reindexLocations(schedIdx) {
-            const container = document.querySelector(
-                `#scheduleContainer .schedule-point[data-sched-idx="${schedIdx}"]`
-            ).querySelector(`#locationContainer-${schedIdx}`);
+            const schedSelector = `#scheduleContainer .schedule-point[data-sched-idx="${schedIdx}"]`;
+            const schedDiv = document.querySelector(schedSelector);
+            if (!schedDiv) {
+                console.warn(`reindexLocations: schedule-point not found for idx=${schedIdx}`);
+                return;
+            }
+
+            const container = schedDiv.querySelector('.location-container');
+            if (!container) {
+                // location-container가 없으면
+                return;
+            }
 
             container.querySelectorAll(".location-point").forEach((locDiv, newIdx) => {
-                // 각 필드(name 속성)에 반영될 prefix
                 const prefix = `schedules[${schedIdx}].locations[${newIdx}]`;
 
-                // type(hidden)
+                // input 이름 갱신
                 locDiv.querySelectorAll('input[type="hidden"]').forEach(h => {
                     h.name = `${prefix}.locationType`;
                 });
 
-                // 텍스트/날짜/셀렉트/기타 input들
+                // 모든 input/select 이름 재설정
                 Array.from(locDiv.querySelectorAll("input, select")).forEach(input => {
-                    // 원래 name 에서 앞부분만 바꾸고, 뒤속성(.city, .date, .air.id 등)는 유지
+                    if (!input.name) return;
+
                     const parts = input.name.split(".");
+                    if (parts.length < 2) {
+                        return;
+                    }
                     const suffix = parts.slice(1).join(".");
                     input.name = `${prefix}.${suffix}`;
                 });
             });
         }
-        // 유틸 함수들
-        function createLabel(text) {
-            const label = document.createElement('label');
-            label.textContent = text;
-            return label;
-        }
 
-        function createInput(type, name, placeholder = '', attrs = {}) {
-            const input = document.createElement('input');
-            input.type = type;
-            input.name = name;
-            if (placeholder) input.placeholder = placeholder;
-            Object.entries(attrs).forEach(([key, value]) => input.setAttribute(key, value));
-            return input;
-        }
-
-        function createHidden(name, value) {
-            const hidden = document.createElement('input');
-            hidden.type = 'hidden';
-            hidden.name = name;
-            hidden.value = value;
-            return hidden;
-        }
-
-        function searchAir(input) {
-            // 날짜, 출발지, 도착지, 인원 입력 후 항공 목록 Popup
-            const locationDiv = input.closest(".location-point");
-            // const containerDiv = input.closest(".location-container");
-
-            // 1. 형제 요소 from, to
-            const fromInput = locationDiv.querySelector("input[name$='.departAirport']");
-            const toInput = locationDiv.querySelector("input[name$='.arriveAirport']");
-
-            // 2. 상위 스케줄 블록의 date
-            const schedulePoint = input.closest('.schedule-point');
-            const dateInput = schedulePoint.querySelector('input[type="date"]');
-            // const dateInput = containerDiv.closest("div").querySelector("input[name$='.date']");
-
-            // 3. 최상위 블록의 인원수 count
-            // const countInput = document.querySelector('#count');
-
-            // 4. 값 읽기
-            const fromValue = fromInput?.value || null;
-            const toValue = toInput?.value || null;
-            const dateValue = dateInput?.value || null;
-            // const countValue = countInput?.value || null;
-
-            console.log("출발지 (from):", fromValue);
-            console.log("도착지 (to):", toValue);
-            console.log("날짜 (date):", dateValue);
-            // console.log("인원수 (count):", countValue);
-
-            if (fromValue != null && toValue != null && dateValue != null) {
-                console.log("searchAir called for:", input.value);
-                searchTarget = input;
-                const popup = window.open(
-                    '/air/search?departAirport=' + fromValue + '&arriveAirport=' + toValue + '&departDateTimeFrom=' + dateValue + '&departDateTimeTo=' + dateValue, // URL + 파라미터
-                    'airSearchPopup',
-                    'width=1200,height=800'
-                );
-            } else {
-                alert("인원수, 날짜, 출발지, 도착지를 모두 입력하세요")
-            }
-        }
-        
+        // 호텔 검색 — startDate, endDate, dayOffset, maxCapacity을 쿼리 파라미터로 전송
+        let searchTarget = null;
         function searchHotel(input) {
-            console.log('Search Hotel for : '+input.value)
-            // 날짜, 도시, 인원 입력 후 호텔 목록 Popup
-            const locationDiv = input.closest(".location-point");
+            console.log('Search Hotel for : ' + input?.value);
 
-            // 1. 형제 요소 city
-            const cityInput = locationDiv.querySelector("input[name$='.city']");
+            const locationDiv = input?.closest(".location-point");
+            const cityInput = locationDiv?.querySelector("input[name$='.city'], input[name='city'], input[id$='city']");
+            const cityValue = cityInput?.value?.trim() || null;
 
-            // 2. 상위 스케줄 블록의 date
-            const schedulePoint = input.closest('.schedule-point');
-            const dateInput = schedulePoint.querySelector('input[type="date"]');
+            // // 클릭한 schedule의 data-sched-idx를 dayOffset으로 사용
+            // const schedulePoint = input?.closest('.schedule-point');
+            // const dayOffset = schedulePoint ? schedulePoint.dataset.schedIdx : null;
 
-            // 3. 최상위 블록의 인원수 count
-            // const countInput = document.querySelector('#count');
+            // // 최상위 startDate / endDate
+            // const startInput = document.querySelector('input[name="startDate"], input[name$=".startDate"], input[id$="startDate"]');
+            // const endInput = document.querySelector('input[name="endDate"], input[name$=".endDate"], input[id$="endDate"]');
+            // const startDate = addOffsetToDate(startInput?.value || null, dayOffset);
+            // const endDate = addOffsetToDate(endInput?.value || null, dayOffset);
 
-            // 4. 값 읽기
-            const cityValue = cityInput?.value || null;
-            const dateValue = dateInput?.value || null;
-            // const countValue = countInput?.value || null;
+            // // maxCapacity
+            // const maxInput = document.querySelector('input[name="maxCapacity"], input[name$=".maxCapacity"], input[id$="maxCapacity"]');
+            // const maxCapacity = maxInput?.value || null;
 
             console.log("도시 (city):", cityValue);
-            console.log("날짜 (date):", dateValue);
-            // console.log("인원수 (count):", countValue);
+            // console.log("startDate:", startDate, "endDate:", endDate, "dayOffset:", dayOffset, "maxCapacity:", maxCapacity);
 
-            if (cityValue != null && dateValue != null) {
-                console.log("searchHotel called for:", input.value);
+            // 유효성 검사 (필수 항목들)
+            // if (cityValue && startDate && endDate && dayOffset != null && dayOffset !== '' && maxCapacity != null && String(maxCapacity).trim() !== '') {
+            if (cityValue) {
                 searchTarget = input;
-                const popup = window.open(
-                    '/hotel/search?city=' + cityValue + '&targetDate=' + dateValue, // URL + 파라미터
-                    'hotelSearchPopup',
-                    'width=1200,height=800'
-                );
+
+                const url =
+                    '/hotel/search' +
+                    '?city=' + encodeURIComponent(cityValue);
+                // '?city=' + encodeURIComponent(cityValue) +
+                // '&startDate=' + encodeURIComponent(startDate) +
+                // '&endDate=' + encodeURIComponent(endDate) +
+                // '&requiredPersons=' + encodeURIComponent(maxCapacity);
+
+                window.open(url, 'hotelSearchPopup', 'width=1200,height=800');
             } else {
-                alert("인원수, 날짜, 도시를 모두 입력하세요")
+                alert("도시를 선택하세요.");
             }
         }
 
-        // 팝업에서 선택한 값을 입력하는 메서드
-        // function setAir(airId) {
-        //     airSearchTarget.value = airId;
-        //     console.log("airSearchTarget updated:", airSearchTarget.value);
-        // }
-
-        // function setHotel(hotelId) {
-        //     hotelSearchTarget.value = hotelId;
-        //     console.log("hotelSearchTarget updated:", hotelSearchTarget.value);
-        // }
-
         function setId(id) {
-            searchTarget.value = id;
-            console.log("searchTarget updated:", searchTarget.value);
+            if (searchTarget) {
+                searchTarget.value = id;
+                console.log("searchTarget updated:", searchTarget.value);
+            }
         }
 
         function deleteTour(id) {
@@ -452,19 +464,47 @@
                             window.location.href = '/tour';
                         } else {
                             alert('삭제 실패');
+                            res.text().then(msg => {
+                                alert(msg);
+                            })
                         }
                     });
             }
         }
-    </script>
 
+        // function addOffsetToDate(dateStr, offsetDays) {
+        //     if (!dateStr || typeof dateStr !== 'string') return null;
+
+        //     const parts = dateStr.split('-');
+        //     if (parts.length !== 3) return null;
+
+        //     const [y, m, d] = parts.map(Number);
+        //     if ([y, m, d].some(v => Number.isNaN(v))) return null;
+
+        //     // 입력 날짜 유효성 확인
+        //     const dt = new Date(y, m - 1, d);
+        //     if (dt.getFullYear() !== y || dt.getMonth() + 1 !== m || dt.getDate() !== d) return null;
+
+        //     // offset 적용
+        //     dt.setDate(dt.getDate() + Number(offsetDays));
+
+        //     // YYYY-MM-DD 문자열로 반환
+        //     const yyyy = dt.getFullYear();
+        //     const mm = String(dt.getMonth() + 1).padStart(2, '0');
+        //     const dd = String(dt.getDate()).padStart(2, '0');
+        //     return `${yyyy}-${mm}-${dd}`;
+        // }
+
+    </script>
+    <!-- 
     <datalist id="countryList">
-        <!-- countryRepo.findAll()으로 받아온 리스트를 순회하면서 옵션 생성 -->
         <option th:each="cc : ${countryCode}" th:value="${cc.code} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
-    </datalist>
+    </datalist> -->
 
     <datalist id="cityList">
-        <option th:each="cc : ${cityCode}" th:value="${cc.airportCode} + ' | ' + ${cc.airportEng} + ' | ' + ${cc.countryCode} + ' | ' + ${cc.countryKor}"></option>
+        <option th:each="cc : ${cityCode}"
+            th:value="${cc.airportCode} + ' | ' + ${cc.airportEng} + ' | ' + ${cc.countryCode} + ' | ' + ${cc.countryKor}">
+        </option>
     </datalist>
 
     <datalist id="types">
