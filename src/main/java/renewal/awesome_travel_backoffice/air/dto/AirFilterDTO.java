@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import renewal.common.entity.CityCode;
 import renewal.common.entity.Air.AirStatus;
 import renewal.common.entity.Air.FlightType;
 import renewal.common.entity.SeatClass.SeatClassType;
@@ -26,8 +27,8 @@ public class AirFilterDTO {
     private LocalDate arriveDateFrom;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate arriveDateTo;
-    private String departAirport;
-    private String arriveAirport;
+    private CityCode departAirport;
+    private CityCode arriveAirport;
     private Long minStopovers;
     private Long maxStopovers;
     private Boolean infantSeatsRequired;

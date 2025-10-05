@@ -37,7 +37,7 @@ public class RandomGenerator {
             System.out.println(">>> RandomGenerator CommandLineRunner 실행됨!");
             Random random = new Random();
             List<Airline> airlines = airlineRepo.findAll();
-            List<CityCode> cities = cityRepo.findByCountryCode("KR");
+            List<CityCode> cities = cityRepo.findByCountryCodeCountryCode("KR");
 
             for (int i = 100; i < 10000; i++) {
                 Airline airline = airlines.get(random.nextInt(airlines.size()));

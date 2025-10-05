@@ -50,8 +50,8 @@ public class TourService {
         if (filter.getPointLocation() != null && !filter.getPointLocation().isEmpty()) {
             spec = spec.and(TourSpecification.scheduleLocationContains(filter.getPointLocation()));
         }
-        if (filter.getCity() != null && !filter.getCity().isEmpty()) {
-            spec = spec.and(TourSpecification.cityContains(filter.getCity()));
+        if (filter.getCountry() != null) {
+            spec = spec.and(TourSpecification.countryEquals(filter.getCountry()));
         }
         if (filter.getStartCount() != null || filter.getEndCount() != null) {
             spec = spec.and(TourSpecification.maxCapacityBetween(filter.getStartCount(), filter.getEndCount()));

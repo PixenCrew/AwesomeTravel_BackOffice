@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+import renewal.common.entity.CountryCode;
 import renewal.common.entity.Location;
 import renewal.common.entity.Product;
 import renewal.common.entity.Schedule;
@@ -88,9 +89,13 @@ public class TourSpecification {
         };
     }
 
-    // Tour.name LIKE %name%
-    public static Specification<Tour> cityContains(String city) {
-        return (root, query, builder) -> builder.like(root.get("city"), "%" + city + "%");
+    // Tour.country LIKE %country%
+    public static Specification<Tour> countryEquals(CountryCode country) {
+        return (root, query, builder) -> {
+            if (country == null)
+                return null;
+            return builder.equal(root.get("country"), country);
+        };
     }
 
     // Tour.count BETWEEN min AND max
@@ -120,10 +125,10 @@ public class TourSpecification {
 
     // Product와 연결 여부 확인용
     public static Specification<Tour> withProductJoin() {
-    return (root, query, cb) -> {
-        // fetch join 설정 (JPA가 Tour.product를 조회할 수 있도록)
-        root.fetch("product", JoinType.LEFT);
-        return cb.conjunction(); // 아무 조건 없는 기본 쿼리
-    };
-}
+        return (root, query, cb) -> {
+            // fetch join 설정 (JPA가 Tour.product를 조회할 수 있도록)
+            root.fetch("product", JoinType.LEFT);
+            return cb.conjunction(); // 아무 조건 없는 기본 쿼리
+        };
+    }
 }

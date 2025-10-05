@@ -42,8 +42,8 @@
         <label for="price">가격[영유아]:</label>
         <input type="number" th:field="*{priceInfant}" min="1" required /><br>
 
-        <label for="country">도시:</label>
-        <input type="text" th:field="*{city}" onchange="stripAfterPipe(this)" list="cityList" required /><br>
+        <label for="country">국가:</label>
+        <input type="text" th:field="*{country}" onchange="stripAfterPipe(this)" list="countryList" required /><br>
 
         <label for="count">최대 인원:</label>
         <input type="number" th:field="*{maxCapacity}" min="1" required /><br>
@@ -496,14 +496,14 @@
         // }
 
     </script>
-    <!-- 
+    
     <datalist id="countryList">
-        <option th:each="cc : ${countryCode}" th:value="${cc.code} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
-    </datalist> -->
+        <option th:each="cc : ${countryCode}" th:value="${cc.countryCode} + ' | ' + ${cc.countryKor} + ' | ' + ${cc.subKor}"></option>
+    </datalist>
 
     <datalist id="cityList">
         <option th:each="cc : ${cityCode}"
-            th:value="${cc.airportCode} + ' | ' + ${cc.airportEng} + ' | ' + ${cc.countryCode} + ' | ' + ${cc.countryKor}">
+            th:value="${cc.airportCode} + ' | ' + ${cc.airportEng} + ' | ' + ${cc.countryCode.countryCode}">
         </option>
     </datalist>
 

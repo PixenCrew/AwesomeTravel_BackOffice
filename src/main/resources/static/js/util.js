@@ -23,7 +23,7 @@ function returnData(trElement) {
         id: Number(trElement.dataset.id),
         priceAdult: Number(trElement.dataset.priceAdult),
         hotelPriceSum: Number(trElement.dataset.hotelPrice),
-        city: trElement.dataset.city,
+        country: trElement.dataset.country,
         startDate: trElement.dataset.start,
         endDate: trElement.dataset.end
     };

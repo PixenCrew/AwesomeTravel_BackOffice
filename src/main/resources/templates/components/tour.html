@@ -45,10 +45,10 @@
             list="cityList" />
         <br />
 
-        <!-- 도시 -->
-        <label> 도시:</label>
-        <input type="text" th:field="*{city}" placeholder="Enter city" onclick="stripAfterPipe(this)"
-            list="cityList" /><br>
+        <!-- 국가 -->
+        <label> 국가:</label>
+        <input type="text" th:field="*{country}" placeholder="Enter country" onclick="stripAfterPipe(this)"
+            list="countryList" /><br>
 
         <!-- 인원 범위 -->
         <label>최소 인원:</label>
@@ -120,9 +120,9 @@
             <th:block th:each="tour : ${tourPage.content}">
                 <!-- <tr th:onclick="|window.location.href='@{/air/{id}(id=${seatClass.air.id})}'|" style="cursor:pointer;"> -->
                 <tr th:data-id="${tour.id}" th:data-price-adult="${tour.priceAdult}"
-                    th:data-hotel-price="${tour.hotelPriceSum}" th:data-city="${tour.city.cityCode}"
+                    th:data-hotel-price="${tour.hotelPriceSum}" th:data-country="${tour.country.countryCode}"
                     th:data-start="${tour.startDate}" th:data-end="${tour.endDate}"
-                    th:onclick="${isSelectionPage} ? 'returnData(this)' : |window.location.href=\'@{/tour/{id}(id=${tour.id})}\'|"
+                    th:onclick="${isSelectionPage} ? 'returnData(this)' : |window.location.href='@{/tour/{id}(id=${tour.id})}'|"
                     style="cursor:pointer;">
                     <td th:text="${tour.id}">1</td>
                     <td th:text="${tour.startDate}">2000-01-01</td>
@@ -130,7 +130,7 @@
                     <td th:text="${tour.name}">투어</td>
                     <td th:text="${tour.company}">Awesome</td>
                     <td th:text="${tour.priceAdult}">100000</td>
-                    <td th:text="${tour.city.cityCode}">KR</td>
+                    <td th:text="${tour.country.countryCode}">KR</td>
                     <td th:text="${tour.maxCapacity}">1212</td>
                     <td th:text="${tour.hotelPriceSum}">1212</td>
                     <td th:text="${tour.product != null} ? ${tour.product.id} : ' -'"></td>
@@ -167,12 +167,13 @@
 
     <datalist id="cityList">
         <option th:each="cc : ${cityCode}"
-            th:value="${cc.airportCode} + ' | ' + ${cc.airportEng} + ' | ' + ${cc.countryCode} + ' | ' + ${cc.countryKor}">
+            th:value="${cc.cityCode} + ' | ' + ${cc.cityEng} + ' | ' + ${cc.countryCode.countryCode}+ ' | ' + ${cc.countryCode.countryKor}">
         </option>
     </datalist>
-    <!-- 
+
     <datalist id="countryList">
-        <option th:each="cc : ${countryCode}" th:value="${cc.code} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
-    </datalist> -->
+        <option th:each="cc : ${countryCode}"
+            th:value="${cc.countryCode} + ' | ' + ${cc.countryKor} + ' | ' + ${cc.subKor}"></option>
+    </datalist>
 
 </div>

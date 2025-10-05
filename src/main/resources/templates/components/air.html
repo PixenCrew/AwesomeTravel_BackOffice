@@ -208,7 +208,7 @@
     <script src="/js/util.js"></script>
 
     <datalist id="cityList">
-        <option th:each="cc : ${cityCode}" th:value="${cc.airportCode} + ' | ' + ${cc.airportEng} + ' | ' + ${cc.countryCode} + ' | ' + ${cc.countryKor}"></option>
+        <option th:each="cc : ${cityCode}" th:value="${cc.airportCode} + ' | ' + ${cc.airportEng} + ' | ' + ${cc.countryCode.countryCode} + ' | ' + ${cc.countryCode.countryKor}"></option>
     </datalist>
 
     <datalist id="seatClassList">

@@ -132,12 +132,12 @@ public class AirService {
         }
 
         // depart == value
-        if (StringUtils.hasText(filter.getDepartAirport())) {
+        if (filter.getDepartAirport() != null) {
             spec = spec.and(AirSpecification.departEquals(filter.getDepartAirport()));
         }
 
         // arrive == value
-        if (StringUtils.hasText(filter.getArriveAirport())) {
+        if (filter.getDepartAirport() != null) {
             spec = spec.and(AirSpecification.arriveEquals(filter.getArriveAirport()));
         }
 

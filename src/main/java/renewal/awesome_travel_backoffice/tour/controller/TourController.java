@@ -71,7 +71,7 @@ public class TourController {
         Page<Tour> tourPage = tourService.searchTours(filter, pageable);
 
         // 3) View에서 쓸 속성들
-        // model.addAttribute("countryCode", countryRepo.findAll());
+        model.addAttribute("countryCode", countryRepo.findAll());
         model.addAttribute("cityCode", cityRepo.findAll());
         model.addAttribute("tourPage", tourPage);
         // model.addAttribute("tourList", tourPage.getContent());
@@ -116,7 +116,7 @@ public class TourController {
         // blank.getLocations().add(defaultLocation);
 
         model.addAttribute("types", LocationType.values());
-        // model.addAttribute("countryCode", countryRepo.findAll());
+        model.addAttribute("countryCode", countryRepo.findAll());
         model.addAttribute("cityCode", cityRepo.findAll());
         model.addAttribute("tour", blankTour);
         model.addAttribute("title", "New Tour");
@@ -151,7 +151,7 @@ public class TourController {
 
         Tour tour = tourRepo.getReferenceById(id);
         model.addAttribute("types", LocationType.class);
-        // model.addAttribute("countryCode", countryRepo.findAll());
+        model.addAttribute("countryCode", countryRepo.findAll());
         model.addAttribute("cityCode", cityRepo.findAll());
         model.addAttribute("tour", tour);
         model.addAttribute("title", "Tour " + tour.getName());

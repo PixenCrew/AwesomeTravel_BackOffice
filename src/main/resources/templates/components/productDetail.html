@@ -22,7 +22,7 @@
             <input type="text" th:field="*{tour.id}" onclick="searchTour(this)" readonly /><br>
 
             <label for="tourPrice">투어 국가 :</label>
-            <input type="text" th:field="*{tour.city}" disabled /><br>
+            <input type="text" th:field="*{tour.country}" disabled /><br>
 
             <label for="tourPrice">투어 시작날짜 :</label>
             <input type="text" th:field="*{tour.startDate}" disabled /><br>
@@ -117,7 +117,7 @@
             } 
                         
             document.getElementById("tour.id").value = params["id"];
-            document.getElementById("tour.city").value = params["city"];
+            document.getElementById("tour.country").value = params["country"];
             document.getElementById("tour.startDate").value = params["startDate"];
             document.getElementById("tour.endDate").value = params["endDate"];
             document.getElementById("tour.priceAdult").value = params["priceAdult"];
@@ -244,12 +244,12 @@
     </script>
 
     <datalist id="countryList">
-        <option th:each="cc : ${countryCode}" th:value="${cc.code} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
+        <option th:each="cc : ${countryCode}" th:value="${cc.countryCode} + ' | ' + ${cc.countryKor} + ' | ' + ${cc.subKor}"></option>
     </datalist>
 
     <datalist id="cityList">
         <option th:each="cc : ${cityCode}"
-            th:value="${cc.airportCode} + ' | ' + ${cc.airportEng} + ' | ' + ${cc.countryCode} + ' | ' + ${cc.countryKor}">
+            th:value="${cc.airportCode} + ' | ' + ${cc.airportEng} + ' | ' + ${cc.countryCode.countryCode}">
         </option>
     </datalist>
 

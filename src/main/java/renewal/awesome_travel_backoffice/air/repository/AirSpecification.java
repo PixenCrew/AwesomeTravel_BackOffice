@@ -14,6 +14,7 @@ import renewal.common.entity.Air;
 import renewal.common.entity.Air.AirStatus;
 import renewal.common.entity.Air.FlightType;
 import renewal.common.entity.Airline;
+import renewal.common.entity.CityCode;
 import renewal.common.entity.SeatClass;
 
 public class AirSpecification {
@@ -86,20 +87,20 @@ public class AirSpecification {
     }
 
     // departAirport == value
-    public static Specification<SeatClass> departEquals(String depart) {
+    public static Specification<SeatClass> departEquals(CityCode depart) {
         return (root, query, builder) -> {
             Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT);
-            if (!StringUtils.hasText(depart))
+            if (depart==null)
                 return null;
             return builder.equal(seatJoin.get("departAirport"), depart);
         };
     }
 
     // arriveAirport == value
-    public static Specification<SeatClass> arriveEquals(String arrive) {
+    public static Specification<SeatClass> arriveEquals(CityCode arrive) {
         return (root, query, builder) -> {
             Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT);
-            if (!StringUtils.hasText(arrive))
+            if (arrive==null)
                 return null;
             return builder.equal(seatJoin.get("arriveAirport"), arrive);
         };

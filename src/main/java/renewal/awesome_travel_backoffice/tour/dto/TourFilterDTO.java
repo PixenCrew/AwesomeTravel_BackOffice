@@ -8,13 +8,14 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.Getter;
 import lombok.Setter;
+import renewal.common.entity.CountryCode;
 
 @Getter
 @Setter
 public class TourFilterDTO {
     private String name;
     private List<String> companies;
-    private String city;
+    private CountryCode country;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDateFrom;
     @DateTimeFormat(pattern = "yyyy-MM-dd")

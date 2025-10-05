@@ -25,6 +25,7 @@ import renewal.common.entity.Product;
 import renewal.common.entity.Tour;
 import renewal.common.entity.Product.Info;
 import renewal.common.repository.CityCodeRepository;
+import renewal.common.repository.CountryCodeRepository;
 // import renewal.common.repository.CountryCodeRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -36,7 +37,7 @@ public class ProductController {
     private final ProductRepository productRepo;
     private final TourRepository tourRepo;
     private final ProductService productService;
-    // private final CountryCodeRepository countryRepo;
+    private final CountryCodeRepository countryRepo;
     private final CityCodeRepository cityRepo;
 
     @GetMapping
@@ -56,7 +57,7 @@ public class ProductController {
         Page<Product> productPage = productService.searchProducts(filter, pageable);
 
         // 3) View에서 쓸 속성들
-        // model.addAttribute("countryCode", countryRepo.findAll());
+        model.addAttribute("countryCode", countryRepo.findAll());
         model.addAttribute("cityCode", cityRepo.findAll());
         model.addAttribute("productPage", productPage);
         model.addAttribute("sortField", sortField);
@@ -77,7 +78,7 @@ public class ProductController {
         blankProduct.setImages(new ArrayList<String>());
         blankProduct.setInfo(new ArrayList<Info>());
 
-        // model.addAttribute("countryCode", countryRepo.findAll());
+        model.addAttribute("countryCode", countryRepo.findAll());
         model.addAttribute("cityCode", cityRepo.findAll());
         model.addAttribute("product", blankProduct);
         model.addAttribute("title", "New Product");

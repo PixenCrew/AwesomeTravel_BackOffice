@@ -131,10 +131,10 @@
     <script src="/js/util.js"></script>
 
     <datalist id="cityList">
-        <option th:each="cc : ${cityCode}" th:value="${cc.airportCode} + ' | ' + ${cc.airportEng} + ' | ' + ${cc.countryCode} + ' | ' + ${cc.countryKor}"></option>
+        <option th:each="cc : ${cityCode}" th:value="${cc.airportCode} + ' | ' + ${cc.airportEng} + ' | ' + ${cc.countryCode.countryCode}"></option>
     </datalist>
 
     <datalist id="countryList">
-        <option th:each="cc : ${countryCode}" th:value="${cc.code} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
+        <option th:each="cc : ${countryCode}" th:value="${cc.countryCode} + ' | ' + ${cc.countryKor} + ' | ' + ${cc.subKor}"></option>
     </datalist>
 </div>

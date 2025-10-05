@@ -7,7 +7,8 @@
         <input type="text" th:field="*{name}" placeholder="Enter hotel name" /><br>
 
         <label>도시:</label>
-        <input type="text" th:field="*{city}" placeholder="Enter city" list="cityList" onchange="stripAfterPipe(this)" required th:attr="readonly=${isSelectionPage} ? 'readonly' : null" /><br>
+        <input type="text" th:field="*{city}" placeholder="Enter city" list="cityList" onchange="stripAfterPipe(this)"
+            required th:attr="readonly=${isSelectionPage} ? 'readonly' : null" /><br>
 
         <label>주소:</label>
         <input type="text" th:field="*{address}" placeholder="Enter address" /><br>
@@ -23,7 +24,8 @@
         <label>호텔 유형:</label>
         <select th:field="*{hotelType}">
             <option value="">-- 선택 --</option>
-            <option th:each="type : ${T(renewal.common.entity.Hotel.HotelType).values()}" th:value="${type}" th:text="${type}"></option>
+            <option th:each="type : ${T(renewal.common.entity.Hotel.HotelType).values()}" th:value="${type}"
+                th:text="${type}"></option>
         </select><br>
 
         <label>사용 가능:</label>
@@ -58,7 +60,9 @@
         <thead>
             <tr>
                 <th>
-                    <a href="#" data-sortfield="id" th:data-sortdir="${sortField=='id' and sortDir=='asc' ? 'asc' : 'desc'}" onclick="toggleSort(this, event)">ID
+                    <a href="#" data-sortfield="id"
+                        th:data-sortdir="${sortField=='id' and sortDir=='asc' ? 'asc' : 'desc'}"
+                        onclick="toggleSort(this, event)">ID
                         <span th:if="${sortField=='id'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
                     </a>
                 </th>
@@ -70,13 +74,17 @@
                 <th>웹사이트</th>
                 <th>유형</th>
                 <th>
-                    <a href="#" data-sortfield="price" th:data-sortdir="${sortField=='price' and sortDir=='asc' ? 'asc' : 'desc'}" onclick="toggleSort(this, event)">가격
+                    <a href="#" data-sortfield="price"
+                        th:data-sortdir="${sortField=='price' and sortDir=='asc' ? 'asc' : 'desc'}"
+                        onclick="toggleSort(this, event)">가격
                         <span th:if="${sortField=='price'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
                     </a>
                 </th>
                 <th>활성</th>
                 <th>전화번호</th>
-                <th> <a href="#" data-sortfield="maxRoomCount" th:data-sortdir="${sortField=='maxRoomCount' and sortDir=='asc' ? 'asc' : 'desc'}" onclick="toggleSort(this, event)">객실 수
+                <th> <a href="#" data-sortfield="maxRoomCount"
+                        th:data-sortdir="${sortField=='maxRoomCount' and sortDir=='asc' ? 'asc' : 'desc'}"
+                        onclick="toggleSort(this, event)">객실 수
                         <span th:if="${sortField=='maxRoomCount'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
                     </a>
                 </th>
@@ -86,24 +94,25 @@
         <tbody>
             <th:block th:each="hotel : ${hotelPage.content}">
                 <!-- <tr th:onclick="|window.location.href='@{/air/{id}(id=${seatClass.air.id})}'|" style="cursor:pointer;"> -->
-                <tr th:onclick="${isSelectionPage} ? |returnNumber(${hotel.id})| : |window.location.href='@{/hotel/{id}(id=${hotel.id})}'|" style="cursor:pointer;">
-            
+                <tr th:onclick="${isSelectionPage} ? |returnNumber(${hotel.id})| : |window.location.href='@{/hotel/{id}(id=${hotel.id})}'|"
+                    style="cursor:pointer;">
+
                     <td th:text="${hotel.id}">1</td>
-                <td th:text="${hotel.name}">호텔명</td>
-                <td th:text="${hotel.description}">설명</td>
-                <td th:text="${hotel.city}">도시</td>
-                <td th:text="${hotel.address}">주소</td>
-                <td th:text="${hotel.email}">이메일</td>
-                <td>
-                    <a th:if="${hotel.website}" th:text="${hotel.website}">링크</a>
-                    <span th:if="${hotel.website == null}">-</span>
-                </td>
-                <td th:text="${hotel.hotelType}">HOTEL</td>
-                <td th:text="${hotel.price}">100000</td>
-                <td th:text="${hotel.isActive ? 'Yes' : 'No'}">Yes</td>
-                <td th:text="${hotel.number}">010-0000-0000</td>
-                <td th:text="${hotel.maxRoomCount}">20</td>
-            </tr>
+                    <td th:text="${hotel.name}">호텔명</td>
+                    <td th:text="${hotel.description}">설명</td>
+                    <td th:text="${hotel.city}">도시</td>
+                    <td th:text="${hotel.address}">주소</td>
+                    <td th:text="${hotel.email}">이메일</td>
+                    <td>
+                        <a th:if="${hotel.website}" th:text="${hotel.website}">링크</a>
+                        <span th:if="${hotel.website == null}">-</span>
+                    </td>
+                    <td th:text="${hotel.hotelType}">HOTEL</td>
+                    <td th:text="${hotel.price}">100000</td>
+                    <td th:text="${hotel.isActive ? 'Yes' : 'No'}">Yes</td>
+                    <td th:text="${hotel.number}">010-0000-0000</td>
+                    <td th:text="${hotel.maxRoomCount}">20</td>
+                </tr>
         </tbody>
     </table>
 
@@ -114,7 +123,8 @@
                 <a th:onclick="|get(${hotelPage.number - 1})|" style="cursor: pointer;">Prev</a>
             </li>
             <li th:each="i : ${#numbers.sequence(0, hotelPage.totalPages - 1)}">
-                <a th:onclick="|get(${i})|" th:classappend="${i == hotelPage.number} ? ' active' : ''" th:text="${i + 1}" style="cursor: pointer;"></a>
+                <a th:onclick="|get(${i})|" th:classappend="${i == hotelPage.number} ? ' active' : ''"
+                    th:text="${i + 1}" style="cursor: pointer;"></a>
             </li>
             <li th:if="${hotelPage.hasNext()}">
                 <a th:onclick="|get(${hotelPage.number + 1})|" style="cursor: pointer;">Next</a>
@@ -123,11 +133,13 @@
     </div>
 
     <a href="/hotel/new">새 호텔 등록</a>
-    
+
     <script src="/js/util.js"></script>
     <script src="/js/filter.js"></script>
 
     <datalist id="cityList">
-        <option th:each="cc : ${cityCode}" th:value="${cc.airportCode} + ' | ' + ${cc.airportEng} + ' | ' + ${cc.countryCode} + ' | ' + ${cc.countryKor}"></option>
+        <option th:each="cc : ${cityCode}"
+            th:value="${cc.cityCode} + ' | ' + ${cc.cityEng} + ' | ' + ${cc.countryCode.countryCode} + ' | ' + ${cc.countryCode.countryKor}">
+        </option>
     </datalist>
 </div>
