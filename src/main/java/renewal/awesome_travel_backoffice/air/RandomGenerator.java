@@ -114,7 +114,7 @@ public class RandomGenerator {
                             } while (segArrive.equals(segDepart));
                         }
 
-                        LocalDateTime segArriveTime = segmentDepart.plusHours(2 + random.nextInt(3));
+                        LocalDateTime segArriveTime = segmentDepart.plusMinutes(random.nextLong(60, 360 + 1));
 
                         Air.FlightSegment segment = new Air.FlightSegment();
                         segment.setDepartAirport(segDepart);
@@ -124,7 +124,7 @@ public class RandomGenerator {
                         segment.setArriveTerminal("T3");
                         segment.setArriveDateTime(segArriveTime);
                         segment.setFlightDuration(
-                                airService.calcDuration(departDateTime, depart, arriveDateTime, arrive));
+                            airService.calcDuration(segmentDepart, segDepart, segArriveTime, segArrive));
 
                         if (s != 0) {
                             Air.FlightSegment lastSegment = segments.get(segments.size() - 1); // getLast() 대신
@@ -138,7 +138,7 @@ public class RandomGenerator {
                         segments.add(segment);
 
                         // 다음 segment를 위해 준비
-                        segmentDepart = segArriveTime.plusHours(1); // 대기 1시간 가정
+                        segmentDepart = segArriveTime.plusMinutes(random.nextLong(60, 180 + 1)); // 대기 ~3시간 가정
                         lastArrive = segArrive; // 이번 segment 도착을 다음 segment 출발로
                     }
                 }
