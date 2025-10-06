@@ -1,7 +1,5 @@
 package renewal.awesome_travel_backoffice.hotel.controller;
 
-import java.util.List;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,7 +41,7 @@ public class HotelController {
     // 호텔 목록 + 필터 + 페이징
     @GetMapping
     public String listAndFilter(
-            @ModelAttribute("filter") HotelFilterDTO filter,
+            @ModelAttribute HotelFilterDTO filter,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "id") String sortField,
             @RequestParam(defaultValue = "asc") String sortDir,
@@ -93,7 +91,7 @@ public class HotelController {
 
     // 호텔 상세 조회
     @GetMapping("/{id}")
-    public String selectHotel(@PathVariable("id") Long id, Model model) {
+    public String selectHotel(@PathVariable Long id, Model model) {
         Hotel hotel = hotelRepo.getReferenceById(id);
 
         // 도시코드
@@ -144,7 +142,7 @@ public class HotelController {
     
     @GetMapping("/search")
     public String searchHotel(
-            @ModelAttribute("filter") HotelFilterDTO filter, // 필터 DTO를 바인딩
+            @ModelAttribute HotelFilterDTO filter, // 필터 DTO를 바인딩
             @RequestParam(defaultValue = "id") String sortField,
             @RequestParam(defaultValue = "asc") String sortDir,
             @RequestParam(defaultValue = "0") int page, // 페이지 번호

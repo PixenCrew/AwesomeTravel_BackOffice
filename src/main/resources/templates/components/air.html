@@ -2,7 +2,7 @@
     <h1>항공 목록</h1>
 
     <!-- 1) 필터 폼 -->
-    <form id="filterForm" th:object="${filter}">
+    <form id="filterForm" th:object="${airFilterDTO}">
         <!-- 코드 -->
         <label>코드:</label>
         <input type="text" th:field="*{code}" placeholder="Enter code" />

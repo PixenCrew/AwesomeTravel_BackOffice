@@ -2,7 +2,7 @@
     <h1>호텔 목록</h1>
 
     <!-- 1) 필터 폼 -->
-    <form id="filterForm" th:object="${filter}">
+    <form id="filterForm" th:object="${hotelFilterDTO}">
         <label>호텔 이름:</label>
         <input type="text" th:field="*{name}" placeholder="Enter hotel name" /><br>
 

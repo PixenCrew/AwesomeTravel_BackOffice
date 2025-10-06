@@ -18,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
-import renewal.awesome_travel_backoffice.hotel.repository.HotelRepository;
 // import renewal.awesome_travel_backoffice.hotel.repository.HotelReservationRepository;
 import renewal.awesome_travel_backoffice.product.repository.ProductRepository;
 import renewal.awesome_travel_backoffice.tour.TourService;
@@ -41,7 +40,6 @@ public class TourController {
 
     private final TourRepository tourRepo;
     private final TourService tourService;
-    private final HotelRepository hotelRepo;
     // private final HotelReservationRepository hotelReservationRepo;
     private final ProductRepository productRepo;
 
@@ -52,7 +50,7 @@ public class TourController {
     // 필터 폼과 결과 리스트(또는 전체 리스트)를 동일하게 렌더링
     @GetMapping
     public String listAndFilter(
-            @ModelAttribute("filter") TourFilterDTO filter, // 필터 DTO를 바인딩
+            @ModelAttribute TourFilterDTO filter, // 필터 DTO를 바인딩
             @RequestParam(defaultValue = "0") int page, // 페이지 번호
             @RequestParam(defaultValue = "startDate") String sortField,
             @RequestParam(defaultValue = "asc") String sortDir,
@@ -147,7 +145,7 @@ public class TourController {
 
     // 특정 투어
     @GetMapping("/{id}")
-    public String selectTravel(@PathVariable("id") Long id, Model model) {
+    public String selectTravel(@PathVariable Long id, Model model) {
 
         Tour tour = tourRepo.getReferenceById(id);
         model.addAttribute("types", LocationType.class);
@@ -212,7 +210,7 @@ public class TourController {
     // 투어 검색용
     @GetMapping("/search")
     public String searchTour(
-            @ModelAttribute("filter") TourFilterDTO filter, // 필터 DTO를 바인딩
+            @ModelAttribute TourFilterDTO filter, // 필터 DTO를 바인딩
             @RequestParam(defaultValue = "0") int page, // 페이지 번호
             @RequestParam(defaultValue = "startDate") String sortField,
             @RequestParam(defaultValue = "asc") String sortDir,

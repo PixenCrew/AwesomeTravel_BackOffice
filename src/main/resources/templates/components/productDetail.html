@@ -16,6 +16,12 @@
         <label for="title">이름:</label>
         <input type="text" th:field="*{title}" required /><br>
 
+        <label for="title">투어 타입:</label>
+        <select th:field="*{productType}">
+            <option th:each="type : ${T(renewal.common.entity.Product.ProductType).values()}" th:value="${type}"
+                th:text="${type}"></option>
+        </select><br>
+
         <!-- Tour 필드 -->
         <div style="border: 1px, solid, black;">
             <label for="tour">투어 ID :</label>
@@ -43,9 +49,17 @@
 
         <label for="price">가격:</label>
         <input type="number" th:field="*{price}" required /><br>
-        
+
         <label for="price">예약출발 여유일:</label>
         <input type="number" th:field="*{cutoffDays}" required /><br>
+
+        <label>별점:
+            <label>★1:<input type="text" th:field="*{star1}" readonly /></label><br>
+            <label>★2:<input type="text" th:field="*{star2}" readonly /></label><br>
+            <label>★3:<input type="text" th:field="*{star3}" readonly /></label><br>
+            <label>★4:<input type="text" th:field="*{star4}" readonly /></label><br>
+            <label>★5:<input type="text" th:field="*{star5}" readonly /></label><br>
+        </label>
 
         <!-- 이미지 URL List -->
         <!-- <div>
@@ -114,8 +128,8 @@
 
             for (let key in params) {
                 console.log(`${key}: ${params[key]}`);
-            } 
-                        
+            }
+
             document.getElementById("tour.id").value = params["id"];
             document.getElementById("tour.country").value = params["country"];
             document.getElementById("tour.startDate").value = params["startDate"];
@@ -244,7 +258,8 @@
     </script>
 
     <datalist id="countryList">
-        <option th:each="cc : ${countryCode}" th:value="${cc.countryCode} + ' | ' + ${cc.countryKor} + ' | ' + ${cc.subKor}"></option>
+        <option th:each="cc : ${countryCode}"
+            th:value="${cc.countryCode} + ' | ' + ${cc.countryKor} + ' | ' + ${cc.subKor}"></option>
     </datalist>
 
     <datalist id="cityList">

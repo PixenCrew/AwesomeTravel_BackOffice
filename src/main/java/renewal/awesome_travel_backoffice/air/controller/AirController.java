@@ -50,7 +50,7 @@ public class AirController {
     @GetMapping
     // @PreAuthorize("hasRole('ADMIN')")
     public String listAndFilter(
-            @ModelAttribute("filter") AirFilterDTO filter, // 필터 DTO를 바인딩
+            @ModelAttribute AirFilterDTO filter, // 필터 DTO를 바인딩
             @RequestParam(defaultValue = "0") int page, // 페이지 번호
             @RequestParam(defaultValue = "id") String sortField,
             @RequestParam(defaultValue = "asc") String sortDir,
@@ -127,7 +127,7 @@ public class AirController {
     }
 
     @GetMapping("/{id}")
-    public String selectAir(@PathVariable("id") Long id, Model model) {
+    public String selectAir(@PathVariable Long id, Model model) {
         Air air = airRepo.getReferenceById(id);
 
         // 회사 목록 (드롭박스용)
@@ -189,7 +189,7 @@ public class AirController {
 
     @GetMapping("/search")
     public String searchAir(
-            @ModelAttribute("filter") AirFilterDTO filter, // 필터 DTO를 바인딩
+            @ModelAttribute AirFilterDTO filter, // 필터 DTO를 바인딩
             @RequestParam(defaultValue = "air.departDateTime") String sortField,
             @RequestParam(defaultValue = "asc") String sortDir,
             @RequestParam(defaultValue = "0") int page, // 페이지 번호

@@ -24,6 +24,7 @@ import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
 import renewal.common.entity.Product;
 import renewal.common.entity.Tour;
 import renewal.common.entity.Product.Info;
+import renewal.common.entity.Product.ProductType;
 import renewal.common.repository.CityCodeRepository;
 import renewal.common.repository.CountryCodeRepository;
 // import renewal.common.repository.CountryCodeRepository;
@@ -42,10 +43,10 @@ public class ProductController {
 
     @GetMapping
     public String listAndFilter(
-            @ModelAttribute("filter") ProductFilterDTO filter, // 필터 DTO를 바인딩
-            @RequestParam(name = "page", defaultValue = "0") int page, // 페이지 번호
-            @RequestParam(name = "sortField", defaultValue = "id") String sortField,
-            @RequestParam(name = "sortDir", defaultValue = "asc") String sortDir,
+            @ModelAttribute ProductFilterDTO filter, // 필터 DTO를 바인딩
+            @RequestParam(defaultValue = "0") int page, // 페이지 번호
+            @RequestParam(defaultValue = "id") String sortField,
+            @RequestParam(defaultValue = "asc") String sortDir,
             Model model) {
         // 1) 정렬 객체 설정
         Sort sort = sortDir.equalsIgnoreCase("asc")
@@ -80,6 +81,7 @@ public class ProductController {
 
         model.addAttribute("countryCode", countryRepo.findAll());
         model.addAttribute("cityCode", cityRepo.findAll());
+        model.addAttribute("productTypes", ProductType.values());
         model.addAttribute("product", blankProduct);
         model.addAttribute("title", "New Product");
         model.addAttribute("content", "components/productDetail");
@@ -101,10 +103,11 @@ public class ProductController {
 
     // 특정 패키지
     @GetMapping("/{id}")
-    public String selectProduct(@PathVariable("id") Long id, Model model) {
+    public String selectProduct(@PathVariable Long id, Model model) {
 
         Product product = productRepo.getReferenceById(id);
         model.addAttribute("product", product);
+        model.addAttribute("productTypes", ProductType.values());
         model.addAttribute("title", "Product " + product.getTitle());
         model.addAttribute("content", "components/productDetail");
 
