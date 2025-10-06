@@ -22,6 +22,18 @@
                 th:text="${type}"></option>
         </select><br>
 
+        <!-- 검색용 키워드 -->
+        <div>
+            <label>키워드:</label>
+            <div id="keywords-container">
+                <div th:each="kw : *{keywords}">
+                    <input type="text" th:value="${kw}" name="keywords" placeholder="키워드" />
+                    <button type="button" onclick="removeKeywordField(this)">삭제</button>
+                </div>
+            </div>
+            <button type="button" onclick="addKeywordField()">키워드 추가</button>
+        </div>
+
         <!-- Tour 필드 -->
         <div style="border: 1px, solid, black;">
             <label for="tour">투어 ID :</label>
@@ -53,7 +65,7 @@
         <label for="price">예약출발 여유일:</label>
         <input type="number" th:field="*{cutoffDays}" required /><br>
 
-        <label>별점:
+        <label>별점:<br>
             <label>★1:<input type="text" th:field="*{star1}" readonly /></label><br>
             <label>★2:<input type="text" th:field="*{star2}" readonly /></label><br>
             <label>★3:<input type="text" th:field="*{star3}" readonly /></label><br>
@@ -254,6 +266,42 @@
 
             container.appendChild(div);
         }
+        // 키워드 필드 추가
+        function addKeywordField() {
+            const container = document.getElementById("keywords-container");
+            const index = container.querySelectorAll("div").length;
+
+            const div = document.createElement("div");
+            const input = document.createElement("input");
+            input.type = "text";
+            input.name = `keywords`;
+            input.placeholder = "키워드";
+
+            const button = document.createElement("button");
+            button.type = "button";
+            button.textContent = "삭제";
+            button.addEventListener("click", () => removeKeywordField(button));
+
+            div.appendChild(input);
+            div.appendChild(button);
+
+            container.appendChild(div);
+        }
+
+        // 키워드 필드 삭제
+        function removeKeywordField(btn) {
+            btn.parentElement.remove();
+            // reindexKeywords();
+        }
+
+        // // 삭제 후 index 재정렬
+        // function reindexKeywords() {
+        //     const divs = document.querySelectorAll("#keywords-container div");
+        //     divs.forEach((div, idx) => {
+        //         const input = div.querySelector("input");
+        //         input.name = `keywords[${idx}]`;
+        //     });
+        // }
 
     </script>
 
