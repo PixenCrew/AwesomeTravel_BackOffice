@@ -16,7 +16,6 @@ import org.springframework.util.StringUtils;
 import renewal.awesome_travel_backoffice.air.dto.AirFilterDTO;
 import renewal.common.entity.Air;
 import renewal.common.entity.CityCode;
-import renewal.common.entity.FlightItem;
 import renewal.common.entity.Air.AirStatus;
 import renewal.common.entity.Air.FlightSegment;
 import renewal.common.entity.SeatClass;
