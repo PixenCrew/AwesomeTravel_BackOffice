@@ -1,6 +1,7 @@
 package renewal.awesome_travel_backoffice.tour.controller;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -247,6 +248,7 @@ public class TourController {
         // Long airPriceSum = 0L;
         Long hotelPriceSum = 0L;
 
+        Set<String> keywords = tour.getKeywords();
         // 기존 항공권, 호텔 예약 CANCEL 처리
         // tourService.cancelHotelAir(tour.getId());
 
@@ -256,9 +258,11 @@ public class TourController {
         // Schedules 순회
         for (Schedule schedule : tour.getSchedules()) {
             // LocalDate currentDate = tour.getStartDate().plusDays(schedule.getDay());
-
             // Locations 순회
             for (Location location : schedule.getLocations()) {
+                // 키워드 목록에 이름 추가
+                keywords.add(location.getName());
+
                 if (location.getLocationType() == LocationType.AIR) {
                     // SeatClass sc = location.getSeatClass();
                     // airPriceSum += sc.getPriceAdult();

@@ -56,6 +56,15 @@
 
         <label for="product.id">패키지 상품 ID:</label>
         <input type="number" th:field="*{product.id}" disabled /><br>
+        
+        <div style="border: 1px solid black; padding: 5px ;">
+            <label>키워드:</label>
+            <div id="keywords-container">
+                <div th:each="kw : *{keywords}">
+                    <input type="text" th:value="${kw}" name="keywords" placeholder="키워드" readonly/>
+                </div>
+            </div>
+        </div>
 
         <fieldset id="fieldset">
             <legend>코스 스케줄 및 포인트/항공 정보</legend>
@@ -84,6 +93,12 @@
                                     readonly />
                             </div>
 
+                            <div>
+                                이름
+                                <input type="text"
+                                    th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].name}"
+                                    placeholder="이름 입력" />
+                            </div>
                             <div>
                                 설명
                                 <input type="text"
