@@ -23,13 +23,13 @@ public class ImageController {
 
     @PostMapping
     @ResponseBody
-    public String uploadImage(@RequestParam("file") MultipartFile file) throws Exception {
+    public String uploadImage(@RequestParam MultipartFile file) throws Exception {
         String savedFileName = fileService.uploadFile(file);
         return "/images/" + savedFileName; // 클라이언트에 반환되는 이미지 URL
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteImage(@RequestParam("target") String target) throws Exception {
+    public ResponseEntity<Void> deleteImage(@RequestParam String target) throws Exception {
         boolean deleted = fileService.deleteFile(target);
         if (deleted) {
             return ResponseEntity.ok().build();
