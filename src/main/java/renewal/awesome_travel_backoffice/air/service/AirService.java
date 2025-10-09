@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 import renewal.awesome_travel_backoffice.air.dto.AirFilterDTO;
 import renewal.common.entity.Air;
 import renewal.common.entity.Air.AirStatus;
+import renewal.common.entity.Airline;
 import renewal.common.entity.SeatClass;
 import renewal.awesome_travel_backoffice.air.repository.AirRepository;
 import renewal.awesome_travel_backoffice.air.repository.AirSpecification;
@@ -32,13 +33,17 @@ public class AirService {
 
     @Transactional
     public void createAir(Air air) {
-        if (airRepository.existsByflightNumber(air.getAirline().getCode())) {
+        if (airRepository.existsByflightNumber(air.getFlightNumber())) {
             throw new IllegalArgumentException("중복된 항공편 코드입니다.");
         }
 
-        airlineRepository
+        // Airline 코드로 실제 Airline 엔티티를 조회해서 설정
+        Airline airline = airlineRepository
                 .findByCode(air.getAirline().getCode())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 항공사입니다."));
+        
+        // 조회한 Airline 엔티티로 설정
+        air.setAirline(airline);
 
         for (SeatClass seat : air.getSeatClasses()) {
             seat.setAir(air);

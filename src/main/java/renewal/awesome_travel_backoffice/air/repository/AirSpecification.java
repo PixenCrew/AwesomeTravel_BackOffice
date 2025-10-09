@@ -25,7 +25,7 @@ public class AirSpecification {
             if (!StringUtils.hasText(code))
                 return null;
             return builder.like(
-                    builder.lower(seatJoin.get("code")),
+                    builder.lower(seatJoin.get("flightNumber")),
                     "%" + code.toLowerCase() + "%");
         };
     }
@@ -151,20 +151,16 @@ public class AirSpecification {
         };
     }
 
-    // seatClasses.price BETWEEN min AND max (JOIN & DISTINCT)
+    // seatClasses.price BETWEEN min AND max
     public static Specification<SeatClass> priceBetween(BigDecimal min, BigDecimal max) {
         return (root, query, builder) -> {
-            if (min == null && max == null || query == null)
+            if (min == null && max == null)
                 return null;
-            // Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT);
             if (min != null && max != null) {
-                query.distinct(true);
                 return builder.between(root.get("price"), min, max);
             } else if (min != null) {
-                query.distinct(true);
                 return builder.greaterThanOrEqualTo(root.get("price"), min);
             } else {
-                query.distinct(true);
                 return builder.lessThanOrEqualTo(root.get("price"), max);
             }
         };
@@ -173,10 +169,8 @@ public class AirSpecification {
     // availableSeats >= value
     public static Specification<SeatClass> availableSeatsMore(Long more) {
         return (root, query, builder) -> {
-            if (more == null || query == null)
+            if (more == null)
                 return null;
-            // Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT);
-            // query.distinct(true);
             return builder.greaterThanOrEqualTo(root.get("availableSeats"), more);
         };
     }
@@ -184,11 +178,9 @@ public class AirSpecification {
     // SeatClassType == value
     public static Specification<SeatClass> seatClassEquals(SeatClass.SeatClassType type) {
         return (root, query, builder) -> {
-            if (query != null) {
-                query.distinct(true);
+            if (type == null) {
+                return null;
             }
-            // SeatClass 조인
-            // Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT);
             return builder.equal(root.get("classType"), type);
         };
     }

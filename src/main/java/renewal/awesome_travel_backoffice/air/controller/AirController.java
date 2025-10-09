@@ -32,7 +32,7 @@ import renewal.common.entity.SeatClass.SeatClassType;
 import renewal.awesome_travel_backoffice.air.repository.AirRepository;
 import renewal.awesome_travel_backoffice.air.repository.AirReservationRepository;
 import renewal.awesome_travel_backoffice.air.service.AirService;
-import renewal.common.repository.CityCodeRepository;
+import renewal.awesome_travel_backoffice.citycode.repository.CityCodeRepository;
 
 @Controller
 @RequestMapping("/air")
@@ -74,7 +74,9 @@ public class AirController {
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("title", "Air List");
-        model.addAttribute("content", "components/air"); // layout 안에서 이 fragment를 렌더
+        // air.html에서 참조하는 플래그 기본값 설정 (null → SpEL 오류 방지)
+        model.addAttribute("isSelectionPage", false);
+        model.addAttribute("content", "components/air/air"); // layout 안에서 이 fragment를 렌더
 
         return "layout";
     }
@@ -102,7 +104,7 @@ public class AirController {
 
         model.addAttribute("air", air);
         model.addAttribute("title", "New Air");
-        model.addAttribute("content", "components/airDetail"); // layout 안에서 이 fragment를 렌더
+        model.addAttribute("content", "components/air/airDetail"); // layout 안에서 이 fragment를 렌더
 
         return "layout";
     }
@@ -134,7 +136,7 @@ public class AirController {
 
         model.addAttribute("air", air);
         model.addAttribute("title", "Air Detail");
-        model.addAttribute("content", "components/airDetail"); // layout 안에서 이 fragment를 렌더
+        model.addAttribute("content", "components/air/airDetail"); // layout 안에서 이 fragment를 렌더
 
         return "layout";
     }
@@ -189,7 +191,7 @@ public class AirController {
     @GetMapping("/search")
     public String searchAir(
             @ModelAttribute("filter") AirFilterDTO filter, // 필터 DTO를 바인딩
-            @RequestParam(defaultValue = "air.departDate") String sortField,
+            @RequestParam(defaultValue = "air.flightNumber") String sortField,
             @RequestParam(defaultValue = "asc") String sortDir,
             @RequestParam(defaultValue = "0") int page, // 페이지 번호
             Model model) {
@@ -206,12 +208,13 @@ public class AirController {
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("title", "Air Select");
+        model.addAttribute("cityCode", cityRepo.findAll());
         
         // 항공선택 플래그
         model.addAttribute("isSelectionPage", true);
 
         // return "airSelect";
-        return "components/air";
+        return "components/air/airSearchPopup";
     }
 
     @GetMapping("/seat/{id}")
@@ -220,6 +223,6 @@ public class AirController {
         List<AirReservation> reservations = airReservationRepo.findAllBySeatClassId(id);
         model.addAttribute("reservations", reservations);
         
-        return "components/airReservation";
+        return "components/air/airReservation";
     }
 }
