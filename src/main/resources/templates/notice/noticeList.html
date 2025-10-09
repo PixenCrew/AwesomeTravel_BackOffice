@@ -1,0 +1,178 @@
+<div th:fragment="content">
+    <div class="space-y-4">
+        <!-- 페이지 헤더 -->
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900">공지사항 관리</h2>
+                <p class="text-sm text-gray-600 mt-1">공지사항을 조회하고 관리합니다.</p>
+            </div>
+            <div class="flex items-center space-x-3">
+                <a href="/notice/create" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                    <i class="fas fa-plus mr-2"></i>새 공지사항
+                </a>
+            </div>
+        </div>
+        
+        <!-- 성공 메시지 표시 -->
+        <div th:if="${param.message == 'success'}" class="p-4 bg-green-100 text-green-800 rounded-lg mb-6">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <span>공지사항이 성공적으로 등록되었습니다.</span>
+            </div>
+        </div>
+        
+            <!-- 검색 및 필터 -->
+            <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                <form method="get" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">검색어</label>
+                            <input type="text" name="keyword" th:value="${searchRequest?.keyword}" 
+                                   placeholder="제목 또는 내용 검색" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">검색 타입</label>
+                            <select name="searchType" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">전체</option>
+                                <option value="TITLE" th:selected="${searchRequest?.searchType == 'TITLE'}">제목</option>
+                                <option value="CONTENT" th:selected="${searchRequest?.searchType == 'CONTENT'}">내용</option>
+                                <option value="TITLE_CONTENT" th:selected="${searchRequest?.searchType == 'TITLE_CONTENT'}">제목+내용</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">카테고리</label>
+                            <select name="category" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">전체</option>
+                                <option value="EVENT" th:selected="${searchRequest?.category == 'EVENT'}">이벤트</option>
+                                <option value="UPDATE" th:selected="${searchRequest?.category == 'UPDATE'}">업데이트</option>
+                                <option value="SYSTEM" th:selected="${searchRequest?.category == 'SYSTEM'}">점검</option>
+                                <option value="GUIDE" th:selected="${searchRequest?.category == 'GUIDE'}">안내</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">상태</label>
+                            <select name="fix" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">전체</option>
+                                <option value="true" th:selected="${searchRequest?.fix == true}">고정</option>
+                                <option value="false" th:selected="${searchRequest?.fix == false}">일반</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="includeHidden" th:checked="${searchRequest?.includeHidden == true}" class="mr-2">
+                            <span class="text-sm text-gray-700">숨김 공지사항 포함</span>
+                        </label>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200">
+                            <i class="fas fa-search mr-2"></i>검색
+                        </button>
+                        <a href="/notice" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors duration-200">
+                            <i class="fas fa-refresh mr-2"></i>초기화
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 공지사항 목록 -->
+            <div class="bg-white rounded-lg shadow-sm">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900">공지사항 목록</h2>
+                    <p class="text-sm text-gray-600 mt-1" th:text="'총 ' + ${notices.totalElements} + '개의 공지사항'">총 0개의 공지사항</p>
+                </div>
+
+                <div th:if="${notices.content != null and !notices.content.isEmpty()}" class="divide-y divide-gray-200">
+                    <div th:each="notice : ${notices.content}" 
+                         class="p-6 hover:bg-gray-50 transition-colors duration-200"
+                         th:classappend="${notice.visible == false} ? 'bg-gray-100 opacity-75' : ''">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-3 mb-2">
+                                    <h3 class="text-lg font-semibold text-gray-900">
+                                        <a th:href="@{'/notice/' + ${notice.id}}" class="hover:text-blue-600 transition-colors duration-200" th:text="${notice.title}">공지사항 제목</a>
+                                    </h3>
+                                    <span th:if="${notice.fix}" class="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">고정</span>
+                                    <span th:if="${notice.visible == false}" class="px-2 py-1 text-xs bg-gray-200 text-gray-600 rounded-full">숨김</span>
+                                    <span th:switch="${notice.category?.name()}" class="px-2 py-1 text-xs rounded-full">
+                                        <span th:case="EVENT" class="bg-purple-100 text-purple-800">이벤트</span>
+                                        <span th:case="UPDATE" class="bg-blue-100 text-blue-800">업데이트</span>
+                                        <span th:case="SYSTEM" class="bg-orange-100 text-orange-800">점검</span>
+                                        <span th:case="GUIDE" class="bg-green-100 text-green-800">안내</span>
+                                        <span th:case="*" class="bg-gray-100 text-gray-800" th:text="${notice.category?.displayName}">카테고리</span>
+                                    </span>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-3 line-clamp-2" th:text="${notice.content}">공지사항 내용 미리보기...</p>
+                                <div class="flex items-center space-x-6 text-xs text-gray-500">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-calendar mr-1"></i>
+                                        <span th:text="${notice.createdAt != null ? #temporals.format(notice.createdAt, 'yyyy-MM-dd HH:mm') : ''}">작성일</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-user mr-1"></i>
+                                        <span th:text="${notice.createdBy}">작성자</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-eye mr-1"></i>
+                                        <span th:if="${notice.visible == false}" class="text-gray-400">숨김</span>
+                                        <span th:if="${notice.visible}">
+                                            <span th:if="${notice.startAt != null and notice.startAt.isAfter(#temporals.createNow())}" class="text-orange-600">대기 중</span>
+                                            <span th:if="${notice.endAt != null and notice.endAt.isBefore(#temporals.createNow())}" class="text-red-600">종료됨</span>
+                                            <span th:if="${(notice.startAt == null or notice.startAt.isBefore(#temporals.createNow())) and (notice.endAt == null or notice.endAt.isAfter(#temporals.createNow()))}" class="text-green-600">노출 중</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2 ml-4">
+                                <a th:href="@{'/notice/' + ${notice.id}}" class="px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded hover:bg-blue-200 transition-colors duration-200">
+                                    <i class="fas fa-eye mr-1"></i>보기
+                                </a>
+                                <a th:href="@{'/notice/edit/' + ${notice.id}}" class="px-3 py-1 text-sm bg-gray-100 text-gray-800 rounded hover:bg-gray-200 transition-colors duration-200">
+                                    <i class="fas fa-edit mr-1"></i>수정
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${notices.content == null or notices.content.isEmpty()}" class="p-12 text-center">
+                    <i class="fas fa-bullhorn text-4xl text-gray-400 mb-4"></i>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">공지사항이 없습니다</h3>
+                    <p class="text-gray-600 mb-4">아직 등록된 공지사항이 없습니다.</p>
+                    <a href="/notice/create" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                        <i class="fas fa-plus mr-2"></i>첫 공지사항 작성하기
+                    </a>
+                </div>
+            </div>
+
+            <!-- 페이지네이션 -->
+            <div th:if="${notices.totalPages > 1}" class="mt-6 flex justify-center">
+                <nav class="flex items-center space-x-2">
+                    <a th:if="${notices.hasPrevious()}" 
+                       th:href="@{/notice(page=${notices.number - 1}, keyword=${searchRequest?.keyword}, searchType=${searchRequest?.searchType}, category=${searchRequest?.category}, fix=${searchRequest?.fix}, includeHidden=${searchRequest?.includeHidden})}"
+                       class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors duration-200">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                    
+                    <span th:each="pageNum : ${#numbers.sequence(0, notices.totalPages - 1)}" 
+                          th:if="${pageNum >= notices.number - 2 and pageNum <= notices.number + 2}">
+                        <a th:if="${pageNum != notices.number}"
+                           th:href="@{/notice(page=${pageNum}, keyword=${searchRequest?.keyword}, searchType=${searchRequest?.searchType}, category=${searchRequest?.category}, fix=${searchRequest?.fix}, includeHidden=${searchRequest?.includeHidden})}"
+                           class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors duration-200"
+                           th:text="${pageNum + 1}">1</a>
+                        <span th:if="${pageNum == notices.number}"
+                              class="px-3 py-2 text-sm bg-blue-600 text-white border border-blue-600 rounded-md"
+                              th:text="${pageNum + 1}">1</span>
+                    </span>
+                    
+                    <a th:if="${notices.hasNext()}" 
+                       th:href="@{/notice(page=${notices.number + 1}, keyword=${searchRequest?.keyword}, searchType=${searchRequest?.searchType}, category=${searchRequest?.category}, fix=${searchRequest?.fix}, includeHidden=${searchRequest?.includeHidden})}"
+                       class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors duration-200">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>

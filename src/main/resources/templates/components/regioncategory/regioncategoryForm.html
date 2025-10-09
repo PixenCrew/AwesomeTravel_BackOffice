@@ -1,0 +1,110 @@
+<div th:fragment="content">
+    <div class="space-y-6">
+        <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold" th:text="${category.id != null ? '카테고리 수정' : '새 카테고리 등록'}">새 카테고리 등록</h2>
+            <a href="/region-category" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"><i class="fas fa-arrow-left mr-2"></i>목록</a>
+        </div>
+
+        <div th:if="${error}" class="p-4 bg-red-100 text-red-800 rounded-lg"><span th:text="${error}"></span></div>
+
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <form th:action="@{/region-category}" method="POST" class="space-y-6">
+                <input th:if="${category.id != null}" type="hidden" name="id" th:value="${category.id}">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">타입 *</label>
+                        <select name="type" id="typeSelect" required class="w-full px-4 py-2 border rounded-lg" onchange="updateParentOptions()">
+                            <option value="">선택</option>
+                            <option value="CONTINENT" th:selected="${category.type?.name() == 'CONTINENT'}">대륙</option>
+                            <option value="REGION" th:selected="${category.type?.name() == 'REGION'}">지역</option>
+                            <option value="COUNTRY" th:selected="${category.type?.name() == 'COUNTRY'}">국가</option>
+                            <option value="SUB_REGION" th:selected="${category.type?.name() == 'SUB_REGION'}">지역구</option>
+                            <option value="CITY" th:selected="${category.type?.name() == 'CITY'}">도시</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">부모 카테고리</label>
+                        <select name="parentId" id="parentSelect" class="w-full px-4 py-2 border rounded-lg">
+                            <option value="">없음 (최상위)</option>
+                            <option th:each="c : ${allCategories}" 
+                                    th:value="${c.id}" 
+                                    th:text="|${c.name} (${c.type?.description})|"
+                                    th:selected="${category.parentId == c.id}"
+                                    th:data-type="${c.type?.name()}">
+                            </option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">타입에 맞는 부모만 선택 가능</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">코드</label>
+                        <input type="text" name="code" th:value="${category.code}" placeholder="ASIA" class="w-full px-4 py-2 border rounded-lg uppercase">
+                        <p class="text-xs text-gray-500 mt-1">대문자 영문 (선택사항)</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">표시 순서</label>
+                        <input type="number" name="displayOrder" th:value="${category.displayOrder}" placeholder="0" class="w-full px-4 py-2 border rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">이름 (한글) *</label>
+                        <input type="text" name="name" th:value="${category.name}" placeholder="아시아" required class="w-full px-4 py-2 border rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">이름 (영문)</label>
+                        <input type="text" name="nameEng" th:value="${category.nameEng}" placeholder="Asia" class="w-full px-4 py-2 border rounded-lg">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">국가 코드</label>
+                        <input type="text" name="countryCode" th:value="${category.countryCode}" placeholder="KR (선택사항)" class="w-full px-4 py-2 border rounded-lg uppercase">
+                        <p class="text-xs text-gray-500 mt-1">국가 타입일 경우 ISO 국가 코드 입력</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-4 pt-6 border-t">
+                    <a href="/region-category" class="px-6 py-2 border rounded-lg hover:bg-gray-50">취소</a>
+                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        <i class="fas fa-save mr-2"></i><span th:text="${category.id != null ? '수정' : '등록'}">등록</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 타입에 따라 부모 옵션 필터링
+        function updateParentOptions() {
+            const typeSelect = document.getElementById('typeSelect');
+            const parentSelect = document.getElementById('parentSelect');
+            const selectedType = typeSelect.value;
+            
+            // 타입별 허용되는 부모 타입
+            const parentTypeMap = {
+                'CONTINENT': [],
+                'REGION': ['CONTINENT'],
+                'COUNTRY': ['REGION'],
+                'SUB_REGION': ['COUNTRY'],
+                'CITY': ['SUB_REGION', 'COUNTRY']
+            };
+            
+            const allowedParentTypes = parentTypeMap[selectedType] || [];
+            
+            // 모든 옵션 순회하며 필터링
+            Array.from(parentSelect.options).forEach(option => {
+                if (option.value === '') {
+                    option.style.display = selectedType === 'CONTINENT' ? '' : 'none';
+                } else {
+                    const optionType = option.dataset.type;
+                    option.style.display = allowedParentTypes.includes(optionType) ? '' : 'none';
+                }
+            });
+            
+            // 선택된 옵션이 숨겨진 경우 초기화
+            if (parentSelect.selectedOptions[0] && parentSelect.selectedOptions[0].style.display === 'none') {
+                parentSelect.value = '';
+            }
+        }
+        
+        // 페이지 로드 시 실행
+        document.addEventListener('DOMContentLoaded', updateParentOptions);
+    </script>
+</div>

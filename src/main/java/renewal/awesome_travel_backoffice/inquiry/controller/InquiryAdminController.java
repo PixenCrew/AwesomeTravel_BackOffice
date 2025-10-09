@@ -38,10 +38,15 @@ public class InquiryAdminController {
     @GetMapping("/search")
     public ResponseEntity<Page<InquiryResponseDto>> searchInquiriesAdmin(
             @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String searchType,
             @RequestParam(required = false) Boolean isAnswered,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
             Pageable pageable
     ) {
-        return ResponseEntity.ok(inquiryService.searchInquiriesAdmin(keyword, isAnswered, pageable));
+        return ResponseEntity.ok(inquiryService.searchInquiriesAdmin(keyword, searchType, isAnswered, category, status, startDate, endDate, pageable));
     }
 
     // 답변 등록

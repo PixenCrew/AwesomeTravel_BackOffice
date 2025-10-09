@@ -1,0 +1,558 @@
+<div th:fragment="content">
+    <style>
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+            transform: translateY(-1px);
+        }
+        
+        .filter-section {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .filter-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .filter-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .toggle-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background-color 0.2s;
+        }
+        
+        .toggle-btn:hover {
+            background: #2563eb;
+        }
+        
+        .search-form {
+            display: flex;
+            gap: 1rem;
+            align-items: end;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .form-select {
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: white;
+        }
+        
+        .form-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .btn-search {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            height: fit-content;
+        }
+        
+        .btn-search:hover {
+            background: #059669;
+        }
+        
+        .btn-reset {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            height: fit-content;
+        }
+        
+        .btn-reset:hover {
+            background: #4b5563;
+        }
+        
+        .table-section {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th {
+            background: #f8fafc;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .table td {
+            padding: 1rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .table tbody tr:hover {
+            background: #f9fafb;
+        }
+        
+        .sort-link {
+            color: #374151;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s;
+        }
+        
+        .sort-link:hover {
+            color: #3b82f6;
+        }
+        
+        .sort-icon {
+            font-size: 0.75rem;
+        }
+        
+        .report-id {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .comment-content {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .reporter-name {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .reported-user-name {
+            color: #6b7280;
+        }
+        
+        .reason-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .reason-spam {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .reason-offensive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .reason-illegal {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+        
+        .reason-etc {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .star {
+            color: #fbbf24;
+            font-size: 0.875rem;
+        }
+        
+        .rating-number {
+            font-weight: 600;
+            color: #374151;
+            margin-left: 0.25rem;
+        }
+        
+        .date {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .btn-info {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            text-decoration: none;
+        }
+        
+        .btn-info:hover {
+            background: #2563eb;
+        }
+        
+        .pagination-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+        }
+        
+        .pagination-info {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .pagination {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .pagination a {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            color: #374151;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .pagination a:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+        
+        .pagination a.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            color: #6b7280;
+        }
+        
+        .no-data i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #d1d5db;
+        }
+    </style>
+
+    <!-- 페이지 헤더 -->
+    <div class="page-header">
+        <h1 class="page-title">댓글 신고 관리</h1>
+        <div class="btn-group">
+            <a href="/comment" class="btn-secondary">
+                <i class="fas fa-comments mr-2"></i>댓글 관리
+            </a>
+        </div>
+    </div>
+
+    <!-- 필터 섹션 -->
+    <div class="filter-section">
+        <div class="filter-toggle">
+            <h3 class="filter-title">검색 필터</h3>
+            <button type="button" class="toggle-btn" onclick="toggleFilter()">
+                <i class="fas fa-filter mr-1"></i>필터
+            </button>
+        </div>
+        
+        <form id="filterForm" class="hidden">
+            <div class="search-form">
+                <div class="form-group">
+                    <label class="form-label">신고 사유</label>
+                    <select name="reason" class="form-select">
+                        <option value="">전체</option>
+                        <option th:each="reason : ${reportReasons}" 
+                                th:value="${reason}" 
+                                th:text="${reason}" 
+                                th:selected="${reason == reason}">SPAM</option>
+                    </select>
+                </div>
+                
+                <button type="button" class="btn-reset" onclick="resetFilter()">
+                    <i class="fas fa-undo mr-1"></i>초기화
+                </button>
+                <button type="button" class="btn-search" onclick="searchReports()">
+                    <i class="fas fa-search mr-1"></i>검색
+                </button>
+            </div>
+            
+            <!-- 정렬 기준 및 방향 (hidden input) -->
+            <input type="hidden" name="sortField" th:value="${sortField}" />
+            <input type="hidden" name="sortDir" th:value="${sortDir}" />
+        </form>
+    </div>
+
+    <!-- 결과 테이블 -->
+    <div class="table-section">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>신고 ID</th>
+                    <th>댓글 내용</th>
+                    <th>신고자</th>
+                    <th>피신고자</th>
+                    <th>신고 사유</th>
+                    <th>평점</th>
+                    <th>
+                        <a href="#" data-sortfield="reportedAt" onclick="toggleSort(this, event)" class="sort-link">
+                            신고일
+                            <i th:if="${sortField=='reportedAt'}" th:class="${sortDir=='asc'} ? 'fas fa-sort-up sort-icon' : 'fas fa-sort-down sort-icon'"></i>
+                        </a>
+                    </th>
+                    <th>작업</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:if="${reportPage.content.isEmpty()}">
+                    <td colspan="8" class="no-data">
+                        <i class="fas fa-flag-slash"></i>
+                        <div>신고된 댓글이 없습니다.</div>
+                    </td>
+                </tr>
+                <tr th:each="report : ${reportPage.content}">
+                    <td class="report-id" th:text="${report.reportId}">1</td>
+                    <td class="comment-content" th:text="${report.commentContent}">댓글 내용</td>
+                    <td class="reporter-name" th:text="${report.reporterName}">신고자</td>
+                    <td class="reported-user-name" th:text="${report.reportedUserName}">피신고자</td>
+                    <td>
+                        <span th:class="|reason-badge reason-${report.reason.name().toLowerCase()}|" 
+                              th:text="${report.reason}">SPAM</span>
+                    </td>
+                    <td>
+                        <div class="rating">
+                            <span th:each="i : ${#numbers.sequence(1, 5)}" 
+                                  th:class="${i <= report.rating} ? 'star fas fa-star' : 'star far fa-star'"></span>
+                            <span class="rating-number" th:text="${report.rating}">5</span>
+                        </div>
+                    </td>
+                    <td class="date" th:text="${#temporals.format(report.reportedAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 12:00</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button th:onclick="|deleteReport(${report.reportId})|" class="btn-danger">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 페이징 -->
+    <div class="pagination-section">
+        <div class="pagination-info">
+            총 <span th:text="${reportPage.totalElements}">0</span>개 중 
+            <span th:text="${reportPage.number * reportPage.size + 1}">1</span>-<span th:text="${(reportPage.number + 1) * reportPage.size > reportPage.totalElements ? reportPage.totalElements : (reportPage.number + 1) * reportPage.size}">10</span>개 표시
+        </div>
+        
+        <div class="pagination">
+            <a th:if="${reportPage.hasPrevious()}" th:onclick="|searchReports(${reportPage.number - 1})|">
+                <i class="fas fa-chevron-left"></i> 이전
+            </a>
+            
+            <a th:each="i : ${#numbers.sequence(0, reportPage.totalPages - 1)}" 
+               th:onclick="|searchReports(${i})|" 
+               th:class="${i == reportPage.number} ? 'active' : ''" 
+               th:text="${i + 1}">1</a>
+            
+            <a th:if="${reportPage.hasNext()}" th:onclick="|searchReports(${reportPage.number + 1})|">
+                다음 <i class="fas fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <script src="/js/filter.js"></script>
+    <script src="/js/util.js"></script>
+    
+    <script>
+        function toggleFilter() {
+            const filterForm = document.getElementById('filterForm');
+            const toggleBtn = document.querySelector('.toggle-btn');
+            
+            if (filterForm.classList.contains('hidden')) {
+                filterForm.classList.remove('hidden');
+                toggleBtn.innerHTML = '<i class="fas fa-chevron-up mr-1"></i>접기';
+            } else {
+                filterForm.classList.add('hidden');
+                toggleBtn.innerHTML = '<i class="fas fa-filter mr-1"></i>필터';
+            }
+        }
+        
+        function searchReports(page = 0) {
+            const form = document.getElementById('filterForm');
+            const formData = new FormData(form);
+            formData.set('page', page);
+            
+            const params = new URLSearchParams();
+            for (let [key, value] of formData.entries()) {
+                if (value) params.append(key, value);
+            }
+            
+            window.location.href = '/comment-report?' + params.toString();
+        }
+        
+        function resetFilter() {
+            document.querySelector('select[name="reason"]').value = '';
+            searchReports(0);
+        }
+        
+        function toggleSort(element, event) {
+            event.preventDefault();
+            const sortField = element.getAttribute('data-sortfield');
+            const currentSortField = document.querySelector('input[name="sortField"]').value;
+            const currentSortDir = document.querySelector('input[name="sortDir"]').value;
+            
+            let newSortDir = 'desc';
+            if (sortField === currentSortField && currentSortDir === 'desc') {
+                newSortDir = 'asc';
+            }
+            
+            document.querySelector('input[name="sortField"]').value = sortField;
+            document.querySelector('input[name="sortDir"]').value = newSortDir;
+            
+            searchReports(0);
+        }
+        
+        function deleteReport(id) {
+            if (confirm('정말로 이 신고를 삭제하시겠습니까?\n삭제된 신고는 복구할 수 없습니다.')) {
+                fetch('/api/admin/comment-reports/' + id, { 
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(res => {
+                    if (res.ok) {
+                        alert('신고가 삭제되었습니다.');
+                        window.location.reload();
+                    } else {
+                        alert('신고 삭제에 실패했습니다.');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    alert('신고 삭제 중 오류가 발생했습니다.');
+                });
+            }
+        }
+    </script>
+</div>
+
+
+

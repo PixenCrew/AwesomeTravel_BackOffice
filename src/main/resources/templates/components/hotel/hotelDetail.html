@@ -1,0 +1,221 @@
+<div th:fragment="content" class="min-h-screen bg-gray-50 py-6">
+    <!-- 헤더 -->
+    <div class="sm:flex sm:items-center">
+        <div class="sm:flex-auto">
+            <h1 class="text-base font-semibold leading-6 text-gray-900" th:text="${hotel.id == null} ? '호텔 등록' : '호텔 상세'">호텔 상세</h1>
+            <p class="mt-2 text-sm text-gray-700" th:text="${hotel.id == null} ? '새로운 호텔을 등록합니다.' : '호텔 정보를 확인하고 수정할 수 있습니다.'">호텔 정보를 확인하고 수정할 수 있습니다.</p>
+        </div>
+        <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none space-x-3" th:if="${hotel.id != null}">
+            <button th:onclick="|openReservationPopup(${hotel.id})|" 
+                    class="inline-flex items-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500">
+                <i class="fas fa-calendar -ml-0.5 mr-1.5 h-4 w-4"></i>
+                예약상세
+            </button>
+            <button th:onclick="deleteHotel([[${hotel.id}]])" 
+                    class="inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500">
+                <i class="fas fa-trash -ml-0.5 mr-1.5 h-4 w-4"></i>
+                삭제
+            </button>
+        </div>
+    </div>
+
+    <form th:object="${hotel}" th:action="${hotel.id == null} ? @{/hotel/new} : @{/hotel/{id}(id=${hotel.id})}" method="post" class="mt-6 space-y-8">
+        <!-- 기본 정보 -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-base font-semibold leading-6 text-gray-900 mb-4">기본 정보</h3>
+                
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <div th:if="${hotel.id != null}">
+                        <label class="block text-sm font-medium leading-6 text-gray-900">ID</label>
+                        <input type="text" th:field="*{id}" readonly 
+                               class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 bg-gray-50 sm:text-sm sm:leading-6" />
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium leading-6 text-gray-900">호텔명</label>
+                        <input type="text" th:field="*{name}" required 
+                               class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium leading-6 text-gray-900">도시</label>
+                        <input type="text" th:field="*{city}" list="cityList" onchange="stripAfterPipe(this)" required 
+                               class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium leading-6 text-gray-900">주소</label>
+                        <input type="text" th:field="*{address}" required 
+                               class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium leading-6 text-gray-900">전화번호</label>
+                        <input type="text" th:field="*{number}" 
+                               class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium leading-6 text-gray-900">이메일</label>
+                        <input type="email" th:field="*{email}" 
+                               class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium leading-6 text-gray-900">웹사이트</label>
+                        <input type="url" th:field="*{website}" 
+                               class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium leading-6 text-gray-900">호텔 유형</label>
+                        <select th:field="*{hotelType}" 
+                                class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
+                            <option th:each="type : ${T(renewal.common.entity.Hotel.HotelType).values()}" th:value="${type}" th:text="${type}"></option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium leading-6 text-gray-900">가격 (원)</label>
+                        <input type="number" th:field="*{price}" required 
+                               class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium leading-6 text-gray-900">최대 객실 수</label>
+                        <input type="number" th:field="*{maxRoomCount}" 
+                               class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <input type="checkbox" th:field="*{isActive}" 
+                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
+                        <label class="ml-2 block text-sm text-gray-900">활성 상태</label>
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <label class="block text-sm font-medium leading-6 text-gray-900">설명</label>
+                    <textarea th:field="*{description}" rows="4" required 
+                              class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- 이미지 관리 -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-base font-semibold leading-6 text-gray-900 mb-4">이미지 관리</h3>
+                <fieldset id="images-fieldset" class="space-y-4">
+                    <div class="image-item" th:each="img, iterStat : *{images}">
+                        <div class="flex space-x-2">
+                            <input type="text" th:field="*{images[__${iterStat.index}__]}" placeholder="이미지 URL을 입력하세요" 
+                                   class="flex-1 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                            <button type="button" onclick="removeImage(this)" 
+                                    class="inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500">
+                                <i class="fas fa-trash h-4 w-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="button" onclick="addImage()" 
+                            class="inline-flex items-center rounded-md bg-gray-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500">
+                        <i class="fas fa-plus -ml-0.5 mr-1.5 h-4 w-4"></i>
+                        이미지 추가
+                    </button>
+                </fieldset>
+            </div>
+        </div>
+
+        <!-- 편의시설 선택 -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-base font-semibold leading-6 text-gray-900 mb-4">편의시설 선택</h3>
+                <fieldset class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                    <div th:each="a : ${allAmenities}" class="flex items-center">
+                        <input type="checkbox" name="amenities" th:value="${a.id}" th:checked="${hotel.amenities.contains(a)}" 
+                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
+                        <label class="ml-2 block text-sm text-gray-900" th:text="${a.name}">편의시설</label>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+
+        <!-- 폼 버튼 -->
+        <div class="flex justify-end space-x-3">
+            <a th:href="@{/hotel}" 
+               class="inline-flex items-center rounded-md bg-gray-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500">
+                <i class="fas fa-arrow-left -ml-0.5 mr-1.5 h-4 w-4"></i>
+                목록으로
+            </a>
+            <button type="submit" th:text="${hotel.id == null} ? '등록' : '수정'"
+                    class="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500">
+                <i class="fas fa-save -ml-0.5 mr-1.5 h-4 w-4"></i>
+                <span th:text="${hotel.id == null} ? '등록' : '수정'">수정</span>
+            </button>
+        </div>
+    </form>
+    
+    <script src="/js/util.js"></script>
+    <script>
+        function deleteHotel(id) {
+            if (confirm('정말로 삭제하시겠습니까?')) {
+                fetch('/hotel/' + id, { method: 'DELETE' })
+                    .then(res => {
+                        if (res.ok) {
+                            alert('삭제 성공');
+                            window.location.href = '/hotel';
+                        } else {
+                            alert('삭제 실패');
+                        }
+                    });
+            }
+        }
+
+        function openReservationPopup(hotelId) {
+            const popup = window.open(
+                '/hotel/' + hotelId + '/hotelReservation',
+                'hotelReservation',
+                'width=1200,height=800,scrollbars=yes,resizable=yes,menubar=no,toolbar=no,location=no,status=no'
+            );
+            popup.focus();
+        }
+
+        // function addImage() {
+        //     const fieldset = document.getElementById("images-fieldset");
+        //     const item = document.createElement("div");
+        //     const index = fieldset.querySelectorAll(".image-item").length;
+
+        //     item.classList.add("image-item");
+        //     item.innerHTML = `
+        //         <input type="text" name="images[${index}]" placeholder="이미지 URL" readonly />
+        //         <input type="file" onchange="uploadImage(this, ${index})" />
+        //         <button type="button" onclick="removeImage(this)">삭제</button>
+        //     `;
+        //     fieldset.insertBefore(item, fieldset.lastElementChild);
+        // }
+        function addImage() {
+            const fieldset = document.getElementById("images-fieldset");
+
+            // .image-item 개수 → 다음 인덱스
+            const index = fieldset.querySelectorAll(".image-item").length;
+
+            const item = document.createElement("div");
+            item.classList.add("image-item");
+
+            item.innerHTML = `
+                <input type="text" name="images[${index}]" placeholder="이미지 URL" readonly />
+                <input type="file" onchange="uploadImage(this)" />
+                <button type="button" onclick="removeImage(this)">삭제</button>
+            `;
+
+            fieldset.insertBefore(item, fieldset.lastElementChild);
+        }
+        
+    </script>
+    
+    <datalist id="cityList">
+        <option th:each="cc : ${cityCode}"
+            th:value="${cc.code} + ' | ' + ${cc.country} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
+    </datalist>
+</div>
