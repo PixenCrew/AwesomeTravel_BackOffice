@@ -25,7 +25,7 @@ import renewal.awesome_travel_backoffice.notice.dto.request.NoticeRequestDto;
 import renewal.awesome_travel_backoffice.notice.dto.request.NoticeSearchRequest;
 import renewal.awesome_travel_backoffice.notice.dto.response.NoticeResponseDto;
 import renewal.awesome_travel_backoffice.notice.service.NoticeService;
-import renewal.awesome_travel_backoffice.notice.utils.NoticeCategory;
+import renewal.common.entity.Notice.NoticeCategory;
 
 import lombok.RequiredArgsConstructor;
 

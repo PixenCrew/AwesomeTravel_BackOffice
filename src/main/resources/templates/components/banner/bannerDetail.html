@@ -1,0 +1,183 @@
+<div th:fragment="content">
+    <div class="space-y-6">
+        <!-- 페이지 헤더 -->
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900">배너 상세</h2>
+                <p class="text-sm text-gray-600 mt-1">배너의 상세 정보를 확인하고 관리할 수 있습니다.</p>
+            </div>
+            <div class="flex space-x-3">
+                <a href="/banner" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-arrow-left mr-2"></i>목록으로
+                </a>
+                <a th:href="@{/banner/edit/{id}(id=${banner.id})}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    <i class="fas fa-edit mr-2"></i>수정
+                </a>
+            </div>
+        </div>
+
+        <!-- 배너 상세 정보 -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">기본 정보</h3>
+            </div>
+            <div class="px-6 py-4">
+                <dl class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">배너 ID</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${banner.id}">1</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">제목</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${banner.title}">배너 제목</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">표시 순서</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${banner.displayOrder}">1</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">활성 상태</dt>
+                        <dd class="mt-1">
+                            <span th:if="${banner.active}" 
+                                  class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                활성
+                            </span>
+                            <span th:unless="${banner.active}" 
+                                  class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                                비활성
+                            </span>
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">시작 날짜</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${#temporals.format(banner.startDate, 'yyyy-MM-dd')}">2024-01-01</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">종료 날짜</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${#temporals.format(banner.endDate, 'yyyy-MM-dd')}">2024-12-31</dd>
+                    </div>
+                    <div class="md:col-span-2">
+                        <dt class="text-sm font-medium text-gray-500">연결 URL</dt>
+                        <dd class="mt-1 text-sm text-gray-900">
+                            <a th:href="${banner.url}" 
+                               th:text="${banner.url}" 
+                               target="_blank" 
+                               class="text-blue-600 hover:text-blue-800 hover:underline">
+                                https://example.com
+                            </a>
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <!-- 배너 이미지 -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">배너 이미지</h3>
+            </div>
+            <div class="px-6 py-4">
+                <div th:if="${banner.file != null && !banner.file.isEmpty()}" class="text-center">
+                    <img th:src="@{${banner.file}}" 
+                         alt="배너 이미지" 
+                         class="max-w-full h-auto max-h-96 mx-auto rounded-lg shadow-lg">
+                    <p class="mt-2 text-sm text-gray-500" th:text="${banner.file}">이미지 파일명</p>
+                </div>
+                <div th:unless="${banner.file != null && !banner.file.isEmpty()}" class="text-center py-12">
+                    <i class="fas fa-image text-4xl text-gray-400 mb-4"></i>
+                    <p class="text-gray-500">등록된 이미지가 없습니다.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 시스템 정보 -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">시스템 정보</h3>
+            </div>
+            <div class="px-6 py-4">
+                <dl class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">생성일</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${#temporals.format(banner.createdAt, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01 09:00:00</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">생성자</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${banner.createdBy}">admin</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">수정일</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${banner.modifiedAt != null ? #temporals.format(banner.modifiedAt, 'yyyy-MM-dd HH:mm:ss') : '-'}">2024-01-01 09:00:00</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">수정자</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${banner.modifiedBy != null ? banner.modifiedBy : '-'}">admin</dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <!-- 액션 버튼 -->
+        <div class="flex justify-center space-x-4">
+            <button th:onclick="|toggleBanner(${banner.id})|" 
+                    th:class="${banner.active} ? 'px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700' : 'px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700'">
+                <i th:class="${banner.active} ? 'fas fa-pause mr-2' : 'fas fa-play mr-2'"></i>
+                <span th:text="${banner.active} ? '비활성화' : '활성화'">비활성화</span>
+            </button>
+            <button th:onclick="|deleteBanner(${banner.id})|" 
+                    class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                <i class="fas fa-trash mr-2"></i>삭제
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function toggleBanner(id) {
+            if (confirm('배너 상태를 변경하시겠습니까?')) {
+                fetch(`/banner/${id}/toggle`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        return response.text().then(text => {
+                            alert('상태 변경에 실패했습니다: ' + text);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('오류가 발생했습니다.');
+                });
+            }
+        }
+
+        function deleteBanner(id) {
+            if (confirm('정말로 이 배너를 삭제하시겠습니까?')) {
+                fetch(`/banner/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        location.href = '/banner';
+                    } else {
+                        return response.text().then(text => {
+                            alert('삭제에 실패했습니다: ' + text);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('오류가 발생했습니다.');
+                });
+            }
+        }
+    </script>
+</div>

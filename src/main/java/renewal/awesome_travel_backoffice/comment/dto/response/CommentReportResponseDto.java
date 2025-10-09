@@ -2,7 +2,7 @@ package renewal.awesome_travel_backoffice.comment.dto.response;
 
 import java.time.LocalDateTime;
 
-import renewal.awesome_travel_backoffice.comment.utiles.ReportReason;
+import renewal.common.entity.CommentReport.ReportReason;
 
 import lombok.Getter;
 import lombok.Builder;

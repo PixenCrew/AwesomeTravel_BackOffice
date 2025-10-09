@@ -1,0 +1,201 @@
+<div th:fragment="content" class="space-y-6">
+        <!-- 페이지 헤더 -->
+        <div class="bg-white rounded-lg shadow-sm">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center space-x-4">
+                        <div class="flex-shrink-0 h-16 w-16">
+                            <div class="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center">
+                                <span class="text-2xl font-medium text-blue-600" th:text="${#strings.substring(user.name, 0, 1)}">U</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900" th:text="${user.name}">홍길동</h2>
+                            <p class="text-sm text-gray-600" th:text="${user.email}">user@example.com</p>
+                            <div class="flex items-center space-x-2 mt-1">
+                                <span th:switch="${user.status}" 
+                                      class="inline-flex px-2 py-1 text-xs font-semibold rounded-full">
+                                    <span th:case="ACTIVE" class="bg-green-100 text-green-800">활성</span>
+                                    <span th:case="WITHDRAWN" class="bg-gray-100 text-gray-800">탈퇴</span>
+                                    <span th:case="BANNED" class="bg-red-100 text-red-800">차단</span>
+                                </span>
+                                <span th:switch="${user.role}" 
+                                      class="inline-flex px-2 py-1 text-xs font-semibold rounded-full">
+                                    <span th:case="ADMIN" class="bg-purple-100 text-purple-800">관리자</span>
+                                    <span th:case="USER" class="bg-blue-100 text-blue-800">일반회원</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex space-x-3">
+                        <a th:href="@{/member/edit/{id}(id=${user.id})}" 
+                           class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
+                            수정
+                        </a>
+                        <a href="/member" 
+                           class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
+                            목록으로
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 기본 정보 -->
+        <div class="bg-white rounded-lg shadow-sm">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">기본 정보</h3>
+            </div>
+            <div class="px-6 py-4">
+                <dl class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">이름</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${user.name}">홍길동</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">이메일</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${user.email}">user@example.com</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">전화번호</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${user.phone}">010-1234-5678</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">생년월일</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${#temporals.format(user.birthDate, 'yyyy-MM-dd')}">1990-01-01</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">가입일</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 10:00</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">마지막 수정일</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${#temporals.format(user.updatedAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 10:00</dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <!-- 소셜 로그인 정보 -->
+        <div class="bg-white rounded-lg shadow-sm">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">소셜 로그인 정보</h3>
+            </div>
+            <div class="px-6 py-4">
+                <dl class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">가입 경로</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${user.provider}">GOOGLE</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">소셜 ID</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${user.socialId}">1234567890</dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <!-- 여권 정보 -->
+        <div class="bg-white rounded-lg shadow-sm">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">여권 정보</h3>
+            </div>
+            <div class="px-6 py-4">
+                <dl class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">여권번호</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${user.passportNumber}">M12345678</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">발급국가</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${user.passportCountry}">대한민국</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">발급일</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${#temporals.format(user.passportIssuedDate, 'yyyy-MM-dd')}">2020-01-01</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">만료일</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${#temporals.format(user.passportExpiryDate, 'yyyy-MM-dd')}">2030-01-01</dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <!-- 영문 이름 -->
+        <div class="bg-white rounded-lg shadow-sm">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">영문 이름</h3>
+            </div>
+            <div class="px-6 py-4">
+                <dl class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">영문 이름</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${user.englishFirstName}">Gildong</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">영문 성</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${user.englishLastName}">Hong</dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <!-- 동의 정보 -->
+        <div class="bg-white rounded-lg shadow-sm">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">동의 정보</h3>
+            </div>
+            <div class="px-6 py-4">
+                <dl class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">이메일 인증</dt>
+                        <dd class="mt-1">
+                            <span th:if="${user.emailVerified}" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">완료</span>
+                            <span th:unless="${user.emailVerified}" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">미완료</span>
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">마케팅 수신 동의</dt>
+                        <dd class="mt-1">
+                            <span th:if="${user.marketingConsent}" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">동의</span>
+                            <span th:unless="${user.marketingConsent}" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">비동의</span>
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <!-- 최근 댓글 -->
+        <div class="bg-white rounded-lg shadow-sm">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">최근 댓글</h3>
+            </div>
+            <div class="px-6 py-4">
+                <div th:if="${#lists.isEmpty(recentComments)}" class="text-center py-8">
+                    <svg class="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                    </svg>
+                    <p class="text-gray-500">작성한 댓글이 없습니다.</p>
+                </div>
+                <div th:unless="${#lists.isEmpty(recentComments)}" class="space-y-4">
+                    <div th:each="comment : ${recentComments}" class="border border-gray-200 rounded-lg p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm font-medium text-gray-900" th:text="${comment.productTitle}">상품명</span>
+                                <span class="text-sm text-gray-500">•</span>
+                                <span class="text-sm text-gray-500" th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 10:00</span>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <span th:each="i : ${#numbers.sequence(1, 5)}" 
+                                      th:class="${i <= comment.rating ? 'text-yellow-400' : 'text-gray-300'}"
+                                      class="text-sm">★</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-700" th:text="${comment.content}">댓글 내용입니다.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

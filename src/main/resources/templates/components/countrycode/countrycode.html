@@ -1,0 +1,227 @@
+<div th:fragment="content">
+    <div class="space-y-6">
+        <!-- 페이지 헤더 -->
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900">국가 코드 관리</h2>
+                <p class="text-sm text-gray-600 mt-1">국가 코드를 등록하고 관리합니다.</p>
+            </div>
+            <div class="flex space-x-3">
+                <a href="/country-code/download-template" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200">
+                    <i class="fas fa-download mr-2"></i>템플릿 다운로드
+                </a>
+                <a href="/country-code/download" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200">
+                    <i class="fas fa-file-excel mr-2"></i>Excel 다운로드
+                </a>
+                <button onclick="document.getElementById('excelUpload').click()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors duration-200">
+                    <i class="fas fa-upload mr-2"></i>Excel 업로드
+                </button>
+                <a href="/country-code/new" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                    <i class="fas fa-plus mr-2"></i>새 국가 코드 등록
+                </a>
+            </div>
+        </div>
+
+        <!-- Excel 업로드 폼 (숨김) -->
+        <form id="excelUploadForm" action="/country-code/upload" method="POST" enctype="multipart/form-data" style="display: none;">
+            <input type="file" id="excelUpload" name="file" accept=".xlsx, .xls" onchange="handleExcelUpload(this)">
+        </form>
+
+        <!-- 메시지 표시 -->
+        <div th:if="${message}" class="p-4 bg-green-100 text-green-800 rounded-lg">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <span>작업이 성공적으로 완료되었습니다.</span>
+            </div>
+        </div>
+
+        <div th:if="${error}" class="p-4 bg-red-100 text-red-800 rounded-lg">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+                <span th:text="${error}">오류 메시지</span>
+            </div>
+        </div>
+
+        <!-- 검색 필터 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <form method="GET" action="/country-code" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">검색 유형</label>
+                    <select name="searchType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="code" th:selected="${searchType == 'code'}">국가 코드</option>
+                        <option value="nameKor" th:selected="${searchType == 'nameKor'}">국가명 (한글)</option>
+                        <option value="nameEng" th:selected="${searchType == 'nameEng'}">국가명 (영문)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">검색어</label>
+                    <input type="text" name="searchKeyword" th:value="${searchKeyword}"
+                           placeholder="검색어를 입력하세요"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="flex items-end gap-2">
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        <i class="fas fa-search mr-2"></i>검색
+                    </button>
+                    <a href="/country-code" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+                        <i class="fas fa-refresh mr-2"></i>초기화
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- 국가 코드 목록 -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <a th:href="@{/country-code(sortField='code', sortDir=${sortDir == 'asc' ? 'desc' : 'asc'})}"
+                                   class="hover:text-gray-700">
+                                    국가 코드
+                                    <i th:class="${sortField == 'code'} ? (${sortDir == 'asc'} ? 'fas fa-sort-up' : 'fas fa-sort-down') : 'fas fa-sort'"></i>
+                                </a>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <a th:href="@{/country-code(sortField='nameKor', sortDir=${sortDir == 'asc' ? 'desc' : 'asc'})}"
+                                   class="hover:text-gray-700">
+                                    국가명 (한글)
+                                    <i th:class="${sortField == 'nameKor'} ? (${sortDir == 'asc'} ? 'fas fa-sort-up' : 'fas fa-sort-down') : 'fas fa-sort'"></i>
+                                </a>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <a th:href="@{/country-code(sortField='nameEng', sortDir=${sortDir == 'asc' ? 'desc' : 'asc'})}"
+                                   class="hover:text-gray-700">
+                                    국가명 (영문)
+                                    <i th:class="${sortField == 'nameEng'} ? (${sortDir == 'asc'} ? 'fas fa-sort-up' : 'fas fa-sort-down') : 'fas fa-sort'"></i>
+                                </a>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">작업</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr th:each="country : ${countryCodePage.content}" class="hover:bg-gray-50 cursor-pointer country-row"
+                            th:data-code="${country.code}">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="${country.code}">KR</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${country.nameKor}">대한민국</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${country.nameEng}">South Korea</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex items-center space-x-2" onclick="event.stopPropagation()">
+                                    <a th:href="@{/country-code/{code}(code=${country.code})}"
+                                       class="inline-flex items-center justify-center px-3 py-1.5 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                                       title="상세보기">
+                                        <i class="fas fa-eye text-sm"></i>
+                                    </a>
+                                    <a th:href="@{/country-code/edit/{code}(code=${country.code})}"
+                                       class="inline-flex items-center justify-center px-3 py-1.5 bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200 transition-colors"
+                                       title="수정">
+                                        <i class="fas fa-edit text-sm"></i>
+                                    </a>
+                                    <button th:data-code="${country.code}"
+                                            onclick="deleteCountryCode(this.dataset.code)"
+                                            class="inline-flex items-center justify-center px-3 py-1.5 bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
+                                            title="삭제"
+                                            type="button">
+                                        <i class="fas fa-trash text-sm"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 빈 상태 -->
+            <div th:if="${countryCodePage.content.isEmpty()}" class="text-center py-12">
+                <i class="fas fa-globe text-4xl text-gray-400 mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">등록된 국가 코드가 없습니다</h3>
+                <p class="text-gray-500 mb-4">새로운 국가 코드를 등록해보세요.</p>
+                <a href="/country-code/new" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    <i class="fas fa-plus mr-2"></i>새 국가 코드 등록
+                </a>
+            </div>
+        </div>
+
+        <!-- 페이징 -->
+        <div th:if="${countryCodePage.totalPages > 1}" class="flex items-center justify-between">
+            <div class="text-sm text-gray-700">
+                <span th:text="${countryCodePage.number + 1}">1</span> / <span th:text="${countryCodePage.totalPages}">1</span> 페이지
+                (총 <span th:text="${countryCodePage.totalElements}">0</span>개)
+            </div>
+            <div class="flex space-x-2">
+                <a th:if="${countryCodePage.hasPrevious()}"
+                   th:href="@{/country-code(page=${countryCodePage.number - 1}, sortField=${sortField}, sortDir=${sortDir}, searchType=${searchType}, searchKeyword=${searchKeyword})}"
+                   class="px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                    이전
+                </a>
+                <a th:if="${countryCodePage.hasNext()}"
+                   th:href="@{/country-code(page=${countryCodePage.number + 1}, sortField=${sortField}, sortDir=${sortDir}, searchType=${searchType}, searchKeyword=${searchKeyword})}"
+                   class="px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                    다음
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 행 클릭 이벤트
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.country-row').forEach(row => {
+                row.addEventListener('click', function() {
+                    const code = this.dataset.code;
+                    location.href = '/country-code/' + code;
+                });
+            });
+        });
+
+        // Excel 업로드 핸들러
+        function handleExcelUpload(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const fileName = file.name;
+                const fileExt = fileName.substring(fileName.lastIndexOf('.')).toLowerCase();
+                
+                if (fileExt !== '.xlsx' && fileExt !== '.xls') {
+                    alert('Excel 파일만 업로드 가능합니다.');
+                    input.value = '';
+                    return;
+                }
+                
+                if (confirm('이 Excel 파일을 업로드하시겠습니까?\n파일명: ' + fileName + '\n\n※ 기존 데이터와 중복되는 코드는 업데이트됩니다.')) {
+                    document.getElementById('excelUploadForm').submit();
+                } else {
+                    input.value = '';
+                }
+            }
+        }
+
+        function deleteCountryCode(code) {
+            if (confirm('정말로 이 국가 코드를 삭제하시겠습니까?\n코드: ' + code)) {
+                fetch(`/country-code/${code}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        return response.text().then(text => {
+                            alert('삭제에 실패했습니다: ' + text);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('오류가 발생했습니다.');
+                });
+            }
+        }
+    </script>
+</div>

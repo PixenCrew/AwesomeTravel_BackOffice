@@ -1,0 +1,125 @@
+<div th:fragment="content">
+    <div class="space-y-6">
+        <!-- 페이지 헤더 -->
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900">공지사항 상세</h2>
+                <p class="text-sm text-gray-600 mt-1">공지사항의 상세 정보를 확인합니다.</p>
+            </div>
+            <div class="flex items-center space-x-3">
+                <a th:href="@{/notice}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200">
+                    목록으로
+                </a>
+                <a th:href="@{'/notice/edit/' + ${notice.id}}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                    수정하기
+                </a>
+            </div>
+        </div>
+
+        <!-- 공지사항 상세 정보 -->
+        <div class="bg-white rounded-lg shadow-sm">
+            <!-- 헤더 정보 -->
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <h3 class="text-xl font-semibold text-gray-900" th:text="${notice.title}">공지사항 제목</h3>
+                            <span th:if="${notice.fix}" class="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">고정</span>
+                            <span th:switch="${notice.category?.name()}" class="px-2 py-1 text-xs rounded-full">
+                                <span th:case="EVENT" class="bg-purple-100 text-purple-800">이벤트</span>
+                                <span th:case="UPDATE" class="bg-blue-100 text-blue-800">업데이트</span>
+                                <span th:case="SYSTEM" class="bg-orange-100 text-orange-800">점검</span>
+                                <span th:case="GUIDE" class="bg-green-100 text-green-800">안내</span>
+                                <span th:case="*" class="bg-gray-100 text-gray-800" th:text="${notice.category?.displayName}">카테고리</span>
+                            </span>
+                        </div>
+                        <div class="flex items-center space-x-6 text-sm text-gray-600">
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span th:text="${notice.createdAt != null ? #temporals.format(notice.createdAt, 'yyyy-MM-dd HH:mm') : ''}">작성일</span>
+                            </div>
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                                <span th:text="${notice.createdBy}">작성자</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span th:if="${notice.visible == false}" class="px-3 py-1 text-sm bg-gray-100 text-gray-800 rounded-full">숨김</span>
+                        <span th:if="${notice.visible}">
+                            <span th:if="${notice.startAt != null and notice.startAt.isAfter(#temporals.createNow())}" class="px-3 py-1 text-sm bg-orange-100 text-orange-800 rounded-full">대기 중</span>
+                            <span th:if="${notice.endAt != null and notice.endAt.isBefore(#temporals.createNow())}" class="px-3 py-1 text-sm bg-red-100 text-red-800 rounded-full">종료됨</span>
+                            <span th:if="${(notice.startAt == null or notice.startAt.isBefore(#temporals.createNow())) and (notice.endAt == null or notice.endAt.isAfter(#temporals.createNow()))}" class="px-3 py-1 text-sm bg-green-100 text-green-800 rounded-full">노출 중</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 노출 기간 정보 -->
+            <div th:if="${notice.startAt != null or notice.endAt != null}" class="p-6 border-b border-gray-200 bg-gray-50">
+                <h4 class="text-sm font-medium text-gray-700 mb-3">노출 기간</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">시작일</label>
+                        <div class="text-sm text-gray-900" th:text="${notice.startAt != null ? #temporals.format(notice.startAt, 'yyyy-MM-dd HH:mm') : '제한 없음'}">시작일</div>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">종료일</label>
+                        <div class="text-sm text-gray-900" th:text="${notice.endAt != null ? #temporals.format(notice.endAt, 'yyyy-MM-dd HH:mm') : '제한 없음'}">종료일</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 대표 이미지 -->
+            <div th:if="${notice.imageUrl != null and notice.imageUrl != ''}" class="p-6 border-b border-gray-200">
+                <h4 class="text-sm font-medium text-gray-700 mb-3">대표 이미지</h4>
+                <div class="flex justify-center">
+                    <img th:src="${notice.imageUrl}" 
+                         alt="공지사항 대표 이미지" 
+                         class="max-w-full max-h-96 rounded-lg shadow-sm object-contain">
+                </div>
+            </div>
+
+            <!-- 공지사항 내용 -->
+            <div class="p-6">
+                <h4 class="text-sm font-medium text-gray-700 mb-3">내용</h4>
+                <div class="prose max-w-none">
+                    <div class="whitespace-pre-wrap text-gray-900 leading-relaxed" th:text="${notice.content}">공지사항 내용이 여기에 표시됩니다.</div>
+                </div>
+            </div>
+
+            <!-- 수정 정보 -->
+            <div th:if="${notice.modifiedAt != null}" class="p-6 border-t border-gray-200 bg-gray-50">
+                <div class="flex items-center text-sm text-gray-600">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                    <span>마지막 수정: <span th:text="${#temporals.format(notice.modifiedAt, 'yyyy-MM-dd HH:mm')}">수정일</span></span>
+                    <span th:if="${notice.modifiedBy}" class="ml-2">by <span th:text="${notice.modifiedBy}">수정자</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 액션 버튼 -->
+        <div class="flex justify-center space-x-4">
+            <a th:href="@{/notice}" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors duration-200">
+                목록으로 돌아가기
+            </a>
+            <a th:href="@{'/notice/edit/' + ${notice.id}}" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                수정하기
+            </a>
+            <form th:action="@{'/notice/' + ${notice.id}}" method="POST" style="display: inline;">
+                <input type="hidden" name="_method" value="DELETE" />
+                <button type="submit" 
+                        class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
+                        onclick="return confirm('정말 삭제하시겠습니까?')">
+                    삭제하기
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

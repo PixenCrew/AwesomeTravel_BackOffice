@@ -1,0 +1,78 @@
+<div th:fragment="content">
+    <div class="space-y-6">
+        <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold">지역 카테고리 상세</h2>
+            <div class="flex space-x-3">
+                <a href="/region-category" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"><i class="fas fa-arrow-left mr-2"></i>목록</a>
+                <a th:href="@{/region-category/edit/{id}(id=${category.id})}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"><i class="fas fa-edit mr-2"></i>수정</a>
+            </div>
+        </div>
+
+        <!-- Breadcrumb -->
+        <div class="bg-white rounded-lg shadow-sm p-4">
+            <nav class="flex" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-2">
+                    <li th:each="parent, iterStat : ${parentChain}" class="inline-flex items-center">
+                        <span th:unless="${iterStat.first}" class="mx-2 text-gray-400">/</span>
+                        <a th:href="@{/region-category/{id}(id=${parent.id})}" 
+                           th:class="${parent.id == category.id} ? 'text-blue-700 font-semibold' : 'text-gray-600 hover:text-blue-700'"
+                           th:text="${parent.name}">카테고리</a>
+                    </li>
+                </ol>
+            </nav>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b"><h3 class="text-lg font-medium">기본 정보</h3></div>
+            <div class="px-6 py-4">
+                <dl class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div><dt class="text-sm font-medium text-gray-500">ID</dt><dd class="mt-1 text-lg font-semibold" th:text="${category.id}">1</dd></div>
+                    <div><dt class="text-sm font-medium text-gray-500">코드</dt><dd class="mt-1 text-lg" th:text="${category.code}">ASIA</dd></div>
+                    <div><dt class="text-sm font-medium text-gray-500">이름 (한글)</dt><dd class="mt-1 text-lg" th:text="${category.name}">아시아</dd></div>
+                    <div><dt class="text-sm font-medium text-gray-500">이름 (영문)</dt><dd class="mt-1 text-lg" th:text="${category.nameEng}">Asia</dd></div>
+                    <div><dt class="text-sm font-medium text-gray-500">타입</dt>
+                        <dd class="mt-1">
+                            <span th:if="${category.type?.name() == 'CONTINENT'}" class="px-3 py-1 rounded-full bg-purple-100 text-purple-800">대륙</span>
+                            <span th:if="${category.type?.name() == 'REGION'}" class="px-3 py-1 rounded-full bg-blue-100 text-blue-800">지역</span>
+                            <span th:if="${category.type?.name() == 'COUNTRY'}" class="px-3 py-1 rounded-full bg-green-100 text-green-800">국가</span>
+                            <span th:if="${category.type?.name() == 'SUB_REGION'}" class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800">지역구</span>
+                            <span th:if="${category.type?.name() == 'CITY'}" class="px-3 py-1 rounded-full bg-gray-100 text-gray-800">도시</span>
+                        </dd>
+                    </div>
+                    <div><dt class="text-sm font-medium text-gray-500">부모 ID</dt><dd class="mt-1 text-lg" th:text="${category.parentId != null ? category.parentId : '-'}">-</dd></div>
+                    <div><dt class="text-sm font-medium text-gray-500">표시 순서</dt><dd class="mt-1 text-lg" th:text="${category.displayOrder}">0</dd></div>
+                    <div><dt class="text-sm font-medium text-gray-500">국가 코드</dt><dd class="mt-1 text-lg" th:text="${category.countryCode != null ? category.countryCode : '-'}">-</dd></div>
+                </dl>
+            </div>
+        </div>
+
+        <!-- 하위 카테고리 -->
+        <div th:if="${!children.isEmpty()}" class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b"><h3 class="text-lg font-medium">하위 카테고리 (<span th:text="${children.size()}">0</span>개)</h3></div>
+            <div class="px-6 py-4">
+                <ul class="space-y-2">
+                    <li th:each="child : ${children}">
+                        <a th:href="@{/region-category/{id}(id=${child.id})}" class="text-blue-600 hover:underline">
+                            <span th:text="${child.name}">카테고리명</span> 
+                            <span class="text-gray-500 text-sm" th:text="|( ${child.type?.description} )|">(타입)</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="flex justify-center">
+            <button th:data-id="${category.id}" onclick="deleteCategory(this.dataset.id)" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"><i class="fas fa-trash mr-2"></i>삭제</button>
+        </div>
+    </div>
+
+    <script>
+        function deleteCategory(id) {
+            if (confirm('카테고리를 삭제하시겠습니까?\n※ 하위 카테고리가 있으면 삭제할 수 없습니다.')) {
+                fetch(`/region-category/${id}`, { method: 'DELETE' })
+                .then(response => response.ok ? location.href = '/region-category?message=success' : response.text().then(text => alert(text)))
+                .catch(() => alert('오류 발생'));
+            }
+        }
+    </script>
+</div>

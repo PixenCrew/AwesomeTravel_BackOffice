@@ -1,10 +1,13 @@
 package renewal.awesome_travel_backoffice.airPurchase.repository;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import renewal.common.entity.AirPurchase;
 import renewal.common.entity.BasePurchase.PurchaseStatus;
@@ -17,5 +20,11 @@ public interface AirPurchaseRepository extends JpaRepository<AirPurchase, Long>,
             Pageable pageable
     );
 
+    Optional<AirPurchase> findByProductPurchaseId(Long productPurchaseId);
+
+    @Query("SELECT ap FROM AirPurchase ap " +
+           "LEFT JOIN FETCH ap.airPassengers passengers " +
+           "WHERE ap.productPurchaseId = :id")
+    Optional<AirPurchase> findByIdWithPassengers(@Param("id") Long id);
 
 }

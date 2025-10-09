@@ -35,6 +35,7 @@ public class MainController {
         return "layout";
     }
     
+    
     // TEST 테스트용 가입 TEST
     @PostMapping("admin")
     public String newAdmin(Admin admin) {

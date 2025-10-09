@@ -1,0 +1,77 @@
+<div th:fragment="content">
+    <div class="space-y-6">
+        <!-- 페이지 헤더 -->
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900">국가 코드 상세</h2>
+                <p class="text-sm text-gray-600 mt-1">국가 코드의 상세 정보를 확인할 수 있습니다.</p>
+            </div>
+            <div class="flex space-x-3">
+                <a href="/country-code" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-arrow-left mr-2"></i>목록으로
+                </a>
+                <a th:href="@{/country-code/edit/{code}(code=${countryCode.code})}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    <i class="fas fa-edit mr-2"></i>수정
+                </a>
+            </div>
+        </div>
+
+        <!-- 국가 코드 상세 정보 -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">기본 정보</h3>
+            </div>
+            <div class="px-6 py-4">
+                <dl class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">국가 코드</dt>
+                        <dd class="mt-1 text-lg font-semibold text-gray-900" th:text="${countryCode.code}">KR</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">국가명 (한글)</dt>
+                        <dd class="mt-1 text-lg text-gray-900" th:text="${countryCode.nameKor}">대한민국</dd>
+                    </div>
+                    <div class="md:col-span-2">
+                        <dt class="text-sm font-medium text-gray-500">국가명 (영문)</dt>
+                        <dd class="mt-1 text-lg text-gray-900" th:text="${countryCode.nameEng}">South Korea</dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <!-- 액션 버튼 -->
+        <div class="flex justify-center space-x-4">
+            <button th:data-code="${countryCode.code}"
+                    onclick="deleteCountryCode(this.dataset.code)" 
+                    class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                <i class="fas fa-trash mr-2"></i>삭제
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function deleteCountryCode(code) {
+            if (confirm('정말로 이 국가 코드를 삭제하시겠습니까?\n코드: ' + code + '\n\n※ 이 국가와 연결된 도시 코드가 있으면 삭제에 실패할 수 있습니다.')) {
+                fetch(`/country-code/${code}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        location.href = '/country-code?message=success';
+                    } else {
+                        return response.text().then(text => {
+                            alert('삭제에 실패했습니다: ' + text);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('오류가 발생했습니다.');
+                });
+            }
+        }
+    </script>
+</div>
