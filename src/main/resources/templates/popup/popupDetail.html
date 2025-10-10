@@ -1,0 +1,130 @@
+<div th:fragment="content">
+    <div class="space-y-6">
+        <!-- 페이지 헤더 -->
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900">팝업 상세</h2>
+                <p class="text-sm text-gray-600 mt-1">팝업의 상세 정보를 확인합니다.</p>
+            </div>
+            <div class="flex space-x-3">
+                <a th:href="@{/popup}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200">
+                    <i class="fas fa-list mr-2"></i>목록으로
+                </a>
+                <a th:href="@{'/popup/edit/' + ${popup.id}}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                    <i class="fas fa-edit mr-2"></i>수정하기
+                </a>
+                <form th:action="@{'/popup/' + ${popup.id}}" method="POST" style="display: inline;">
+                    <input type="hidden" name="_method" value="DELETE" />
+                    <button type="submit" 
+                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
+                            onclick="return confirm('정말로 이 팝업을 삭제하시겠습니까?')">
+                        <i class="fas fa-trash mr-2"></i>삭제하기
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 팝업 상세 정보 -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">기본 정보</h3>
+            </div>
+            <div class="px-6 py-4">
+                <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">팝업 ID</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${popup.id}">1</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">표시 순서</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${popup.displayOrder}">1</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">제목</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${popup.title}">팝업 제목</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">상태</dt>
+                        <dd class="mt-1">
+                            <span th:if="${popup.active}" class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">활성화</span>
+                            <span th:unless="${popup.active}" class="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">비활성화</span>
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">시작일</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${#temporals.format(popup.startDate, 'yyyy-MM-dd')}">2024-01-01</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">종료일</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${#temporals.format(popup.endDate, 'yyyy-MM-dd')}">2024-12-31</dd>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <dt class="text-sm font-medium text-gray-500">파일 경로</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${popup.file}">/images/popup/popup1.jpg</dd>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <dt class="text-sm font-medium text-gray-500">연결 URL</dt>
+                        <dd class="mt-1 text-sm text-gray-900">
+                            <a th:href="${popup.url}" 
+                               th:text="${popup.url}" 
+                               target="_blank" 
+                               class="text-blue-600 hover:text-blue-800 underline">https://example.com</a>
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <!-- 시스템 정보 -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">시스템 정보</h3>
+            </div>
+            <div class="px-6 py-4">
+                <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">등록일</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${#temporals.format(popup.createdAt, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01 10:00:00</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">수정일</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${#temporals.format(popup.modifiedAt, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01 10:00:00</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">등록자</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${popup.createdBy}">admin</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">수정자</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${popup.modifiedBy}">admin</dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <!-- 팝업 미리보기 -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">팝업 미리보기</h3>
+            </div>
+            <div class="px-6 py-4">
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                    <div th:if="${popup.file}" class="mb-4">
+                        <img th:src="${popup.file}" 
+                             alt="팝업 미리보기" 
+                             class="max-w-full h-auto mx-auto rounded-lg shadow-sm"
+                             style="max-height: 300px;">
+                    </div>
+                    <div th:unless="${popup.file}" class="text-gray-500">
+                        <i class="fas fa-image text-4xl mb-2"></i>
+                        <p>이미지 파일이 없습니다.</p>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-sm text-gray-600">제목: <span th:text="${popup.title}">팝업 제목</span></p>
+                        <p class="text-sm text-gray-600">URL: <a th:href="${popup.url}" th:text="${popup.url}" target="_blank" class="text-blue-600 hover:text-blue-800 underline">https://example.com</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
