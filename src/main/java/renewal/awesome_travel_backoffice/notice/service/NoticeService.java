@@ -35,6 +35,14 @@ public class NoticeService {
                 dto.getCategory(),
                 dto.getStartAt(),
                 dto.getEndAt());
+        
+        // visible 필드 설정 (null이면 true로 기본 설정)
+        if (dto.getVisible() != null) {
+            notice.setVisible(dto.getVisible());
+        } else {
+            notice.setVisible(true); // 기본값 true
+        }
+        
         return noticeRepository.save(notice).getId();
     }
 
@@ -69,6 +77,7 @@ public class NoticeService {
         if (dto.getCategory() != null)  notice.updateCategory(dto.getCategory());
         if (dto.getStartAt() != null)   notice.updateStartAt(dto.getStartAt());
         if (dto.getEndAt() != null)     notice.updateEndAt(dto.getEndAt());
+        if (dto.getVisible() != null)   notice.setVisible(dto.getVisible());
     }
 
     // @Transactional
@@ -102,8 +111,11 @@ public class NoticeService {
                 .category(notice.getCategory())
                 .startAt(notice.getStartAt())
                 .endAt(notice.getEndAt())
+                .visible(notice.getVisible())
                 .createdAt(notice.getCreatedAt())
                 .modifiedAt(notice.getModifiedAt())
+                .createdBy(notice.getCreatedBy())
+                .modifiedBy(notice.getModifiedBy())
                 .build();
     }
 

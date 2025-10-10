@@ -1,7 +1,7 @@
 package renewal.awesome_travel_backoffice.notice.dto.request;
 
-import renewal.awesome_travel_backoffice.notice.utils.NoticeCategory;
-import renewal.awesome_travel_backoffice.notice.utils.SearchType;
+import renewal.common.entity.Notice.NoticeCategory;
+import renewal.common.entity.Notice.SearchType;
 
 import lombok.Getter;
 import lombok.Setter;
