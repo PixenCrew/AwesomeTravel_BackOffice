@@ -1,0 +1,309 @@
+<div th:fragment="content">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <th:block>
+      <script>
+        function filterDropdown(id, keyword) {
+          const select = document.getElementById(id + "-select");
+          const options = select.options;
+          for (let i = 0; i < options.length; i++) {
+            const txt = options[i].text.toLowerCase();
+            options[i].style.display = txt.includes(keyword.toLowerCase()) ? '' : 'none';
+          }
+        }
+
+        function setDateRange(days) {
+          const now = new Date();
+          const start = new Date();
+          start.setDate(now.getDate() - days);
+          document.querySelector('input[name="startDate"]').value = start.toISOString().split('T')[0];
+          document.querySelector('input[name="endDate"]').value = now.toISOString().split('T')[0];
+        }
+
+        function toggleFilter() {
+          const filterPanel = document.getElementById('filterPanel');
+          const toggleBtn = document.getElementById('toggleFilterBtn');
+          if (filterPanel.classList.contains('hidden')) {
+            filterPanel.classList.remove('hidden');
+            toggleBtn.innerHTML = '<i class="fas fa-chevron-up mr-2"></i>필터 접기';
+          } else {
+            filterPanel.classList.add('hidden');
+            toggleBtn.innerHTML = '<i class="fas fa-chevron-down mr-2"></i>필터 펼치기';
+          }
+        }
+
+        function updateFilterCount() {
+          const activeFilters = document.querySelectorAll('input[type="text"]:not([value=""]), input[type="date"]:not([value=""]), select:not([value=""])').length;
+          const countBadge = document.getElementById('filterCount');
+          countBadge.textContent = activeFilters;
+        }
+        
+        // 페이지 로드 시 필터 카운트 업데이트
+        document.addEventListener('DOMContentLoaded', function() {
+          updateFilterCount();
+          
+          // 필터 입력 필드에 이벤트 리스너 추가
+          const filterInputs = document.querySelectorAll('input[type="text"], input[type="date"], select');
+          filterInputs.forEach(input => {
+            input.addEventListener('change', updateFilterCount);
+            input.addEventListener('input', updateFilterCount);
+          });
+        });
+
+        function toggleStatus(id) {
+          if (confirm('상태를 변경하시겠습니까?')) {
+            var form = document.getElementById('toggleForm' + id);
+            if(form) form.submit();
+            else alert('상태 변경 폼이 존재하지 않습니다.');
+          }
+        }
+
+        function exportToExcel() {
+          const form = document.createElement('form');
+          form.method = 'GET';
+          form.action = '/inquiry/export';
+          document.body.appendChild(form);
+          form.submit();
+        }
+      </script>
+    </th:block>
+
+    <div class="max-w-7xl mx-auto">
+      <!-- 에러 메시지 -->
+      <div th:if="${errorMessage}" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+        <i class="fas fa-exclamation-triangle mr-2"></i>
+        <span th:text="${errorMessage}">에러 메시지</span>
+      </div>
+
+      <!-- 헤더 -->
+      <div class="mb-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900">1:1 문의 관리</h2>
+          <p class="text-gray-600 mt-2">사용자 문의를 관리할 수 있습니다.</p>
+        </div>
+        <div class="flex space-x-3">
+          <button onclick="exportToExcel()" 
+                  class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+            <i class="fas fa-file-excel mr-2"></i>엑셀 다운로드
+          </button>
+        </div>
+      </div>
+
+      <!-- 필터 패널 -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+        <div class="p-4 border-b border-gray-200">
+          <button id="toggleFilterBtn" onclick="toggleFilter()" 
+                  class="flex items-center text-gray-700 hover:text-gray-900">
+            <i class="fas fa-chevron-down mr-2"></i>필터 펼치기
+            <span id="filterCount" class="ml-2 bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">0</span>
+          </button>
+        </div>
+        
+        <div id="filterPanel" class="hidden p-6">
+          <form method="GET" action="/inquiry" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- <input type="hidden" name="_csrf" th:value="${_csrf.token}"> -->
+            
+            <!-- 검색어 -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">검색어</label>
+              <input type="text" name="keyword" th:value="${param.keyword}" 
+                     placeholder="제목, 내용 검색" 
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <!-- 검색 타입 -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">검색 타입</label>
+              <select name="searchType" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">전체</option>
+                <option value="TITLE" th:selected="${param.searchType == 'TITLE'}">제목</option>
+                <option value="CONTENT" th:selected="${param.searchType == 'CONTENT'}">내용</option>
+                <option value="TITLE_CONTENT" th:selected="${param.searchType == 'TITLE_CONTENT'}">제목+내용</option>
+              </select>
+            </div>
+
+            <!-- 상태 -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">상태</label>
+              <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">전체</option>
+                <option value="PENDING" th:selected="${param.status == 'PENDING'}">대기중</option>
+                <option value="IN_PROGRESS" th:selected="${param.status == 'IN_PROGRESS'}">처리중</option>
+                <option value="COMPLETED" th:selected="${param.status == 'COMPLETED'}">완료</option>
+              </select>
+            </div>
+
+            <!-- 카테고리 -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">카테고리</label>
+              <select name="category" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">전체</option>
+                <option value="GENERAL" th:selected="${param.category == 'GENERAL'}">일반</option>
+                <option value="TECHNICAL" th:selected="${param.category == 'TECHNICAL'}">기술</option>
+                <option value="BILLING" th:selected="${param.category == 'BILLING'}">결제</option>
+                <option value="OTHER" th:selected="${param.category == 'OTHER'}">기타</option>
+              </select>
+            </div>
+
+            <!-- 날짜 범위 -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">시작일</label>
+              <input type="date" name="startDate" th:value="${param.startDate}" 
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">종료일</label>
+              <input type="date" name="endDate" th:value="${param.endDate}" 
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <!-- 빠른 날짜 선택 -->
+            <div class="flex space-x-2">
+              <button type="button" onclick="setDateRange(7)" 
+                      class="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200">7일</button>
+              <button type="button" onclick="setDateRange(30)" 
+                      class="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200">30일</button>
+              <button type="button" onclick="setDateRange(90)" 
+                      class="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200">90일</button>
+            </div>
+
+            <!-- 버튼 -->
+            <div class="flex space-x-2">
+              <button type="submit" 
+                      class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                <i class="fas fa-search mr-2"></i>검색
+              </button>
+              <a href="/inquiry" 
+                 class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">
+                <i class="fas fa-undo mr-2"></i>초기화
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- 결과 요약 -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+        <div class="p-4">
+          <div class="flex justify-between items-center">
+            <div class="text-sm text-gray-600">
+              총 <span class="font-semibold text-blue-600" th:text="${totalCount}">0</span>건의 문의
+            </div>
+            <div class="flex space-x-4 text-sm">
+              <span class="text-yellow-600">
+                <i class="fas fa-clock mr-1"></i>대기중: <span th:text="${#lists.size(inquiries.?[status.name() == 'PENDING'])}">0</span>
+              </span>
+              <span class="text-blue-600">
+                <i class="fas fa-spinner mr-1"></i>처리중: <span th:text="${#lists.size(inquiries.?[status.name() == 'IN_PROGRESS'])}">0</span>
+              </span>
+              <span class="text-green-600">
+                <i class="fas fa-check mr-1"></i>완료: <span th:text="${#lists.size(inquiries.?[status.name() == 'COMPLETED'])}">0</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 테이블 -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">번호</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">제목</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">작성자</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">카테고리</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">상태</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">작성일</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">관리</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr th:each="inquiry : ${inquiries}" th:class="${!inquiry.isAnswered} ? 'bg-yellow-50' : ''">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${inquiry.id}">1</td>
+                <td class="px-6 py-4">
+                  <div class="text-sm font-medium text-gray-900" th:text="${inquiry.title}">문의 제목</div>
+                  <div class="text-sm text-gray-500" th:text="${#strings.abbreviate(inquiry.content, 50)}">문의 내용 미리보기...</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${inquiry.userName}">사용자명</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full" 
+                        th:class="${inquiry.category.name() == 'GENERAL'} ? 'bg-blue-100 text-blue-800' : (${inquiry.category.name() == 'TECHNICAL'} ? 'bg-green-100 text-green-800' : (${inquiry.category.name() == 'BILLING'} ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'))"
+                        th:text="${inquiry.category.displayName}">일반</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full" 
+                        th:class="${inquiry.status.name() == 'PENDING'} ? 'bg-yellow-100 text-yellow-800' : (${inquiry.status.name() == 'IN_PROGRESS'} ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800')"
+                        th:text="${inquiry.status.displayName}">대기중</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" 
+                    th:text="${#temporals.format(inquiry.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <div class="flex space-x-2">
+                    <a th:href="@{/inquiry/{id}(id=${inquiry.id})}" 
+                       class="text-blue-600 hover:text-blue-900">
+                      <i class="fas fa-eye"></i>
+                    </a>
+                    <button type="button" 
+                            th:onclick="'toggleStatus(' + ${inquiry.id} + ')'" 
+                            th:class="${inquiry.isAnswered} ? 'text-yellow-600 hover:text-yellow-900' : 'text-green-600 hover:text-green-900'"
+                            th:title="${inquiry.isAnswered} ? '답변 취소' : '답변 완료'">
+                      <i th:class="${inquiry.isAnswered} ? 'fas fa-undo' : 'fas fa-check'"></i>
+                    </button>
+                    <form th:id="'toggleForm' + ${inquiry.id}" method="POST" th:action="@{/inquiry/{id}/status/toggle(id=${inquiry.id})}" style="display: none;">
+                      <th:block th:if="${_csrf != null}">
+                        <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+                      </th:block>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+          <div class="flex-1 flex justify-between sm:hidden">
+            <a th:if="${currentPage > 0}" th:href="@{/inquiry(page=${currentPage - 1})}" 
+               class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+              이전
+            </a>
+            <a th:if="${currentPage < totalPages - 1}" th:href="@{/inquiry(page=${currentPage + 1})}" 
+               class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+              다음
+            </a>
+          </div>
+          <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+              <p class="text-sm text-gray-700">
+                총 <span class="font-medium" th:text="${totalCount}">0</span>건 중
+                <span class="font-medium" th:text="${currentPage * 10 + 1}">1</span> -
+                <span class="font-medium" th:text="${currentPage * 10 + #lists.size(inquiries)}">10</span>건
+              </p>
+            </div>
+            <div>
+              <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                <a th:if="${currentPage > 0}" th:href="@{/inquiry(page=${currentPage - 1})}" 
+                   class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                  <i class="fas fa-chevron-left"></i>
+                </a>
+                
+                <a th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}" 
+                   th:href="@{/inquiry(page=${pageNum})}"
+                   th:class="${pageNum == currentPage} ? 'relative inline-flex items-center px-4 py-2 border border-gray-300 bg-blue-50 text-sm font-medium text-blue-600' : 'relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50'"
+                   th:text="${pageNum + 1}">1</a>
+                
+                <a th:if="${currentPage < totalPages - 1}" th:href="@{/inquiry(page=${currentPage + 1})}" 
+                   class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                  <i class="fas fa-chevron-right"></i>
+                </a>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
