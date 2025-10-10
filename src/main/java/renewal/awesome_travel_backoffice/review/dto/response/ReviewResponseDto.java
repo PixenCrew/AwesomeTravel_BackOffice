@@ -1,4 +1,4 @@
-package renewal.awesome_travel_backoffice.comment.dto.response;
+package renewal.awesome_travel_backoffice.review.dto.response;
 
 import java.time.LocalDateTime;
 
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Builder
 @Getter
 @Setter
-public class CommentResponseDto {
+public class ReviewResponseDto {
     private Long id;
     private String writerName;
     private String content;

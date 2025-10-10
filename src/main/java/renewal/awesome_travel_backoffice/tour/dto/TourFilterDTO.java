@@ -8,13 +8,14 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.Getter;
 import lombok.Setter;
+import renewal.common.entity.CountryCode;
 
 @Getter
 @Setter
 public class TourFilterDTO {
     private String name;
     private List<String> companies;
-    private String country;
+    private CountryCode country;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDateFrom;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -28,4 +29,8 @@ public class TourFilterDTO {
     private String pointLocation;
     private Long startCount;
     private Long endCount;
+
+    // 연결된 Product 번호 있는지
+    private boolean findOrphan = false;
+
 }

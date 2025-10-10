@@ -14,6 +14,7 @@ import renewal.common.entity.Air;
 import renewal.common.entity.Air.AirStatus;
 import renewal.common.entity.Air.FlightType;
 import renewal.common.entity.Airline;
+import renewal.common.entity.CityCode;
 import renewal.common.entity.SeatClass;
 
 public class AirSpecification {
@@ -53,16 +54,16 @@ public class AirSpecification {
         };
     }
 
-    // departDate BETWEEN from AND to
-    public static Specification<SeatClass> departDateBetween(LocalDate from, LocalDate to) {
+    // departDateTime BETWEEN from AND to
+    public static Specification<SeatClass> departDateTimeBetween(LocalDate from, LocalDate to) {
         return (root, query, builder) -> {
             Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT);
             if (from != null && to != null) {
-                return builder.between(seatJoin.get("departDate"), from, to);
+                return builder.between(seatJoin.get("departDateTime"), from, to);
             } else if (from != null) {
-                return builder.greaterThanOrEqualTo(seatJoin.get("departDate"), from);
+                return builder.greaterThanOrEqualTo(seatJoin.get("departDateTime"), from);
             } else if (to != null) {
-                return builder.lessThanOrEqualTo(seatJoin.get("departDate"), to);
+                return builder.lessThanOrEqualTo(seatJoin.get("departDateTime"), to);
             } else {
                 return null;
             }
@@ -86,20 +87,20 @@ public class AirSpecification {
     }
 
     // departAirport == value
-    public static Specification<SeatClass> departEquals(String depart) {
+    public static Specification<SeatClass> departEquals(CityCode depart) {
         return (root, query, builder) -> {
             Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT);
-            if (!StringUtils.hasText(depart))
+            if (depart==null)
                 return null;
             return builder.equal(seatJoin.get("departAirport"), depart);
         };
     }
 
     // arriveAirport == value
-    public static Specification<SeatClass> arriveEquals(String arrive) {
+    public static Specification<SeatClass> arriveEquals(CityCode arrive) {
         return (root, query, builder) -> {
             Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT);
-            if (!StringUtils.hasText(arrive))
+            if (arrive==null)
                 return null;
             return builder.equal(seatJoin.get("arriveAirport"), arrive);
         };

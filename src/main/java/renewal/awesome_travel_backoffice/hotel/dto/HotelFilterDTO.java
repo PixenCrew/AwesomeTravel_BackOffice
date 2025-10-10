@@ -22,8 +22,9 @@ public class HotelFilterDTO {
     @DateTimeFormat(pattern = "yyyy-MM-dd") 
     private LocalDate endDate;
 
-    // 예약검색용
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate targetDate;
-    private Long requiredPersons;
+    // // 예약검색용
+    // @DateTimeFormat(pattern = "yyyy-MM-dd")
+    // private LocalDate targetDate;
+    // private Long requiredPersons;
+    // private Long dayOffset; // N일차 오프셋정도
 }

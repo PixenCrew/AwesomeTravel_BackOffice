@@ -1,13 +1,13 @@
-package renewal.awesome_travel_backoffice.hotel.repository;
+// package renewal.awesome_travel_backoffice.hotel.repository;
 
-import java.util.List;
+// import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+// import org.springframework.data.jpa.repository.JpaRepository;
 
-import renewal.common.entity.HotelReservation;
+// import renewal.common.entity.HotelReservation;
 
-public interface HotelReservationRepository extends JpaRepository<HotelReservation, Long> {
+// public interface HotelReservationRepository extends JpaRepository<HotelReservation, Long> {
 
-    List<HotelReservation> findByHotelId(Long id);
-    List<HotelReservation> findByTourId(Long id);
-}
+//     List<HotelReservation> findByHotelId(Long id);
+//     List<HotelReservation> findByTourId(Long id);
+// }

@@ -8,7 +8,9 @@ import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+import renewal.common.entity.CountryCode;
 import renewal.common.entity.Location;
+import renewal.common.entity.Product;
 import renewal.common.entity.Schedule;
 import renewal.common.entity.Tour;
 import renewal.common.entity.Product;
@@ -64,15 +66,15 @@ public class TourSpecification {
         };
     }
 
-    // Tour.price BETWEEN min AND max
+    // tour.priceAdult BETWEEN min AND max
     public static Specification<Tour> priceBetween(BigDecimal min, BigDecimal max) {
         return (root, query, builder) -> {
             if (min != null && max != null) {
-                return builder.between(root.get("price"), min, max);
+                return builder.between(root.get("priceAdult"), min, max);
             } else if (min != null) {
-                return builder.greaterThanOrEqualTo(root.get("price"), min);
+                return builder.greaterThanOrEqualTo(root.get("priceAdult"), min);
             } else if (max != null) {
-                return builder.lessThanOrEqualTo(root.get("price"), max);
+                return builder.lessThanOrEqualTo(root.get("priceAdult"), max);
             } else {
                 return null;
             }
@@ -88,20 +90,24 @@ public class TourSpecification {
         };
     }
 
-    // Tour.name LIKE %name%
-    public static Specification<Tour> countryContains(String country) {
-        return (root, query, builder) -> builder.like(root.get("country"), "%" + country + "%");
+    // Tour.country LIKE %country%
+    public static Specification<Tour> countryEquals(CountryCode country) {
+        return (root, query, builder) -> {
+            if (country == null)
+                return null;
+            return builder.equal(root.get("country"), country);
+        };
     }
 
     // Tour.count BETWEEN min AND max
-    public static Specification<Tour> countBetween(Long min, Long max) {
+    public static Specification<Tour> maxCapacityBetween(Long min, Long max) {
         return (root, query, builder) -> {
             if (min != null && max != null) {
-                return builder.between(root.get("count"), min, max);
+                return builder.between(root.get("maxCapacity"), min, max);
             } else if (min != null) {
-                return builder.greaterThanOrEqualTo(root.get("count"), min);
+                return builder.greaterThanOrEqualTo(root.get("maxCapacity"), min);
             } else if (max != null) {
-                return builder.lessThanOrEqualTo(root.get("count"), max);
+                return builder.lessThanOrEqualTo(root.get("maxCapacity"), max);
             } else {
                 return null;
             }
@@ -118,4 +124,22 @@ public class TourSpecification {
         };
     }
 
+    // Tour.product_id == NULL Product가 연결 안된 Tour만 찾기
+    public static Specification<Tour> productIsEmptyOrNull() {
+        return (root, query, cb) -> {
+            // Tour LEFT JOIN Product
+            Join<Tour, Product> productJoin = root.join("product", JoinType.LEFT);
+            // Product가 없는 Tour만
+            return cb.isNull(productJoin.get("id"));
+        };
+    }
+
+    // Product와 연결 여부 확인용
+    public static Specification<Tour> withProductJoin() {
+        return (root, query, cb) -> {
+            // fetch join 설정 (JPA가 Tour.product를 조회할 수 있도록)
+            root.fetch("product", JoinType.LEFT);
+            return cb.conjunction(); // 아무 조건 없는 기본 쿼리
+        };
+    }
 }

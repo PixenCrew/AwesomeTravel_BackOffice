@@ -9,19 +9,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import renewal.awesome_travel_backoffice.airPurchase.dto.request.AirPurchaseSearchCondition;
-import renewal.common.entity.QAirPurchase;
-import renewal.common.entity.AirPurchase;
+import renewal.awesome_travel_backoffice.airPurchase.dto.request.PurchaseAirSearchCondition;
+import renewal.common.entity.QPurchaseAir;
+import renewal.common.entity.PurchaseAir;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class AirPurchaseRepositoryCustomImpl implements AirPurchaseRepositoryCustom {
+public class PurchaseAirRepositoryCustomImpl implements PurchaseAirRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<AirPurchase> searchByCondition(AirPurchaseSearchCondition cond, Pageable pageable) {
-        QAirPurchase q = QAirPurchase.airPurchase;
+    public Page<PurchaseAir> searchByCondition(PurchaseAirSearchCondition cond, Pageable pageable) {
+        QPurchaseAir q = QPurchaseAir.purchaseAir;
 
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -41,7 +41,7 @@ public class AirPurchaseRepositoryCustomImpl implements AirPurchaseRepositoryCus
             builder.and(q.purchaseDate.loe(cond.getEndDate().atTime(23, 59, 59)));
         }
 
-        List<AirPurchase> results = queryFactory.selectFrom(q)
+        List<PurchaseAir> results = queryFactory.selectFrom(q)
                 .where(builder)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

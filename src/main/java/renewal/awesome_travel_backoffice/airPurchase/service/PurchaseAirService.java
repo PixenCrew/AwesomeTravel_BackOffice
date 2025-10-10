@@ -13,39 +13,39 @@ import renewal.common.entity.SeatClass;
 import renewal.common.entity.Air;
 import renewal.common.entity.SpecialRequest;
 import renewal.common.entity.CountryCode;
-import renewal.awesome_travel_backoffice.airPurchase.dto.request.AirPurchaseSearchCondition;
+import renewal.awesome_travel_backoffice.airPurchase.dto.request.PurchaseAirSearchCondition;
 import renewal.awesome_travel_backoffice.airPurchase.dto.request.AirPassengerUpdateRequestDto;
 import renewal.awesome_travel_backoffice.airPurchase.dto.response.AirPurchaseResponseDto;
 import renewal.awesome_travel_backoffice.airPurchase.dto.response.AirResponseOneDto;
 import renewal.awesome_travel_backoffice.airPurchase.dto.response.AirPassengerResponseDto;
-import renewal.awesome_travel_backoffice.airPurchase.repository.AirPurchaseRepository;
-import renewal.common.entity.AirPurchase;
+import renewal.awesome_travel_backoffice.airPurchase.repository.PurchaseAirRepository;
+import renewal.common.entity.PurchaseAir;
 import renewal.common.entity.AirPassenger;
-import renewal.common.entity.BasePurchase.PurchaseStatus;
+import renewal.common.entity.PurchaseBase.PurchaseStatus;
 import renewal.common.entity.BasePassenger.Sex;
 import renewal.awesome_travel_backoffice.countrycode.repository.CountryCodeRepository;
-import renewal.awesome_travel_backoffice.airPurchase.controller.AirPurchaseAdminController.CountryCodeDto;
+import renewal.awesome_travel_backoffice.airPurchase.controller.PurchaseAirAdminController.CountryCodeDto;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class AirPurchaseService {
+public class PurchaseAirService {
 
-    private final AirPurchaseRepository airPurchaseRepository;
+    private final PurchaseAirRepository airPurchaseRepository;
     private final CountryCodeRepository countryCodeRepository;
 
     /**
      *  어드민 - 전체 항공 예약 목록 조회 (페이징 + 정렬)
      */
-    public Page<AirPurchase> getAllPurchases(AirPurchaseSearchCondition condition, Pageable pageable) {
+    public Page<PurchaseAir> getAllPurchases(PurchaseAirSearchCondition condition, Pageable pageable) {
         return airPurchaseRepository.searchByCondition(condition, pageable);
     }
 
     /**
      *  어드민 - 전체 항공 예약 목록 조회 (DTO 변환)
      */
-    public Page<AirPurchaseResponseDto> getAllPurchasesDto(AirPurchaseSearchCondition condition, Pageable pageable) {
-        Page<AirPurchase> purchases = airPurchaseRepository.searchByCondition(condition, pageable);
+    public Page<AirPurchaseResponseDto> getAllPurchasesDto(PurchaseAirSearchCondition condition, Pageable pageable) {
+        Page<PurchaseAir> purchases = airPurchaseRepository.searchByCondition(condition, pageable);
         return purchases.map(this::toDto);
     }
 
@@ -53,8 +53,8 @@ public class AirPurchaseService {
     /**
      *  어드민 - 단건 예약 상세 조회
      */
-    public AirPurchase getPurchase(Long id) {
-        AirPurchase purchase = airPurchaseRepository.findByProductPurchaseId(id)
+    public PurchaseAir getPurchase(Long id) {
+        PurchaseAir purchase = airPurchaseRepository.findByProductPurchaseId(id)
                 .orElseThrow(() -> new IllegalArgumentException("구매 내역 없음"));
         return purchase;
     }
@@ -65,7 +65,7 @@ public class AirPurchaseService {
     public AirPurchaseResponseDto getPurchaseDto(Long id) {
         System.out.println("=== getPurchaseDto 호출 - ID: " + id + " ===");
         
-        AirPurchase purchase = airPurchaseRepository.findByIdWithPassengers(id)
+        PurchaseAir purchase = airPurchaseRepository.findByIdWithPassengers(id)
                 .orElseThrow(() -> new IllegalArgumentException("구매 내역 없음"));
         
         
@@ -92,7 +92,7 @@ public class AirPurchaseService {
     // 관리자용 - 상태 변경
     @Transactional
     public void changePurchaseStatus(Long id, PurchaseStatus newStatus) {
-        AirPurchase purchase = airPurchaseRepository.findByProductPurchaseId(id)
+        PurchaseAir purchase = airPurchaseRepository.findByProductPurchaseId(id)
                 .orElseThrow(() -> new IllegalArgumentException("구매 내역 없음"));
 
         PurchaseStatus currentStatus = purchase.getPurchaseStatus();
@@ -130,7 +130,7 @@ public class AirPurchaseService {
     /**
      *  내부 변환 메서드 (응답용 DTO로 변환)
      */
-    private AirPurchaseResponseDto toDto(AirPurchase purchase) {
+    private AirPurchaseResponseDto toDto(PurchaseAir purchase) {
         SeatClass seatClass = purchase.getSeatClass();
         Air air = seatClass.getAir();
 
@@ -199,7 +199,7 @@ public class AirPurchaseService {
      * 최소 1명의 승객 정보는 입력해야 하며, 나머지는 마감일 전까지 입력 가능합니다.
      */
     @Transactional
-    public AirPurchase createPurchaseWithPassengers(SeatClass seatClass, Long productPurchaseId, Long price, 
+    public PurchaseAir createPurchaseWithPassengers(SeatClass seatClass, Long productPurchaseId, Long price, 
                                                    Long member_id, String name, String number, String email, 
                                                    int expectedPassengerCount, List<AirPassengerUpdateRequestDto> passengerDtos) {
         
@@ -227,7 +227,7 @@ public class AirPurchaseService {
             }
         }
         
-        AirPurchase purchase = new AirPurchase(seatClass, productPurchaseId, price, 
+        PurchaseAir purchase = new PurchaseAir(seatClass, productPurchaseId, price, 
                                              member_id, name, number, email, 
                                              LocalDateTime.now(), LocalDateTime.now().plusDays(1),
                                              expectedPassengerCount);
@@ -296,7 +296,7 @@ public class AirPurchaseService {
      */
     @Transactional
     public void addPassengerInfo(Long purchaseId, AirPassengerUpdateRequestDto passengerDto) {
-        AirPurchase purchase = airPurchaseRepository.findByIdWithPassengers(purchaseId)
+        PurchaseAir purchase = airPurchaseRepository.findByIdWithPassengers(purchaseId)
                 .orElseThrow(() -> new IllegalArgumentException("구매 내역을 찾을 수 없습니다."));
         
         // 마감일 확인
@@ -357,7 +357,7 @@ public class AirPurchaseService {
      */
     @Transactional
     public void completePayment(Long purchaseId) {
-        AirPurchase purchase = airPurchaseRepository.findByIdWithPassengers(purchaseId)
+        PurchaseAir purchase = airPurchaseRepository.findByIdWithPassengers(purchaseId)
                 .orElseThrow(() -> new IllegalArgumentException("구매 내역을 찾을 수 없습니다."));
         
         // 승객 정보가 완료되었는지 확인
@@ -374,7 +374,7 @@ public class AirPurchaseService {
     /**
      * 승객 정보 완료 상태 확인
      */
-    private void checkPassengerInfoComplete(AirPurchase purchase) {
+    private void checkPassengerInfoComplete(PurchaseAir purchase) {
         // 예상 승객 수와 실제 승객 수가 일치하고, 모든 승객의 필수 정보가 완전한지 확인
         if (purchase.getAirPassengers().size() == purchase.getExpectedPassengerCount()) {
             boolean allComplete = purchase.getAirPassengers().stream()
@@ -399,7 +399,7 @@ public class AirPurchaseService {
     @Transactional
     public void updatePassenger(Long purchaseId, Long passengerId, AirPassengerUpdateRequestDto updateRequest) {
         // 구매 정보 조회
-        AirPurchase purchase = airPurchaseRepository.findByProductPurchaseId(purchaseId)
+        PurchaseAir purchase = airPurchaseRepository.findByProductPurchaseId(purchaseId)
                 .orElseThrow(() -> new IllegalArgumentException("구매 내역을 찾을 수 없습니다."));
 
         // 승객 정보 조회

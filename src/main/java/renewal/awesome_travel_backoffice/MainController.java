@@ -22,7 +22,7 @@ public class MainController {
 
     // 로그인 페이지
     @GetMapping("login")
-    public String loginPage(@RequestParam(value = "error", required = false) String error) {
+    public String loginPage(@RequestParam(required = false) String error) {
         return "login";
     }
     

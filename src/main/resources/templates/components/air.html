@@ -1,0 +1,221 @@
+<div th:fragment="content" th:inline="text">
+    <h1>항공 목록</h1>
+
+    <!-- 1) 필터 폼 -->
+    <form id="filterForm" th:object="${airFilterDTO}">
+        <!-- 코드 -->
+        <label>코드:</label>
+        <input type="text" th:field="*{code}" placeholder="Enter code" />
+        <br />
+
+        <!-- 항공사 체크박스 -->
+        <label>항공사 선택:</label><br />
+        <div style="height: 100px; padding: 5px; border: 1px solid black; overflow-y:scroll">
+            <div th:each="airline : ${allAirlines}">
+                <input type="checkbox" th:field="*{airlines}" th:value="${airline.code}" th:id="${'air_' + airline.code}" />
+                <img th:src="${airline.iconUrl}" alt="" style="width:24px; height:24px; vertical-align:middle; margin-right:5px;" />
+                <label th:for="${'air_' + airline.code}" th:text="${airline.nameKor}"></label>
+            </div>
+        </div>
+
+        <!-- 좌석등급 -->
+        <label>좌석등급:</label>
+        <select th:field="*{seatClassType}">
+            <option value=""> ALL </option>
+            <option th:each="type : ${T(renewal.common.entity.SeatClass.SeatClassType).values()}" th:value="${type}" th:text="${type}">TYPE</option>
+        </select>
+        <br />
+
+        <!-- 출발일 범위 (isSelectionPage이면 수정 불가)-->
+        <label>출발일 (From):</label>
+        <input type="date" th:field="*{departDateTimeFrom}" th:attr="readonly=${isSelectionPage} ? 'readonly' : null" />
+        <label>출발일 (To):</label>
+        <input type="date" th:field="*{departDateTimeTo}" th:attr="readonly=${isSelectionPage} ? 'readonly' : null" />
+        <br />
+
+        <!-- 도착일 범위 -->
+        <label>도착일 (From):</label>
+        <input type="date" th:field="*{arriveDateFrom}" />
+        <label>도착일 (To):</label>
+        <input type="date" th:field="*{arriveDateTo}" />
+        <br />
+
+        <!-- 출발지/도착지 (isSelectionPage이면 수정 불가)-->
+        <label>출발지:</label>
+        <input type="text" th:field="*{departAirport}" placeholder="Enter depart" list="cityList" onchange="stripAfterPipe(this)" th:attr="readonly=${isSelectionPage} ? 'readonly' : null" />
+        <label>도착지:</label>
+        <input type="text" th:field="*{arriveAirport}" placeholder="Enter arrive" list="cityList" onchange="stripAfterPipe(this)" th:attr="readonly=${isSelectionPage} ? 'readonly' : null" />
+        <br />
+
+        <!-- 경유지 수 -->
+        <label>경유지 수 최소:</label>
+        <input type="number" th:field="*{minStopovers}" min="0" />
+        <label>경유지 수 최대:</label>
+        <input type="number" th:field="*{maxStopovers}" min="1" />
+        <br />
+
+        <!-- 유아좌석 -->
+        <div>
+            <span>유아 좌석 필요 여부:</span>
+
+            <!-- 1) 선택 안 함 (null) -->
+            <input type="radio" th:field="*{infantSeatsRequired}" value="" id="infant-none" checked />
+            <label for="infant-none">선택 안 함</label>
+
+            <!-- 2) 필요 (true) -->
+            <input type="radio" th:field="*{infantSeatsRequired}" value="true" id="infant-yes" />
+            <label for="infant-yes">필요</label>
+
+            <!-- 3) 불필요 (false) -->
+            <input type="radio" th:field="*{infantSeatsRequired}" value="false" id="infant-no" />
+            <label for="infant-no">불필요</label>
+        </div>
+
+        <!-- 좌석 수 범위
+        <label>최소 좌석 수:</label>
+        <input type="number" th:field="*{startCount}" min="0" />
+        <label>최대 좌석 수:</label>
+        <input type="number" th:field="*{endCount}" min="0" />
+        <br/> -->
+
+        <!-- 비행 타입 -->
+        <label>비행 타입:</label>
+        <select th:field="*{flightType}">
+            <option value=""> ALL </option>
+            <option th:each="type : ${T(renewal.common.entity.Air.FlightType).values()}" th:value="${type}" th:text="${type}">TYPE</option>
+        </select>
+        <br />
+
+        <!-- 상태 -->
+        <label>상태:</label>
+        <select th:field="*{status}">
+            <option value=""> ALL </option>
+            <option th:each="st : ${T(renewal.common.entity.Air.AirStatus).values()}" th:value="${st}" th:text="${st}">STATUS</option>
+        </select>
+        <br />
+
+        <!-- 가격 범위 -->
+        <label>최소 가격:</label>
+        <input type="number" th:field="*{minPrice}" />
+        <label>최대 가격:</label>
+        <input type="number" th:field="*{maxPrice}" />
+        <br />
+
+        <!-- 잔여 좌석 (isSelectionPage이면 수정 불가)-->
+        <label>잔여 좌석:</label>
+        <input type="number" th:field="*{availableSeats}" th:attr="readonly=${isSelectionPage} ? 'readonly' : null" />
+        <br />
+
+        <!-- 검색 버튼 -->
+        <button type="button" onclick="get(0, event)">검색</button>
+
+        <!-- 정렬 기준 및 방향 (hidden) -->
+        <input type="hidden" name="sortField" th:value="${sortField}" />
+        <input type="hidden" name="sortDir" th:value="${sortDir}" />
+    </form>
+
+    <!-- 초기화 버튼 -->
+    <button type="button" onclick="reset(event)">초기화</button>
+
+    <!-- 2) 결과 테이블 -->
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>출발지</th>
+                <th>
+                    <a href="#" data-sortfield="air.departDateTime" th:data-sortdir="${sortField=='air.departDateTime' and sortDir=='asc' ? 'asc' : 'desc'}" onclick="toggleSort(this, event)">
+                        출발일
+                        <span th:if="${sortField=='air.departDateTime'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
+                    </a>
+                </th>
+                <th>도착지</th>
+                <th>
+                    <a href="#" data-sortfield="air.arriveDate" th:data-sortdir="${sortField=='air.arriveDate' and sortDir=='asc' ? 'asc' : 'desc'}" onclick="toggleSort(this, event)">
+                        도착일
+                        <span th:if="${sortField=='air.arriveDate'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
+                    </a>
+                </th>
+                <th>코드</th>
+                <th>항공사</th>
+                <th>항공사(한글)</th>
+                <th>항공사(영문)</th>
+                <th>유아 좌석필요</th>
+                <th>경유지 수</th>
+                <th>비행 타입</th>
+                <th>상태</th>
+                <th>좌석ID</th>
+                <th>등급</th>
+                <th>
+                    <a href="#" data-sortfield="price" th:data-sortdir="${sortField=='price' and sortDir=='asc' ? 'asc' : 'desc'}" onclick="toggleSort(this, event)">
+                        가격
+                        <span th:if="${sortField=='price'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"></span>
+                    </a>
+                </th>
+                <th>총 좌석</th>
+                <th>잔여 좌석</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <th:block th:each="seatClass : ${airPage.content}">
+                <!-- <tr th:onclick="|window.location.href='@{/air/{id}(id=${seatClass.air.id})}'|" style="cursor:pointer;"> -->
+                <tr th:onclick="${isSelectionPage} ? |returnNumber(${seatClass.id})| : |window.location.href='@{/air/{id}(id=${seatClass.air.id})}'|" style="cursor:pointer;">
+                    <td th:text="${seatClass.air.id}">1</td>
+                    <td th:text="${seatClass.air.departAirport.airportCode}">1</td>
+                    <td th:text="${seatClass.air.departDateTime}">2025-01-02 01:00</td>
+                    <td th:text="${seatClass.air.arriveAirport.airportCode}">1</td>
+                    <td th:text="${seatClass.air.arriveDateTime}">2025-01-02 01:00</td>
+                    <td th:text="${seatClass.air.flightNumber}">AB123</td>
+                    <td th:text="${seatClass.air.airline.code}">AAA</td>
+                    <td th:text="${seatClass.air.airline.nameKor}">좋은항공</td>
+                    <td th:text="${seatClass.air.airline.nameEng}">GreatAir</td>
+                    <td th:text="${seatClass.air.airline.infantSeatsRequired}">1</td>
+                    <td th:text="${seatClass.air.stopovers}">0</td>
+                    <td th:text="${seatClass.air.flightType}">ONE_WAY</td>
+                    <td th:text="${seatClass.air.status}">ACTIVE</td>
+                    <td th:text="${seatClass.id}">123</td>
+                    <td th:text="${seatClass.classType}">FIRST</td>
+                    <td th:text="${seatClass.priceAdult}">50000</td>
+                    <td th:text="${seatClass.maxSeats}">100</td>
+                    <td th:text="${seatClass.availableSeats}">10</td>
+                </tr>
+            </th:block>
+        </tbody>
+
+
+
+    </table>
+
+    <!-- 3) 페이징 -->
+    <div>
+        <ul style="list-style:none; display:flex; gap:0.5rem;">
+            <li th:if="${airPage.hasPrevious()}">
+                <a th:onclick="|get(${airPage.number -1})|" style="cursor:pointer;">Prev</a>
+            </li>
+            <li th:each="i : ${#numbers.sequence(0, airPage.totalPages -1)}">
+                <a th:onclick="|get(${i})|" th:classappend="${i == airPage.number} ? ' active' : ''" th:text="${i +1}" style="cursor:pointer;"></a>
+            </li>
+            <li th:if="${airPage.hasNext()}">
+                <a th:onclick="|get(${airPage.number +1})|" style="cursor:pointer;">Next</a>
+            </li>
+        </ul>
+    </div>
+
+    <a href="/air/new">새 항공편 등록</a>
+
+    <script src="/js/filter.js"></script>
+    <script src="/js/util.js"></script>
+
+    <datalist id="cityList">
+        <option th:each="cc : ${cityCode}" th:value="${cc.airportCode} + ' | ' + ${cc.airportEng} + ' | ' + ${cc.countryCode.countryCode} + ' | ' + ${cc.countryCode.countryKor}"></option>
+    </datalist>
+
+    <datalist id="seatClassList">
+        <option value="ECONOMY">ECONOMY</option>
+        <option value="PREMIUMECONOMY">PREMIUMECONOMY</option>
+        <option value="BUSINESS">BUSINESS</option>
+        <option value="FIRST">FIRST</option>
+    </datalist>
+
+</div>

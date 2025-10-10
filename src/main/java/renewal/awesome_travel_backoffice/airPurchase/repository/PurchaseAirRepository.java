@@ -9,12 +9,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import renewal.common.entity.AirPurchase;
-import renewal.common.entity.BasePurchase.PurchaseStatus;
+import renewal.common.entity.PurchaseAir;
+import renewal.common.entity.PurchaseBase.PurchaseStatus;
 
-public interface AirPurchaseRepository extends JpaRepository<AirPurchase, Long>, AirPurchaseRepositoryCustom {
+public interface PurchaseAirRepository extends JpaRepository<PurchaseAir, Long>, PurchaseAirRepositoryCustom {
 
-    Page<AirPurchase> findByPurchaseStatusAndPaymentDueDateBefore(
+    Page<PurchaseAir> findByPurchaseStatusAndPaymentDueDateBefore(
             PurchaseStatus status,
             LocalDateTime time,
             Pageable pageable

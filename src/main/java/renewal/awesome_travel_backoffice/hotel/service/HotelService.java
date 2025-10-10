@@ -46,22 +46,22 @@ public class HotelService {
             spec = spec.and(HotelSpecification.isActiveEquals(filter.getIsActive()));
         }
 
-        // 기간 예약 조회 (3개 값이 모두 있어야 작동)
-        if (filter.getStartDate() != null && filter.getEndDate() != null && filter.getRequiredPersons() != null) {
-            spec = spec.and(
-                    HotelSpecification.availableBetweenAndCapacity(
-                            filter.getStartDate(),
-                            filter.getEndDate(),
-                            filter.getRequiredPersons()));
-        }
+        // // 기간 예약 조회 (4개 값이 모두 있어야 작동)
+        // if (filter.getStartDate() != null && filter.getEndDate() != null && filter.getRequiredPersons() != null && filter.getDayOffset() != null ) {
+        //     spec = spec.and(
+        //             HotelSpecification.availableBetweenAndCapacity(
+        //                     filter.getStartDate().plusDays(filter.getDayOffset()),
+        //                     filter.getEndDate().plusDays(filter.getDayOffset()),
+        //                     filter.getRequiredPersons()));
+        // }
 
-        // 특정일 예약 조회 (2개 값이 모두 있어야 작동)
-        if (filter.getTargetDate() != null && filter.getRequiredPersons() != null) {
-            spec = spec.and(
-                    HotelSpecification.availableOnDateAndRooms(
-                            filter.getTargetDate(),
-                            filter.getRequiredPersons()));
-        }
+        // // 특정일 예약 조회 (2개 값이 모두 있어야 작동)
+        // if (filter.getTargetDate() != null && filter.getRequiredPersons() != null) {
+        //     spec = spec.and(
+        //             HotelSpecification.availableOnDateAndRooms(
+        //                     filter.getTargetDate(),
+        //                     filter.getRequiredPersons()));
+        // }
 
         return hotelRepo.findAll(spec, pageable);
     }

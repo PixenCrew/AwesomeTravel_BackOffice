@@ -1,0 +1,390 @@
+<div th:fragment="content">
+    <h1 th:text="${air.id == null} ? '항공 등록' : '항공 상세' "></h1>
+
+    <form th:object="${air}" th:action="${air.id == null} ? @{/air/new} : @{/air/{id}(id=${air.id})}" method="post">
+
+        <div th:if="${air.id != null}">
+            <label>ID:</label>
+            <input type="text" th:field="*{id}" readonly><br>
+        </div>
+
+        <div>
+            <label>항공편 코드:</label>
+            <input type="text" th:field="*{flightNumber}" required>
+        </div>
+
+        <div>
+            <label for="airlineCode">항공사 코드:</label>
+            <select id="airlineCode" th:field="*{airline}" required>
+                <option value="" disabled>-- 항공사 선택 --</option>
+                <option th:each="airline : ${allAirlines}" th:value="${airline.code}" th:text="${airline.code}">
+                </option>
+            </select>
+        </div>
+
+        <!-- ========== 기본 출발/도착 정보 ========== -->
+        <div>
+            <label>출발지:</label>
+            <input type="text" th:field="*{departAirport}" list="cityList" onchange="stripAfterPipe(this);syncFirstLastReadonly(false)" required>
+        </div>
+        <div>
+            <label>출발지 터미널:</label>
+            <input type="text" th:field="*{departTerminal}" onchange="syncFirstLastReadonly(false)" required>
+        </div>
+        <div>
+            <label>출발 일시:</label>
+            <input type="datetime-local" th:field="*{departDateTime}" onchange="syncFirstLastReadonly(false)" required>
+        </div>
+        <div>
+            <label>총 비행시간:</label>
+            <input type="number" th:field="*{flightDuration}" readonly>
+        </div>
+        <div>
+            <label>도착지:</label>
+            <input type="text" th:field="*{arriveAirport}" list="cityList" onchange="stripAfterPipe(this);syncFirstLastReadonly(false)" required>
+        </div>
+        <div>
+            <label>도착지 터미널:</label>
+            <input type="text" th:field="*{arriveTerminal}" onchange="syncFirstLastReadonly(false)" required>
+        </div>
+        <div>
+            <label>도착 일시:</label>
+            <input type="datetime-local" th:field="*{arriveDateTime}" onchange="syncFirstLastReadonly(false)" required>
+        </div>
+
+        <div>
+            <label>비행 유형:</label>
+            <input type="text" th:field="*{flightType}" readonly>
+        </div>
+
+        <div>
+            <label>경유 횟수:</label>
+            <input type="number" th:field="*{stopovers}" id="stopovers" min="0" readonly />
+        </div>
+
+        <!-- ========== Segment List ========== -->
+        <div id="segmentContainer">
+            <div th:each="seg, iterStat : *{flightSegments}" class="segment-entry"
+                style="border:1px solid black; padding:6px;">
+                <label>출발 공항:</label>
+                <input type="text" th:field="*{flightSegments[__${iterStat.index}__].departAirport}" list="cityList"
+                    onchange="stripAfterPipe(this);onAirportChange(this)" required th:readonly="${iterStat.index == 0}"><br>
+
+                <label>출발 터미널:</label>
+                <input type="text" th:field="*{flightSegments[__${iterStat.index}__].departTerminal}" required
+                    th:readonly="${iterStat.index == 0}"><br>
+
+                <label>출발 일시:</label>
+                <input type="datetime-local" th:field="*{flightSegments[__${iterStat.index}__].departDateTime}" required
+                    th:readonly="${iterStat.index == 0}"><br>
+
+                <label>비행 시간(분):</label>
+                <input type="number" th:field="*{flightSegments[__${iterStat.index}__].flightDuration}" min="0"
+                    placeholder='등록완료시 계산' readonly><br>
+
+                <label>도착 공항:</label>
+                <input type="text" th:field="*{flightSegments[__${iterStat.index}__].arriveAirport}" list="cityList"
+                    onchange="stripAfterPipe(this);onAirportChange(this)"  required th:readonly="${iterStat.index == (air.flightSegments.size() - 1)}"><br>
+
+                <label>도착 터미널:</label>
+                <input type="text" th:field="*{flightSegments[__${iterStat.index}__].arriveTerminal}" required
+                    th:readonly="${iterStat.index == (air.flightSegments.size() - 1)}"><br>
+
+                <label>도착 일시:</label>
+                <input type="datetime-local" th:field="*{flightSegments[__${iterStat.index}__].arriveDateTime}" required
+                    th:readonly="${iterStat.index == (air.flightSegments.size() - 1)}"><br>
+
+                <label>대기 시간(분):</label>
+                <input type="number" th:field="*{flightSegments[__${iterStat.index}__].waitDuration}"
+                    placeholder='등록완료시 계산' readonly><br>
+
+                <!-- 첫 세그먼트는 삭제 버튼 없음 -->
+                <button type="button" th:if="${iterStat.index > 0}" onclick="removeSegment(this)">삭제</button>
+            </div>
+        </div>
+        <button type="button" onclick="addSegment()">세그먼트 추가</button>
+
+        <!-- ========== 상태 & 좌석 등급 ========== -->
+        <div>
+            <label>상태:</label>
+            <select th:field="*{status}">
+                <option th:each="st : ${T(renewal.common.entity.Air.AirStatus).values()}" th:value="${st}"
+                    th:text="${st}"></option>
+            </select>
+        </div>
+
+        <hr>
+        <h3>좌석 등급 정보</h3>
+        <div th:each="seat, iterStat : ${air.seatClasses}" style="border:1px solid black;">
+            <label>등급:</label>
+            <input type="text" th:field="*{seatClasses[__${iterStat.index}__].classType}" readonly><br>
+            <label>가격[성인]:</label>
+            <input type="number" th:field="*{seatClasses[__${iterStat.index}__].priceAdult}" min="0" required><br>
+            <label>가격[청소년]:</label>
+            <input type="number" th:field="*{seatClasses[__${iterStat.index}__].priceYouth}" min="0" required><br>
+            <label>가격[영유아]:</label>
+            <input type="number" th:field="*{seatClasses[__${iterStat.index}__].priceInfant}" min="0" required><br>
+            <label>최대 좌석 수:</label>
+            <input type="number" th:field="*{seatClasses[__${iterStat.index}__].maxSeats}" min="0" required>
+            <label>잔여 좌석 수:</label>
+            <input type="number" th:field="*{seatClasses[__${iterStat.index}__].availableSeats}" min="0" required><br>
+        </div>
+
+        <button type="submit" th:text="${air.id == null} ? '등록' : '수정'"></button>
+    </form>
+
+    <button th:if="${air.id != null}" th:onclick="deleteAir([[${air.id}]])">삭제</button>
+
+    <datalist id="cityList">
+        <option th:each="cc : ${cityCode}"
+            th:value="${cc.airportCode} + ' | ' + ${cc.airportEng} + ' | ' + ${cc.countryCode.countryCode} + ' | ' + ${cc.countryCode.countryKor}">
+        </option>
+    </datalist>
+
+    <script src="/js/util.js"></script>
+    <script>
+        function deleteAir(id) {
+            if (confirm('정말로 삭제하시겠습니까?')) {
+                fetch('/air/' + id, { method: 'DELETE' })
+                    .then(res => res.ok ? location.href = '/air' : alert('삭제 실패'));
+            }
+        }
+
+        function addSegment() {
+            const container = document.getElementById('segmentContainer');
+            const segmentIdx = document.querySelectorAll('.segment-entry').length;
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'segment-entry';
+            wrapper.style.border = '1px solid black';
+            wrapper.style.padding = '6px';
+
+            // 출발 공항
+            const departLabel = document.createElement('label');
+            departLabel.textContent = '출발 공항:';
+            wrapper.appendChild(departLabel);
+
+            const departInput = document.createElement('input');
+            departInput.type = 'text';
+            departInput.name = `flightSegments[${segmentIdx}].departAirport`;
+            departInput.setAttribute('list', 'cityList');
+            departInput.required = true;
+            departInput.onchange = function() {stripAfterPipe(this);onAirportChange(this);};
+            wrapper.appendChild(departInput);
+            wrapper.appendChild(document.createElement('br'));
+            
+            // 출발 터미널
+            const departTermLabel = document.createElement('label');
+            departTermLabel.textContent = '출발 터미널:';
+            wrapper.appendChild(departTermLabel);
+
+            const departTermInput = document.createElement('input');
+            departTermInput.type = 'text';
+            departTermInput.name = `flightSegments[${segmentIdx}].departTerminal`;
+            departTermInput.required = true;
+            wrapper.appendChild(departTermInput);
+            wrapper.appendChild(document.createElement('br'));
+
+            // 출발 일시
+            const departDateTimeLabel = document.createElement('label');
+            departDateTimeLabel.textContent = '출발 일시:';
+            wrapper.appendChild(departDateTimeLabel);
+
+            const departDateTimeInput = document.createElement('input');
+            departDateTimeInput.type = 'datetime-local';
+            departDateTimeInput.name = `flightSegments[${segmentIdx}].departDateTime`;
+            departDateTimeInput.required = true;
+            wrapper.appendChild(departDateTimeInput);
+            wrapper.appendChild(document.createElement('br'));
+
+            // 비행 시간
+            const flightDurationLabel = document.createElement('label');
+            flightDurationLabel.textContent = '비행 시간(분):';
+            wrapper.appendChild(flightDurationLabel);
+
+            const flightDurationInput = document.createElement('input');
+            flightDurationInput.type = 'number';
+            flightDurationInput.name = `flightSegments[${segmentIdx}].flightDuration`;
+            flightDurationInput.min = 0;
+            flightDurationInput.readOnly = true;
+            flightDurationInput.placeholder = '등록완료시 계산';
+            wrapper.appendChild(flightDurationInput);
+            wrapper.appendChild(document.createElement('br'));
+
+            // 도착 공항
+            const arriveLabel = document.createElement('label');
+            arriveLabel.textContent = '도착 공항:';
+            wrapper.appendChild(arriveLabel);
+
+            const arriveInput = document.createElement('input');
+            arriveInput.type = 'text';
+            arriveInput.name = `flightSegments[${segmentIdx}].arriveAirport`;
+            arriveInput.setAttribute('list', 'cityList');
+            arriveInput.required = true;
+            arriveInput.onchange = function() {stripAfterPipe(this);onAirportChange(this);};
+            wrapper.appendChild(arriveInput);
+            wrapper.appendChild(document.createElement('br'));
+            
+            // 도착 터미널
+            const arriveTermLabel = document.createElement('label');
+            arriveTermLabel.textContent = '도착 터미널:';
+            wrapper.appendChild(arriveTermLabel);
+
+            const arriveTermInput = document.createElement('input');
+            arriveTermInput.type = 'text';
+            arriveTermInput.name = `flightSegments[${segmentIdx}].arriveTerminal`;
+            arriveTermInput.required = true;
+            wrapper.appendChild(arriveTermInput);
+            wrapper.appendChild(document.createElement('br'));
+
+            // 도착 일시
+            const arriveDateLabel = document.createElement('label');
+            arriveDateLabel.textContent = '도착 일시:';
+            wrapper.appendChild(arriveDateLabel);
+
+            const arriveDateInput = document.createElement('input');
+            arriveDateInput.type = 'datetime-local';
+            arriveDateInput.name = `flightSegments[${segmentIdx}].arriveDateTime`;
+            arriveDateInput.required = true;
+            wrapper.appendChild(arriveDateInput);
+            wrapper.appendChild(document.createElement('br'));
+
+            // 대기 시간
+            const waitLabel = document.createElement('label');
+            waitLabel.textContent = '대기 시간(분):';
+            wrapper.appendChild(waitLabel);
+
+            const waitInput = document.createElement('input');
+            waitInput.type = 'number';
+            waitInput.name = `flightSegments[${segmentIdx}].waitDuration`;
+            waitInput.placeholder = '등록완료시 계산';
+            waitInput.readOnly = true;
+            wrapper.appendChild(waitInput);
+            wrapper.appendChild(document.createElement('br'));
+
+            // 삭제 버튼
+            if (segmentIdx > 0) {
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.textContent = '삭제';
+                removeBtn.addEventListener('click', () => {
+                    wrapper.remove();
+                    reindexSegments(container);
+                    syncFirstLastReadonly()
+                    updateStopovers()
+                });
+                wrapper.appendChild(removeBtn);
+            }
+
+            container.appendChild(wrapper);
+
+            syncFirstLastReadonly()
+            updateStopovers()
+        }
+
+        // 재인덱싱
+        function reindexSegments() {
+            const container = document.getElementById('segmentContainer');
+            container.querySelectorAll('.segment-entry').forEach((entry, i) => {
+                entry.querySelectorAll('input[name]').forEach(input => {
+                    input.name = input.name.replace(/\[\d+\]/g, `[${i}]`);
+                });
+            });
+        }
+
+        // 첫/마지막 segment의 출발·도착 정보를 기본 출발·도착으로 동기화 & readonly
+        function syncFirstLastReadonly(reset = true) {
+            const entries = document.querySelectorAll('#segmentContainer .segment-entry');
+
+            // 마지막 전 segment의 도착 정보 초기화
+            if (reset && entries.length > 1) {
+                const lastBefore = entries[entries.length - 2];
+                if (lastBefore) {
+                    const arriveAirPrev = lastBefore.querySelector('input[name$=".arriveAirport"]');
+                    const arriveTimePrev = lastBefore.querySelector('input[name$=".arriveDateTime"]');
+                    const arriveTermPrev = lastBefore.querySelector('input[name$=".arriveTerminal"]');
+                    if (arriveAirPrev) arriveAirPrev.value = '';
+                    if (arriveTimePrev) arriveTimePrev.value = '';
+                    if (arriveTermPrev) arriveTermPrev.value = '';
+                }
+            }
+
+            entries.forEach((entry, idx) => {
+                const departAir = entry.querySelector('input[name$=".departAirport"]');
+                const departTime = entry.querySelector('input[name$=".departDateTime"]');
+                const departTerm = entry.querySelector('input[name$=".departTerminal"]');
+
+                const arriveAir = entry.querySelector('input[name$=".arriveAirport"]');
+                const arriveTime = entry.querySelector('input[name$=".arriveDateTime"]');
+                const arriveTerm = entry.querySelector('input[name$=".arriveTerminal"]');
+
+                if (idx === 0) {
+                    departAir.readOnly = true;
+                    departTime.readOnly = true;
+                    departTerm.readOnly = true;
+
+                    departAir.value = document.querySelector('[name="departAirport"]').value;
+                    departTime.value = document.querySelector('[name="departDateTime"]').value;
+                    departTerm.value = document.querySelector('[name="departTerminal"]').value;
+                } else {
+                    departAir.readOnly = false;
+                    departTime.readOnly = false;
+                    departTerm.readOnly = false;
+                }
+
+                if (idx === entries.length - 1) {
+                    arriveAir.readOnly = true;
+                    arriveTime.readOnly = true;
+                    arriveTerm.readOnly = true;
+                    arriveAir.value = document.querySelector('[name="arriveAirport"]').value;
+                    arriveTime.value = document.querySelector('[name="arriveDateTime"]').value;
+                    arriveTerm.value = document.querySelector('[name="arriveTerminal"]').value;
+                } else {
+                    arriveAir.readOnly = false;
+                    arriveTime.readOnly = false;
+                    arriveTerm.readOnly = false;
+                }
+            });
+        }
+
+        function onAirportChange(input) {
+            const container = document.getElementById('segmentContainer');
+            const entries = Array.from(container.querySelectorAll('.segment-entry'));
+            const currentSegment = input.closest('.segment-entry');
+            const idx = entries.indexOf(currentSegment);
+
+            if (input.name.endsWith('.departAirport')) {
+                // 출발공항 input 변경 → 이전 segment 도착공항 수정
+                if (idx > 0) {
+                    const prevSegment = entries[idx - 1];
+                    const prevArriveInput = prevSegment.querySelector('input[name$=".arriveAirport"]');
+                    prevArriveInput.value = input.value;
+                }
+            } else if (input.name.endsWith('.arriveAirport')) {
+                // 도착공항 input 변경 → 다음 segment 출발공항 수정
+                if (idx < entries.length - 1) {
+                    const nextSegment = entries[idx + 1];
+                    const nextDepartInput = nextSegment.querySelector('input[name$=".departAirport"]');
+                    nextDepartInput.value = input.value;
+                }
+            }
+        }
+
+        // stopovers 반영
+        function updateStopovers() {
+            const stopoversInput = document.getElementById('stopovers');
+            const count = document.querySelectorAll('#segmentContainer .segment-entry').length;
+            stopoversInput.value = count > 0 ? count - 1 : 0;
+        }
+
+        // 페이지 로딩 시 segment 없으면 기본 추가
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('segmentContainer');
+            const airIdInput = document.getElementById('id');
+            if (container && (!airIdInput || !airIdInput.value)) {
+                addSegment();
+            }
+        });
+
+    </script>
+</div>

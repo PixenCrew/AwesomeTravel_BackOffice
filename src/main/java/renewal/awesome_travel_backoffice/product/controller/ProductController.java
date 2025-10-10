@@ -24,9 +24,16 @@ import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
 import renewal.common.entity.Product;
 import renewal.common.entity.Tour;
 import renewal.common.entity.Product.Info;
+<<<<<<< HEAD
 import renewal.awesome_travel_backoffice.citycode.repository.CityCodeRepository;
 import renewal.awesome_travel_backoffice.countrycode.repository.CountryCodeRepository;
 import renewal.awesome_travel_backoffice.productPurchase.repository.ProductPurchaseRepository;
+=======
+import renewal.common.entity.Product.ProductType;
+import renewal.common.repository.CityCodeRepository;
+import renewal.common.repository.CountryCodeRepository;
+// import renewal.common.repository.CountryCodeRepository;
+>>>>>>> develop
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -43,7 +50,7 @@ public class ProductController {
 
     @GetMapping
     public String listAndFilter(
-            @ModelAttribute("filter") ProductFilterDTO filter, // 필터 DTO를 바인딩
+            @ModelAttribute ProductFilterDTO filter, // 필터 DTO를 바인딩
             @RequestParam(defaultValue = "0") int page, // 페이지 번호
             @RequestParam(defaultValue = "id") String sortField,
             @RequestParam(defaultValue = "asc") String sortDir,
@@ -70,7 +77,7 @@ public class ProductController {
         // 3) View에서 쓸 속성들
         model.addAttribute("filter", filter); // 필터 객체 추가
         model.addAttribute("countryCode", countryRepo.findAll());
-        // model.addAttribute("cityCode", cityRepo.findAll());
+        model.addAttribute("cityCode", cityRepo.findAll());
         model.addAttribute("productPage", productPage);
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
@@ -82,7 +89,7 @@ public class ProductController {
 
     // 새 패키지
     @GetMapping("/new")
-    public String newProduct(Model model){
+    public String newProduct(Model model) {
 
         Product blankProduct = new Product();
         Tour blankTour = new Tour();
@@ -92,6 +99,7 @@ public class ProductController {
 
         model.addAttribute("countryCode", countryRepo.findAll());
         model.addAttribute("cityCode", cityRepo.findAll());
+        model.addAttribute("productTypes", ProductType.values());
         model.addAttribute("product", blankProduct);
         model.addAttribute("title", "New Product");
         model.addAttribute("content", "components/product/productDetail");
@@ -102,6 +110,7 @@ public class ProductController {
     // 새 패키지 등록
     @PostMapping("/new")
     public String submitProduct(@ModelAttribute Product product) throws Exception {
+<<<<<<< HEAD
         
         // product 등록 (먼저 저장하여 ID 생성)
         Product savedProduct = productRepo.save(product);
@@ -110,16 +119,24 @@ public class ProductController {
         Tour tour = tourRepo.findById(product.getTour().getId()).get();
         tour.setProductId(savedProduct.getId());
         tourRepo.save(tour);
+=======
+
+        // 투어 productId 업데이트
+        Tour tour = tourRepo.findById(product.getTour().getId()).get();
+        product.setTour(tour);
+        productRepo.save(product);
+>>>>>>> develop
 
         return "redirect:/product";
     }
 
     // 특정 패키지
     @GetMapping("/{id}")
-    public String selectProduct(@PathVariable("id") Long id, Model model) {
+    public String selectProduct(@PathVariable Long id, Model model) {
 
         Product product = productRepo.getReferenceById(id);
         model.addAttribute("product", product);
+        model.addAttribute("productTypes", ProductType.values());
         model.addAttribute("title", "Product " + product.getTitle());
         model.addAttribute("content", "components/product/productDetail");
 
@@ -129,19 +146,23 @@ public class ProductController {
     // 특정 패키지 수정
     @PostMapping("/{id}")
     public String submitSelectedProduct(@ModelAttribute Product product) {
+<<<<<<< HEAD
         
         // 기존 Product 조회하여 리뷰 데이터 보존
         Product existingProduct = productRepo.findById(product.getId()).get();
         
+=======
+
+>>>>>>> develop
         // 기존 Tour productId 삭제
         Long lastTourId = existingProduct.getTour().getId();
         Tour lastTour = tourRepo.findById(lastTourId).get();
-        lastTour.setProductId(null);
+        lastTour.setProduct(null);
         tourRepo.save(lastTour);
 
         // 투어 productId 업데이트
         Tour tour = tourRepo.findById(product.getTour().getId()).get();
-        tour.setProductId(product.getId());
+        tour.setProduct(product);
         tourRepo.save(tour);
 
         // 리뷰 데이터 보존하면서 Product 업데이트
@@ -153,12 +174,13 @@ public class ProductController {
         
         // Product 저장
         productRepo.save(product);
-        
+
         return "redirect:/product";
     }
 
     // 패키지 비활성화 처리
     @DeleteMapping("/{id}")
+<<<<<<< HEAD
     public ResponseEntity<String> deactivateProduct(@PathVariable Long id) {
         try {
             Product product = productRepo.findById(id).orElse(null);
@@ -207,6 +229,21 @@ public class ProductController {
         } catch (Exception e) {
             return ResponseEntity.status(500).body("활성화 실패: " + e.getMessage());
         }
+=======
+    public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
+        
+        // Product와 연결된 Tour가 있으면 연결 해제
+        Product product = productRepo.findById(id).get();
+        Tour tour = product.getTour();
+        if (tour != null) {
+            tour.setProduct(null); // FK를 null로 만들어서 참조 끊기
+            tourRepo.save(tour); // 업데이트 필요
+        }
+        
+        productRepo.deleteById(id);
+
+        return ResponseEntity.ok("삭제 완료");
+>>>>>>> develop
     }
 
 }

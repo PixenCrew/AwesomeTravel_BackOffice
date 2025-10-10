@@ -31,6 +31,7 @@ import renewal.common.entity.SeatClass;
 import renewal.common.entity.SeatClass.SeatClassType;
 import renewal.awesome_travel_backoffice.air.repository.AirRepository;
 import renewal.awesome_travel_backoffice.air.repository.AirReservationRepository;
+import renewal.awesome_travel_backoffice.air.repository.AirlineRepository;
 import renewal.awesome_travel_backoffice.air.service.AirService;
 import renewal.awesome_travel_backoffice.citycode.repository.CityCodeRepository;
 
@@ -41,6 +42,7 @@ public class AirController {
 
     private final AirService airService;
     private final AirRepository airRepo;
+    private final AirlineRepository airlineRepo;
     private final AirReservationRepository airReservationRepo;
     private final CityCodeRepository cityRepo;
 
@@ -48,7 +50,7 @@ public class AirController {
     @GetMapping
     // @PreAuthorize("hasRole('ADMIN')")
     public String listAndFilter(
-            @ModelAttribute("filter") AirFilterDTO filter, // 필터 DTO를 바인딩
+            @ModelAttribute AirFilterDTO filter, // 필터 DTO를 바인딩
             @RequestParam(defaultValue = "0") int page, // 페이지 번호
             @RequestParam(defaultValue = "id") String sortField,
             @RequestParam(defaultValue = "asc") String sortDir,
@@ -59,7 +61,8 @@ public class AirController {
                 : Sort.by(sortField).descending();
 
         // 1) 회사 목록 (체크박스용)
-        List<String> allAirlines = airService.getAllCompanies();
+        // List<String> allAirlines = airService.getAllCompanies();
+        List<Airline> allAirlines = airlineRepo.findAll();
         model.addAttribute("allAirlines", allAirlines);
 
         // 2) 페이징(50개 고정) + 필터링 로직
@@ -92,11 +95,13 @@ public class AirController {
         // 빈 SeatClasses 배열
         for (SeatClass.SeatClassType seatType : SeatClassType.values()) {
             // SeatClass 종류만큼 SeatClass 객체 추가
-            air.getSeatClasses().add(new SeatClass(air, seatType, 0L, 0L, 0L));
+            SeatClass seat = new SeatClass();
+            seat.setClassType(seatType);
+            air.getSeatClasses().add(seat);
         }
 
         // 회사 목록 (드롭박스용)
-        List<String> allAirlines = airService.getAllCompanies();
+        List<Airline> allAirlines = airlineRepo.findAll();
         model.addAttribute("allAirlines", allAirlines);
 
         // 도시코드
@@ -124,11 +129,11 @@ public class AirController {
     }
 
     @GetMapping("/{id}")
-    public String selectAir(@PathVariable("id") Long id, Model model) {
+    public String selectAir(@PathVariable Long id, Model model) {
         Air air = airRepo.getReferenceById(id);
 
         // 회사 목록 (드롭박스용)
-        List<String> allAirlines = airService.getAllCompanies();
+        List<Airline> allAirlines = airlineRepo.findAll();
         model.addAttribute("allAirlines", allAirlines);
 
         // 도시코드
@@ -150,11 +155,7 @@ public class AirController {
             air.setFlightType(FlightType.STOP_OVER);
         }
 
-        // seatClass 지정
-        for (SeatClass seat : air.getSeatClasses()) {
-            seat.setAir(air);
-        }
-        airRepo.save(air);
+        airService.createAir(air);
 
         return "redirect:/air";
     }
@@ -190,8 +191,13 @@ public class AirController {
 
     @GetMapping("/search")
     public String searchAir(
+<<<<<<< HEAD
             @ModelAttribute("filter") AirFilterDTO filter, // 필터 DTO를 바인딩
             @RequestParam(defaultValue = "air.flightNumber") String sortField,
+=======
+            @ModelAttribute AirFilterDTO filter, // 필터 DTO를 바인딩
+            @RequestParam(defaultValue = "air.departDateTime") String sortField,
+>>>>>>> develop
             @RequestParam(defaultValue = "asc") String sortDir,
             @RequestParam(defaultValue = "0") int page, // 페이지 번호
             Model model) {

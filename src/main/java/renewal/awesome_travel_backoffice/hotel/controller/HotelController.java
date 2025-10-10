@@ -1,7 +1,5 @@
 package renewal.awesome_travel_backoffice.hotel.controller;
 
-import java.util.List;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,10 +17,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import renewal.awesome_travel_backoffice.hotel.dto.HotelFilterDTO;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelRepository;
-import renewal.awesome_travel_backoffice.hotel.repository.HotelReservationRepository;
+// import renewal.awesome_travel_backoffice.hotel.repository.HotelReservationRepository;
 import renewal.awesome_travel_backoffice.hotel.service.HotelService;
 import renewal.common.entity.Hotel;
-import renewal.common.entity.HotelReservation;
+// import renewal.common.entity.HotelReservation;
 import renewal.common.entity.Hotel.HotelType;
 import renewal.awesome_travel_backoffice.citycode.repository.CityCodeRepository;
 import renewal.awesome_travel_backoffice.hotel.repository.AmenityRepository;
@@ -36,14 +34,14 @@ public class HotelController {
 
     private final HotelService hotelService;
     private final HotelRepository hotelRepo;
-    private final HotelReservationRepository hotelReservationRepo;
+    // private final HotelReservationRepository hotelReservationRepo;
     private final AmenityRepository amenityRepo;
     private final CityCodeRepository cityRepo;
 
     // 호텔 목록 + 필터 + 페이징
     @GetMapping
     public String listAndFilter(
-            @ModelAttribute("filter") HotelFilterDTO filter,
+            @ModelAttribute HotelFilterDTO filter,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "id") String sortField,
             @RequestParam(defaultValue = "asc") String sortDir,
@@ -94,7 +92,7 @@ public class HotelController {
 
     // 호텔 상세 조회
     @GetMapping("/{id}")
-    public String selectHotel(@PathVariable("id") Long id, Model model) {
+    public String selectHotel(@PathVariable Long id, Model model) {
         Hotel hotel = hotelRepo.getReferenceById(id);
 
         // 도시코드
@@ -119,13 +117,13 @@ public class HotelController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteHotel(@PathVariable Long id) {
 
-        // 1. 호텔 ID에 연결된 모든 예약 가져오기
-        List<HotelReservation> hotelReservations = hotelReservationRepo.findByHotelId(id);
+        // // 1. 호텔 ID에 연결된 모든 예약 가져오기
+        // List<HotelReservation> hotelReservations = hotelReservationRepo.findByHotelId(id);
 
-        // 2. 예약 삭제
-        for (HotelReservation hotelReservation : hotelReservations) {
-            hotelReservationRepo.deleteById(hotelReservation.getId());
-        }
+        // // 2. 예약 삭제
+        // for (HotelReservation hotelReservation : hotelReservations) {
+        //     hotelReservationRepo.deleteById(hotelReservation.getId());
+        // }
         
         // 3. 호텔 삭제
         hotelRepo.deleteById(id);
@@ -133,18 +131,19 @@ public class HotelController {
         return ResponseEntity.ok("삭제 완료");
     }
 
-    // 특정 호텔 예약 조회 (팝업용)
-    @GetMapping("/{id}/hotelReservation")
-    public String selectHotelHotelReservation(@PathVariable("id") Long id, Model model) {
-        List<HotelReservation> hotelReservations = hotelReservationRepo.findByHotelId(id);
-        model.addAttribute("hotelReservation", hotelReservations);
-        model.addAttribute("title", "Hotel ID "+id+" HotelReservation");
-        return "components/hotel/hotelReservation";
-    }
+    // // 특정 호텔 예약 조회
+    // @GetMapping("/{id}/hotelReservation")
+    // public String selectHotelHotelReservation(@PathVariable("id") Long id, Model model) {
+    //     List<HotelReservation> hotelReservations = hotelReservationRepo.findByHotelId(id);
+    //     model.addAttribute("hotelReservation", hotelReservations);
+    //     model.addAttribute("title", "Hotel ID "+id+" HotelReservation");
+    //     model.addAttribute("content", "components/hotelReservation");
+    //     return "layout";
+    // }
     
     @GetMapping("/search")
     public String searchHotel(
-            @ModelAttribute("filter") HotelFilterDTO filter, // 필터 DTO를 바인딩
+            @ModelAttribute HotelFilterDTO filter, // 필터 DTO를 바인딩
             @RequestParam(defaultValue = "id") String sortField,
             @RequestParam(defaultValue = "asc") String sortDir,
             @RequestParam(defaultValue = "0") int page, // 페이지 번호

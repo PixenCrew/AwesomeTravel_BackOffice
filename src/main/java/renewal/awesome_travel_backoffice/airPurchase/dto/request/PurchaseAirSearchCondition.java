@@ -4,14 +4,14 @@ import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import renewal.common.entity.BasePurchase.PurchaseStatus;
+import renewal.common.entity.PurchaseBase.PurchaseStatus;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class AirPurchaseSearchCondition {
+public class PurchaseAirSearchCondition {
 
     private PurchaseStatus status;        // 상태 필터 (예: HOLDING, PAID)
 

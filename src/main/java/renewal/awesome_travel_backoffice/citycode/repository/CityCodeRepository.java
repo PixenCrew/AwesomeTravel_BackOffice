@@ -45,3 +45,5 @@ public interface CityCodeRepository extends JpaRepository<CityCode, String> {
     @Query("SELECT c FROM CityCode c ORDER BY c.country ASC, c.code ASC")
     List<CityCode> findAllCityCodesList();
 }
+
+

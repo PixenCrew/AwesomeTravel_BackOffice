@@ -39,3 +39,4 @@ public interface BannerRepository extends JpaRepository<Banner, Long>, JpaSpecif
     @Query("SELECT b FROM Banner b WHERE b.startDate >= :startDate AND b.endDate <= :endDate ORDER BY b.displayOrder ASC, b.createdAt DESC")
     Page<Banner> findByDateRange(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate, Pageable pageable);
 }
+
