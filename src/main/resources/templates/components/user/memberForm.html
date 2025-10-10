@@ -1,0 +1,265 @@
+<div th:fragment="content" class="bg-white rounded-lg shadow-sm">
+        <!-- 페이지 헤더 -->
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900" th:text="${title}">회원 등록</h2>
+                    <p class="text-sm text-gray-600 mt-1">회원 정보를 입력해주세요</p>
+                </div>
+                <a href="/member" 
+                   class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
+                    목록으로
+                </a>
+            </div>
+        </div>
+
+        <!-- 폼 -->
+        <form th:action="${userId != null ? '/member/edit/' + userId : '/member/new'}" 
+              th:object="${user}" 
+              method="post" 
+              class="p-6 space-y-6">
+            
+            <!-- 기본 정보 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">이름 *</label>
+                    <input type="text" 
+                           id="name" 
+                           th:field="*{name}" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           required>
+                </div>
+                
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">이메일 *</label>
+                    <input type="email" 
+                           id="email" 
+                           th:field="*{email}" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           required>
+                </div>
+                
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">전화번호 *</label>
+                    <input type="tel" 
+                           id="phone" 
+                           th:field="*{phone}" 
+                           placeholder="010-1234-5678"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           required>
+                </div>
+                
+                <div>
+                    <label for="birthDate" class="block text-sm font-medium text-gray-700 mb-1">생년월일</label>
+                    <input type="date" 
+                           id="birthDate" 
+                           th:field="*{birthDate}" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+            </div>
+
+            <!-- 소셜 로그인 정보 -->
+            <div class="border-t pt-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">소셜 로그인 정보</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="provider" class="block text-sm font-medium text-gray-700 mb-1">가입 경로</label>
+                        <select id="provider" 
+                                th:field="*{provider}" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">선택하세요</option>
+                            <option th:each="provider : ${providers}" 
+                                    th:value="${provider}" 
+                                    th:text="${provider}">GOOGLE</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="socialId" class="block text-sm font-medium text-gray-700 mb-1">소셜 ID</label>
+                        <input type="text" 
+                               id="socialId" 
+                               th:field="*{socialId}" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 여권 정보 -->
+            <div class="border-t pt-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">여권 정보</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="passportNumber" class="block text-sm font-medium text-gray-700 mb-1">여권번호</label>
+                        <input type="text" 
+                               id="passportNumber" 
+                               th:field="*{passportNumber}" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    
+                    <div>
+                        <label for="passportCountry" class="block text-sm font-medium text-gray-700 mb-1">발급국가</label>
+                        <input type="text" 
+                               id="passportCountry" 
+                               th:field="*{passportCountry}" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    
+                    <div>
+                        <label for="passportIssuedDate" class="block text-sm font-medium text-gray-700 mb-1">발급일</label>
+                        <input type="date" 
+                               id="passportIssuedDate" 
+                               th:field="*{passportIssuedDate}" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    
+                    <div>
+                        <label for="passportExpiryDate" class="block text-sm font-medium text-gray-700 mb-1">만료일</label>
+                        <input type="date" 
+                               id="passportExpiryDate" 
+                               th:field="*{passportExpiryDate}" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 영문 이름 -->
+            <div class="border-t pt-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">영문 이름</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="englishFirstName" class="block text-sm font-medium text-gray-700 mb-1">영문 이름</label>
+                        <input type="text" 
+                               id="englishFirstName" 
+                               th:field="*{englishFirstName}" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    
+                    <div>
+                        <label for="englishLastName" class="block text-sm font-medium text-gray-700 mb-1">영문 성</label>
+                        <input type="text" 
+                               id="englishLastName" 
+                               th:field="*{englishLastName}" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 권한 및 상태 -->
+            <div class="border-t pt-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">권한 및 상태</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="role" class="block text-sm font-medium text-gray-700 mb-1">역할 *</label>
+                        <select id="role" 
+                                th:field="*{role}" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                required>
+                            <option value="">선택하세요</option>
+                            <option th:each="role : ${roles}" 
+                                    th:value="${role}" 
+                                    th:text="${role}">USER</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="status" class="block text-sm font-medium text-gray-700 mb-1">상태 *</label>
+                        <select id="status" 
+                                th:field="*{status}" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                required>
+                            <option value="">선택하세요</option>
+                            <option th:each="status : ${statuses}" 
+                                    th:value="${status}" 
+                                    th:text="${status}">ACTIVE</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 동의 정보 -->
+            <div class="border-t pt-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">동의 정보</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center">
+                        <input type="checkbox" 
+                               id="emailVerified" 
+                               th:field="*{emailVerified}" 
+                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="emailVerified" class="ml-2 block text-sm text-gray-700">
+                            이메일 인증 완료
+                        </label>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <input type="checkbox" 
+                               id="marketingConsent" 
+                               th:field="*{marketingConsent}" 
+                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="marketingConsent" class="ml-2 block text-sm text-gray-700">
+                            마케팅 정보 수신 동의
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 버튼 -->
+            <div class="border-t pt-6 flex justify-end space-x-3">
+                <a href="/member" 
+                   class="px-6 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors duration-200">
+                    취소
+                </a>
+                <button type="submit" 
+                        class="px-6 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                    <span th:text="${userId != null ? '수정' : '등록'}">등록</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // 폼 유효성 검사
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const requiredFields = ['name', 'email', 'phone', 'role', 'status'];
+            let isValid = true;
+            
+            requiredFields.forEach(fieldName => {
+                const field = document.getElementById(fieldName);
+                if (!field.value.trim()) {
+                    field.classList.add('border-red-500');
+                    isValid = false;
+                } else {
+                    field.classList.remove('border-red-500');
+                }
+            });
+            
+            if (!isValid) {
+                e.preventDefault();
+                alert('필수 항목을 모두 입력해주세요.');
+            }
+        });
+
+        // 이메일 형식 검사
+        document.getElementById('email').addEventListener('blur', function() {
+            const email = this.value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (email && !emailRegex.test(email)) {
+                this.classList.add('border-red-500');
+                alert('올바른 이메일 형식을 입력해주세요.');
+            } else {
+                this.classList.remove('border-red-500');
+            }
+        });
+
+        // 전화번호 형식 검사
+        document.getElementById('phone').addEventListener('blur', function() {
+            const phone = this.value;
+            const phoneRegex = /^010-\d{4}-\d{4}$/;
+            if (phone && !phoneRegex.test(phone)) {
+                this.classList.add('border-red-500');
+                alert('올바른 전화번호 형식을 입력해주세요. (예: 010-1234-5678)');
+            } else {
+                this.classList.remove('border-red-500');
+            }
+        });
+    </script>
+</div>
