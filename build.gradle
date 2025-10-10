@@ -68,10 +68,15 @@ dependencies {
 
 	// DB 연결
     implementation 			group: 'org.mariadb.jdbc',	name : 'mariadb-java-client'
+    implementation 			group: 'com.h2database', name: 'h2'
 	annotationProcessor 	group: 'jakarta.persistence', name: 'jakarta.persistence-api'
 
 	// 템플릿 엔진
 	implementation 			group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf'
+	
+	// Apache POI for Excel processing
+	implementation 'org.apache.poi:poi:5.2.4'
+	implementation 'org.apache.poi:poi-ooxml:5.2.4'
 
 }
 
