@@ -22,7 +22,7 @@ import renewal.awesome_travel_backoffice.hotel.service.HotelService;
 import renewal.common.entity.Hotel;
 // import renewal.common.entity.HotelReservation;
 import renewal.common.entity.Hotel.HotelType;
-import renewal.common.repository.CityCodeRepository;
+import renewal.awesome_travel_backoffice.citycode.repository.CityCodeRepository;
 import renewal.awesome_travel_backoffice.hotel.repository.AmenityRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -60,8 +60,9 @@ public class HotelController {
         // model.addAttribute("hotelList", hotelPage.getContent());
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
+        model.addAttribute("isSelectionPage", false); // 기본값 설정
         model.addAttribute("title", "Hotel List");
-        model.addAttribute("content", "components/hotel");
+        model.addAttribute("content", "components/hotel/hotel");
 
         return "layout";
     }
@@ -78,7 +79,7 @@ public class HotelController {
         model.addAttribute("hotelTypes", HotelType.values());
         model.addAttribute("allAmenities", amenityRepo.findAll());
         model.addAttribute("title", "New Hotel");
-        model.addAttribute("content", "components/hotelDetail");
+        model.addAttribute("content", "components/hotel/hotelDetail");
         return "layout";
     }
 
@@ -101,7 +102,7 @@ public class HotelController {
         model.addAttribute("hotelTypes", HotelType.values());
         model.addAttribute("allAmenities", amenityRepo.findAll());
         model.addAttribute("title", "Hotel Detail");
-        model.addAttribute("content", "components/hotelDetail");
+        model.addAttribute("content", "components/hotel/hotelDetail");
         return "layout";
     }
 
@@ -160,11 +161,12 @@ public class HotelController {
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("title", "Hotel Select");
+        model.addAttribute("cityCode", cityRepo.findAll());
         
         // 호텔선택 플래그
         model.addAttribute("isSelectionPage", true);
 
         // return "hotelSelect";
-        return "components/hotel";
+        return "components/hotel/hotelSearchPopup";
     }
 }

@@ -1,0 +1,274 @@
+<div th:fragment="content">
+    <!-- 헤더 -->
+    <div class="sm:flex sm:items-center">
+      <div class="sm:flex-auto">
+        <h1 class="text-base font-semibold leading-6 text-gray-900" th:text="${air.id == null} ? '항공편 등록' : '항공편 상세'">항공편 상세</h1>
+        <p class="mt-2 text-sm text-gray-700" th:text="${air.id == null} ? '새로운 항공편을 등록합니다.' : '항공편 정보를 확인하고 수정할 수 있습니다.'">항공편 정보를 확인하고 수정할 수 있습니다.</p>
+      </div>
+      <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none" th:if="${air.id != null}">
+        <button th:onclick="deleteAir([[${air.id}]])" 
+                class="inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500">
+          <i class="fas fa-trash -ml-0.5 mr-1.5 h-4 w-4"></i>
+          삭제
+        </button>
+      </div>
+    </div>
+
+    <form th:object="${air}" th:action="${air.id == null} ? @{/air/new} : @{/air/{id}(id=${air.id})}" method="post" class="mt-6 space-y-8">
+      <!-- 기본 정보 -->
+      <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+          <h3 class="text-base font-semibold leading-6 text-gray-900 mb-4">기본 정보</h3>
+          
+          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div th:if="${air.id != null}">
+              <label class="block text-sm font-medium leading-6 text-gray-900">ID</label>
+              <input type="text" th:field="*{id}" readonly 
+                     class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 bg-gray-50 sm:text-sm sm:leading-6" />
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium leading-6 text-gray-900">항공편 코드</label>
+              <input type="text" th:field="*{flightNumber}" required 
+                     class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+            </div>
+            
+            <div>
+              <label for="airlineCode" class="block text-sm font-medium leading-6 text-gray-900">항공사</label>
+              <select id="airlineCode" th:field="*{airline.code}" required 
+                      class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
+                <option value="" disabled>-- 항공사 선택 --</option>
+                <option th:each="code : ${allAirlines}" th:value="${code}" th:text="${code}"></option>
+              </select>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium leading-6 text-gray-900">비행 유형</label>
+              <input type="text" th:field="*{flightType}" readonly 
+                     class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 bg-gray-50 sm:text-sm sm:leading-6" />
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium leading-6 text-gray-900">경유 횟수</label>
+              <input type="number" th:field="*{stopovers}" id="stopovers" min="0" readonly 
+                     class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 bg-gray-50 sm:text-sm sm:leading-6" />
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium leading-6 text-gray-900">상태</label>
+              <select th:field="*{status}" 
+                      class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
+                <option th:each="st : ${T(renewal.common.entity.Air.AirStatus).values()}" th:value="${st}" th:text="${st}">STATUS</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 출발/도착 정보 -->
+      <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+          <h3 class="text-base font-semibold leading-6 text-gray-900 mb-4">출발/도착 정보</h3>
+          
+          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <!-- 출발지 -->
+            <div>
+              <label class="block text-sm font-medium leading-6 text-gray-900">출발지</label>
+              <input type="text" th:field="*{departAirport}" list="cityList" onchange="stripAfterPipe(this)" required 
+                     class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+            </div>
+            
+            <!-- 도착지 -->
+            <div>
+              <label class="block text-sm font-medium leading-6 text-gray-900">도착지</label>
+              <input type="text" th:field="*{arriveAirport}" list="cityList" onchange="stripAfterPipe(this)" required 
+                     class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+            </div>
+            
+            <!-- 출발일 -->
+            <div>
+              <label class="block text-sm font-medium leading-6 text-gray-900">출발일</label>
+              <input type="date" th:field="*{departDate}" required 
+                     class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+            </div>
+            
+            <!-- 출발시간 -->
+            <div>
+              <label class="block text-sm font-medium leading-6 text-gray-900">출발시간</label>
+              <input type="time" th:field="*{departTime}" required 
+                     class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+            </div>
+            
+            <!-- 도착일 -->
+            <div>
+              <label class="block text-sm font-medium leading-6 text-gray-900">도착일</label>
+              <input type="date" th:field="*{arriveDate}" required 
+                     class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+            </div>
+            
+            <!-- 도착시간 -->
+            <div>
+              <label class="block text-sm font-medium leading-6 text-gray-900">도착시간</label>
+              <input type="time" th:field="*{arriveTime}" required 
+                     class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 경유지 정보 -->
+      <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-base font-semibold leading-6 text-gray-900">경유지 정보</h3>
+            <button type="button" onclick="addStopover()" 
+                    class="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500">
+              <i class="fas fa-plus -ml-0.5 mr-1.5 h-4 w-4"></i>
+              경유지 추가
+            </button>
+          </div>
+          
+          <div id="stopoverContainer" class="space-y-3">
+            <div th:each="stop, iterStat : *{stopoverList}" class="stopover-entry flex items-center space-x-3">
+              <input type="text" th:field="*{stopoverList[__${iterStat.index}__]}" list="cityList" onchange="stripAfterPipe(this)" required 
+                     class="flex-1 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+              <button type="button" onclick="removeStopover(this)" 
+                      class="inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500">
+                <i class="fas fa-trash h-4 w-4"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 좌석 등급 정보 -->
+      <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+          <h3 class="text-base font-semibold leading-6 text-gray-900 mb-4">좌석 등급 정보</h3>
+          
+          <div class="space-y-6">
+            <div th:each="seat, iterStat : ${air.seatClasses}" class="border border-gray-200 rounded-lg p-4">
+              <div class="flex items-center justify-between mb-4">
+                <h4 class="text-sm font-medium text-gray-900" th:text="${seat.classType}">ECONOMY</h4>
+                <button th:if="${seat.id != null}" type="button" th:onclick="window.open('/air/seat/[[${seat.id}]]', 'popup', 'width=400,height=600')" 
+                        class="inline-flex items-center rounded-md bg-gray-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500">
+                  <i class="fas fa-eye -ml-0.5 mr-1.5 h-4 w-4"></i>
+                  예약 조회
+                </button>
+              </div>
+              
+              <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div>
+                  <label class="block text-sm font-medium leading-6 text-gray-900">등급</label>
+                  <input type="text" th:field="*{seatClasses[__${iterStat.index}__].classType}" readonly 
+                         class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 bg-gray-50 sm:text-sm sm:leading-6" />
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium leading-6 text-gray-900">가격</label>
+                  <input type="number" th:field="*{seatClasses[__${iterStat.index}__].price}" min="0" required 
+                         class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium leading-6 text-gray-900">최대 좌석 수</label>
+                  <input type="number" th:field="*{seatClasses[__${iterStat.index}__].maxSeats}" min="0" required 
+                         class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium leading-6 text-gray-900">잔여 좌석 수</label>
+                  <input type="number" th:field="*{seatClasses[__${iterStat.index}__].availableSeats}" min="0" required 
+                         class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 버튼 -->
+      <div class="flex justify-end space-x-3">
+        <a th:href="@{/air}" 
+           class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+          <i class="fas fa-arrow-left -ml-0.5 mr-1.5 h-4 w-4"></i>
+          목록으로
+        </a>
+        <button type="submit" 
+                class="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
+                th:text="${air.id == null} ? '등록' : '수정'">등록</button>
+      </div>
+    </form>
+
+    <script src="/js/util.js"></script>
+    <script>
+        function deleteAir(id) {
+            if (confirm('정말로 삭제하시겠습니까?')) {
+                fetch('/air/' + id, { method: 'DELETE' })
+                    .then(res => {
+                        if (res.ok) {
+                            alert('삭제 성공');
+                            window.location.href = '/air';
+                        } else {
+                            alert('삭제 실패');
+                        }
+                    });
+            }
+        }
+
+        // 페이지 로딩 시 stopovers 값으로 초기화
+        let stopoverCount = parseInt(document.getElementById("stopovers").value) || 0;
+
+        function addStopover() {
+            const container = document.getElementById("stopoverContainer");
+            const stopoverDiv = document.createElement("div");
+            stopoverDiv.className = "stopover-entry";
+
+            stopoverDiv.innerHTML = `
+            <input type="text"
+                   name="stopoverList[${stopoverCount}]"
+                   list="cityList"
+                   onchange="stripAfterPipe(this)"
+                   required />
+            <button type="button" onclick="removeStopover(this)">삭제</button>
+            `;
+
+            container.appendChild(stopoverDiv);
+            stopoverCount++;
+            updateStopoverCount();
+        }
+
+        function removeStopover(button) {
+            button.parentElement.remove();
+            stopoverCount = Math.max(0, stopoverCount - 1);
+            updateStopoverCount();
+        }
+
+        function updateStopoverCount() {
+            document.getElementById("stopovers").value = stopoverCount;
+        }
+
+        function searchAir(button) {
+            const locPoint = button.closest('.location-point');
+            const from = locPoint.querySelector('input[list="cityList"]').value;
+            const to = locPoint.querySelectorAll('input[list="cityList"]')[1].value;
+            const count = document.querySelector('input[name="count"]').value;
+            window.open(
+                `/air/search?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&count=${encodeURIComponent(count)}`,
+                'airSearchPopup',
+                'width=800,height=600,scrollbars=yes'
+            );
+            window.__lastSeatInput__ = locPoint.querySelector('input[data-role="seatClass"]');
+        }
+
+        function __fillSelectedAirId__(selectedId) {
+            if (window.__lastSeatInput__) {
+                window.__lastSeatInput__.value = selectedId;
+            }
+        }
+    </script>
+
+    <datalist id="cityList">
+        <option th:each="cc : ${cityCode}" th:value="${cc.code} + ' | ' + ${cc.country} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
+    </datalist>
+</div>

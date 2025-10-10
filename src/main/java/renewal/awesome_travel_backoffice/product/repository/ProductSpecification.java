@@ -98,12 +98,21 @@ public class ProductSpecification {
         } else if (from != null) {
             return builder.greaterThanOrEqualTo(avg,  builder.literal(from));
         } else if (to != null) {
-            return builder.lessThanOrEqualTo(avg,  builder.literal(from));
+            return builder.lessThanOrEqualTo(avg,  builder.literal(to));
         }
         return null;
     };
 }
 
+
+    // isActive = ?
+    public static Specification<Product> isActive(Boolean isActive) {
+        return (root, query, builder) -> {
+            if (isActive == null)
+                return null;
+            return builder.equal(root.get("isActive"), isActive);
+        };
+    }
 
     // Tour.country = ?
     public static Specification<Product> tourCountryEquals(String country) {

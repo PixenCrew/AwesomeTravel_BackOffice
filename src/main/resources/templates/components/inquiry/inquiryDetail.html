@@ -1,0 +1,177 @@
+<div th:fragment="content">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <div class="max-w-4xl mx-auto">
+        <!-- 성공 메시지 -->
+        <div th:if="${message}" class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span th:text="${message}">성공 메시지</span>
+        </div>
+
+        <!-- 에러 메시지 -->
+        <div th:if="${errorMessage}" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+            <i class="fas fa-exclamation-triangle mr-2"></i>
+            <span th:text="${errorMessage}">에러 메시지</span>
+        </div>
+
+        <!-- 헤더 -->
+        <div class="mb-6 flex justify-between items-center">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900">문의 상세</h2>
+                <p class="text-gray-600 mt-2">문의 내용을 확인하고 답변을 작성할 수 있습니다.</p>
+            </div>
+            <div class="flex space-x-3">
+                <a href="/inquiry" 
+                   class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">
+                    <i class="fas fa-arrow-left mr-2"></i>목록으로
+                </a>
+            </div>
+        </div>
+
+        <!-- 문의 정보 -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900" th:text="${inquiry.title}">문의 제목</h3>
+                        <div class="mt-2 flex items-center space-x-4 text-sm text-gray-600">
+                            <span>
+                                <i class="fas fa-user mr-1"></i>
+                                작성자: <span th:text="${inquiry.userName}">사용자명</span>
+                            </span>
+                            <span>
+                                <i class="fas fa-calendar mr-1"></i>
+                                작성일: <span th:text="${#temporals.format(inquiry.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="inline-flex px-3 py-1 text-sm font-semibold rounded-full" 
+                              th:class="${!inquiry.isAnswered} ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'"
+                              th:text="${!inquiry.isAnswered} ? '대기중' : '완료'">대기중</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 문의 내용 -->
+            <div class="p-6">
+                <h4 class="text-sm font-medium text-gray-700 mb-3">문의 내용</h4>
+                <div class="prose max-w-none">
+                    <div class="whitespace-pre-wrap text-gray-900 leading-relaxed" th:text="${inquiry.content}">문의 내용이 여기에 표시됩니다.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 답변 섹션 -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">답변</h3>
+            </div>
+
+            <!-- 기존 답변 -->
+            <div th:if="${answer != null}" class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="text-sm text-gray-600">
+                        <i class="fas fa-user-tie mr-1"></i>
+                        관리자 답변
+                        <span class="ml-4">
+                            <i class="fas fa-calendar mr-1"></i>
+                            <span th:text="${#temporals.format(answer.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01</span>
+                        </span>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="editAnswer()" 
+                                class="text-blue-600 hover:text-blue-900 text-sm">
+                            <i class="fas fa-edit mr-1"></i>수정
+                        </button>
+                        <form th:action="@{/inquiry/answer/{answerId}/delete(answerId=${answer.id})}" method="POST" class="inline">
+                            <input type="hidden" name="inquiryId" th:value="${inquiry.id}">
+                            <button type="submit" 
+                                    onclick="return confirm('답변을 삭제하시겠습니까?')"
+                                    class="text-red-600 hover:text-red-900 text-sm">
+                                <i class="fas fa-trash mr-1"></i>삭제
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <div class="prose max-w-none">
+                    <div class="whitespace-pre-wrap text-gray-900 leading-relaxed" th:text="${answer.content}">답변 내용이 여기에 표시됩니다.</div>
+                </div>
+            </div>
+
+            <!-- 답변 작성/수정 폼 -->
+            <div class="p-6">
+                <form th:action="@{/inquiry/{id}/answer(id=${inquiry.id})}" method="POST">
+                    <div class="mb-4">
+                        <label for="content" class="block text-sm font-medium text-gray-700 mb-2">
+                            <span th:if="${answer == null}">답변 작성</span>
+                            <span th:if="${answer != null}">답변 수정</span>
+                        </label>
+                        <textarea id="content" 
+                                  name="content" 
+                                  rows="8"
+                                  placeholder="답변 내용을 입력하세요"
+                                  required
+                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                  th:text="${answer?.content}"></textarea>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <div class="text-sm text-gray-600">
+                            <input type="hidden" name="adminId" value="1">
+                            <span>관리자 ID: 1</span>
+                        </div>
+                        <div class="flex space-x-3">
+                            <button type="button" 
+                                    onclick="cancelEdit()" 
+                                    th:if="${answer != null}"
+                                    class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">
+                                취소
+                            </button>
+                            <button type="submit" 
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                                <i class="fas fa-paper-plane mr-2"></i>
+                                <span th:if="${answer == null}">답변 등록</span>
+                                <span th:if="${answer != null}">답변 수정</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 상태 변경 버튼 -->
+        <div class="mt-6 flex justify-center space-x-4">
+            <form th:action="@{/inquiry/{id}/status/toggle(id=${inquiry.id})}" method="POST" class="inline">
+                <button type="submit" 
+                        class="px-6 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700">
+                    <i class="fas fa-sync mr-2"></i>
+                    <span th:if="${!inquiry.isAnswered}">처리중으로 변경</span>
+                    <span th:if="${inquiry.isAnswered}">대기중으로 변경</span>
+                </button>
+            </form>
+            
+            <form th:action="@{/inquiry/{id}/status/complete(id=${inquiry.id})}" method="POST" class="inline">
+                <button type="submit" 
+                        th:if="${!inquiry.isAnswered}"
+                        class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                    <i class="fas fa-check mr-2"></i>완료 처리
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function editAnswer() {
+            // 답변 수정 모드로 전환
+            const contentTextarea = document.getElementById('content');
+            contentTextarea.focus();
+            contentTextarea.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelEdit() {
+            // 수정 취소 시 원래 내용으로 복원
+            location.reload();
+        }
+    </script>
+</div>

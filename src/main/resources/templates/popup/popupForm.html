@@ -1,0 +1,143 @@
+<div th:fragment="content">
+    <div class="space-y-4">
+        <!-- 페이지 헤더 -->
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900" th:text="${popup != null ? '팝업 수정' : '팝업 등록'}">팝업 등록</h2>
+                <p class="text-sm text-gray-600 mt-1">새로운 팝업을 등록하거나 기존 팝업을 수정합니다.</p>
+            </div>
+            <a th:href="@{/popup}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200">
+                목록으로
+            </a>
+        </div>
+
+        <!-- 메시지 표시 -->
+        <div th:if="${message}" class="p-4 bg-green-100 text-green-800 rounded-lg">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <span th:text="${message}">성공 메시지</span>
+            </div>
+        </div>
+        
+        <div th:if="${error}" class="p-4 bg-red-100 text-red-800 rounded-lg">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+                <span th:text="${error}">오류 메시지</span>
+            </div>
+        </div>
+
+        <!-- 팝업 등록/수정 폼 -->
+        <div class="bg-white rounded-lg shadow-sm p-6 pb-12">
+            <form th:action="${popup != null ? '/popup/' + popup.id : '/popup'}" 
+                  method="POST" 
+                  class="space-y-6">
+                <!-- PUT 메서드 시뮬레이션을 위한 hidden input -->
+                <input type="hidden" name="_method" th:value="${popup != null ? 'PUT' : 'POST'}" />
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 표시 순서 -->
+                    <div>
+                        <label for="displayOrder" class="block text-sm font-medium text-gray-700 mb-2">표시 순서 *</label>
+                        <input type="number" 
+                               id="displayOrder" 
+                               name="displayOrder" 
+                               th:value="${popup?.displayOrder}"
+                               placeholder="1"
+                               required
+                               min="1"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    
+                    <!-- 제목 -->
+                    <div>
+                        <label for="title" class="block text-sm font-medium text-gray-700 mb-2">제목 *</label>
+                        <input type="text" 
+                               id="title" 
+                               name="title" 
+                               th:value="${popup?.title}"
+                               placeholder="팝업 제목을 입력하세요"
+                               required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 시작일 -->
+                    <div>
+                        <label for="startDate" class="block text-sm font-medium text-gray-700 mb-2">시작일 *</label>
+                        <input type="date" 
+                               id="startDate" 
+                               name="startDate" 
+                               th:value="${popup?.startDate}"
+                               required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    
+                    <!-- 종료일 -->
+                    <div>
+                        <label for="endDate" class="block text-sm font-medium text-gray-700 mb-2">종료일 *</label>
+                        <input type="date" 
+                               id="endDate" 
+                               name="endDate" 
+                               th:value="${popup?.endDate}"
+                               required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 파일 경로 -->
+                    <div>
+                        <label for="file" class="block text-sm font-medium text-gray-700 mb-2">파일 경로 *</label>
+                        <input type="text" 
+                               id="file" 
+                               name="file" 
+                               th:value="${popup?.file}"
+                               placeholder="/images/popup/popup1.jpg"
+                               required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    
+                    <!-- URL -->
+                    <div>
+                        <label for="url" class="block text-sm font-medium text-gray-700 mb-2">연결 URL *</label>
+                        <input type="url" 
+                               id="url" 
+                               name="url" 
+                               th:value="${popup?.url}"
+                               placeholder="https://example.com"
+                               required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                </div>
+                
+                <!-- 활성화 상태 -->
+                <div class="flex items-center">
+                    <input type="checkbox" 
+                           id="active" 
+                           name="active" 
+                           th:checked="${popup?.active != null ? popup.active : true}"
+                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="active" class="ml-2 block text-sm text-gray-900">
+                        활성화
+                    </label>
+                </div>
+                
+                <!-- 버튼 -->
+                <div class="flex justify-end space-x-3 pt-6">
+                    <a th:href="@{/popup}" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200">
+                        취소
+                    </a>
+                    <button type="submit" 
+                            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                        <span th:text="${popup != null ? '수정하기' : '등록하기'}">등록하기</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

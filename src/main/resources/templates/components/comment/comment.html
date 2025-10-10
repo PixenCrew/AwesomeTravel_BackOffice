@@ -1,0 +1,564 @@
+<div th:fragment="content">
+    <style>
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+            transform: translateY(-1px);
+        }
+        
+        .filter-section {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .filter-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .filter-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .toggle-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background-color 0.2s;
+        }
+        
+        .toggle-btn:hover {
+            background: #2563eb;
+        }
+        
+        .search-form {
+            display: flex;
+            gap: 1rem;
+            align-items: end;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .form-input {
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .btn-search {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            height: fit-content;
+        }
+        
+        .btn-search:hover {
+            background: #059669;
+        }
+        
+        .btn-reset {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            height: fit-content;
+        }
+        
+        .btn-reset:hover {
+            background: #4b5563;
+        }
+        
+        .table-section {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th {
+            background: #f8fafc;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .table td {
+            padding: 1rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .table tbody tr:hover {
+            background: #f9fafb;
+        }
+        
+        .sort-link {
+            color: #374151;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s;
+        }
+        
+        .sort-link:hover {
+            color: #3b82f6;
+        }
+        
+        .sort-icon {
+            font-size: 0.75rem;
+        }
+        
+        .comment-id {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .comment-content {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .product-info {
+            min-width: 200px;
+        }
+        
+        .product-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+        
+        .product-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+        
+        .product-id {
+            font-family: 'Courier New', monospace;
+            background: #f3f4f6;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            display: inline-block;
+        }
+        
+        .product-price {
+            font-weight: 500;
+            color: #059669;
+        }
+        
+        .writer-name {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .product-title {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .star {
+            color: #fbbf24;
+            font-size: 0.875rem;
+        }
+        
+        .rating-number {
+            font-weight: 600;
+            color: #374151;
+            margin-left: 0.25rem;
+        }
+        
+        .date {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .btn-info {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            text-decoration: none;
+        }
+        
+        .btn-info:hover {
+            background: #2563eb;
+        }
+        
+        .pagination-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+        }
+        
+        .pagination-info {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .pagination {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .pagination a {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            color: #374151;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .pagination a:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+        
+        .pagination a.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            color: #6b7280;
+        }
+        
+        .no-data i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #d1d5db;
+        }
+    </style>
+
+    <!-- 페이지 헤더 -->
+    <div class="page-header">
+        <h1 class="page-title">댓글 관리</h1>
+        <div class="btn-group">
+            <a href="/comment-report" class="btn-secondary">
+                <i class="fas fa-flag mr-2"></i>신고 관리
+            </a>
+        </div>
+    </div>
+
+    <!-- 필터 섹션 -->
+    <div class="filter-section">
+        <div class="filter-toggle">
+            <h3 class="filter-title">검색 필터</h3>
+            <button type="button" class="toggle-btn" onclick="toggleFilter()">
+                <i class="fas fa-filter mr-1"></i>필터
+            </button>
+        </div>
+        
+        <form id="filterForm" class="hidden">
+            <div class="search-form">
+                <div class="form-group">
+                    <label class="form-label">검색어</label>
+                    <input type="text" name="keyword" th:value="${keyword}" placeholder="작성자명, 댓글 내용, 상품명으로 검색" class="form-input" />
+                </div>
+                
+                <button type="button" class="btn-reset" onclick="resetFilter()">
+                    <i class="fas fa-undo mr-1"></i>초기화
+                </button>
+                <button type="button" class="btn-search" onclick="searchComments()">
+                    <i class="fas fa-search mr-1"></i>검색
+                </button>
+            </div>
+            
+            <!-- 정렬 기준 및 방향 (hidden input) -->
+            <input type="hidden" name="sortField" th:value="${sortField}" />
+            <input type="hidden" name="sortDir" th:value="${sortDir}" />
+        </form>
+    </div>
+
+    <!-- 결과 테이블 -->
+    <div class="table-section">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>
+                        <a href="#" data-sortfield="writer.name" onclick="toggleSort(this, event)" class="sort-link">
+                            작성자
+                            <i th:if="${sortField=='writer.name'}" th:class="${sortDir=='asc'} ? 'fas fa-sort-up sort-icon' : 'fas fa-sort-down sort-icon'"></i>
+                        </a>
+                    </th>
+                    <th>상품 정보</th>
+                    <th>댓글 내용</th>
+                    <th>
+                        <a href="#" data-sortfield="rating" onclick="toggleSort(this, event)" class="sort-link">
+                            평점
+                            <i th:if="${sortField=='rating'}" th:class="${sortDir=='asc'} ? 'fas fa-sort-up sort-icon' : 'fas fa-sort-down sort-icon'"></i>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" data-sortfield="createdAt" onclick="toggleSort(this, event)" class="sort-link">
+                            작성일
+                            <i th:if="${sortField=='createdAt'}" th:class="${sortDir=='asc'} ? 'fas fa-sort-up sort-icon' : 'fas fa-sort-down sort-icon'"></i>
+                        </a>
+                    </th>
+                    <th>작업</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:if="${commentPage.content.isEmpty()}">
+                    <td colspan="7" class="no-data">
+                        <i class="fas fa-comment-slash"></i>
+                        <div>등록된 댓글이 없습니다.</div>
+                    </td>
+                </tr>
+                <tr th:each="comment : ${commentPage.content}">
+                    <td class="comment-id" th:text="${comment.id}">1</td>
+                    <td class="writer-name" th:text="${comment.writerName}">작성자</td>
+                    <td class="product-info">
+                        <div class="product-title" th:text="${comment.productTitle}">상품명</div>
+                        <div class="product-details">
+                            <span class="product-id">ID: <span th:text="${comment.productId}">1001</span></span>
+                            <span class="product-price" th:text="${#numbers.formatInteger(comment.productPrice, 3, 'COMMA')} + '원'">550,000원</span>
+                        </div>
+                    </td>
+                    <td class="comment-content" th:text="${comment.content}">댓글 내용</td>
+                    <td>
+                        <div class="rating">
+                            <span th:each="i : ${#numbers.sequence(1, 5)}" 
+                                  th:class="${i <= comment.rating} ? 'star fas fa-star' : 'star far fa-star'"></span>
+                            <span class="rating-number" th:text="${comment.rating}">5</span>
+                        </div>
+                    </td>
+                    <td class="date" th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 12:00</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button th:onclick="|deleteComment(${comment.id})|" class="btn-danger">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 페이징 -->
+    <div class="pagination-section">
+        <div class="pagination-info">
+            총 <span th:text="${commentPage.totalElements}">0</span>개 중 
+            <span th:text="${commentPage.number * commentPage.size + 1}">1</span>-<span th:text="${(commentPage.number + 1) * commentPage.size > commentPage.totalElements ? commentPage.totalElements : (commentPage.number + 1) * commentPage.size}">10</span>개 표시
+        </div>
+        
+        <div class="pagination">
+            <a th:if="${commentPage.hasPrevious()}" th:onclick="|searchComments(${commentPage.number - 1})|">
+                <i class="fas fa-chevron-left"></i> 이전
+            </a>
+            
+            <a th:each="i : ${#numbers.sequence(0, commentPage.totalPages - 1)}" 
+               th:onclick="|searchComments(${i})|" 
+               th:class="${i == commentPage.number} ? 'active' : ''" 
+               th:text="${i + 1}">1</a>
+            
+            <a th:if="${commentPage.hasNext()}" th:onclick="|searchComments(${commentPage.number + 1})|">
+                다음 <i class="fas fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <script src="/js/filter.js"></script>
+    <script src="/js/util.js"></script>
+    
+    <script>
+        function toggleFilter() {
+            const filterForm = document.getElementById('filterForm');
+            const toggleBtn = document.querySelector('.toggle-btn');
+            
+            if (filterForm.classList.contains('hidden')) {
+                filterForm.classList.remove('hidden');
+                toggleBtn.innerHTML = '<i class="fas fa-chevron-up mr-1"></i>접기';
+            } else {
+                filterForm.classList.add('hidden');
+                toggleBtn.innerHTML = '<i class="fas fa-filter mr-1"></i>필터';
+            }
+        }
+        
+        function searchComments(page = 0) {
+            const form = document.getElementById('filterForm');
+            const formData = new FormData(form);
+            formData.set('page', page);
+            
+            const params = new URLSearchParams();
+            for (let [key, value] of formData.entries()) {
+                if (value) params.append(key, value);
+            }
+            
+            window.location.href = '/comment?' + params.toString();
+        }
+        
+        function resetFilter() {
+            document.querySelector('input[name="keyword"]').value = '';
+            searchComments(0);
+        }
+        
+        function toggleSort(element, event) {
+            event.preventDefault();
+            const sortField = element.getAttribute('data-sortfield');
+            const currentSortField = document.querySelector('input[name="sortField"]').value;
+            const currentSortDir = document.querySelector('input[name="sortDir"]').value;
+            
+            let newSortDir = 'desc';
+            if (sortField === currentSortField && currentSortDir === 'desc') {
+                newSortDir = 'asc';
+            }
+            
+            document.querySelector('input[name="sortField"]').value = sortField;
+            document.querySelector('input[name="sortDir"]').value = newSortDir;
+            
+            searchComments(0);
+        }
+        
+        function deleteComment(id) {
+            if (confirm('정말로 이 댓글을 삭제하시겠습니까?\n삭제된 댓글은 복구할 수 없습니다.')) {
+                fetch('/api/admin/comments/' + id, { 
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(res => {
+                    if (res.ok) {
+                        alert('댓글이 삭제되었습니다.');
+                        window.location.reload();
+                    } else {
+                        alert('댓글 삭제에 실패했습니다.');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    alert('댓글 삭제 중 오류가 발생했습니다.');
+                });
+            }
+        }
+    </script>
+</div>

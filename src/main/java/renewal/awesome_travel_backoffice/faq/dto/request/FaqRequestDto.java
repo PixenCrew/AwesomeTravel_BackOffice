@@ -11,4 +11,5 @@ public class FaqRequestDto {
     private String question;
     private String answer;
     private FaqCategory category;
+    private Boolean visible = true;
 }
