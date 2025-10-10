@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import renewal.awesome_travel_backoffice.comment.dto.response.CommentReportResponseDto;
 import renewal.awesome_travel_backoffice.comment.service.CommentReportService;
-import renewal.awesome_travel_backoffice.comment.utiles.ReportReason;
+import renewal.common.entity.CommentReport.ReportReason;
 
 import lombok.RequiredArgsConstructor;
 
