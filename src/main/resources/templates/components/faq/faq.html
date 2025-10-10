@@ -1,0 +1,342 @@
+<div th:fragment="content">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <th:block>
+      <script th:inline="javascript">
+        function filterDropdown(id, keyword) {
+          const select = document.getElementById(id + "-select");
+          const options = select.options;
+          for (let i = 0; i < options.length; i++) {
+            const txt = options[i].text.toLowerCase();
+            options[i].style.display = txt.includes(keyword.toLowerCase()) ? '' : 'none';
+          }
+        }
+
+        function setDateRange(days) {
+          const now = new Date();
+          const start = new Date();
+          start.setDate(now.getDate() - days);
+          document.querySelector('input[name="startDate"]').value = start.toISOString().split('T')[0];
+          document.querySelector('input[name="endDate"]').value = now.toISOString().split('T')[0];
+        }
+
+        function toggleFilter() {
+          const filterPanel = document.getElementById('filterPanel');
+          const toggleBtn = document.getElementById('toggleFilterBtn');
+          if (filterPanel.classList.contains('hidden')) {
+            filterPanel.classList.remove('hidden');
+            toggleBtn.innerHTML = '<i class="fas fa-chevron-up mr-2"></i>필터 접기';
+          } else {
+            filterPanel.classList.add('hidden');
+            toggleBtn.innerHTML = '<i class="fas fa-chevron-down mr-2"></i>필터 펼치기';
+          }
+        }
+
+        function updateFilterCount() {
+          const activeFilters = document.querySelectorAll('input[type="text"], input[type="date"], select').length;
+          const countBadge = document.getElementById('filterCount');
+          countBadge.textContent = activeFilters;
+        }
+
+        function toggleStatus(id) {
+          if (confirm('상태를 변경하시겠습니까?')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/faq/' + id + '/status/toggle';
+            
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = document.querySelector('input[name="_csrf"]').name;
+            csrfToken.value = document.querySelector('input[name="_csrf"]').value;
+            
+            form.appendChild(csrfToken);
+            document.body.appendChild(form);
+            form.submit();
+          }
+        }
+
+        function exportToExcel() {
+          const form = document.createElement('form');
+          form.method = 'GET';
+          form.action = '/faq/export';
+          document.body.appendChild(form);
+          form.submit();
+        }
+
+        function deleteFaq(faqId) {
+          if(confirm('정말 삭제하시겠습니까?')) {
+            var form = document.getElementById('deleteForm' + faqId);
+            if(form) form.submit();
+            else alert('삭제 폼이 존재하지 않습니다.');
+          }
+        }
+
+        function toggleStatus(faqId) {
+          if(confirm('상태를 변경하시겠습니까?')) {
+            var form = document.getElementById('toggleForm' + faqId);
+            if(form) form.submit();
+            else alert('상태 변경 폼이 존재하지 않습니다.');
+          }
+        }
+      </script>
+    </th:block>
+
+    <!-- 성공/실패 메시지 알림 -->
+    <div th:if="${message}" class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-md">
+      <div class="flex items-center">
+        <i class="fas fa-check-circle mr-2"></i>
+        <span th:text="${message}">성공 메시지</span>
+      </div>
+    </div>
+    <div th:if="${error}" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
+      <div class="flex items-center">
+        <i class="fas fa-exclamation-circle mr-2"></i>
+        <span th:text="${error}">오류 메시지</span>
+      </div>
+    </div>
+    <!-- 헤더 -->
+    <div class="max-w-7xl mx-auto">
+      <div class="mb-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900">FAQ 관리</h2>
+          <p class="text-gray-600 mt-2">자주 묻는 질문을 관리할 수 있습니다.</p>
+        </div>
+        <div class="flex space-x-3">
+          <a href="/faq/new" 
+             class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+            <i class="fas fa-plus mr-2"></i>새 FAQ 등록
+          </a>
+          <button onclick="exportToExcel()" 
+                  class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+            <i class="fas fa-file-excel mr-2"></i>엑셀 다운로드
+          </button>
+        </div>
+      </div>
+
+      <!-- 필터 패널 -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+        <div class="p-4 border-b border-gray-200">
+          <button id="toggleFilterBtn" onclick="toggleFilter()" 
+                  class="flex items-center text-gray-700 hover:text-gray-900">
+            <i class="fas fa-chevron-down mr-2"></i>필터 펼치기
+            <span id="filterCount" class="ml-2 bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">0</span>
+          </button>
+        </div>
+        
+        <div id="filterPanel" class="hidden p-6">
+          <form method="GET" action="/faq" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- <input type="hidden" name="_csrf" th:value="${_csrf.token}"> -->
+            
+            <!-- 검색어 -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">검색어</label>
+              <input type="text" name="keyword" th:value="${param.keyword}" 
+                     placeholder="제목, 내용 검색" 
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <!-- 검색 타입 -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">검색 타입</label>
+              <select name="searchType" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">전체</option>
+                <option value="TITLE" th:selected="${param.searchType == 'TITLE'}">제목</option>
+                <option value="CONTENT" th:selected="${param.searchType == 'CONTENT'}">내용</option>
+                <option value="TITLE_CONTENT" th:selected="${param.searchType == 'TITLE_CONTENT'}">제목+내용</option>
+              </select>
+            </div>
+
+            <!-- 카테고리 -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">카테고리</label>
+              <select name="category" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">전체</option>
+                <option value="MEMBER" th:selected="${param.category == 'MEMBER'}">MEMBER</option>
+                <option value="PAYMENT" th:selected="${param.category == 'PAYMENT'}">PAYMENT</option>
+                <option value="RESERVATION" th:selected="${param.category == 'RESERVATION'}">RESERVATION</option>
+                <option value="ETC" th:selected="${param.category == 'ETC'}">ETC</option>
+              </select>
+            </div>
+
+            <!-- 상태 -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">상태</label>
+              <select name="isVisible" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">전체</option>
+                <option value="true" th:selected="${param.isVisible == 'true'}">공개</option>
+                <option value="false" th:selected="${param.isVisible == 'false'}">숨김</option>
+              </select>
+            </div>
+
+            <!-- 날짜 범위 -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">시작일</label>
+              <input type="date" name="startDate" th:value="${param.startDate}" 
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">종료일</label>
+              <input type="date" name="endDate" th:value="${param.endDate}" 
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <!-- 빠른 날짜 선택 -->
+            <div class="flex space-x-2">
+              <button type="button" onclick="setDateRange(7)" 
+                      class="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200">7일</button>
+              <button type="button" onclick="setDateRange(30)" 
+                      class="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200">30일</button>
+              <button type="button" onclick="setDateRange(90)" 
+                      class="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200">90일</button>
+            </div>
+
+            <!-- 버튼 -->
+            <div class="flex space-x-2">
+              <button type="submit" 
+                      class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                <i class="fas fa-search mr-2"></i>검색
+              </button>
+              <a href="/faq" 
+                 class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">
+                <i class="fas fa-undo mr-2"></i>초기화
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- 결과 요약 -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+        <div class="p-4">
+          <div class="flex justify-between items-center">
+            <div class="text-sm text-gray-600">
+              총 <span class="font-semibold text-blue-600" th:text="${totalCount}">0</span>건의 FAQ
+            </div>
+            <div class="flex space-x-4 text-sm">
+              <span class="text-green-600">
+                <i class="fas fa-eye mr-1"></i>공개: <span th:text="${#lists.size(faqs.?[visible == true])}">0</span>
+              </span>
+              <span class="text-gray-600">
+                <i class="fas fa-eye-slash mr-1"></i>숨김: <span th:text="${#lists.size(faqs.?[visible == false])}">0</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 테이블 -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">번호</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">질문</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">카테고리</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">상태</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">등록일</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">관리</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr th:each="faq : ${faqs}">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${faq.id}">1</td>
+                <td class="px-6 py-4">
+                  <div class="text-sm font-medium text-gray-900" th:text="${faq.question}">FAQ 질문</div>
+                  <div class="text-sm text-gray-500" th:text="${#strings.abbreviate(faq.answer, 50)}">FAQ 답변 미리보기...</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span th:switch="${faq.category}">
+                    <span th:case="'MEMBER'" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800" th:text="${faq.category}">카테고리</span>
+                    <span th:case="'PAYMENT'" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800" th:text="${faq.category}">카테고리</span>
+                    <span th:case="'RESERVATION'" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800" th:text="${faq.category}">카테고리</span>
+                    <span th:case="*" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800" th:text="${faq.category}">카테고리</span>
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full" 
+                        th:class="${faq.visible} ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'"
+                        th:text="${faq.visible} ? '공개' : '숨김'">공개</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" 
+                    th:text="${#temporals.format(faq.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <div class="flex space-x-2">
+                    <a th:href="@{/faq/{id}(id=${faq.id})}" 
+                       class="text-blue-600 hover:text-blue-900" title="상세보기">
+                      <i class="fas fa-eye"></i>
+                    </a>
+                    <a th:href="@{/faq/edit/{id}(id=${faq.id})}" 
+                       class="text-green-600 hover:text-green-900" title="수정">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <button type="button" 
+                            th:onclick="'toggleStatus(' + ${faq.id} + ')'" 
+                            th:class="${faq.visible} ? 'text-yellow-600 hover:text-yellow-900' : 'text-gray-600 hover:text-gray-900'"
+                            th:title="${faq.visible} ? '숨김 처리' : '공개 처리'">
+                      <i th:class="${faq.visible} ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                    </button>
+                    <button type="button" th:onclick="'deleteFaq(' + ${faq.id} + ')'" class="text-red-600 hover:text-red-900" title="삭제">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                    <form th:id="'deleteForm' + ${faq.id}" method="POST" th:action="@{/faq/delete/{id}(id=${faq.id})}" style="display: none;">
+                      <th:block th:if="${_csrf != null}">
+                        <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+                      </th:block>
+                    </form>
+                    <form th:id="'toggleForm' + ${faq.id}" method="POST" th:action="@{/faq/{id}/status/toggle(id=${faq.id})}" style="display: none;">
+                      <th:block th:if="${_csrf != null}">
+                        <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+                      </th:block>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+          <div class="flex-1 flex justify-between sm:hidden">
+            <a th:if="${currentPage > 0}" th:href="@{/faq(page=${currentPage - 1})}" 
+               class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+              이전
+            </a>
+            <a th:if="${currentPage < totalPages - 1}" th:href="@{/faq(page=${currentPage + 1})}" 
+               class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+              다음
+            </a>
+          </div>
+          <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+              <p class="text-sm text-gray-700">
+                총 <span class="font-medium" th:text="${totalCount}">0</span>건 중
+                <span class="font-medium" th:text="${currentPage * 10 + 1}">1</span> -
+                <span class="font-medium" th:text="${currentPage * 10 + #lists.size(faqs)}">10</span>건
+              </p>
+            </div>
+            <div>
+              <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                <a th:if="${currentPage > 0}" th:href="@{/faq(page=${currentPage - 1})}" 
+                   class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                  <i class="fas fa-chevron-left"></i>
+                </a>
+                
+                <a th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}" 
+                   th:href="@{/faq(page=${pageNum})}"
+                   th:class="${pageNum == currentPage} ? 'relative inline-flex items-center px-4 py-2 border border-gray-300 bg-blue-50 text-sm font-medium text-blue-600' : 'relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50'"
+                   th:text="${pageNum + 1}">1</a>
+                
+                <a th:if="${currentPage < totalPages - 1}" th:href="@{/faq(page=${currentPage + 1})}" 
+                   class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                  <i class="fas fa-chevron-right"></i>
+                </a>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>

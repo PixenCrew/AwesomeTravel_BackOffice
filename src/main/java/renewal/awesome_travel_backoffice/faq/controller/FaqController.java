@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import renewal.awesome_travel_backoffice.faq.dto.request.FaqRequestDto;
 import renewal.awesome_travel_backoffice.faq.dto.response.FaqResponseDto;
 import renewal.awesome_travel_backoffice.faq.service.FaqService;
-import renewal.awesome_travel_backoffice.faq.utils.FaqCategory;
+import renewal.common.entity.Faq.FaqCategory;
 
 import lombok.RequiredArgsConstructor;
 
