@@ -34,8 +34,8 @@ import renewal.common.entity.Location;
 import renewal.common.entity.Schedule;
 import renewal.common.entity.Tour;
 import renewal.common.entity.Location.Type;
-import renewal.common.repository.CityCodeRepository;
-import renewal.common.repository.CountryCodeRepository;
+import renewal.awesome_travel_backoffice.citycode.repository.CityCodeRepository;
+import renewal.awesome_travel_backoffice.countrycode.repository.CountryCodeRepository;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -82,8 +82,9 @@ public class TourController {
         // model.addAttribute("tourList", tourPage.getContent());
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
+        model.addAttribute("isSelectionPage", false); // 일반 목록 페이지임을 명시
         model.addAttribute("title", "Tour List");
-        model.addAttribute("content", "components/tour"); // layout 안에서 이 fragment를 렌더
+        model.addAttribute("content", "components/tour/tour"); // layout 안에서 이 fragment를 렌더
 
         return "layout";
     }
@@ -106,6 +107,7 @@ public class TourController {
         // 3. Location
         Location blankLocation = new Location();
         blankLocation.setLocationType(Type.POINT);
+        blankLocation.setDescription("");
 
         // 2. Schedule
         Schedule blankSchedule = new Schedule();
@@ -113,6 +115,9 @@ public class TourController {
 
         // 1. Tour
         Tour blankTour = new Tour();
+        blankTour.setName("");
+        blankTour.setCompany("");
+        blankTour.setCountry("");
         blankTour.getSchedules().add(blankSchedule);
 
         // defaultLocation.setCity(null);
@@ -124,8 +129,9 @@ public class TourController {
         model.addAttribute("countryCode", countryRepo.findAll());
         model.addAttribute("cityCode", cityRepo.findAll());
         model.addAttribute("tour", blankTour);
+        model.addAttribute("isSelectionPage", false);
         model.addAttribute("title", "New Tour");
-        model.addAttribute("content", "components/tourDetail");
+        model.addAttribute("content", "components/tour/tourDetail");
 
         return "layout";
     }
@@ -155,13 +161,14 @@ public class TourController {
     @GetMapping("/{id}")
     public String selectTravel(@PathVariable("id") Long id, Model model) {
 
-        Tour tour = tourRepo.getReferenceById(id);
+        Tour tour = tourService.findById(id);
         model.addAttribute("types", Type.class);
         model.addAttribute("countryCode", countryRepo.findAll());
         model.addAttribute("cityCode", cityRepo.findAll());
         model.addAttribute("tour", tour);
+        model.addAttribute("isSelectionPage", false);
         model.addAttribute("title", "Tour " + tour.getName());
-        model.addAttribute("content", "components/tourDetail");
+        model.addAttribute("content", "components/tour/tourDetail");
 
         return "layout";
     }
@@ -228,7 +235,8 @@ public class TourController {
 
         Pageable pageable = PageRequest.of(page, 50, sort);
 
-        Page<Tour> tourPage = tourService.searchTours(filter, pageable);
+        // Product 선택용이므로 연결된 Tour 제외
+        Page<Tour> tourPage = tourService.searchTours(filter, pageable, true);
 
         // View에서 쓸 속성들
         model.addAttribute("tourPage", tourPage);
@@ -239,7 +247,7 @@ public class TourController {
         // 투어선택 플래그
         model.addAttribute("isSelectionPage", true);
 
-        return "components/tour";
+        return "components/tour/tour";
     }
 
     protected Tour setTour(Tour tour) throws Exception {
