@@ -22,7 +22,7 @@ import renewal.common.entity.SeatClass;
 import renewal.common.entity.Air.FlightType;
 import renewal.common.repository.CityCodeRepository;
 
-@Configuration
+// @Configuration
 public class RandomGenerator {
 
     @Bean
