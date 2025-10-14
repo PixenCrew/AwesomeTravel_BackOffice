@@ -24,13 +24,16 @@ import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
 import renewal.common.entity.Product;
 import renewal.common.entity.Tour;
 import renewal.common.entity.Product.Info;
+<<<<<<< HEAD
 import renewal.awesome_travel_backoffice.citycode.repository.CityCodeRepository;
 import renewal.awesome_travel_backoffice.countrycode.repository.CountryCodeRepository;
 import renewal.awesome_travel_backoffice.productPurchase.repository.ProductPurchaseRepository;
+=======
 import renewal.common.entity.Product.ProductType;
 import renewal.common.repository.CityCodeRepository;
 import renewal.common.repository.CountryCodeRepository;
 // import renewal.common.repository.CountryCodeRepository;
+>>>>>>> develop
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -115,11 +118,13 @@ public class ProductController {
         Tour tour = tourRepo.findById(product.getTour().getId()).get();
         tour.setProductId(savedProduct.getId());
         tourRepo.save(tour);
+=======
 
         // 투어 productId 업데이트
         Tour tour = tourRepo.findById(product.getTour().getId()).get();
         product.setTour(tour);
         productRepo.save(product);
+>>>>>>> develop
 
         return "redirect:/product";
     }
@@ -144,7 +149,9 @@ public class ProductController {
         // 기존 Product 조회하여 리뷰 데이터 보존
         Product existingProduct = productRepo.findById(product.getId()).get();
         
+=======
 
+>>>>>>> develop
         // 기존 Tour productId 삭제
         Long lastTourId = existingProduct.getTour().getId();
         Tour lastTour = tourRepo.findById(lastTourId).get();
@@ -169,8 +176,9 @@ public class ProductController {
         return "redirect:/product";
     }
 
-    // 패키지 비활성화 처리
+    // 패키지 삭제 처리
     @DeleteMapping("/{id}")
+<<<<<<< HEAD
     public ResponseEntity<String> deactivateProduct(@PathVariable Long id) {
         try {
             Product product = productRepo.findById(id).orElse(null);
@@ -219,6 +227,7 @@ public class ProductController {
         } catch (Exception e) {
             return ResponseEntity.status(500).body("활성화 실패: " + e.getMessage());
         }
+=======
     public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
         
         // Product와 연결된 Tour가 있으면 연결 해제

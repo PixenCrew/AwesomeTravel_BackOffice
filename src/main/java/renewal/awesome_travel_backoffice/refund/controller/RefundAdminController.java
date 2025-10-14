@@ -88,7 +88,7 @@ public class RefundAdminController {
         RefundStats stats = new RefundStats();
         stats.setRequestedCount(refundService.getRefundCountByStatus(Refund.RefundStatus.REQUESTED));
         stats.setApprovedCount(refundService.getRefundCountByStatus(Refund.RefundStatus.APPROVED));
-        stats.setProcessedCount(refundService.getRefundCountByStatus(Refund.RefundStatus.PROCESSED));
+        stats.setProcessedCount(refundService.getRefundCountByStatus(Refund.RefundStatus.COMPLETED));
         stats.setRejectedCount(refundService.getRefundCountByStatus(Refund.RefundStatus.REJECTED));
         return ResponseEntity.ok(stats);
     }

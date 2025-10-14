@@ -74,6 +74,7 @@ public class AirController {
 
         // 3) View에서 쓸 속성들
         model.addAttribute("airPage", airPage);
+        model.addAttribute("filter", filter); // 필터 객체 추가
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("title", "Air List");
@@ -100,12 +101,12 @@ public class AirController {
             air.getSeatClasses().add(seat);
         }
 
-        // 회사 목록 (드롭박스용)
+        // 항공사 목록 (드롭박스용)
         List<Airline> allAirlines = airlineRepo.findAll();
         model.addAttribute("allAirlines", allAirlines);
 
-        // 도시코드
-        model.addAttribute("cityCode", cityRepo.findAll());
+        // 도시코드 목록 (드롭박스용)
+        model.addAttribute("allCities", cityRepo.findAll());
 
         model.addAttribute("air", air);
         model.addAttribute("title", "New Air");
@@ -132,12 +133,12 @@ public class AirController {
     public String selectAir(@PathVariable Long id, Model model) {
         Air air = airRepo.getReferenceById(id);
 
-        // 회사 목록 (드롭박스용)
+        // 항공사 목록 (드롭박스용)
         List<Airline> allAirlines = airlineRepo.findAll();
         model.addAttribute("allAirlines", allAirlines);
 
-        // 도시코드
-        model.addAttribute("cityCode", cityRepo.findAll());
+        // 도시코드 목록 (드롭박스용)
+        model.addAttribute("allCities", cityRepo.findAll());
 
         model.addAttribute("air", air);
         model.addAttribute("title", "Air Detail");

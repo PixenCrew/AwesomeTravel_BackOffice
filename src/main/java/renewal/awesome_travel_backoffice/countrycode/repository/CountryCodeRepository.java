@@ -15,26 +15,26 @@ import java.util.Optional;
 public interface CountryCodeRepository extends JpaRepository<CountryCode, String> {
 
     // 국가명(한글)으로 검색
-    @Query("SELECT c FROM CountryCode c WHERE c.nameKor LIKE %:nameKor% ORDER BY c.code ASC")
+    @Query("SELECT c FROM CountryCode c WHERE c.countryKor LIKE %:nameKor% ORDER BY c.countryCode ASC")
     Page<CountryCode> findByNameKorContaining(@Param("nameKor") String nameKor, Pageable pageable);
 
     // 국가명(영문)으로 검색
-    @Query("SELECT c FROM CountryCode c WHERE c.nameEng LIKE %:nameEng% ORDER BY c.code ASC")
+    @Query("SELECT c FROM CountryCode c WHERE c.countryEng LIKE %:nameEng% ORDER BY c.countryCode ASC")
     Page<CountryCode> findByNameEngContaining(@Param("nameEng") String nameEng, Pageable pageable);
 
     // 국가 코드로 검색
-    @Query("SELECT c FROM CountryCode c WHERE c.code LIKE %:code% ORDER BY c.code ASC")
+    @Query("SELECT c FROM CountryCode c WHERE c.countryCode LIKE %:code% ORDER BY c.countryCode ASC")
     Page<CountryCode> findByCodeContaining(@Param("code") String code, Pageable pageable);
 
     // 모든 국가 코드 조회 (정렬)
-    @Query("SELECT c FROM CountryCode c ORDER BY c.code ASC")
+    @Query("SELECT c FROM CountryCode c ORDER BY c.countryCode ASC")
     Page<CountryCode> findAllCountryCodes(Pageable pageable);
 
     // 모든 국가 코드 조회 (리스트, 셀렉트박스용)
-    @Query("SELECT c FROM CountryCode c ORDER BY c.code ASC")
+    @Query("SELECT c FROM CountryCode c ORDER BY c.countryCode ASC")
     List<CountryCode> findAllCountryCodesList();
 
     // 국가 코드로 조회 (단일, 기존 코드 호환용)
-    @Query("SELECT c FROM CountryCode c WHERE c.code = :code")
+    @Query("SELECT c FROM CountryCode c WHERE c.countryCode = :code")
     Optional<CountryCode> findByCode(@Param("code") String code);
 }

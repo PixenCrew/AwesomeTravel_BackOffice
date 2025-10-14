@@ -20,11 +20,14 @@ public interface PurchaseAirRepository extends JpaRepository<PurchaseAir, Long>,
             Pageable pageable
     );
 
-    Optional<AirPurchase> findByProductPurchaseId(Long productPurchaseId);
+    // 기존 코드 호환성을 위한 메서드 (실제로는 findById와 동일)
+    default Optional<PurchaseAir> findByProductPurchaseId(Long productPurchaseId) {
+        return findById(productPurchaseId);
+    }
 
-    @Query("SELECT ap FROM AirPurchase ap " +
+    @Query("SELECT ap FROM PurchaseAir ap " +
            "LEFT JOIN FETCH ap.airPassengers passengers " +
-           "WHERE ap.productPurchaseId = :id")
-    Optional<AirPurchase> findByIdWithPassengers(@Param("id") Long id);
+           "WHERE ap.id = :id")
+    Optional<PurchaseAir> findByIdWithPassengers(@Param("id") Long id);
 
 }

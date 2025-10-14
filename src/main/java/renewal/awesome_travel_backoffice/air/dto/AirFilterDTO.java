@@ -42,4 +42,62 @@ public class AirFilterDTO {
     private BigDecimal maxPrice;
     private Long availableSeats;
     private SeatClassType seatClassType;
+    
+    // Alias getters/setters for backward compatibility
+    public LocalDate getDepartDateFrom() {
+        return departDateTimeFrom;
+    }
+    
+    public void setDepartDateFrom(LocalDate departDateFrom) {
+        this.departDateTimeFrom = departDateFrom;
+    }
+    
+    public LocalDate getDepartDateTo() {
+        return departDateTimeTo;
+    }
+    
+    public void setDepartDateTo(LocalDate departDateTo) {
+        this.departDateTimeTo = departDateTo;
+    }
+    
+    public LocalDate getArriveDateFrom() {
+        return arriveDateFrom;
+    }
+    
+    public void setArriveDateFrom(LocalDate arriveDateFrom) {
+        this.arriveDateFrom = arriveDateFrom;
+    }
+    
+    public LocalDate getArriveDateTo() {
+        return arriveDateTo;
+    }
+    
+    public void setArriveDateTo(LocalDate arriveDateTo) {
+        this.arriveDateTo = arriveDateTo;
+    }
+    
+    // Additional aliases for other fields that might be referenced
+    public List<String> getAirlines() {
+        return airlines;
+    }
+    
+    public void setAirlines(List<String> airlines) {
+        this.airlines = airlines;
+    }
+    
+    public Boolean getInfantSeatsRequired() {
+        return infantSeatsRequired;
+    }
+    
+    public void setInfantSeatsRequired(Boolean infantSeatsRequired) {
+        this.infantSeatsRequired = infantSeatsRequired;
+    }
+    
+    public SeatClassType getSeatClassType() {
+        return seatClassType;
+    }
+    
+    public void setSeatClassType(SeatClassType seatClassType) {
+        this.seatClassType = seatClassType;
+    }
 }
