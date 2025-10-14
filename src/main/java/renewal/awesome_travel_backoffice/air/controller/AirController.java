@@ -191,13 +191,8 @@ public class AirController {
 
     @GetMapping("/search")
     public String searchAir(
-<<<<<<< HEAD
-            @ModelAttribute("filter") AirFilterDTO filter, // 필터 DTO를 바인딩
-            @RequestParam(defaultValue = "air.flightNumber") String sortField,
-=======
             @ModelAttribute AirFilterDTO filter, // 필터 DTO를 바인딩
             @RequestParam(defaultValue = "air.departDateTime") String sortField,
->>>>>>> develop
             @RequestParam(defaultValue = "asc") String sortDir,
             @RequestParam(defaultValue = "0") int page, // 페이지 번호
             Model model) {
