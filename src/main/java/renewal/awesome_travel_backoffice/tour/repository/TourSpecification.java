@@ -13,6 +13,7 @@ import renewal.common.entity.Location;
 import renewal.common.entity.Product;
 import renewal.common.entity.Schedule;
 import renewal.common.entity.Tour;
+import renewal.common.entity.Product;
 
 public class TourSpecification {
 
@@ -110,6 +111,16 @@ public class TourSpecification {
             } else {
                 return null;
             }
+        };
+    }
+
+    // Product와 연결되지 않은 Tour만 조회 (사용 중인 tour_id 제외)
+    public static Specification<Tour> notConnectedToProduct(List<Long> usedTourIds) {
+        return (root, query, builder) -> {
+            if (usedTourIds == null || usedTourIds.isEmpty()) {
+                return null; // 사용 중인 tour_id가 없으면 모든 Tour 조회
+            }
+            return builder.not(root.get("id").in(usedTourIds));
         };
     }
 

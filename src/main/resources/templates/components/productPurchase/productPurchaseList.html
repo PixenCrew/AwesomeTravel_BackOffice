@@ -1,0 +1,252 @@
+<div th:fragment="content">
+    <div class="container mx-auto px-4 py-8">
+        <!-- 헤더 -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">패키지 상품 주문 목록</h1>
+            <p class="text-gray-600">고객의 패키지 상품 주문 내역을 관리하세요</p>
+        </div>
+
+        <!-- 필터 및 검색 -->
+        <div class="bg-white shadow-md rounded-lg mb-6">
+            <!-- 필터 헤더 -->
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-medium text-gray-900">검색 필터</h3>
+                    <button type="button" id="filterToggle" onclick="toggleFilter()" 
+                            class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-filter mr-2"></i>
+                        <span id="filterToggleText">필터 숨기기</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 필터 폼 -->
+            <div id="filterForm" class="p-6">
+                <form th:action="@{/product-purchase}" method="get" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                            <label for="purchaseStatus" class="block text-sm font-medium text-gray-700 mb-1">주문 상태</label>
+                            <select id="purchaseStatus" name="purchaseStatus" 
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <option value="">전체</option>
+                                <option value="HOLDING">대기 중</option>
+                                <option value="PAID">결제 완료</option>
+                                <option value="CANCELLED">취소됨</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="memberId" class="block text-sm font-medium text-gray-700 mb-1">회원 ID</label>
+                            <input type="number" id="memberId" name="memberId" th:value="${condition.memberId}" 
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                   placeholder="회원 ID 입력">
+                        </div>
+                        <div>
+                            <label for="productId" class="block text-sm font-medium text-gray-700 mb-1">상품 ID</label>
+                            <input type="number" id="productId" name="productId" th:value="${condition.productId}" 
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                   placeholder="상품 ID 입력">
+                        </div>
+                        <div>
+                            <label for="customerName" class="block text-sm font-medium text-gray-700 mb-1">고객명</label>
+                            <input type="text" id="customerName" name="customerName" th:value="${condition.customerName}" 
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                   placeholder="고객명 입력">
+                        </div>
+                        <div>
+                            <label for="customerEmail" class="block text-sm font-medium text-gray-700 mb-1">고객 이메일</label>
+                            <input type="email" id="customerEmail" name="customerEmail" th:value="${condition.customerEmail}" 
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                   placeholder="이메일 입력">
+                        </div>
+                    </div>
+                    
+                    <!-- 버튼 영역 -->
+                    <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                        <button type="button" onclick="resetFilter()" 
+                                class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-undo mr-2"></i>
+                            초기화
+                        </button>
+                        <button type="submit" 
+                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-search mr-2"></i>
+                            검색
+                        </button>
+                    </div>
+                    
+                    <input type="hidden" name="sortField" th:value="${sortField}" />
+                    <input type="hidden" name="sortDir" th:value="${sortDir}" />
+                </form>
+            </div>
+        </div>
+
+        <!-- 주문 목록 테이블 -->
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <a th:href="@{/product-purchase(sortField='productPurchaseId', sortDir=${sortField == 'productPurchaseId' && sortDir == 'asc' ? 'desc' : 'asc'}, purchaseStatus=${condition.purchaseStatus}, memberId=${condition.memberId}, productId=${condition.productId}, customerName=${condition.customerName}, customerEmail=${condition.customerEmail})}" 
+                               class="hover:text-gray-700">
+                                주문 ID
+                                <i th:if="${sortField == 'productPurchaseId'}" 
+                                   th:class="${sortDir == 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'}" 
+                                   class="ml-1"></i>
+                            </a>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <a th:href="@{/product-purchase(sortField='product.title', sortDir=${sortField == 'product.title' && sortDir == 'asc' ? 'desc' : 'asc'}, purchaseStatus=${condition.purchaseStatus}, memberId=${condition.memberId}, productId=${condition.productId}, customerName=${condition.customerName}, customerEmail=${condition.customerEmail})}" 
+                               class="hover:text-gray-700">
+                                상품명
+                                <i th:if="${sortField == 'product.title'}" 
+                                   th:class="${sortDir == 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'}" 
+                                   class="ml-1"></i>
+                            </a>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <a th:href="@{/product-purchase(sortField='name', sortDir=${sortField == 'name' && sortDir == 'asc' ? 'desc' : 'asc'}, purchaseStatus=${condition.purchaseStatus}, memberId=${condition.memberId}, productId=${condition.productId}, customerName=${condition.customerName}, customerEmail=${condition.customerEmail})}" 
+                               class="hover:text-gray-700">
+                                고객명
+                                <i th:if="${sortField == 'name'}" 
+                                   th:class="${sortDir == 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'}" 
+                                   class="ml-1"></i>
+                            </a>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <a th:href="@{/product-purchase(sortField='price', sortDir=${sortField == 'price' && sortDir == 'asc' ? 'desc' : 'asc'}, purchaseStatus=${condition.purchaseStatus}, memberId=${condition.memberId}, productId=${condition.productId}, customerName=${condition.customerName}, customerEmail=${condition.customerEmail})}" 
+                               class="hover:text-gray-700">
+                                결제 금액
+                                <i th:if="${sortField == 'price'}" 
+                                   th:class="${sortDir == 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'}" 
+                                   class="ml-1"></i>
+                            </a>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <a th:href="@{/product-purchase(sortField='purchaseStatus', sortDir=${sortField == 'purchaseStatus' && sortDir == 'asc' ? 'desc' : 'asc'}, purchaseStatus=${condition.purchaseStatus}, memberId=${condition.memberId}, productId=${condition.productId}, customerName=${condition.customerName}, customerEmail=${condition.customerEmail})}" 
+                               class="hover:text-gray-700">
+                                주문 상태
+                                <i th:if="${sortField == 'purchaseStatus'}" 
+                                   th:class="${sortDir == 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'}" 
+                                   class="ml-1"></i>
+                            </a>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <a th:href="@{/product-purchase(sortField='purchaseDate', sortDir=${sortField == 'purchaseDate' && sortDir == 'asc' ? 'desc' : 'asc'}, purchaseStatus=${condition.purchaseStatus}, memberId=${condition.memberId}, productId=${condition.productId}, customerName=${condition.customerName}, customerEmail=${condition.customerEmail})}" 
+                               class="hover:text-gray-700">
+                                주문일
+                                <i th:if="${sortField == 'purchaseDate'}" 
+                                   th:class="${sortDir == 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'}" 
+                                   class="ml-1"></i>
+                            </a>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            승객 수
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            작업
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tr th:each="purchase : ${purchasePage.content}">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900" th:text="${purchase.productPurchaseId}">#3001</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                            <div class="font-medium" th:text="${purchase.product.title}">프랑스 8일 패키지</div>
+                            <div class="text-gray-500" th:text="'ID: ' + ${purchase.product.productId}">ID: 1001</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${purchase.name}">홍길동</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="${#numbers.formatInteger(purchase.price, 3, 'COMMA')} + '원'">2,500,000원</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span th:if="${purchase.purchaseStatus == 'HOLDING'}"
+                                  class="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
+                                  th:text="'대기 중'">대기 중</span>
+                            <span th:if="${purchase.purchaseStatus == 'PAID'}"
+                                  class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                                  th:text="'결제 완료'">결제 완료</span>
+                            <span th:if="${purchase.purchaseStatus == 'CANCELLED'}"
+                                  class="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
+                                  th:text="'취소됨'">취소됨</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${#temporals.format(purchase.purchaseDate, 'yyyy-MM-dd HH:mm')}">2024-01-15 14:30</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <div th:text="${purchase.productPassengers != null ? purchase.productPassengers.size() : 0}">2</div>
+                            <div class="text-xs text-gray-400" th:text="'/' + ${purchase.expectedPassengerCount}">/4</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <a th:href="@{/product-purchase/{id}(id=${purchase.productPurchaseId})}" 
+                               class="text-blue-600 hover:text-blue-900 mr-3">
+                                <i class="fas fa-eye"></i> 상세
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 페이징 -->
+            <nav class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6" aria-label="Pagination">
+                <div class="hidden sm:block">
+                    <p class="text-sm text-gray-700">
+                        총 <span class="font-medium" th:text="${purchasePage.totalElements}">100</span>개 결과 중
+                        <span class="font-medium" th:text="${purchasePage.number * purchasePage.size + 1}">1</span> -
+                        <span class="font-medium" th:text="${(purchasePage.number + 1) * purchasePage.size > purchasePage.totalElements ? purchasePage.totalElements : (purchasePage.number + 1) * purchasePage.size}">10</span> 표시
+                    </p>
+                </div>
+                <div class="flex-1 flex justify-between sm:justify-end">
+                    <a th:if="${purchasePage.hasPrevious()}"
+                       th:href="@{/product-purchase(page=${purchasePage.number - 1}, size=${purchasePage.size}, sortField=${sortField}, sortDir=${sortDir}, purchaseStatus=${condition.purchaseStatus}, memberId=${condition.memberId}, productId=${condition.productId}, customerName=${condition.customerName}, customerEmail=${condition.customerEmail})}"
+                       class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        이전
+                    </a>
+                    <a th:if="${purchasePage.hasNext()}"
+                       th:href="@{/product-purchase(page=${purchasePage.number + 1}, size=${purchasePage.size}, sortField=${sortField}, sortDir=${sortDir}, purchaseStatus=${condition.purchaseStatus}, memberId=${condition.memberId}, productId=${condition.productId}, customerName=${condition.customerName}, customerEmail=${condition.customerEmail})}"
+                       class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        다음
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <script>
+        // 필터 토글 기능
+        function toggleFilter() {
+            const filterForm = document.getElementById('filterForm');
+            const toggleText = document.getElementById('filterToggleText');
+            const toggleIcon = document.querySelector('#filterToggle i');
+            
+            if (filterForm.style.display === 'none') {
+                filterForm.style.display = 'block';
+                toggleText.textContent = '필터 숨기기';
+                toggleIcon.className = 'fas fa-filter mr-2';
+            } else {
+                filterForm.style.display = 'none';
+                toggleText.textContent = '필터 보기';
+                toggleIcon.className = 'fas fa-filter mr-2';
+            }
+        }
+
+        // 필터 초기화
+        function resetFilter() {
+            document.getElementById('purchaseStatus').value = '';
+            document.getElementById('memberId').value = '';
+            document.getElementById('productId').value = '';
+            document.getElementById('customerName').value = '';
+            document.getElementById('customerEmail').value = '';
+            
+            // 폼 제출
+            const form = document.querySelector('form');
+            form.submit();
+        }
+
+        // 페이지 로드 시 현재 선택된 값 설정
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentStatus = '[[${condition.purchaseStatus}]]';
+            
+            if (currentStatus && currentStatus !== 'null') {
+                document.getElementById('purchaseStatus').value = currentStatus;
+            }
+        });
+    </script>
+</div>

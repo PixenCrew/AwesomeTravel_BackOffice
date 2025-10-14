@@ -26,8 +26,46 @@ public class InquiryService {
         return inquiryRepository.findAll(pageable).map(this::toDto);
     }
 
-    public Page<InquiryResponseDto> searchInquiriesAdmin(String keyword, Boolean isAnswered, Pageable pageable) {
-        return inquiryRepository.searchAdmin(keyword, isAnswered, pageable).map(this::toDto);
+    public Page<InquiryResponseDto> searchInquiriesAdmin(String keyword, String searchType, Boolean isAnswered, String category, String status, String startDate, String endDate, Pageable pageable) {
+        // String을 enum으로 변환
+        Inquiry.InquiryCategory categoryEnum = null;
+        if (category != null && !category.trim().isEmpty()) {
+            try {
+                categoryEnum = Inquiry.InquiryCategory.valueOf(category);
+            } catch (IllegalArgumentException e) {
+                // 잘못된 카테고리 값은 무시
+            }
+        }
+        
+        Inquiry.InquiryStatus statusEnum = null;
+        if (status != null && !status.trim().isEmpty()) {
+            try {
+                statusEnum = Inquiry.InquiryStatus.valueOf(status);
+            } catch (IllegalArgumentException e) {
+                // 잘못된 상태 값은 무시
+            }
+        }
+        
+        // 날짜 변환
+        java.time.LocalDateTime startDateTime = null;
+        if (startDate != null && !startDate.trim().isEmpty()) {
+            try {
+                startDateTime = java.time.LocalDate.parse(startDate).atStartOfDay();
+            } catch (Exception e) {
+                // 잘못된 날짜 형식은 무시
+            }
+        }
+        
+        java.time.LocalDateTime endDateTime = null;
+        if (endDate != null && !endDate.trim().isEmpty()) {
+            try {
+                endDateTime = java.time.LocalDate.parse(endDate).atTime(23, 59, 59);
+            } catch (Exception e) {
+                // 잘못된 날짜 형식은 무시
+            }
+        }
+        
+        return inquiryRepository.searchAdmin(keyword, searchType, isAnswered, categoryEnum, statusEnum, startDateTime, endDateTime, pageable).map(this::toDto);
     }
 
     public Long createAnswer(Long inquiryId, Long adminId, InquiryAnswerRequestDto dto) {
@@ -58,8 +96,11 @@ public class InquiryService {
         return InquiryResponseDto.builder()
                 .id(inquiry.getId())
                 .userId(inquiry.getUser().getId())
+                .userName(inquiry.getUser().getName())
                 .title(inquiry.getTitle())
                 .content(inquiry.getContent())
+                .category(inquiry.getCategory())
+                .status(inquiry.getStatus())
                 .isAnswered(inquiry.isAnswered())
                 .createdAt(inquiry.getCreatedAt())
                 .answeredAt(inquiry.getAnsweredAt())

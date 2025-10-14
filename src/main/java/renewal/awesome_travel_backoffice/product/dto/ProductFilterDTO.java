@@ -6,10 +6,12 @@ import java.time.LocalDate;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class ProductFilterDTO {
     private String title;
     private BigDecimal minPrice;
@@ -28,4 +30,7 @@ public class ProductFilterDTO {
     private LocalDate endDateFrom;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDateTo;
+    
+    // 상품 상태 필터
+    private String status; // "all", "active", "inactive"
 }

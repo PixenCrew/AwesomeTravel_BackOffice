@@ -1,6 +1,5 @@
 package renewal.awesome_travel_backoffice.notice.repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -28,7 +27,6 @@ public class NoticeQueryRepositoryImpl implements NoticeQueryRepository {
 
     @Override
     public Page<NoticeResponseDto> search(NoticeSearchRequest nsr, Pageable pageable) {
-        LocalDateTime now = LocalDateTime.now();
         List<NoticeResponseDto> results = queryFactory
                 .select(new QNoticeResponseDto(
                         notice.id,
@@ -40,16 +38,19 @@ public class NoticeQueryRepositoryImpl implements NoticeQueryRepository {
                         notice.category,
                         notice.startAt,
                         notice.endAt,
+                        notice.isVisible,
                         notice.createdAt,
-                        notice.modifiedAt
+                        notice.modifiedAt,
+                        notice.createdBy,
+                        notice.modifiedBy
                 ))
                 .from(notice)
                 .where(
                         categoryEq(nsr.getCategory()),
                         searchByType(nsr.getKeyword(), nsr.getSearchType()),
                         fixEq(nsr.getFix()),
-                        isVisibleCondition(nsr.getIncludeHidden()),
-                        withinExposurePeriod(now)
+                        isVisibleCondition(nsr.getIncludeHidden())
+                        // 관리자 페이지에서는 노출 기간 조건 제거
                 )
                 .orderBy(
                         notice.fix.desc(),
@@ -67,8 +68,8 @@ public class NoticeQueryRepositoryImpl implements NoticeQueryRepository {
                         categoryEq(nsr.getCategory()),
                         searchByType(nsr.getKeyword(), nsr.getSearchType()),
                         fixEq(nsr.getFix()),
-                        isVisibleCondition(nsr.getIncludeHidden()),
-                        withinExposurePeriod(now)
+                        isVisibleCondition(nsr.getIncludeHidden())
+                        // 관리자 페이지에서는 노출 기간 조건 제거
                 )
                 .fetchOne();
 
@@ -84,14 +85,15 @@ public class NoticeQueryRepositoryImpl implements NoticeQueryRepository {
     }
 
     private BooleanExpression isVisibleCondition(Boolean includeHidden) {
-        if (includeHidden != null && includeHidden) return null; // 조건 생략 → 전체 조회
+        if (includeHidden != null && includeHidden) {
+            System.out.println("DEBUG: includeHidden=true, 전체 공지사항 조회");
+            return null; // true일 때 전체 조회
+        }
+        System.out.println("DEBUG: includeHidden=" + includeHidden + ", 공개 공지만 조회");
         return notice.isVisible.eq(true); // 기본: 공개 공지만
     }
 
 
-    private BooleanExpression withinExposurePeriod(LocalDateTime now) {
-        return notice.startAt.loe(now).and(notice.endAt.goe(now));
-    }
 
 
     private BooleanExpression searchByType(String keyword, SearchType searchType) {

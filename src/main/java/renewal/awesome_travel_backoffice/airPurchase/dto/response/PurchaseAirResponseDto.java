@@ -12,7 +12,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class PurchaseAirResponseDto {
 
@@ -37,5 +36,35 @@ public class PurchaseAirResponseDto {
     private LocalDateTime paymentDueDate;
 
     private List<AirPassengerResponseDto> airPassengers;
+    
+    private int expectedPassengerCount;
+    
+    private boolean isPassengerInfoComplete;
+    
+    private LocalDateTime passengerInfoDeadline;
+    
+    private boolean transactionComplete;
+    
+    public AirPurchaseResponseDto(Long id, AirResponseOneDto airDto, PurchaseStatus status, Long price, Long member_id, 
+                                 String name, String number, String email, LocalDateTime purchaseDate, 
+                                 LocalDateTime paymentDueDate, List<AirPassengerResponseDto> airPassengers, 
+                                 int expectedPassengerCount, boolean isPassengerInfoComplete, 
+                                 LocalDateTime passengerInfoDeadline, boolean transactionComplete) {
+        this.id = id;
+        this.airDto = airDto;
+        this.status = status;
+        this.price = price;
+        this.member_id = member_id;
+        this.name = name;
+        this.number = number;
+        this.email = email;
+        this.purchaseDate = purchaseDate;
+        this.paymentDueDate = paymentDueDate;
+        this.airPassengers = airPassengers;
+        this.expectedPassengerCount = expectedPassengerCount;
+        this.isPassengerInfoComplete = isPassengerInfoComplete;
+        this.passengerInfoDeadline = passengerInfoDeadline;
+        this.transactionComplete = transactionComplete;
+    }
 }
 

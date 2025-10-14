@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import renewal.common.entity.Review;
+import java.util.List;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
@@ -19,5 +20,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
            LOWER(c.product.title) LIKE LOWER(CONCAT('%', :keyword, '%')))
     """)
     Page<Review> searchAll(@Param("keyword") String keyword, Pageable pageable);
+
+    /**
+     * 특정 사용자의 최근 댓글 5개 조회
+     */
+    List<Review> findTop5ByWriterIdOrderByCreatedAtDesc(Long writerId);
 
 }

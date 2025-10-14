@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 // import renewal.awesome_travel_backoffice.hotel.repository.HotelReservationRepository;
+import renewal.awesome_travel_backoffice.product.repository.ProductRepository;
 import renewal.awesome_travel_backoffice.tour.dto.TourFilterDTO;
 import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
 import renewal.awesome_travel_backoffice.tour.repository.TourSpecification;
@@ -24,12 +25,17 @@ public class TourService {
 
     private final TourRepository tourRepository;
     // private final HotelReservationRepository hotelReservationRepo;
+    private final ProductRepository productRepository;
     
     public List<String> getAllCompanies() {
         return tourRepository.findDistinctCompanies();
     }
 
     public Page<Tour> searchTours(TourFilterDTO filter, Pageable pageable) {
+        return searchTours(filter, pageable, false); // 기본값: 모든 Tour 조회
+    }
+    
+    public Page<Tour> searchTours(TourFilterDTO filter, Pageable pageable, boolean excludeConnected) {
         Specification<Tour> spec = Specification.where(TourSpecification.withProductJoin()); // 기본적으로 Product와 JOIN
 
         if (filter.getName() != null && !filter.getName().isEmpty()) {
@@ -60,7 +66,20 @@ public class TourService {
             spec = spec.and(TourSpecification.productIsEmptyOrNull());
         }
 
+        // Product와 연결된 Tour 제외 여부 선택
+        if (excludeConnected) {
+            List<Long> usedTourIds = productRepository.findUsedTourIds();
+            spec = spec.and(TourSpecification.notConnectedToProduct(usedTourIds));
+        }
+
         return tourRepository.findAll(spec, pageable);
+    }
+
+    public Tour findById(Long id) {
+        Tour tour = tourRepository.findById(id).orElseThrow(() -> new RuntimeException("Tour not found with id: " + id));
+        // 스케줄을 명시적으로 로드
+        tour.getSchedules().size();
+        return tour;
     }
 
     // public void cancelHotelAir(Long tourId) throws Exception{

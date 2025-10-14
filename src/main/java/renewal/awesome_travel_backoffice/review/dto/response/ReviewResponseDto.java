@@ -16,5 +16,8 @@ public class ReviewResponseDto {
     private int rating;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Long productId;
+    private String productTitle;
+    private Long productPrice;
 }
 

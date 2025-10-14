@@ -1,0 +1,877 @@
+<div th:fragment="content">
+    <div class="container mx-auto px-4 py-8">
+        <!-- 헤더 -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">패키지 상품 주문 상세</h1>
+                    <p class="text-gray-600">주문 ID: <span class="font-mono" th:text="${purchase.productPurchaseId}">#3001</span></p>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="/product-purchase" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                        <i class="fas fa-arrow-left"></i> 목록으로
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 주문 정보 -->
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">주문 정보</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">주문 ID</label>
+                    <p class="mt-1 text-sm text-gray-900 font-mono" th:text="${purchase.productPurchaseId}">#3001</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">주문 상태</label>
+                    <p class="mt-1">
+                        <span th:if="${purchase.purchaseStatus == 'HOLDING'}"
+                              id="currentStatusDisplay"
+                              class="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
+                              th:text="'대기 중'">대기 중</span>
+                        <span th:if="${purchase.purchaseStatus == 'PAID'}"
+                              id="currentStatusDisplay"
+                              class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                              th:text="'결제 완료'">결제 완료</span>
+                        <span th:if="${purchase.purchaseStatus == 'CANCELLED'}"
+                              id="currentStatusDisplay"
+                              class="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
+                              th:text="'취소됨'">취소됨</span>
+                    </p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">결제 금액</label>
+                    <p class="mt-1 text-sm font-medium text-gray-900" th:text="${#numbers.formatInteger(purchase.price, 3, 'COMMA')} + '원'">2,500,000원</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">주문일</label>
+                    <p class="mt-1 text-sm text-gray-900" th:text="${#temporals.format(purchase.purchaseDate, 'yyyy-MM-dd HH:mm')}">2024-01-15 14:30</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">결제 기한</label>
+                    <p class="mt-1 text-sm text-gray-900" th:text="${#temporals.format(purchase.paymentDueDate, 'yyyy-MM-dd HH:mm')}">2024-01-16 14:30</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">회원 ID</label>
+                    <p class="mt-1 text-sm text-gray-900" th:text="${purchase.memberId}">1001</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 고객 정보 -->
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">고객 정보</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">고객명</label>
+                    <p class="mt-1 text-sm text-gray-900" th:text="${purchase.name}">홍길동</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">연락처</label>
+                    <p class="mt-1 text-sm text-gray-900" th:text="${purchase.number}">010-1234-5678</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">이메일</label>
+                    <p class="mt-1 text-sm text-gray-900" th:text="${purchase.email}">hong@example.com</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 상품 정보 -->
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">상품 정보</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">상품명</label>
+                    <p class="mt-1 text-sm font-medium text-gray-900" th:text="${purchase.product.title}">프랑스 8일 패키지</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">상품 ID</label>
+                    <p class="mt-1 text-sm text-gray-900" th:text="${purchase.product.productId}">1001</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">여행지</label>
+                    <p class="mt-1 text-sm text-gray-900" th:text="${purchase.product.country} + ', ' + ${purchase.product.city}">프랑스, 파리</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">여행 기간</label>
+                    <p class="mt-1 text-sm text-gray-900" th:text="${purchase.product.duration} + '일'">8일</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">출발일</label>
+                    <p class="mt-1 text-sm text-gray-900" th:text="${purchase.product.startDate}">2024-02-01</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">도착일</label>
+                    <p class="mt-1 text-sm text-gray-900" th:text="${purchase.product.endDate}">2024-02-08</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">평점</label>
+                    <p class="mt-1 text-sm text-gray-900" th:text="${purchase.product.averageRating != null ? #numbers.formatDecimal(purchase.product.averageRating, 1, 1) : 'N/A'} + ' / 5.0'">4.5 / 5.0</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">리뷰 수</label>
+                    <p class="mt-1 text-sm text-gray-900" th:text="${purchase.product.totalReviews != null ? purchase.product.totalReviews : 0} + '개'">128개</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">총 정원</label>
+                    <p class="mt-1 text-sm text-gray-900" th:text="${purchase.product.totalCapacity != null ? purchase.product.totalCapacity : 0} + '명'">20명</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">남은 정원</label>
+                    <p class="mt-1 text-sm font-medium" 
+                       data-remaining-capacity
+                       th:class="${purchase.product.remainingCapacity != null && purchase.product.remainingCapacity > 0 ? 'text-green-600' : 'text-red-600'}"
+                       th:text="${purchase.product.remainingCapacity != null ? purchase.product.remainingCapacity : 0} + '명'">18명</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2단계 승객 정보 상태 -->
+        <div class="passenger-status-section" th:if="${!purchase.isPassengerInfoComplete}">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <div class="flex items-center">
+                    <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                    <div>
+                        <h4 class="text-blue-800 font-semibold">승객 정보 입력 필요</h4>
+                        <p class="text-blue-700 text-sm mt-1">
+                            패키지 상품의 경우 결제 후에도 승객 정보를 추가할 수 있습니다.
+                        </p>
+                        <p class="text-blue-600 text-xs mt-1">
+                            예상 승객 수: <span th:text="${purchase.expectedPassengerCount}">4</span>명 | 
+                            현재 입력된 승객: <span th:text="${purchase.productPassengers != null ? purchase.productPassengers.size() : 0}">0</span>명
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2단계 승객 정보 입력 폼 -->
+        <div class="passenger-form-section" th:if="${!purchase.isPassengerInfoComplete}">
+            <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-plus-circle text-blue-500 mr-2"></i>
+                    <h3 class="text-xl font-semibold text-gray-900">승객 정보 입력</h3>
+                </div>
+                <p class="text-sm text-gray-600 mb-4">
+                    패키지 상품의 경우 결제 후에도 승객 정보를 추가할 수 있습니다.
+                </p>
+                <form id="passengerForm" class="bg-gray-50 p-4 rounded-lg">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">이름 *</label>
+                            <input type="text" name="name" required 
+                                   class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">연락처 *</label>
+                            <input type="tel" name="number" required 
+                                   class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">이메일 *</label>
+                            <input type="email" name="email" required 
+                                   class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">생년월일 *</label>
+                            <input type="date" name="birth" required 
+                                   class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">성별 *</label>
+                            <select name="sex" required 
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">선택하세요</option>
+                                <option value="MALE">남성</option>
+                                <option value="FEMALE">여성</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">국적 *</label>
+                            <select name="nationality" required 
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">선택하세요</option>
+                                <option value="KOR">대한민국</option>
+                                <option value="USA">미국</option>
+                                <option value="JPN">일본</option>
+                                <option value="CHN">중국</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">여권번호</label>
+                            <input type="text" name="passportNum" 
+                                   class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">영문 성</label>
+                            <input type="text" name="lastName" 
+                                   class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">영문 이름</label>
+                            <input type="text" name="firstName" 
+                                   class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">여권 만료일</label>
+                            <input type="date" name="expire" 
+                                   class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    <div class="mt-4 flex justify-end">
+                        <button type="button" onclick="addPassenger()" 
+                                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-plus mr-2"></i>승객 추가
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 승객 정보 -->
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold text-gray-900">승객 정보</h2>
+                <span class="text-sm text-gray-500" th:text="'총 ' + ${purchase.productPassengers != null ? purchase.productPassengers.size() : 0} + '명'">총 2명</span>
+            </div>
+            
+            <div th:if="${purchase.productPassengers != null && !purchase.productPassengers.isEmpty()}" class="space-y-4">
+                <div th:each="passenger, iterStat : ${purchase.productPassengers}" 
+                     class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-lg font-medium text-gray-900" th:text="'승객 ' + ${iterStat.count}">승객 1</h3>
+                        <button type="button"
+                                class="text-blue-600 hover:text-blue-900 text-sm edit-passenger-btn"
+                                th:data-passenger-id="${passenger.id}"
+                                th:data-name="${passenger.name != null ? passenger.name : ''}"
+                                th:data-number="${passenger.number != null ? passenger.number : ''}"
+                                th:data-email="${passenger.email != null ? passenger.email : ''}"
+                                th:data-birth="${passenger.birth != null ? #temporals.format(passenger.birth, 'yyyy-MM-dd') : ''}"
+                                th:data-sex="${passenger.sex != null ? passenger.sex : ''}"
+                                th:data-passport-num="${passenger.passportNum != null ? passenger.passportNum : ''}"
+                                th:data-last-name="${passenger.lastName != null ? passenger.lastName : ''}"
+                                th:data-first-name="${passenger.firstName != null ? passenger.firstName : ''}"
+                                th:data-expire="${passenger.expire != null ? #temporals.format(passenger.expire, 'yyyy-MM-dd') : ''}"
+                                th:data-nationality="${passenger.nationality != null ? passenger.nationality : ''}">
+                            <i class="fas fa-edit"></i> 수정
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">이름</label>
+                            <p class="mt-1 text-sm text-gray-900" th:text="${passenger.name != null ? passenger.name : '미입력'}">홍길동</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">연락처</label>
+                            <p class="mt-1 text-sm text-gray-900" th:text="${passenger.number != null ? passenger.number : '미입력'}">010-1234-5678</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">이메일</label>
+                            <p class="mt-1 text-sm text-gray-900" th:text="${passenger.email != null ? passenger.email : '미입력'}">hong@example.com</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">생년월일</label>
+                            <p class="mt-1 text-sm text-gray-900" th:text="${passenger.birth != null ? #temporals.format(passenger.birth, 'yyyy-MM-dd') : '미입력'}">1990-01-01</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">성별</label>
+                            <p class="mt-1 text-sm text-gray-900" th:text="${passenger.sex != null ? (passenger.sex == 'MALE' ? '남성' : '여성') : '미입력'}">남성</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">국적</label>
+                            <p class="mt-1 text-sm text-gray-900" th:text="${passenger.nationality != null ? passenger.nationality : '미입력'}">KOR</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">여권번호</label>
+                            <p class="mt-1 text-sm text-gray-900" th:text="${passenger.passportNum != null ? passenger.passportNum : '미입력'}">M12345678</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">영문 성</label>
+                            <p class="mt-1 text-sm text-gray-900" th:text="${passenger.lastName != null ? passenger.lastName : '미입력'}">HONG</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">영문 이름</label>
+                            <p class="mt-1 text-sm text-gray-900" th:text="${passenger.firstName != null ? passenger.firstName : '미입력'}">GILDONG</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">여권 만료일</label>
+                            <p class="mt-1 text-sm text-gray-900" th:text="${passenger.expire != null ? #temporals.format(passenger.expire, 'yyyy-MM-dd') : '미입력'}">2030-01-01</p>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700">특별 요청사항</label>
+                            <div class="mt-1">
+                                <div th:if="${passenger.specialRequests != null && !passenger.specialRequests.isEmpty()}">
+                                    <span th:each="request, iterStat : ${passenger.specialRequests}" 
+                                          class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mr-2 mb-1"
+                                          th:text="${request}">요청사항</span>
+                                </div>
+                                <span th:if="${passenger.specialRequests == null || passenger.specialRequests.isEmpty()}"
+                                      class="text-sm text-gray-500">없음</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div th:if="${purchase.productPassengers == null || purchase.productPassengers.isEmpty()}" class="text-center py-8 text-gray-500">
+                <i class="fas fa-users text-4xl mb-2"></i>
+                <p>등록된 승객이 없습니다.</p>
+            </div>
+        </div>
+
+        <!-- 액션 버튼 -->
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">관리 작업</h2>
+            <div class="flex flex-wrap gap-3">
+                <button onclick="changeStatusModal()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    <i class="fas fa-edit"></i>
+                    상태 변경
+                </button>
+                <button onclick="cancelPurchase()" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                    <i class="fas fa-times"></i>
+                    주문 취소
+                </button>
+                <button onclick="requestRefund()" class="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2">
+                    <i class="fas fa-undo"></i>
+                    환불 요청
+                </button>
+                <button onclick="printPurchase()" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                    <i class="fas fa-print"></i>
+                    인쇄
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 상태 변경 모달 -->
+    <div id="statusModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">주문 상태 변경</h3>
+                <div class="mb-4">
+                    <label for="newStatus" class="block text-sm font-medium text-gray-700">새 상태:</label>
+                    <select id="newStatus" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                        <option value="HOLDING">대기 중</option>
+                        <option value="PAID">결제 완료</option>
+                        <option value="CANCELLED">취소됨</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button onclick="closeStatusModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
+                        취소
+                    </button>
+                    <button onclick="confirmStatusChange()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                        변경
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 승객 정보 수정 모달 -->
+    <div id="passengerModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div class="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">승객 정보 수정</h3>
+                <form id="passengerForm" class="space-y-4">
+                    <input type="hidden" id="passengerId" name="passengerId">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="passengerName" class="block text-sm font-medium text-gray-700">이름 *</label>
+                            <input type="text" id="passengerName" name="name" required
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="passengerNumber" class="block text-sm font-medium text-gray-700">연락처 *</label>
+                            <input type="tel" id="passengerNumber" name="number" required
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="passengerEmail" class="block text-sm font-medium text-gray-700">이메일 *</label>
+                            <input type="email" id="passengerEmail" name="email" required
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="passengerBirth" class="block text-sm font-medium text-gray-700">생년월일 *</label>
+                            <input type="date" id="passengerBirth" name="birth" required
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="passengerSex" class="block text-sm font-medium text-gray-700">성별 *</label>
+                            <select id="passengerSex" name="sex" required
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <option value="MALE">남성</option>
+                                <option value="FEMALE">여성</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="passengerPassportNum" class="block text-sm font-medium text-gray-700">여권번호 *</label>
+                            <input type="text" id="passengerPassportNum" name="passportNum" required
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div class="relative">
+                            <label for="passengerNationality" class="block text-sm font-medium text-gray-700">국적</label>
+                            <input type="text" id="passengerNationality" placeholder="국적을 검색하세요 (예: K, Korea, 한국)" 
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+                                   autocomplete="off">
+                            <div id="productNationalityDropdown" class="absolute z-50 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto hidden">
+                                <!-- 검색 결과가 여기에 표시됩니다 -->
+                            </div>
+                        </div>
+                        <div>
+                            <label for="passengerLastName" class="block text-sm font-medium text-gray-700">영문 성 *</label>
+                            <input type="text" id="passengerLastName" name="lastName" required
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="passengerFirstName" class="block text-sm font-medium text-gray-700">영문 이름 *</label>
+                            <input type="text" id="passengerFirstName" name="firstName" required
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="passengerExpire" class="block text-sm font-medium text-gray-700">여권 만료일 *</label>
+                            <input type="date" id="passengerExpire" name="expire" required
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="button" onclick="closePassengerModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
+                            취소
+                        </button>
+                        <button type="button" onclick="console.log('수정 버튼 클릭됨'); confirmPassengerUpdate();" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                            수정
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const purchaseId = /*[[${purchase.productPurchaseId}]]*/ 3001;
+        const currentPurchaseStatus = /*[[${purchase.purchaseStatus}]]*/ 'HOLDING';
+
+        function changeStatus() {
+            document.getElementById('statusModal').classList.remove('hidden');
+        }
+
+        function closeStatusModal() {
+            document.getElementById('statusModal').classList.add('hidden');
+        }
+
+        function confirmStatusChange() {
+            const newStatus = document.getElementById('newStatus').value;
+            const statusText = newStatus === 'HOLDING' ? '대기 중' : (newStatus === 'PAID' ? '결제 완료' : '취소됨');
+            
+            if (confirm(`주문 상태를 "${statusText}"로 변경하시겠습니까?`)) {
+                fetch(`/api/admin/product-purchases/${purchaseId}/status?status=${newStatus}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('주문 상태가 변경되었습니다.');
+                        location.reload();
+                    } else {
+                        alert('상태 변경에 실패했습니다.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('상태 변경 중 오류가 발생했습니다.');
+                });
+            }
+        }
+
+        function cancelPurchase() {
+            if (confirm('정말로 이 주문을 취소하시겠습니까?')) {
+                fetch(`/api/admin/product-purchases/${purchaseId}/cancel`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('주문이 취소되었습니다.');
+                        location.reload();
+                    } else {
+                        alert('주문 취소에 실패했습니다.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('주문 취소 중 오류가 발생했습니다.');
+                });
+            }
+        }
+
+        // 승객 수정 버튼 클릭 이벤트 리스너 추가
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.edit-passenger-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    editPassenger(
+                        this.dataset.passengerId,
+                        this.dataset.name,
+                        this.dataset.number,
+                        this.dataset.email,
+                        this.dataset.birth,
+                        this.dataset.sex,
+                        this.dataset.passportNum,
+                        this.dataset.lastName,
+                        this.dataset.firstName,
+                        this.dataset.expire,
+                        this.dataset.nationality
+                    );
+                });
+            });
+        });
+
+        function editPassenger(passengerId, name, number, email, birth, sex, passportNum, lastName, firstName, expire, nationality) {
+            document.getElementById('passengerId').value = passengerId || '';
+            document.getElementById('passengerName').value = name || '';
+            document.getElementById('passengerNumber').value = number || '';
+            document.getElementById('passengerEmail').value = email || '';
+            document.getElementById('passengerBirth').value = birth || '';
+            document.getElementById('passengerSex').value = sex || '';
+            document.getElementById('passengerPassportNum').value = passportNum || '';
+            document.getElementById('passengerLastName').value = lastName || '';
+            document.getElementById('passengerFirstName').value = firstName || '';
+            document.getElementById('passengerExpire').value = expire || '';
+            document.getElementById('passengerNationality').value = nationality || '';
+            
+            // 선택된 국적 코드 설정
+            selectedProductNationalityCode = nationality;
+            
+            document.getElementById('passengerModal').classList.remove('hidden');
+        }
+
+        function closePassengerModal() {
+            document.getElementById('passengerModal').classList.add('hidden');
+            document.getElementById('productNationalityDropdown').classList.add('hidden'); // 드롭다운도 숨김
+            selectedProductNationalityCode = null; // 선택된 국적 초기화
+        }
+
+            function confirmPassengerUpdate() {
+                console.log('=== confirmPassengerUpdate 함수 호출됨 ===');
+                
+                // 직접 DOM 요소에서 값 가져오기
+                const updateData = {
+                    name: document.getElementById('passengerName').value || '',
+                    number: document.getElementById('passengerNumber').value || '',
+                    email: document.getElementById('passengerEmail').value || '',
+                    birth: document.getElementById('passengerBirth').value || null,
+                    sex: document.getElementById('passengerSex').value || '',
+                    passportNum: document.getElementById('passengerPassportNum').value || '',
+                    lastName: document.getElementById('passengerLastName').value || '',
+                    firstName: document.getElementById('passengerFirstName').value || '',
+                    expire: document.getElementById('passengerExpire').value || null,
+                    nationality: selectedProductNationalityCode || document.getElementById('passengerNationality').value || ''
+                };
+                
+                // 디버깅: 폼 데이터 확인
+                console.log('=== 폼 데이터 디버깅 ===');
+                console.log('이름:', updateData.name);
+                console.log('연락처:', updateData.number);
+                console.log('이메일:', updateData.email);
+                console.log('생년월일:', updateData.birth);
+                console.log('성별:', updateData.sex);
+                console.log('여권번호:', updateData.passportNum);
+                console.log('영문성:', updateData.lastName);
+                console.log('영문이름:', updateData.firstName);
+                console.log('여권만료일:', updateData.expire);
+                console.log('국적:', updateData.nationality);
+            
+            console.log('=== 업데이트 데이터 ===');
+            console.log(updateData);
+
+            const passengerId = document.getElementById('passengerId').value;
+            console.log('=== 승객 ID ===');
+            console.log('passengerId: ' + passengerId);
+            console.log('purchaseId: ' + purchaseId);
+
+            fetch(`/api/admin/product-purchases/${purchaseId}/passengers/${passengerId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updateData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('승객 정보가 수정되었습니다.');
+                    location.reload();
+                } else {
+                    response.text().then(text => alert('승객 정보 수정 실패: ' + text));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('승객 정보 수정 중 오류가 발생했습니다.');
+            });
+        }
+
+        function printPurchase() {
+            window.print();
+        }
+
+        function changeStatusModal() {
+            const currentStatus = '[[${purchase.purchaseStatus}]]';
+            
+            // 상태 선택 모달 생성
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
+                    <h3 class="text-lg font-semibold mb-4">상태 변경</h3>
+                    <p class="text-sm text-gray-600 mb-4">현재 상태: <span class="font-medium">${currentStatus}</span></p>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">새로운 상태 선택:</label>
+                        <select id="statusSelect" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">상태를 선택하세요</option>
+                            <option value="HOLDING" ${currentStatus === 'HOLDING' ? 'disabled' : ''}>HOLDING (결제 대기)</option>
+                            <option value="PAID" ${currentStatus === 'PAID' ? 'disabled' : ''}>PAID (결제 완료)</option>
+                            <option value="CANCELLED" ${currentStatus === 'CANCELLED' ? 'disabled' : ''}>CANCELLED (취소)</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-end space-x-2">
+                        <button onclick="closeStatusModal()" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50">취소</button>
+                        <button onclick="confirmStatusChange()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">변경</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // 전역 함수로 등록
+            window.closeStatusModal = function() {
+                document.body.removeChild(modal);
+            };
+            
+            window.confirmStatusChange = function() {
+                const selectedStatus = document.getElementById('statusSelect').value;
+                if (!selectedStatus) {
+                    alert('상태를 선택해주세요.');
+                    return;
+                }
+                
+                // AJAX로 상태 변경 API 호출
+                fetch(`/api/admin/product-purchases/${purchaseId}/status?status=${selectedStatus}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('상태가 성공적으로 변경되었습니다.');
+                        // 상태 변경 후 남은 정원 정보 업데이트
+                        updateRemainingCapacity();
+                        location.reload();
+                    } else {
+                        response.text().then(text => alert('상태 변경 실패: ' + text));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('상태 변경 중 오류가 발생했습니다.');
+                });
+            };
+        }
+
+
+
+        function updateRemainingCapacity() {
+            // 상태 변경 후 남은 정원 정보를 서버에서 다시 가져와서 업데이트
+            fetch(`/api/admin/product-purchases/${purchaseId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // 남은 정원 정보 업데이트
+                    const remainingCapacityElement = document.querySelector('[data-remaining-capacity]');
+                    if (remainingCapacityElement) {
+                        remainingCapacityElement.textContent = data.product.remainingCapacity + '명';
+                        
+                        // 남은 정원에 따라 색상 변경
+                        if (data.product.remainingCapacity > 0) {
+                            remainingCapacityElement.className = 'mt-1 text-sm font-medium text-green-600';
+                        } else {
+                            remainingCapacityElement.className = 'mt-1 text-sm font-medium text-red-600';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating remaining capacity:', error);
+                });
+        }
+
+        function requestRefund() {
+            const reason = prompt('환불 사유를 입력하세요:');
+            if (reason && reason.trim()) {
+                fetch(`/api/refunds/request/${purchaseId}?reason=${encodeURIComponent(reason.trim())}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('환불 요청이 접수되었습니다. 관리자 검토 후 처리됩니다.');
+                        location.reload();
+                    } else {
+                        response.text().then(text => alert('환불 요청 실패: ' + text));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('환불 요청 중 오류가 발생했습니다.');
+                });
+            }
+        }
+
+        // 2단계 승객 정보 추가 함수
+        function addPassenger() {
+            const form = document.getElementById('passengerForm');
+            const formData = new FormData(form);
+            
+            const passengerData = {
+                name: formData.get('name').trim(),
+                number: formData.get('number').trim(),
+                email: formData.get('email').trim(),
+                birth: formData.get('birth'),
+                sex: formData.get('sex').toUpperCase(),
+                nationality: formData.get('nationality'),
+                passportNum: formData.get('passportNum').trim(),
+                lastName: formData.get('lastName').trim(),
+                firstName: formData.get('firstName').trim(),
+                expire: formData.get('expire')
+            };
+
+            // 필수 필드 검증
+            if (!passengerData.name || !passengerData.number || !passengerData.email || 
+                !passengerData.birth || !passengerData.sex || !passengerData.nationality) {
+                alert('필수 필드를 모두 입력해주세요.');
+                return;
+            }
+
+            // AJAX로 승객 정보 추가 API 호출
+            fetch(`/api/admin/product-purchases/${[[${purchase.productPurchaseId}]]}/passengers`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(passengerData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('승객 정보가 성공적으로 추가되었습니다.');
+                    location.reload();
+                } else {
+                    response.text().then(text => alert('승객 정보 추가 실패: ' + text));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('승객 정보 추가 중 오류가 발생했습니다.');
+            });
+        }
+
+        // 국적 검색 기능 (ProductPurchase용)
+        let productNationalitySearchTimeout;
+        let selectedProductNationalityCode = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const nationalityInput = document.getElementById('passengerNationality');
+            const dropdown = document.getElementById('productNationalityDropdown');
+
+            if (nationalityInput && dropdown) {
+                // 입력 시 검색
+                nationalityInput.addEventListener('input', function() {
+                    clearTimeout(productNationalitySearchTimeout);
+                    const query = this.value.trim();
+
+                    if (query.length < 1) {
+                        dropdown.classList.add('hidden');
+                        return;
+                    }
+
+                    productNationalitySearchTimeout = setTimeout(() => {
+                        searchProductNationalities(query);
+                    }, 300); // 300ms 지연
+                });
+
+                // 포커스 시 기본 목록 표시
+                nationalityInput.addEventListener('focus', function() {
+                    console.log('ProductPurchase 국적 필드 포커스됨');
+                    searchProductNationalities('KOR'); // 테스트용으로 한국부터 표시
+                });
+
+                // 외부 클릭 시 드롭다운 숨김
+                document.addEventListener('click', function(e) {
+                    if (!nationalityInput.contains(e.target) && !dropdown.contains(e.target)) {
+                        dropdown.classList.add('hidden');
+                    }
+                });
+            }
+        });
+
+        function searchProductNationalities(query) {
+            const dropdown = document.getElementById('productNationalityDropdown');
+            
+            console.log('=== ProductPurchase 국적 검색 시작 ===');
+            console.log('검색어:', query);
+            console.log('드롭다운 요소:', dropdown);
+            
+            fetch(`/api/admin/product-purchases/countries?search=${encodeURIComponent(query)}`)
+                .then(response => {
+                    console.log('API 응답 상태:', response.status);
+                    return response.json();
+                })
+                .then(countries => {
+                    console.log('검색 결과:', countries);
+                    dropdown.innerHTML = '';
+                    
+                    if (countries.length === 0) {
+                        dropdown.innerHTML = '<div class="px-3 py-2 text-gray-500">검색 결과가 없습니다</div>';
+                    } else {
+                        countries.forEach(country => {
+                            const item = document.createElement('div');
+                            item.className = 'px-3 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100';
+                            item.innerHTML = `
+                                <div class="font-medium">${country.nameKor} (${country.code})</div>
+                                <div class="text-sm text-gray-500">${country.nameEng}</div>
+                            `;
+                            item.addEventListener('click', function() {
+                                selectProductNationality(country.code, country.nameKor);
+                            });
+                            dropdown.appendChild(item);
+                        });
+                    }
+                    
+                    console.log('드롭다운 표시');
+                    dropdown.classList.remove('hidden');
+                })
+                .catch(error => {
+                    console.error('국적 검색 오류:', error);
+                    dropdown.innerHTML = '<div class="px-3 py-2 text-red-500">검색 중 오류가 발생했습니다</div>';
+                    dropdown.classList.remove('hidden');
+                });
+        }
+
+        function selectProductNationality(code, name) {
+            const nationalityInput = document.getElementById('passengerNationality');
+            const dropdown = document.getElementById('productNationalityDropdown');
+            
+            nationalityInput.value = `${name} (${code})`;
+            selectedProductNationalityCode = code;
+            dropdown.classList.add('hidden');
+        }
+
+        /*]]>*/
+    </script>
+</div>

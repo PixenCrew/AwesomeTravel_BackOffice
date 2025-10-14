@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <!-- Google Tag Manager -->
@@ -12,130 +12,422 @@
                     'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
         })(window, document, 'script', 'dataLayer', 'GTM-N2JRTZZQ');</script>
     <!-- End Google Tag Manager -->
-    <meta charset='utf-8'>
-    <title th:text="${title}">기본 타이틀</title>
-    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <meta charset="UTF-8">
+    <title th:text="${title}">BackOffice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.toggle-menu h4').forEach(header => {
-                header.addEventListener('click', () => {
-                    const parent = header.parentElement;
-                    console.log("parent" + parent);
-                    parent.classList.toggle('active');
-                });
-            });
-        });
+        tailwind.config = {
+            theme: {
+                extend: {}
+            }
+        }
     </script>
-
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style type="text/tailwindcss">
+        @layer components {
+            .menu-item {
+                @apply text-gray-700 hover:text-blue-600;
+            }
+            .menu-item.active {
+                @apply text-blue-600;
+            }
+            .menu-item .submenu-link.active {
+                @apply bg-blue-600 text-white;
+            }
+            .menu-item .submenu-link:hover {
+                @apply bg-blue-100;
+            }
+            .sidebar-collapsed {
+                @apply w-16;
+            }
+            .sidebar-expanded {
+                @apply w-64;
+            }
+            .content-shifted {
+                @apply pl-16;
+            }
+            .content-normal {
+                @apply pl-64;
+            }
+            /* 접힌 상태일 때의 스타일 */
+            .sidebar-collapsed .menu-link,
+            .sidebar-collapsed .menu-item a {
+                @apply justify-center;
+            }
+            .sidebar-collapsed .submenu {
+                @apply hidden;
+            }
+            .sidebar-collapsed .toggle-icon {
+                @apply hidden;
+            }
+            .sidebar-collapsed .menu-icon {
+                @apply mx-auto;
+            }
+            .sidebar-collapsed .sidebar-header {
+                @apply justify-center;
+            }
+            .sidebar-collapsed .header-content {
+                @apply justify-center;
+            }
+            .sidebar-collapsed .sidebar-text {
+                @apply hidden;
+            }
+            /* 메뉴 아이템 스타일 */
+            .menu-item-content {
+                @apply flex items-center w-full rounded hover:bg-blue-100 transition-colors duration-200 h-10;
+            }
+            /* 사이드바 접힘 상태 스타일 */
+            .sidebar-collapsed .menu-item-content {
+                @apply justify-center;
+            }
+            .sidebar-collapsed .menu-icon-container {
+                @apply w-16 mx-auto;
+            }
+            .sidebar-collapsed .sidebar-text,
+            .sidebar-collapsed .toggle-icon {
+                @apply hidden;
+            }
+            /* 메뉴 아이콘 컨테이너 */
+            .menu-icon-container {
+                @apply w-16 h-10 flex justify-center items-center flex-shrink-0;
+            }
+            /* 메뉴 아이콘 */
+            .menu-icon {
+                @apply text-xl;
+            }
+            /* 토글 아이콘 */
+            .toggle-icon {
+                @apply ml-auto h-10 flex items-center pr-2;
+            }
+            /* 사이드바 그림자 */
+            .sidebar-shadow {
+                @apply shadow-lg;
+            }
+            /* 헤더 버튼 컨테이너 */
+            .header-content {
+                @apply flex items-center justify-between w-full px-4;
+            }
+            /* 검색창 스타일 */
+            .header-search {
+                @apply flex-1 mx-4;
+            }
+            .header-search input {
+                @apply w-96 px-4 py-2 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200;
+            }
+            /* 사이드바 내용 컨테이너 */
+            .sidebar-inner {
+                @apply h-full flex flex-col overflow-hidden;
+            }
+            /* 메뉴 컨테이너 */
+            .menu-container {
+                @apply flex-1 overflow-y-auto py-4 px-4 space-y-1;
+            }
+            /* 서브메뉴 스타일 */
+            .submenu {
+                @apply ml-8 mt-1 text-sm text-gray-700 space-y-0.5;
+            }
+            .submenu-link {
+                @apply block rounded hover:bg-blue-50 transition-colors duration-200 h-8 leading-8 px-3;
+            }
+            /* 활성화된 메뉴 아이템 */
+            .menu-item-active {
+                @apply bg-blue-50;
+            }
+            /* 메뉴 아이콘 */
+            .menu-icon {
+                @apply text-gray-500;
+            }
+            /* 메뉴 텍스트 */
+            .sidebar-text {
+                @apply truncate flex-shrink-0 leading-10;
+            }
+            /* 메뉴 섹션 */
+            .menu-section {
+                @apply text-xs text-gray-500 font-semibold h-8 flex items-center;
+            }
+            /* 메뉴 리스트 */
+            .menu-list {
+                @apply space-y-1;
+            }
+        }
+    </style>
 </head>
 
-<body class="layout">
+<body class="flex h-screen bg-gray-100">
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N2JRTZZQ" height="0" width="0"
             style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
-    <div class="container">
-        <!-- Fixed Sidebar -->
-        <aside class="sidebar">
-            <a href="/" class="sidebar-header">
-                <h4>Awesome Travel<br>Back Office</h4>
-            </a>
-            <nav class="sidebar-nav">
-
-                <div class="toggle-menu">
-                    <h4>회원 관리</h4>
-                    <ul>
-                        <li><a href="/member">회원 정보 관리</a></li>
-                        <li><a href="/tier">회원 등급 관리</a></li>
-                    </ul>
-                </div>
-
-                <div class="toggle-menu">
-                    <h4>전시 관리</h4>
-                    <ul>
-                        <li><a href="/popup">팝업 관리</a></li>
-                        <li><a href="/banner">배너 관리</a></li>
-                    </ul>
-                </div>
-
-                <div class="toggle-menu">
-                    <h4>상품 관리</h4>
-                    <ul>
-                        <li><a href="/menu-code">메뉴코드 관리</a></li>
-                        <li><a href="/product">여행상품 관리</a></li>
-                        <li><a href="/air">항공상품 관리</a></li>
-                        <li><a href="/hotel">호텔 관리</a></li>
-                        <li><a href="/tour">투어 관리</a></li>
-                    </ul>
-                </div>
-
-                <div class="toggle-menu">
-                    <h4>주문 관리</h4>
-                    <ul>
-                        <li><a href="/order">주문 목록</a></li>
-                    </ul>
-                </div>
-
-                <div class="toggle-menu">
-                    <h4>프로모션 관리</h4>
-                    <ul>
-                        <li><a href="/timedeal">타임딜</a></li>
-                        <li><a href="/coupon">쿠폰</a></li>
-                        <li><a href="/event">이벤트</a></li>
-                        <li><a href="/promotion">프로모션</a></li>
-                    </ul>
-                </div>
-
-            </nav>
-            <div class="sidebar-footer">
-                <div class="support-box">
-                    <h3>Need help?</h3>
-                    <p>Check our documentation or contact support.</p>
-                    <button class="support-button">Contact Support</button>
+    
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar-expanded bg-white border-r border-gray-200 transition-all duration-300 fixed h-full sidebar-shadow">
+        <div class="sidebar-inner">
+            <div class="h-16 border-b border-gray-200 flex items-center sidebar-header">
+                <div class="header-content">
+                    <span class="text-xl font-bold text-blue-700 sidebar-text truncate">
+                        <span class="text-blue-600">딱!</span> BackOffice
+                    </span>
+                    <button id="sidebarToggle" class="p-2 rounded-lg hover:bg-gray-100">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
-        </aside>
 
-        <!-- Main Content Wrapper -->
-        <div class="main-wrapper">
-            <!-- Main Content Header -->
-            <header class="main-header">
+            <nav class="menu-container">
+                <div class="menu-section sidebar-text">MENU</div>
+                <ul class="menu-list">
+                    <!-- 대시보드 -->
+                    <li class="menu-item">
+                        <a href="/" class="menu-item-content">
+                            <div class="menu-icon-container">
+                                <span class="menu-icon">🏠</span>
+                            </div>
+                            <span class="sidebar-text">대시보드</span>
+                        </a>
+                    </li>
 
-                <div class="breadcrumb" th:text="${title}"></div>
+                    <!-- 회원관리 -->
+                    <li class="menu-item">
+                        <div class="menu-item-content cursor-pointer" onclick="toggleMenu(this)">
+                            <div class="menu-icon-container">
+                                <span class="menu-icon">👥</span>
+                            </div>
+                            <span class="sidebar-text">회원관리</span>
+                            <span class="toggle-icon">+</span>
+                        </div>
+                        <ul class="submenu hidden">
+                            <li><a href="/member" class="submenu-link" th:classappend="${#strings.equals(content, 'components/member')} ? 'active' : ''">회원 정보 관리</a></li>
+                            <li><a href="/tier" class="submenu-link" th:classappend="${#strings.equals(content, 'components/memberGrade')} ? 'active' : ''">회원 등급 관리</a></li>
+                        </ul>
+                    </li>
 
-                <div class="header-actions">
+                    <!-- 상품관리 -->
+                    <li class="menu-item">
+                        <div class="menu-item-content cursor-pointer" onclick="toggleMenu(this)">
+                            <div class="menu-icon-container">
+                                <span class="menu-icon">📍</span>
+                            </div>
+                            <span class="sidebar-text">상품관리</span>
+                            <span class="toggle-icon">+</span>
+                        </div>
+                        <ul class="submenu hidden">
+                            <li><a href="/product" class="submenu-link" th:classappend="${#strings.equals(content, 'components/product')} ? 'active' : ''">여행상품 관리</a></li>
+                            <li><a href="/air" class="submenu-link" th:classappend="${#strings.equals(content, 'components/air')} ? 'active' : ''">항공 관리</a></li>
+                            <li><a href="/hotel" class="submenu-link" th:classappend="${#strings.equals(content, 'components/hotel')} ? 'active' : ''">호텔 관리</a></li>
+                            <li><a href="/tour" class="submenu-link" th:classappend="${#strings.equals(content, 'components/tour')} ? 'active' : ''">투어 관리</a></li>
+                        </ul>
+                    </li>
 
-                    <div class="search-box">
-                        <input type="text" placeholder="Search...">
-                    </div>
+                    <!-- 전시관리 -->
+                    <li class="menu-item">
+                        <div class="menu-item-content cursor-pointer" onclick="toggleMenu(this)">
+                            <div class="menu-icon-container">
+                                <span class="menu-icon">📋</span>
+                            </div>
+                            <span class="sidebar-text">전시관리</span>
+                            <span class="toggle-icon">+</span>
+                        </div>
+                        <ul class="submenu hidden">
+                            <li><a href="/popup" class="submenu-link">팝업 관리</a></li>
+                            <li><a href="/banner" class="submenu-link">배너 관리</a></li>
+                        </ul>
+                    </li>
 
-                    <div class="user-profile">
-                        <span th:text="${userName}"></span>
-                        <a href="/logout">로그아웃</a>
-                    </div>
+                    <!-- 프로모션관리 -->
+                    <li class="menu-item">
+                        <div class="menu-item-content cursor-pointer" onclick="toggleMenu(this)">
+                            <div class="menu-icon-container">
+                                <span class="menu-icon">📢</span>
+                            </div>
+                            <span class="sidebar-text">프로모션관리</span>
+                            <span class="toggle-icon">+</span>
+                        </div>
+                        <ul class="submenu hidden">
+                            <li><a href="/timedeal" class="submenu-link">타임딜 관리</a></li>
+                            <li><a href="/coupon" class="submenu-link">쿠폰 관리</a></li>
+                            <li><a href="/event" class="submenu-link">이벤트 관리</a></li>
+                            <li><a href="/promotion" class="submenu-link">프로모션 관리</a></li>
+                        </ul>
+                    </li>
 
-                </div>
+                    <!-- 기초 데이터 관리 -->
+                    <li class="menu-item">
+                        <div class="menu-item-content cursor-pointer" onclick="toggleMenu(this)">
+                            <div class="menu-icon-container">
+                                <span class="menu-icon">🔧</span>
+                            </div>
+                            <span class="sidebar-text">기초 데이터 관리</span>
+                            <span class="toggle-icon">+</span>
+                        </div>
+                        <ul class="submenu hidden">
+                            <li><a href="/region-category" class="submenu-link">지역 카테고리 관리</a></li>
+                            <li><a href="/country-code" class="submenu-link">국가 코드 관리</a></li>
+                            <li><a href="/city-code" class="submenu-link">도시 코드 관리</a></li>
+                            <li><a href="/airport" class="submenu-link">공항 관리</a></li>
+                            <li><a href="/airline" class="submenu-link">항공사 관리</a></li>
+                        </ul>
+                    </li>
 
-            </header>
+                    <!-- 게시물관리 -->
+                    <li class="menu-item">
+                        <div class="menu-item-content cursor-pointer" onclick="toggleMenu(this)">
+                            <div class="menu-icon-container">
+                                <span class="menu-icon">📝</span>
+                            </div>
+                            <span class="sidebar-text">게시물관리</span>
+                            <span class="toggle-icon">+</span>
+                        </div>
+                        <ul class="submenu hidden">
+                            <li><a href="/notice" class="submenu-link" th:classappend="${#strings.equals(content, 'components/notice')} ? 'active' : ''">공지사항 관리</a></li>
+                            <li><a href="/inquiry" class="submenu-link" th:classappend="${#strings.equals(content, 'components/inquiry')} ? 'active' : ''">1:1 문의 관리</a></li>
+                            <li><a href="/qna" class="submenu-link" th:classappend="${#strings.equals(content, 'components/qna')} ? 'active' : ''">자주묻는질문 관리</a></li>
+                            <li><a href="/faq" class="submenu-link" th:classappend="${#strings.equals(content, 'components/faq')} ? 'active' : ''">FAQ 관리</a></li>
+                            <li><a href="/comment" class="submenu-link" th:classappend="${#strings.equals(content, 'components/comment/comment')} ? 'active' : ''">댓글 관리</a></li>
+                            <li><a href="/comment-report" class="submenu-link" th:classappend="${#strings.equals(content, 'components/comment/commentReport')} ? 'active' : ''">댓글 신고 관리</a></li>
+                        </ul>
+                    </li>
 
-            <!-- Scrollable Main Content -->
-            <main class="main-content">
-                <div th:replace="${content} :: content"></div>
-            </main>
-
-            <!-- Main Content Footer -->
-            <footer class="main-footer">
-                <div class="footer-links">
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
-                    <a href="#">Contact Us</a>
-                </div>
-                <div class="copyright">
-                    &copy; 2025 My Application. All rights reserved.
-                </div>
-            </footer>
+                    <!-- 주문관리 -->
+                    <li class="menu-item">
+                        <div class="menu-item-content cursor-pointer" onclick="toggleMenu(this)">
+                            <div class="menu-icon-container">
+                                <span class="menu-icon">🛍️</span>
+                            </div>
+                            <span class="sidebar-text">주문관리</span>
+                            <span class="toggle-icon">+</span>
+                        </div>
+                        <ul class="submenu hidden">
+                            <li><a href="/air-purchase" class="submenu-link" th:classappend="${#strings.equals(content, 'components/airPurchase/airPurchaseList')} ? 'active' : ''">항공 주문 목록</a></li>
+                            <li><a href="/product-purchase" class="submenu-link" th:classappend="${#strings.equals(content, 'components/productPurchase/productPurchaseList')} ? 'active' : ''">패키지 상품 주문 목록</a></li>
+                            <li><a href="/refund" class="submenu-link" th:classappend="${#strings.equals(content, 'components/refund/refundManagement')} ? 'active' : ''">환불 관리</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
         </div>
-    </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main id="mainContent" class="flex-1 flex flex-col min-h-screen transition-all duration-300 content-normal">
+        <!-- Header -->
+        <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
+            <!-- 현재 페이지 제목 -->
+            <div class="flex items-center">
+                <h1 class="text-xl font-semibold text-gray-800" th:text="${title}">페이지 제목</h1>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <!-- Search Bar -->
+                <div class="relative">
+                    <input type="text" placeholder="검색어를 입력하세요" 
+                           class="w-64 px-4 py-2 pr-8 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    <button class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- User Profile -->
+                <div class="flex items-center space-x-3">
+                    <span class="text-sm text-gray-600" th:text="${userName}">관리자</span>
+                    <a href="/logout" class="text-sm text-purple-600 hover:text-purple-700 hover:underline">로그아웃</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dynamic Content Area -->
+        <div class="flex-1 p-6 bg-gray-50 overflow-y-auto">
+            <!-- 동적으로 교체될 컨텐츠 영역 -->
+            <div th:replace="~{${content} :: content}"></div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="h-16 bg-white border-t border-gray-200 flex justify-between items-center px-6 text-sm text-gray-500">
+            <div class="space-x-4">
+                <a href="#" class="hover:text-gray-700">Privacy Policy</a>
+                <a href="#" class="hover:text-gray-700">Terms of Service</a>
+                <a href="#" class="hover:text-gray-700">Contact Us</a>
+            </div>
+            <div>&copy; 2024 딱좋은여행. All rights reserved.</div>
+        </footer>
+    </main>
+
+    <!-- 메뉴 토글 스크립트 -->
+    <script>
+        // 현재 URL 기반으로 활성 메뉴 표시
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const menuItems = document.querySelectorAll('.menu-item');
+            
+            menuItems.forEach(menuItem => {
+                const submenu = menuItem.querySelector('.submenu');
+                const toggleIcon = menuItem.querySelector('.toggle-icon');
+                const links = menuItem.querySelectorAll('a');
+                
+                links.forEach(link => {
+                    if (link.getAttribute('href') === currentPath) {
+                        // 현재 페이지의 메뉴 아이템 활성화
+                        link.classList.add('active');
+                        
+                        // 부모 메뉴 열기
+                        if (submenu && !sidebar.classList.contains('sidebar-collapsed')) {
+                            submenu.classList.remove('hidden');
+                            if (toggleIcon) toggleIcon.textContent = '-';
+                        }
+                        
+                        // 부모 메뉴 아이템에 활성화 스타일 추가
+                        const parentContent = link.closest('.menu-item').querySelector('.menu-item-content');
+                        if (parentContent) {
+                            parentContent.classList.add('menu-item-active');
+                        }
+                    }
+                });
+            });
+        });
+
+        // 메뉴 토글 함수
+        function toggleMenu(element) {
+            if (sidebar.classList.contains('sidebar-collapsed')) {
+                sidebarToggle.click();
+                return;
+            }
+            const item = element.closest('.menu-item');
+            const submenu = item.querySelector('.submenu');
+            const icon = item.querySelector('.toggle-icon');
+            
+            submenu.classList.toggle('hidden');
+            icon.textContent = submenu.classList.contains('hidden') ? '+' : '-';
+        }
+
+        // 사이드바 토글
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-collapsed');
+            sidebar.classList.toggle('sidebar-expanded');
+            mainContent.classList.toggle('content-shifted');
+            mainContent.classList.toggle('content-normal');
+
+            // 접힐 때 모든 서브메뉴 닫기
+            if (sidebar.classList.contains('sidebar-collapsed')) {
+                document.querySelectorAll('.submenu').forEach(submenu => {
+                    submenu.classList.add('hidden');
+                });
+            }
+        });
+
+        // 접힌 사이드바 클릭 시 펼치기
+        sidebar.addEventListener('click', (e) => {
+            if (sidebar.classList.contains('sidebar-collapsed') && !e.target.closest('#sidebarToggle')) {
+                sidebarToggle.click();
+            }
+        });
+    </script>
 </body>
 
 </html>

@@ -10,6 +10,8 @@ import renewal.awesome_travel_backoffice.review.repository.ReviewRepository;
 import renewal.common.entity.Review;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
@@ -22,7 +24,7 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public Page<ReviewResponseDto> searchAllReviews(String keyword, Pageable pageable) {
         return commentRepository.searchAll(keyword, pageable)
-                .map(this::toResponseDto);
+                .map(this::toResponseDtoWithProduct);
     }
 
     /**
@@ -37,6 +39,17 @@ public class ReviewService {
         commentRepository.delete(comment);
     }
 
+    /**
+     * 특정 사용자의 최근 댓글 조회
+     */
+    @Transactional(readOnly = true)
+    public List<ReviewResponseDto> getRecentCommentsByUser(Long userId) {
+        return commentRepository.findTop5ByWriterIdOrderByCreatedAtDesc(userId)
+                .stream()
+                .map(this::toResponseDtoWithProduct)
+                .toList();
+    }
+
     private ReviewResponseDto toResponseDto(Review comment) {
         return ReviewResponseDto.builder()
                 .id(comment.getId())
@@ -45,6 +58,20 @@ public class ReviewService {
                 .rating(comment.getRating())
                 .createdAt(comment.getCreatedAt())
                 .updatedAt(comment.getUpdatedAt())
+                .build();
+    }
+
+    private ReviewResponseDto toResponseDtoWithProduct(Review comment) {
+        return ReviewResponseDto.builder()
+                .id(comment.getId())
+                .writerName(comment.getWriter().getName())
+                .content(comment.getContent())
+                .rating(comment.getRating())
+                .createdAt(comment.getCreatedAt())
+                .updatedAt(comment.getUpdatedAt())
+                .productId(comment.getProduct() != null ? comment.getProduct().getId() : null)
+                .productTitle(comment.getProduct() != null ? comment.getProduct().getTitle() : null)
+                .productPrice(comment.getProduct() != null ? comment.getProduct().getPrice() : null)
                 .build();
     }
 }

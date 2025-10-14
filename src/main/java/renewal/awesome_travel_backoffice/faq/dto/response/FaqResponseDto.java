@@ -14,5 +14,6 @@ public class FaqResponseDto {
     String question;
     String answer;
     FaqCategory category;
+    Boolean visible;
     LocalDateTime createdAt;
 }
