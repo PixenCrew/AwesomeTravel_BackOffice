@@ -102,7 +102,8 @@ public class CityCodeController {
         }
 
         // 국가 정보 조회
-        Optional<CountryCode> countryCode = countryCodeService.getCountryCodeByCode(cityCode.get().getCountry());
+        Optional<CountryCode> countryCode = countryCodeService.getCountryCodeByCode(
+            cityCode.get().getCountry() != null ? cityCode.get().getCountry().getCountryCode() : null);
 
         model.addAttribute("cityCode", cityCode.get());
         model.addAttribute("countryCode", countryCode.orElse(null));

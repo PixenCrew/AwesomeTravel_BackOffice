@@ -11,18 +11,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import renewal.awesome_travel_backoffice.airPurchase.dto.request.AirPurchaseSearchCondition;
-import renewal.awesome_travel_backoffice.airPurchase.dto.response.AirPurchaseResponseDto;
-import renewal.awesome_travel_backoffice.airPurchase.service.AirPurchaseService;
-import renewal.common.entity.AirPurchase;
-import renewal.common.entity.BasePurchase.PurchaseStatus;
+import renewal.awesome_travel_backoffice.airPurchase.dto.request.PurchaseAirSearchCondition;
+import renewal.awesome_travel_backoffice.airPurchase.dto.response.PurchaseAirResponseDto;
+import renewal.awesome_travel_backoffice.airPurchase.service.PurchaseAirService;
+import renewal.common.entity.PurchaseAir;
+import renewal.common.entity.PurchaseBase.PurchaseStatus;
 
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/air-purchase")
 public class AirPurchaseViewController {
 
-    private final AirPurchaseService airPurchaseService;
+    private final PurchaseAirService purchaseAirService;
 
     @GetMapping
     public String listAirPurchases(
@@ -37,7 +37,7 @@ public class AirPurchaseViewController {
             Model model
     ) {
         // 검색 조건 설정
-        AirPurchaseSearchCondition condition = new AirPurchaseSearchCondition();
+        PurchaseAirSearchCondition condition = new PurchaseAirSearchCondition();
         condition.setStatus(status);
         condition.setName(name);
         condition.setEmail(email);
@@ -55,7 +55,7 @@ public class AirPurchaseViewController {
         Pageable pageable = PageRequest.of(page, 20, sort);
 
         // 데이터 조회
-        Page<AirPurchaseResponseDto> airPurchasePage = airPurchaseService.getAllPurchasesDto(condition, pageable);
+        Page<PurchaseAirResponseDto> airPurchasePage = purchaseAirService.getAllPurchasesDto(condition, pageable);
 
         // 모델에 데이터 추가
         model.addAttribute("airPurchasePage", airPurchasePage);
@@ -75,7 +75,7 @@ public class AirPurchaseViewController {
 
     @GetMapping("/{id}")
     public String viewAirPurchase(@PathVariable Long id, Model model) {
-        AirPurchaseResponseDto airPurchase = airPurchaseService.getPurchaseDto(id);
+        PurchaseAirResponseDto airPurchase = purchaseAirService.getPurchaseDto(id);
         
         model.addAttribute("airPurchase", airPurchase);
         model.addAttribute("purchaseStatuses", PurchaseStatus.values());

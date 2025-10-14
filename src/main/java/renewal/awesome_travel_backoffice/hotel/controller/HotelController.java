@@ -57,6 +57,7 @@ public class HotelController {
         model.addAttribute("cityCode", cityRepo.findAll());
 
         model.addAttribute("hotelPage", hotelPage);
+        model.addAttribute("filter", filter); // 필터 객체 추가
         // model.addAttribute("hotelList", hotelPage.getContent());
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
@@ -158,6 +159,7 @@ public class HotelController {
 
         // View에서 쓸 속성들
         model.addAttribute("hotelPage", hotelPage);
+        model.addAttribute("filter", filter); // 필터 객체 추가
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("title", "Hotel Select");

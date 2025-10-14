@@ -30,8 +30,8 @@ import renewal.common.entity.Location;
 import renewal.common.entity.Location.LocationType;
 import renewal.common.entity.Schedule;
 import renewal.common.entity.Tour;
-import renewal.common.repository.CityCodeRepository;
-import renewal.common.repository.CountryCodeRepository;
+import renewal.awesome_travel_backoffice.citycode.repository.CityCodeRepository;
+import renewal.awesome_travel_backoffice.countrycode.repository.CountryCodeRepository;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -73,6 +73,7 @@ public class TourController {
         model.addAttribute("countryCode", countryRepo.findAll());
         model.addAttribute("cityCode", cityRepo.findAll());
         model.addAttribute("tourPage", tourPage);
+        model.addAttribute("filter", filter); // 필터 객체 추가
         // model.addAttribute("tourList", tourPage.getContent());
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
@@ -111,7 +112,7 @@ public class TourController {
         Tour blankTour = new Tour();
         blankTour.setName("");
         blankTour.setCompany("");
-        blankTour.setCountry("");
+        blankTour.setCountry(null);
         blankTour.getSchedules().add(blankSchedule);
 
         // defaultLocation.setCity(null);
@@ -234,6 +235,7 @@ public class TourController {
 
         // View에서 쓸 속성들
         model.addAttribute("tourPage", tourPage);
+        model.addAttribute("filter", filter); // 필터 객체 추가
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("title", "Tour Select");

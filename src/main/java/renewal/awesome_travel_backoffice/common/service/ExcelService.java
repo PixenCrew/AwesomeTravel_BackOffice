@@ -203,7 +203,7 @@ public class ExcelService {
             int rowNum = 1;
             for (CityCode city : cityCodes) {
                 Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(city.getCountry());
+                row.createCell(0).setCellValue(city.getCountry() != null ? city.getCountry().getCountryCode() : "");
                 row.createCell(1).setCellValue(city.getCode());
                 row.createCell(2).setCellValue(city.getKor());
                 row.createCell(3).setCellValue(city.getEng());

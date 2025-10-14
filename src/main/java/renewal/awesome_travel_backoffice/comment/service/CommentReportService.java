@@ -7,8 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import renewal.awesome_travel_backoffice.comment.dto.response.CommentReportResponseDto;
 import renewal.awesome_travel_backoffice.comment.repository.CommentReportRepository;
-import renewal.common.entity.CommentReport.ReportReason;
-import renewal.common.entity.CommentReport;
+import renewal.common.entity.ReviewReport.ReportReason;
+import renewal.common.entity.ReviewReport;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -18,7 +18,7 @@ public class CommentReportService {
     private final CommentReportRepository commentReportRepository;
 
     /**
-     * 어드민 - 댓글 신고 전체 조회 (필터/페이징)
+     * 어드민 - 리뷰 신고 전체 조회 (필터/페이징)
      */
     @Transactional(readOnly = true)
     public Page<CommentReportResponseDto> getAllReports(ReportReason reason, Pageable pageable) {
@@ -40,14 +40,15 @@ public class CommentReportService {
     /**
      * DTO 변환 메서드
      */
-    private CommentReportResponseDto toResponseDto(CommentReport report) {
+    private CommentReportResponseDto toResponseDto(ReviewReport report) {
         return CommentReportResponseDto.builder()
-                .reportId(report.getId())
-                .commentId(report.getComment().getId())
-                .commentContent(report.getComment().getContent())
-                .rating(report.getComment().getRating())
+                .id(report.getId())
+                .reviewId(report.getReview().getId())
+                .reviewContent(report.getReview().getContent())
+                .reporterId(report.getReporter().getId())
                 .reporterName(report.getReporter().getName())
-                .reportedUserName(report.getComment().getWriter().getName())
+                .writerId(report.getReview().getWriter().getId())
+                .writerName(report.getReview().getWriter().getName())
                 .reason(report.getReason())
                 .reportedAt(report.getReportedAt())
                 .build();
