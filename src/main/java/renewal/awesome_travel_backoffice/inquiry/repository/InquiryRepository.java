@@ -14,7 +14,6 @@ public interface InquiryRepository extends JpaRepository<Inquiry, Long> {
             "((:searchType IS NULL OR :searchType = '' OR :searchType = 'TITLE_CONTENT') AND (i.title LIKE CONCAT('%', :keyword, '%') OR i.content LIKE CONCAT('%', :keyword, '%'))) OR " +
             "(:searchType = 'TITLE' AND i.title LIKE CONCAT('%', :keyword, '%')) OR " +
             "(:searchType = 'CONTENT' AND i.content LIKE CONCAT('%', :keyword, '%'))) AND " +
-            "(:isAnswered IS NULL OR i.isAnswered = :isAnswered) AND " +
             "(:category IS NULL OR i.category = :category) AND " +
             "(:status IS NULL OR i.status = :status) AND " +
             "(:startDate IS NULL OR i.createdAt >= :startDate) AND " +

@@ -45,7 +45,7 @@ public class PurchaseAirResponseDto {
     
     private boolean transactionComplete;
     
-    public AirPurchaseResponseDto(Long id, AirResponseOneDto airDto, PurchaseStatus status, Long price, Long member_id, 
+    public PurchaseAirResponseDto(Long id, AirResponseOneDto airDto, PurchaseStatus status, Long price, Long member_id, 
                                  String name, String number, String email, LocalDateTime purchaseDate, 
                                  LocalDateTime paymentDueDate, List<AirPassengerResponseDto> airPassengers, 
                                  int expectedPassengerCount, boolean isPassengerInfoComplete, 

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import renewal.awesome_travel_backoffice.comment.dto.response.CommentResponseDto;
 import renewal.awesome_travel_backoffice.comment.service.CommentService;
-import renewal.common.entity.CommentReport.ReportReason;
+import renewal.common.entity.ReviewReport.ReportReason;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

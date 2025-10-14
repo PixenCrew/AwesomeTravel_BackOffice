@@ -15,14 +15,14 @@ import renewal.common.entity.SpecialRequest;
 import renewal.common.entity.CountryCode;
 import renewal.awesome_travel_backoffice.airPurchase.dto.request.PurchaseAirSearchCondition;
 import renewal.awesome_travel_backoffice.airPurchase.dto.request.AirPassengerUpdateRequestDto;
-import renewal.awesome_travel_backoffice.airPurchase.dto.response.AirPurchaseResponseDto;
+import renewal.awesome_travel_backoffice.airPurchase.dto.response.PurchaseAirResponseDto;
 import renewal.awesome_travel_backoffice.airPurchase.dto.response.AirResponseOneDto;
 import renewal.awesome_travel_backoffice.airPurchase.dto.response.AirPassengerResponseDto;
 import renewal.awesome_travel_backoffice.airPurchase.repository.PurchaseAirRepository;
 import renewal.common.entity.PurchaseAir;
-import renewal.common.entity.AirPassenger;
+import renewal.common.entity.PassengerAir;
 import renewal.common.entity.PurchaseBase.PurchaseStatus;
-import renewal.common.entity.BasePassenger.Sex;
+import renewal.common.entity.PassengerBase.Sex;
 import renewal.awesome_travel_backoffice.countrycode.repository.CountryCodeRepository;
 import renewal.awesome_travel_backoffice.airPurchase.controller.PurchaseAirAdminController.CountryCodeDto;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +44,7 @@ public class PurchaseAirService {
     /**
      *  어드민 - 전체 항공 예약 목록 조회 (DTO 변환)
      */
-    public Page<AirPurchaseResponseDto> getAllPurchasesDto(PurchaseAirSearchCondition condition, Pageable pageable) {
+    public Page<PurchaseAirResponseDto> getAllPurchasesDto(PurchaseAirSearchCondition condition, Pageable pageable) {
         Page<PurchaseAir> purchases = airPurchaseRepository.searchByCondition(condition, pageable);
         return purchases.map(this::toDto);
     }
@@ -62,7 +62,7 @@ public class PurchaseAirService {
     /**
      *  어드민 - 단건 예약 상세 조회 (DTO 변환)
      */
-    public AirPurchaseResponseDto getPurchaseDto(Long id) {
+    public PurchaseAirResponseDto getPurchaseDto(Long id) {
         System.out.println("=== getPurchaseDto 호출 - ID: " + id + " ===");
         
         PurchaseAir purchase = airPurchaseRepository.findByIdWithPassengers(id)
@@ -73,16 +73,16 @@ public class PurchaseAirService {
         System.out.println("=== AirPurchase 디버깅 정보 ===");
         System.out.println("AirPurchase ID: " + purchase.getProductPurchaseId());
         System.out.println("Expected Passengers: " + purchase.getExpectedPassengerCount());
-        System.out.println("Actual Passengers: " + (purchase.getAirPassengers() != null ? purchase.getAirPassengers().size() : "null"));
+        System.out.println("Actual Passengers: " + (purchase.getPassengerAirs() != null ? purchase.getPassengerAirs().size() : "null"));
         System.out.println("Passenger Info Complete: " + purchase.isPassengerInfoComplete());
         System.out.println("Transaction Complete: " + purchase.isTransactionComplete());
-        if (purchase.getAirPassengers() != null && !purchase.getAirPassengers().isEmpty()) {
-            purchase.getAirPassengers().forEach(passenger -> {
+        if (purchase.getPassengerAirs() != null && !purchase.getPassengerAirs().isEmpty()) {
+            purchase.getPassengerAirs().forEach(passenger -> {
                 System.out.println("  - 승객: " + (passenger.getName() != null ? passenger.getName() : "null") + " (ID: " + passenger.getId() + ")");
                 System.out.println("    특별요청: " + passenger.getSpecialRequests().size() + "개");
             });
         } else {
-            System.out.println("  ⚠️ AirPassengers가 비어있습니다!");
+            System.out.println("  ⚠️ PassengerAirs가 비어있습니다!");
         }
         System.out.println("===============================");
         
@@ -116,7 +116,7 @@ public class PurchaseAirService {
         if ((currentStatus == PurchaseStatus.HOLDING || currentStatus == PurchaseStatus.PAID)
                 && newStatus == PurchaseStatus.CANCELLED) {
             SeatClass seatClass = purchase.getSeatClass();
-            seatClass.setAvailableSeats(Long.valueOf(purchase.getAirPassengers().size()));
+            seatClass.setAvailableSeats(Long.valueOf(purchase.getPassengerAirs().size()));
         }
 
         // 상태 변경 적용
@@ -130,7 +130,7 @@ public class PurchaseAirService {
     /**
      *  내부 변환 메서드 (응답용 DTO로 변환)
      */
-    private AirPurchaseResponseDto toDto(PurchaseAir purchase) {
+    private PurchaseAirResponseDto toDto(PurchaseAir purchase) {
         SeatClass seatClass = purchase.getSeatClass();
         Air air = seatClass.getAir();
 
@@ -142,10 +142,10 @@ public class PurchaseAirService {
                 .airlineCode(air.getAirline().getCode())
                 .airlineNameKor(air.getAirline().getNameKor())
                 .airlineNameEng(air.getAirline().getNameEng())
-                .depart(air.getDepartAirport())
-                .arrive(air.getArriveAirport())
-                .departTime(air.getDepartDate().atTime(air.getDepartTime()))
-                .arriveTime(air.getArriveDate().atTime(air.getArriveTime()))
+                .depart(air.getDepartAirport() != null ? air.getDepartAirport().getCityKor() : "")
+                .arrive(air.getArriveAirport() != null ? air.getArriveAirport().getCityKor() : "")
+                .departTime(air.getDepartDateTime())
+                .arriveTime(air.getArriveDateTime())
                 .stopovers(air.getStopovers())
                 .flightType(air.getFlightType())
                 .seatClassId(seatClass.getId())
@@ -154,7 +154,7 @@ public class PurchaseAirService {
                 .availableSeats(seatClass.getAvailableSeats())
                 .build();
 
-        List<AirPassengerResponseDto> passengerDtos = purchase.getAirPassengers().stream()
+        List<AirPassengerResponseDto> passengerDtos = purchase.getPassengerAirs().stream()
                 .map(passenger -> {
                     List<String> requestList = passenger.getSpecialRequests().stream()
                             .map(SpecialRequest::getRequestType)
@@ -175,7 +175,7 @@ public class PurchaseAirService {
                     );
                 }).toList();
 
-        return new AirPurchaseResponseDto(
+        return new PurchaseAirResponseDto(
                 purchase.getProductPurchaseId(),
                 airDto,
                 purchase.getPurchaseStatus(),
@@ -237,7 +237,7 @@ public class PurchaseAirService {
         
         // 1단계: 입력된 승객 정보 추가 (빈 필드가 있어도 객체 생성)
         for (AirPassengerUpdateRequestDto dto : passengerDtos) {
-            AirPassenger passenger = new AirPassenger();
+            PassengerAir passenger = new PassengerAir();
             
             // 입력된 정보만 설정, 빈 필드는 null로 유지
             passenger.setName(dto.getName());
@@ -264,22 +264,22 @@ public class PurchaseAirService {
                 passenger.setNationality(nationality);
             }
             
-            purchase.getAirPassengers().add(passenger);
+            purchase.getPassengerAirs().add(passenger);
         }
         
         // 2단계: 예상 승객 수만큼 빈 승객 객체 생성 (부족한 경우)
-        while (purchase.getAirPassengers().size() < expectedPassengerCount) {
-            AirPassenger emptyPassenger = new AirPassenger();
+        while (purchase.getPassengerAirs().size() < expectedPassengerCount) {
+            PassengerAir emptyPassenger = new PassengerAir();
             emptyPassenger.setAirPurchase(purchase);
             // 모든 필드를 null로 유지 (빈 객체)
-            purchase.getAirPassengers().add(emptyPassenger);
+            purchase.getPassengerAirs().add(emptyPassenger);
         }
         
         System.out.println("=== 빈 객체 생성 완료 ===");
         System.out.println("예상 승객 수: " + expectedPassengerCount);
-        System.out.println("생성된 승객 수: " + purchase.getAirPassengers().size());
+        System.out.println("생성된 승객 수: " + purchase.getPassengerAirs().size());
         System.out.println("입력된 승객 수: " + passengerDtos.size());
-        System.out.println("빈 객체 수: " + (purchase.getAirPassengers().size() - passengerDtos.size()));
+        System.out.println("빈 객체 수: " + (purchase.getPassengerAirs().size() - passengerDtos.size()));
         
         // 승객 정보 완료 상태 확인 및 설정
         checkPassengerInfoComplete(purchase);
@@ -316,7 +316,7 @@ public class PurchaseAirService {
         }
         
         // 빈 승객 객체 찾기 (이름이 null이거나 비어있는 경우)
-        AirPassenger emptyPassenger = purchase.getAirPassengers().stream()
+        PassengerAir emptyPassenger = purchase.getPassengerAirs().stream()
                 .filter(p -> p.getName() == null || p.getName().trim().isEmpty())
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("더 이상 승객 정보를 추가할 수 없습니다."));
@@ -376,8 +376,8 @@ public class PurchaseAirService {
      */
     private void checkPassengerInfoComplete(PurchaseAir purchase) {
         // 예상 승객 수와 실제 승객 수가 일치하고, 모든 승객의 필수 정보가 완전한지 확인
-        if (purchase.getAirPassengers().size() == purchase.getExpectedPassengerCount()) {
-            boolean allComplete = purchase.getAirPassengers().stream()
+        if (purchase.getPassengerAirs().size() == purchase.getExpectedPassengerCount()) {
+            boolean allComplete = purchase.getPassengerAirs().stream()
                 .allMatch(passenger -> 
                     passenger.getName() != null && !passenger.getName().trim().isEmpty() &&
                     passenger.getNumber() != null && !passenger.getNumber().trim().isEmpty() &&
@@ -403,13 +403,13 @@ public class PurchaseAirService {
                 .orElseThrow(() -> new IllegalArgumentException("구매 내역을 찾을 수 없습니다."));
 
         // 승객 정보 조회
-        AirPassenger passenger = purchase.getAirPassengers().stream()
+        PassengerAir passenger = purchase.getPassengerAirs().stream()
                 .filter(p -> p.getId().equals(passengerId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("승객 정보를 찾을 수 없습니다."));
 
         // 디버깅 로그
-        System.out.println("=== AirPassenger 정보 수정 디버깅 ===");
+        System.out.println("=== PassengerAir 정보 수정 디버깅 ===");
         System.out.println("입력된 데이터: " + updateRequest);
         System.out.println("수정 전 승객 정보: " + passenger.getName() + ", " + passenger.getNumber() + ", " + passenger.getEmail());
         

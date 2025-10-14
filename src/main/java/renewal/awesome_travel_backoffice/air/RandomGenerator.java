@@ -20,7 +20,7 @@ import renewal.common.entity.Airline;
 import renewal.common.entity.CityCode;
 import renewal.common.entity.SeatClass;
 import renewal.common.entity.Air.FlightType;
-import renewal.common.repository.CityCodeRepository;
+import renewal.awesome_travel_backoffice.citycode.repository.CityCodeRepository;
 
 @Configuration
 public class RandomGenerator {
@@ -37,7 +37,13 @@ public class RandomGenerator {
             System.out.println(">>> RandomGenerator CommandLineRunner 실행됨!");
             Random random = new Random();
             List<Airline> airlines = airlineRepo.findAll();
-            List<CityCode> cities = cityRepo.findByCountryCodeCountryCode("KR");
+            List<CityCode> cities = cityRepo.findAll();
+
+            // 데이터가 없으면 더미 데이터 생성을 건너뜀
+            if (airlines.isEmpty() || cities.isEmpty()) {
+                System.out.println(">>> 항공사 또는 도시 데이터가 없어서 더미 데이터 생성을 건너뜁니다.");
+                return;
+            }
 
             for (int i = 100; i < 10000; i++) {
                 Airline airline = airlines.get(random.nextInt(airlines.size()));

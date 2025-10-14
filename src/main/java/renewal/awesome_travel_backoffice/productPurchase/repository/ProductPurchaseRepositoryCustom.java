@@ -4,10 +4,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import renewal.awesome_travel_backoffice.productPurchase.dto.request.ProductPurchaseSearchCondition;
-import renewal.common.entity.ProductPurchase;
+import renewal.common.entity.PurchaseProduct;
 
 public interface ProductPurchaseRepositoryCustom {
-    Page<ProductPurchase> searchByCondition(ProductPurchaseSearchCondition condition, Pageable pageable);
+    Page<PurchaseProduct> searchByCondition(ProductPurchaseSearchCondition condition, Pageable pageable);
 }
 
 
