@@ -1,0 +1,7 @@
+<div th:fragment="cityDatalistFragment">
+    <datalist id="cityList">
+        <option th:each="cc : ${cityCode}"
+                th:value="${cc.cityCode} + ' | ' + ${cc.cityKor} + ' | ' + ${cc.cityEng} + ' | ' + ${cc.countryCode.countryKor}">
+        </option>
+    </datalist>
+</div>

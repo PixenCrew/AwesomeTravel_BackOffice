@@ -10,7 +10,7 @@ import renewal.awesome_travel_backoffice.airport.service.AirportService;
 import renewal.awesome_travel_backoffice.citycode.service.CityCodeService;
 import renewal.awesome_travel_backoffice.countrycode.service.CountryCodeService;
 import renewal.common.entity.Airline;
-import renewal.common.entity.Airport;
+import renewal.common.entity.AirportCode;
 import renewal.common.entity.CityCode;
 import renewal.common.entity.CountryCode;
 
@@ -94,9 +94,11 @@ public class ExcelService {
 
                 try {
                     String country = getCellValue(row.getCell(0));
+                    CountryCode countryCode = countryCodeService.getCountryCodeByCode(country).get();
                     String code = getCellValue(row.getCell(1));
                     String kor = getCellValue(row.getCell(2));
                     String eng = getCellValue(row.getCell(3));
+                    Long utcOffsetMins = Long.valueOf(getCellValue(row.getCell(3)));
 
                     if (code == null || code.trim().isEmpty() || country == null || country.trim().isEmpty()) {
                         skipCount++;
@@ -104,18 +106,20 @@ public class ExcelService {
                     }
 
                     CityCode cityCode = new CityCode(
-                        country.trim().toUpperCase(),
                         code.trim().toUpperCase(),
+                        eng != null ? eng.trim() : "",
                         kor != null ? kor.trim() : "",
-                        eng != null ? eng.trim() : ""
+                        utcOffsetMins,
+                        countryCode
                     );
 
                     // 기존 코드가 있으면 업데이트, 없으면 생성
-                    if (cityCodeService.existsByCode(cityCode.getCode())) {
-                        cityCodeService.updateCityCode(cityCode.getCode(), cityCode);
+                    if (cityCodeService.existsByCode(cityCode.getCityCode())) {
+                        cityCodeService.updateCityCode(cityCode.getCityCode(), cityCode);
                     } else {
                         cityCodeService.createCityCode(cityCode);
                     }
+
                     successCount++;
                 } catch (Exception e) {
                     System.err.println("Error processing row " + i + ": " + e.getMessage());
@@ -204,7 +208,7 @@ public class ExcelService {
             for (CityCode city : cityCodes) {
                 Row row = sheet.createRow(rowNum++);
                 row.createCell(0).setCellValue(city.getCountry() != null ? city.getCountry().getCountryCode() : "");
-                row.createCell(1).setCellValue(city.getCode());
+                row.createCell(1).setCellValue(city.getCityCode());
                 row.createCell(2).setCellValue(city.getKor());
                 row.createCell(3).setCellValue(city.getEng());
             }
@@ -466,28 +470,26 @@ public class ExcelService {
 
                     if (code == null || code.trim().isEmpty()) continue;
 
-                    Airport.AirportType type = Airport.AirportType.BOTH;
-                    if (typeStr != null) {
-                        try {
-                            type = Airport.AirportType.valueOf(typeStr.toUpperCase());
-                        } catch (Exception e) {
-                            if ("국제".equals(typeStr)) type = Airport.AirportType.INTERNATIONAL;
-                            else if ("국내".equals(typeStr)) type = Airport.AirportType.DOMESTIC;
-                            else if ("국제/국내".equals(typeStr)) type = Airport.AirportType.BOTH;
-                        }
-                    }
-
-                    Airport airport = new Airport(
+                    // AirportCode.AirportType type = AirportCode.AirportType.BOTH;
+                    // if (typeStr != null) {
+                    //     try {
+                    //         type = AirportCode.AirportType.valueOf(typeStr.toUpperCase());
+                    //     } catch (Exception e) {
+                    //         if ("국제".equals(typeStr)) type = AirportCode.AirportType.INTERNATIONAL;
+                    //         else if ("국내".equals(typeStr)) type = AirportCode.AirportType.DOMESTIC;
+                    //         else if ("국제/국내".equals(typeStr)) type = AirportCode.AirportType.BOTH;
+                    //     }
+                    // }
+                    CityCode cityCode2 = cityCodeService.getCityCodeByCode(cityCode).get();
+                    AirportCode airport = new AirportCode(
                         code.trim().toUpperCase(),
-                        cityCode != null ? cityCode.trim().toUpperCase() : "",
-                        countryCode != null ? countryCode.trim().toUpperCase() : "",
                         nameKor != null ? nameKor.trim() : "",
                         nameEng != null ? nameEng.trim() : "",
-                        type
+                        cityCode2
                     );
 
-                    if (airportService.existsByCode(airport.getCode())) {
-                        airportService.updateAirport(airport.getCode(), airport);
+                    if (airportService.existsByCode(airport.getAirportCode())) {
+                        airportService.updateAirport(airport.getAirportCode(), airport);
                     } else {
                         airportService.createAirport(airport);
                     }
@@ -502,7 +504,7 @@ public class ExcelService {
 
     // 공항 Excel 다운로드
     public byte[] downloadAirports() throws IOException {
-        List<Airport> airports = airportService.getAllAirportsList();
+        List<AirportCode> airports = airportService.getAllAirportsList();
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             Sheet sheet = workbook.createSheet("공항");
             CellStyle headerStyle = workbook.createCellStyle();
@@ -521,14 +523,12 @@ public class ExcelService {
             }
 
             int rowNum = 1;
-            for (Airport airport : airports) {
+            for (AirportCode airport : airports) {
                 Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(airport.getCode());
-                row.createCell(1).setCellValue(airport.getCountryCode());
-                row.createCell(2).setCellValue(airport.getCityCode());
-                row.createCell(3).setCellValue(airport.getNameKor());
-                row.createCell(4).setCellValue(airport.getNameEng());
-                row.createCell(5).setCellValue(airport.getAirportType() != null ? airport.getAirportType().getDescription() : "");
+                row.createCell(0).setCellValue(airport.getAirportCode());
+                row.createCell(1).setCellValue(airport.getCityCode().toString());
+                row.createCell(2).setCellValue(airport.getAirportKor());
+                row.createCell(3).setCellValue(airport.getAirportEng());
             }
 
             for (int i = 0; i < headers.length; i++) {

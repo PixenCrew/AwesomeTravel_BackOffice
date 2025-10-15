@@ -16,7 +16,7 @@ import renewal.awesome_travel_backoffice.airport.service.AirportService;
 import renewal.awesome_travel_backoffice.citycode.service.CityCodeService;
 import renewal.awesome_travel_backoffice.common.service.ExcelService;
 import renewal.awesome_travel_backoffice.countrycode.service.CountryCodeService;
-import renewal.common.entity.Airport;
+import renewal.common.entity.AirportCode;
 import renewal.common.entity.CityCode;
 import renewal.common.entity.CountryCode;
 
@@ -48,7 +48,7 @@ public class AirportController {
 
         Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Airport> airportPage;
+        Page<AirportCode> airportPage;
 
         if (countryCode != null && !countryCode.isEmpty() && cityCode != null && !cityCode.isEmpty()) {
             airportPage = airportService.getAirportsByCountryAndCity(countryCode, cityCode, pageable);
@@ -87,7 +87,7 @@ public class AirportController {
 
     @GetMapping("/{code}")
     public String airportDetail(@PathVariable String code, Model model) {
-        Optional<Airport> airport = airportService.getAirportByCode(code);
+        Optional<AirportCode> airport = airportService.getAirportByCode(code);
         if (airport.isEmpty()) {
             return "redirect:/airport?error=공항을 찾을 수 없습니다.";
         }
@@ -100,7 +100,7 @@ public class AirportController {
 
     @GetMapping("/new")
     public String newAirportForm(Model model) {
-        model.addAttribute("airport", new Airport());
+        model.addAttribute("airport", new AirportCode());
         model.addAttribute("countryList", countryCodeService.getAllCountryCodesList());
         model.addAttribute("cityList", cityCodeService.getAllCityCodesList());
         model.addAttribute("title", "새 공항 등록");
@@ -110,7 +110,7 @@ public class AirportController {
 
     @GetMapping("/edit/{code}")
     public String editAirportForm(@PathVariable String code, Model model) {
-        Optional<Airport> airport = airportService.getAirportByCode(code);
+        Optional<AirportCode> airport = airportService.getAirportByCode(code);
         if (airport.isEmpty()) {
             return "redirect:/airport?error=공항을 찾을 수 없습니다.";
         }
@@ -128,14 +128,14 @@ public class AirportController {
             @RequestParam(required = false) String originalCode,
             @RequestParam String code,
             @RequestParam String countryCode,
-            @RequestParam String cityCode,
+            @RequestParam CityCode cityCode,
             @RequestParam String nameKor,
             @RequestParam String nameEng,
             @RequestParam String airportType,
             Model model) {
 
         try {
-            Airport airport = new Airport(code, cityCode, countryCode, nameKor, nameEng, Airport.AirportType.valueOf(airportType));
+            AirportCode airport = new AirportCode(code, nameKor, nameEng, cityCode);
 
             if (originalCode != null && !originalCode.isEmpty()) {
                 if (!originalCode.equals(code)) {
@@ -151,7 +151,7 @@ public class AirportController {
             return "redirect:/airport?message=success";
         } catch (Exception e) {
             model.addAttribute("error", "공항 저장 중 오류가 발생했습니다: " + e.getMessage());
-            model.addAttribute("airport", new Airport(code, cityCode, countryCode, nameKor, nameEng, Airport.AirportType.valueOf(airportType)));
+            model.addAttribute("airport", new AirportCode(code, nameKor, nameEng, cityCode));
             model.addAttribute("countryList", countryCodeService.getAllCountryCodesList());
             model.addAttribute("cityList", cityCodeService.getAllCityCodesList());
             model.addAttribute("title", originalCode != null ? "공항 수정" : "새 공항 등록");

@@ -1,240 +1,4 @@
 <div th:fragment="content" th:inline="text">
-    <div class="page-header">
-        <h1>투어 관리</h1>
-        <a href="/tour/new" class="btn btn-primary">
-            <i class="fas fa-plus"></i> 새 투어 등록
-        </a>
-    </div>
-
-    <!-- 필터 섹션 -->
-    <div class="filter-section">
-        <div class="filter-header">
-            <h3>검색 필터</h3>
-            <button type="button" class="btn btn-secondary" onclick="toggleFilter()">
-                <i class="fas fa-filter"></i> 필터 토글
-            </button>
-        </div>
-        
-        <form id="filterForm" th:object="${filter}" class="filter-form" style="display: none;">
-            <div class="filter-grid">
-                <!-- 투어 이름 -->
-                <div class="filter-group">
-                    <label for="name">투어 이름</label>
-                    <input type="text" th:field="*{name}" placeholder="투어 이름을 입력하세요" class="form-control" />
-                </div>
-
-                <!-- 회사 선택 -->
-                <div class="filter-group">
-                    <label>회사 선택</label>
-                    <div class="checkbox-container">
-                        <div th:each="comp : ${allCompanies}" class="checkbox-item">
-                            <input type="checkbox" th:field="*{companies}" th:value="${comp}" th:id="${'cmp_' + comp}" class="form-checkbox" />
-                            <label th:for="${'cmp_' + comp}" th:text="${comp}" class="checkbox-label"></label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 날짜 범위 -->
-                <div class="filter-group">
-                    <label>시작일 범위</label>
-                    <div class="date-range">
-                        <input type="date" th:field="*{startDateFrom}" class="form-control" />
-                        <span>~</span>
-                        <input type="date" th:field="*{startDateTo}" class="form-control" />
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <label>종료일 범위</label>
-                    <div class="date-range">
-                        <input type="date" th:field="*{endDateFrom}" class="form-control" />
-                        <span>~</span>
-                        <input type="date" th:field="*{endDateTo}" class="form-control" />
-                    </div>
-                </div>
-
-                <!-- 가격 범위 -->
-                <div class="filter-group">
-                    <label>가격 범위</label>
-                    <div class="price-range">
-                        <input type="number" step="1" th:field="*{minPrice}" placeholder="최소 가격" class="form-control" />
-                        <span>~</span>
-                        <input type="number" step="1" th:field="*{maxPrice}" placeholder="최대 가격" class="form-control" />
-                    </div>
-                </div>
-
-                <!-- 위치 및 국가 -->
-                <div class="filter-group">
-                    <label for="pointLocation">위치</label>
-                    <input type="text" th:field="*{pointLocation}" placeholder="위치를 입력하세요" onclick="stripAfterPipe(this)" list="cityList" class="form-control"/>
-                </div>
-
-                <div class="filter-group">
-                    <label for="country">국가</label>
-                    <input type="text" th:field="*{country}" placeholder="국가를 입력하세요" onclick="stripAfterPipe(this)" list="countryList" class="form-control"/>
-                </div>
-
-                <!-- 인원 범위 -->
-                <div class="filter-group">
-                    <label>인원 범위</label>
-                    <div class="count-range">
-                        <input type="number" step="1" th:field="*{startCount}" placeholder="최소 인원" class="form-control" />
-                        <span>~</span>
-                        <input type="number" step="1" th:field="*{endCount}" placeholder="최대 인원" class="form-control" />
-                    </div>
-                </div>
-            </div>
-
-            <div class="filter-actions">
-                <button type="button" class="btn btn-primary" onclick="get(0, event)">
-                    <i class="fas fa-search"></i> 검색
-                </button>
-                <button type="button" class="btn btn-secondary" onclick="reset(event)">
-                    <i class="fas fa-undo"></i> 초기화
-                </button>
-            </div>
-
-            <!-- 정렬 기준 및 방향 (hidden input) -->
-            <input type="hidden" name="sortField" th:value="${sortField}" />
-            <input type="hidden" name="sortDir" th:value="${sortDir}" />
-        </form>
-    </div>
-
-    <!-- 결과 테이블 -->
-    <div class="table-section">
-        <div class="table-header">
-            <h3>투어 목록 <span class="count-badge" th:text="'총 ' + ${tourPage.totalElements} + '개'"></span></h3>
-        </div>
-        
-        <div class="table-container">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th class="col-id">ID</th>
-                        <th class="col-sortable">
-                            <a href="#" data-sortfield="startDate"
-                                th:data-sortdir="${sortField=='startDate' and sortDir=='asc' ? 'asc' : 'desc'}"
-                                onclick="toggleSort(this, event)">
-                                시작일
-                                <i th:if="${sortField=='startDate'}" th:class="${sortDir=='asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'}"></i>
-                            </a>
-                        </th>
-                        <th class="col-sortable">
-                            <a href="#" data-sortfield="endDate"
-                                th:data-sortdir="${sortField=='endDate' and sortDir=='asc' ? 'asc' : 'desc'}"
-                                onclick="toggleSort(this, event)">
-                                종료일
-                                <i th:if="${sortField=='endDate'}" th:class="${sortDir=='asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'}"></i>
-                            </a>
-                        </th>
-                        <th class="col-name">투어명</th>
-                        <th class="col-company">회사</th>
-                        <th class="col-sortable">
-                            <a href="#" data-sortfield="price"
-                                th:data-sortdir="${sortField=='price' and sortDir=='asc' ? 'asc' : 'desc'}"
-                                onclick="toggleSort(this, event)">
-                                가격
-                                <i th:if="${sortField=='price'}" th:class="${sortDir=='asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'}"></i>
-                            </a>
-                        </th>
-                        <th class="col-country">국가</th>
-                        <th class="col-count">인원</th>
-                        <th class="col-price">항공료</th>
-                        <th class="col-price">호텔료</th>
-                        <th class="col-actions">작업</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <th:block th:each="tour : ${tourPage.content}">
-                        <tr th:onclick="${isSelectionPage != null and isSelectionPage} ? |returnPrice(${tour.id},${tour.price},${tour.airPriceSum},${tour.hotelPriceSum})| : |window.location.href='@{/tour/{id}(id=${tour.id})}'|" 
-                            class="data-row" th:classappend="${isSelectionPage != null and isSelectionPage} ? 'selection-row' : ''">
-                            <td class="col-id" th:text="${tour.id}">1</td>
-                            <td class="col-date" th:text="${#temporals.format(tour.startDate, 'yyyy-MM-dd')}">2000-01-01</td>
-                            <td class="col-date" th:text="${#temporals.format(tour.endDate, 'yyyy-MM-dd')}">2000-12-31</td>
-                            <td class="col-name">
-                                <div class="tour-name" th:text="${tour.name}">투어명</div>
-                            </td>
-                            <td class="col-company">
-                                <span class="company-badge" th:text="${tour.company}">회사명</span>
-                            </td>
-                            <td class="col-price">
-                                <span class="price" th:text="${#numbers.formatInteger(tour.price, 3, 'COMMA')} + '원'">100,000원</span>
-                            </td>
-                            <td class="col-country">
-                                <span class="country-flag" th:text="${tour.country}">KR</span>
-                            </td>
-                            <td class="col-count">
-                                <span class="count-badge" th:text="${tour.count} + '명'">10명</span>
-                            </td>
-                            <td class="col-price">
-                                <span th:text="${#numbers.formatInteger(tour.airPriceSum, 3, 'COMMA')} + '원'">50,000원</span>
-                            </td>
-                            <td class="col-price">
-                                <span th:text="${#numbers.formatInteger(tour.hotelPriceSum, 3, 'COMMA')} + '원'">30,000원</span>
-                            </td>
-                            <td class="col-actions" th:if="${isSelectionPage != null and !isSelectionPage}">
-                                <div class="action-buttons">
-                                    <a th:href="@{/tour/{id}(id=${tour.id})}" class="btn btn-sm btn-outline-primary" title="상세보기">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <button th:onclick="|deleteTour(${tour.id})|" class="btn btn-sm btn-outline-danger" title="삭제">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </th:block>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- 페이징 네비게이션 -->
-    <div class="pagination-section" th:if="${tourPage.totalPages > 1}">
-        <div class="pagination-info">
-            <span th:text="'페이지 ' + (${tourPage.number} + 1) + ' / ' + ${tourPage.totalPages} + ' (총 ' + ${tourPage.totalElements} + '개)'"></span>
-        </div>
-        
-        <nav class="pagination">
-            <ul class="pagination-list">
-                <li class="pagination-item" th:if="${tourPage.hasPrevious()}">
-                    <a th:onclick="|get(${tourPage.number - 1})|" class="pagination-link pagination-prev">
-                        <i class="fas fa-chevron-left"></i>
-                        이전
-                    </a>
-                </li>
-                
-                <!-- 페이지 번호들 -->
-                <li th:each="i : ${#numbers.sequence(0, tourPage.totalPages - 1)}" 
-                    class="pagination-item" 
-                    th:classappend="${i == tourPage.number} ? 'active' : ''">
-                    <a th:onclick="|get(${i})|" 
-                       class="pagination-link" 
-                       th:text="${i + 1}">
-                    </a>
-                </li>
-                
-                <li class="pagination-item" th:if="${tourPage.hasNext()}">
-                    <a th:onclick="|get(${tourPage.number + 1})|" class="pagination-link pagination-next">
-                        다음
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-
-    <script src="/js/filter.js"></script>
-    <script src="/js/util.js"></script>
-
-    <datalist id="cityList">
-        <option th:each="cc : ${cityCode}" th:value="${cc.code} + ' | ' + ${cc.country} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
-    </datalist>
-
-    <datalist id="countryList">
-        <option th:each="cc : ${countryCode}" th:value="${cc.code} + ' | ' + ${cc.nameEng} + ' | ' + ${cc.nameKor}"></option>
-    </datalist>
-
     <style>
         /* 투어 목록 페이지 스타일 */
         .page-header {
@@ -621,6 +385,237 @@
             }
         }
     </style>
+    
+    <div class="page-header">
+        <h1>투어 관리</h1>
+        <a href="/tour/new" class="btn btn-primary">
+            <i class="fas fa-plus"></i> 새 투어 등록
+        </a>
+    </div>
+
+    <!-- 필터 섹션 -->
+    <div class="filter-section">
+        <div class="filter-header">
+            <h3>검색 필터</h3>
+            <button type="button" class="btn btn-secondary" onclick="toggleFilter()">
+                <i class="fas fa-filter"></i> 필터 토글
+            </button>
+        </div>
+        
+        <form id="filterForm" th:object="${filter}" class="filter-form" style="display: none;">
+            <div class="filter-grid">
+                <!-- 투어 이름 -->
+                <div class="filter-group">
+                    <label for="name">투어 이름</label>
+                    <input type="text" th:field="*{name}" placeholder="투어 이름을 입력하세요" class="form-control" />
+                </div>
+
+                <!-- 회사 선택 -->
+                <div class="filter-group">
+                    <label>회사 선택</label>
+                    <div class="checkbox-container">
+                        <div th:each="comp : ${allCompanies}" class="checkbox-item">
+                            <input type="checkbox" th:field="*{companies}" th:value="${comp}" th:id="${'cmp_' + comp}" class="form-checkbox" />
+                            <label th:for="${'cmp_' + comp}" th:text="${comp}" class="checkbox-label"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 날짜 범위 -->
+                <div class="filter-group">
+                    <label>시작일 범위</label>
+                    <div class="date-range">
+                        <input type="date" th:field="*{startDateFrom}" class="form-control" />
+                        <span>~</span>
+                        <input type="date" th:field="*{startDateTo}" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label>종료일 범위</label>
+                    <div class="date-range">
+                        <input type="date" th:field="*{endDateFrom}" class="form-control" />
+                        <span>~</span>
+                        <input type="date" th:field="*{endDateTo}" class="form-control" />
+                    </div>
+                </div>
+
+                <!-- 가격 범위 -->
+                <div class="filter-group">
+                    <label>가격 범위</label>
+                    <div class="price-range">
+                        <input type="number" step="1" th:field="*{minPrice}" placeholder="최소 가격" class="form-control" />
+                        <span>~</span>
+                        <input type="number" step="1" th:field="*{maxPrice}" placeholder="최대 가격" class="form-control" />
+                    </div>
+                </div>
+
+                <!-- 위치 및 국가 -->
+                <div class="filter-group">
+                    <label for="pointLocation">위치</label>
+                    <input type="text" th:field="*{pointLocation}" placeholder="위치를 입력하세요" onclick="stripAfterPipe(this)" list="cityList" class="form-control"/>
+                </div>
+
+                <div class="filter-group">
+                    <label for="country">국가</label>
+                    <input type="text" th:field="*{country}" placeholder="국가를 입력하세요" onclick="stripAfterPipe(this)" list="countryList" class="form-control"/>
+                </div>
+
+                <!-- 인원 범위 -->
+                <div class="filter-group">
+                    <label>인원 범위</label>
+                    <div class="count-range">
+                        <input type="number" step="1" th:field="*{startCount}" placeholder="최소 인원" class="form-control" />
+                        <span>~</span>
+                        <input type="number" step="1" th:field="*{endCount}" placeholder="최대 인원" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-actions">
+                <button type="button" class="btn btn-primary" onclick="get(0, event)">
+                    <i class="fas fa-search"></i> 검색
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="resetFilter(event)">
+                    <i class="fas fa-undo"></i> 초기화
+                </button>
+            </div>
+
+            <!-- 정렬 기준 및 방향 (hidden input) -->
+            <input type="hidden" name="sortField" th:value="${sortField}" />
+            <input type="hidden" name="sortDir" th:value="${sortDir}" />
+        </form>
+    </div>
+
+    <!-- 결과 테이블 -->
+    <div class="table-section">
+        <div class="table-header">
+            <h3>투어 목록 <span class="count-badge" th:text="'총 ' + ${tourPage.totalElements} + '개'"></span></h3>
+        </div>
+        
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th class="col-id">ID</th>
+                        <th class="col-sortable">
+                            <a href="#" data-sortfield="startDate"
+                                th:data-sortdir="${sortField=='startDate' and sortDir=='asc' ? 'asc' : 'desc'}"
+                                onclick="toggleSort(this, event)">
+                                시작일
+                                <i th:if="${sortField=='startDate'}" th:class="${sortDir=='asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'}"></i>
+                            </a>
+                        </th>
+                        <th class="col-sortable">
+                            <a href="#" data-sortfield="endDate"
+                                th:data-sortdir="${sortField=='endDate' and sortDir=='asc' ? 'asc' : 'desc'}"
+                                onclick="toggleSort(this, event)">
+                                종료일
+                                <i th:if="${sortField=='endDate'}" th:class="${sortDir=='asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'}"></i>
+                            </a>
+                        </th>
+                        <th class="col-name">투어명</th>
+                        <th class="col-company">회사</th>
+                        <th class="col-sortable">
+                            <a href="#" data-sortfield="price"
+                                th:data-sortdir="${sortField=='price' and sortDir=='asc' ? 'asc' : 'desc'}"
+                                onclick="toggleSort(this, event)">
+                                가격
+                                <i th:if="${sortField=='price'}" th:class="${sortDir=='asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'}"></i>
+                            </a>
+                        </th>
+                        <th class="col-country">국가</th>
+                        <th class="col-count">인원</th>
+                        <!-- <th class="col-price">항공료</th> -->
+                        <th class="col-price">호텔료</th>
+                        <th class="col-actions">작업</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <th:block th:each="tour : ${tourPage.content}">
+                        <tr th:onclick="${isSelectionPage != null and isSelectionPage} ? |returnPrice(${tour.id},${tour.priceAdult},${tour.hotelPriceSum})| : |window.location.href='@{/tour/{id}(id=${tour.id})}'|" 
+                            class="data-row" th:classappend="${isSelectionPage != null and isSelectionPage} ? 'selection-row' : ''">
+                            <td class="col-id" th:text="${tour.id}">1</td>
+                            <td class="col-date" th:text="${#temporals.format(tour.startDate, 'yyyy-MM-dd')}">2000-01-01</td>
+                            <td class="col-date" th:text="${#temporals.format(tour.endDate, 'yyyy-MM-dd')}">2000-12-31</td>
+                            <td class="col-name">
+                                <div class="tour-name" th:text="${tour.name}">투어명</div>
+                            </td>
+                            <td class="col-company">
+                                <span class="company-badge" th:text="${tour.company}">회사명</span>
+                            </td>
+                            <td class="col-price">
+                                <span class="price" th:text="${#numbers.formatInteger(tour.priceAdult, 3, 'COMMA')} + '원'">100,000원</span>
+                            </td>
+                            <td class="col-country">
+                                <span class="country-flag" th:text="${tour.country.countryEng}">KR</span>
+                            </td>
+                            <td class="col-count">
+                                <span class="count-badge" th:text="${tour.count} + '명'">10명</span>
+                            </td>
+                            <!-- <td class="col-price">
+                                <span th:text="${#numbers.formatInteger(tour.airPriceSum, 3, 'COMMA')} + '원'">50,000원</span>
+                            </td> -->
+                            <td class="col-price">
+                                <span th:text="${#numbers.formatInteger(tour.hotelPriceSum, 3, 'COMMA')} + '원'">30,000원</span>
+                            </td>
+                            <td class="col-actions" th:if="${isSelectionPage != null and !isSelectionPage}">
+                                <div class="action-buttons">
+                                    <a th:href="@{/tour/{id}(id=${tour.id})}" class="btn btn-sm btn-outline-primary" title="상세보기">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <button th:onclick="|deleteTour(${tour.id})|" class="btn btn-sm btn-outline-danger" title="삭제">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </th:block>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 페이징 네비게이션 -->
+    <div class="pagination-section" th:if="${tourPage.totalPages > 1}">
+        <div class="pagination-info">
+            <span th:text="'페이지 ' + (${tourPage.number} + 1) + ' / ' + ${tourPage.totalPages} + ' (총 ' + ${tourPage.totalElements} + '개)'"></span>
+        </div>
+        
+        <nav class="pagination">
+            <ul class="pagination-list">
+                <li class="pagination-item" th:if="${tourPage.hasPrevious()}">
+                    <a th:onclick="|get(${tourPage.number - 1})|" class="pagination-link pagination-prev">
+                        <i class="fas fa-chevron-left"></i>
+                        이전
+                    </a>
+                </li>
+                
+                <!-- 페이지 번호들 -->
+                <li th:each="i : ${#numbers.sequence(0, tourPage.totalPages - 1)}" 
+                    class="pagination-item" 
+                    th:classappend="${i == tourPage.number} ? 'active' : ''">
+                    <a th:onclick="|get(${i})|" 
+                       class="pagination-link" 
+                       th:text="${i + 1}">
+                    </a>
+                </li>
+                
+                <li class="pagination-item" th:if="${tourPage.hasNext()}">
+                    <a th:onclick="|get(${tourPage.number + 1})|" class="pagination-link pagination-next">
+                        다음
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <script src="/js/filter.js"></script>
+    <script src="/js/util.js"></script>
+
+    <div th:replace="components/datalist/countryList :: countryDatalistFragment"></div>
+    <div th:replace="components/datalist/cityList :: cityDatalistFragment"></div>
 
     <script>
         // 필터 토글 기능

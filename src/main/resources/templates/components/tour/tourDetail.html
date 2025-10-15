@@ -48,7 +48,23 @@
                 <div class="form-group">
                     <label for="price">가격 <span class="required">*</span></label>
                     <div class="input-group">
-                        <input type="number" th:field="*{price}" min="1" required class="form-control" placeholder="가격을 입력하세요" />
+                        <input type="number" th:field="*{priceAdult}" min="1" required class="form-control" placeholder="가격을 입력하세요" />
+                        <span class="input-group-text">원</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="price">가격(청소년) <span class="required">*</span></label>
+                    <div class="input-group">
+                        <input type="number" th:field="*{priceYouth}" min="1" required class="form-control" placeholder="가격을 입력하세요" />
+                        <span class="input-group-text">원</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="price">가격(영유아) <span class="required">*</span></label>
+                    <div class="input-group">
+                        <input type="number" th:field="*{priceInfant}" min="1" required class="form-control" placeholder="가격을 입력하세요" />
                         <span class="input-group-text">원</span>
                     </div>
                 </div>
@@ -59,20 +75,28 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="count">인원 <span class="required">*</span></label>
+                    <label for="count">최대인원 <span class="required">*</span></label>
                     <div class="input-group">
-                        <input type="number" th:field="*{count}" min="1" required class="form-control" placeholder="인원수를 입력하세요" />
+                        <input type="number" th:field="*{maxCapacity}" min="1" required class="form-control" placeholder="인원수를 입력하세요" />
                         <span class="input-group-text">명</span>
                     </div>
                 </div>
-
+                
+                <div class="form-group">
+                    <label for="count">최소인원 <span class="required">*</span></label>
+                    <div class="input-group">
+                        <input type="number" th:field="*{minCapacity}" min="1" required class="form-control" placeholder="인원수를 입력하세요" />
+                        <span class="input-group-text">명</span>
+                    </div>
+                </div>
+<!-- 
                 <div class="form-group">
                     <label for="airPriceSum">항공권 가격 합</label>
                     <div class="input-group">
                         <input type="number" th:field="*{airPriceSum}" min="0" disabled class="form-control" />
                         <span class="input-group-text">원</span>
                     </div>
-                </div>
+                </div> -->
 
                 <div class="form-group">
                     <label for="hotelPriceSum">호텔 가격 합</label>
@@ -84,7 +108,7 @@
 
                 <div class="form-group">
                     <label for="productId">패키지 상품 ID</label>
-                    <input type="number" th:field="*{productId}" disabled class="form-control" />
+                    <input type="number" th:field="*{product.id}" disabled class="form-control" />
                 </div>
             </div>
         </div>
@@ -104,7 +128,7 @@
                     <div class="schedule-header">
                         <div class="schedule-date">
                             <label>날짜</label>
-                            <input type="date" th:field="*{schedules[__${schedStat.index}__].date}" class="form-control" />
+                            <input type="number" th:field="*{schedules[__${schedStat.index}__].day}" class="form-control" />
                         </div>
                         <button type="button" class="btn btn-danger btn-sm" onclick="removeSchedule(this)">
                             <i class="fas fa-trash"></i> 스케줄 삭제
@@ -138,7 +162,7 @@
                                 </div>
 
                                 <!-- AIR 타입인 경우 -->
-                                <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType == T(renewal.common.entity.Location.Type).AIR}" class="air-fields">
+                                <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType == T(renewal.common.entity.Location.LocationType).AIR}" class="air-fields">
                                     <div class="form-group">
                                         <label>출발지</label>
                                         <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].departAirport}" 
@@ -149,7 +173,7 @@
                                         <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].arriveAirport}" 
                                                placeholder="도착지 선택" list="cityList" onchange="stripAfterPipe(this)" class="form-control" />
                                     </div>
-                                    <div class="form-group">
+                                    <!-- <div class="form-group">
                                         <label>항공편 선택</label>
                                         <div class="input-group">
                                             <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].seatClass}" 
@@ -158,11 +182,11 @@
                                                 <i class="fas fa-search"></i> 검색
                                             </button>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
 
                                 <!-- POINT 또는 HOTEL 타입인 경우 -->
-                                <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType != T(renewal.common.entity.Location.Type).AIR}" class="location-fields">
+                                <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType != T(renewal.common.entity.Location.LocationType).AIR}" class="location-fields">
                                     <div class="form-group">
                                         <label>도시</label>
                                         <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].city}" 
@@ -170,7 +194,7 @@
                                     </div>
 
                                     <!-- HOTEL 타입인 경우 -->
-                                    <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType == T(renewal.common.entity.Location.Type).HOTEL}" class="hotel-fields">
+                                    <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType == T(renewal.common.entity.Location.LocationType).HOTEL}" class="hotel-fields">
                                         <div class="form-group">
                                             <label>호텔 선택</label>
                                             <div class="input-group">
@@ -239,7 +263,7 @@
             const scheduleDate = document.createElement("div");
             scheduleDate.className = "schedule-date";
             scheduleDate.appendChild(createLabel("날짜"));
-            const dateInput = createInput("date", `schedules[${idx}].date`, "", { class: "form-control" });
+            const dateInput = createInput("number", `schedules[${idx}].day`, "", { class: "form-control" });
             scheduleDate.appendChild(dateInput);
             scheduleHeader.appendChild(scheduleDate);
 

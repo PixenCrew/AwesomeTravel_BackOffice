@@ -11,25 +11,30 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import jakarta.transaction.Transactional;
 import renewal.awesome_travel_backoffice.air.repository.AirRepository;
 import renewal.awesome_travel_backoffice.air.repository.AirlineRepository;
 import renewal.awesome_travel_backoffice.air.repository.SeatClassRepository;
 import renewal.awesome_travel_backoffice.air.service.AirService;
+import renewal.awesome_travel_backoffice.airport.repository.AirportCodeRepository;
 import renewal.common.entity.Air;
 import renewal.common.entity.Airline;
+import renewal.common.entity.AirportCode;
 import renewal.common.entity.CityCode;
 import renewal.common.entity.SeatClass;
 import renewal.common.entity.Air.FlightType;
 import renewal.common.repository.CityCodeRepository;
+import renewal.common.repository.CountryCodeRepository;
 
-// @Configuration
+@Configuration
 public class RandomGenerator {
 
     @Bean
     CommandLineRunner loadFakeAirWithSeats(
             AirRepository airRepo,
             AirlineRepository airlineRepo,
-            CityCodeRepository cityRepo,
+            AirportCodeRepository airportRepo,
+            CountryCodeRepository countryRepo,
             SeatClassRepository seatRepo,
             AirService airService) {
         return args -> {
@@ -37,14 +42,14 @@ public class RandomGenerator {
             System.out.println(">>> RandomGenerator CommandLineRunner 실행됨!");
             Random random = new Random();
             List<Airline> airlines = airlineRepo.findAll();
-            List<CityCode> cities = cityRepo.findByCountryCodeCountryCode("KR");
+            List<AirportCode> cities = airportRepo.findByCityCodeCountryCodeCountryCode("KR");
 
             for (int i = 100; i < 10000; i++) {
                 Airline airline = airlines.get(random.nextInt(airlines.size()));
 
                 // 출/도착 공항은 다르게 선택
-                CityCode depart = cities.get(random.nextInt(cities.size()));
-                CityCode arrive;
+                AirportCode depart = cities.get(random.nextInt(cities.size()));
+                AirportCode arrive;
                 do {
                     arrive = cities.get(random.nextInt(cities.size()));
                 } while (arrive.equals(depart));
@@ -55,8 +60,8 @@ public class RandomGenerator {
                         .withHour(random.nextInt(24))
                         .withMinute(random.nextInt(60));
 
-                ZoneOffset departOffset = ZoneOffset.ofTotalSeconds((int) (depart.getUtcOffsetMins() * 60));
-                ZoneOffset arriveOffset = ZoneOffset.ofTotalSeconds((int) (arrive.getUtcOffsetMins() * 60));
+                ZoneOffset departOffset = ZoneOffset.ofTotalSeconds((int) (depart.getCityCode().getUtcOffsetMins() * 60));
+                ZoneOffset arriveOffset = ZoneOffset.ofTotalSeconds((int) (arrive.getCityCode().getUtcOffsetMins() * 60));
 
                 // 목표 비행 시간 (분)
                 int flightMinutes = 120 + random.nextInt(600); // 2~12시간
@@ -92,18 +97,18 @@ public class RandomGenerator {
                     segment.setArriveAirport(arrive);
                     segment.setArriveTerminal("T3");
                     segment.setArriveDateTime(arriveDateTime);
-                    segment.setFlightDuration(airService.calcDuration(departDateTime, depart, arriveDateTime, arrive));
+                    segment.setFlightDuration(airService.calcDuration(departDateTime, depart.getCityCode(), arriveDateTime, arrive.getCityCode()));
                     segments.add(segment);
                 } else {
 
                     air.setFlightType(FlightType.STOP_OVER);
 
                     // stopovers > 0: 간단히 직항 + 경유 예시
-                    CityCode lastArrive = depart; // 이전 segment의 도착 공항, 첫 segment는 출발 공항
+                    AirportCode lastArrive = depart; // 이전 segment의 도착 공항, 첫 segment는 출발 공항
                     LocalDateTime segmentDepart = departDateTime;
                     for (int s = 0; s <= stopovers; s++) {
-                        CityCode segDepart = lastArrive; // 이전 segment 도착 = 현재 segment 출발
-                        CityCode segArrive;
+                        AirportCode segDepart = lastArrive; // 이전 segment 도착 = 현재 segment 출발
+                        AirportCode segArrive;
 
                         if (s == stopovers) {
                             segArrive = arrive; // 마지막 segment 도착은 최종 도착
@@ -124,15 +129,11 @@ public class RandomGenerator {
                         segment.setArriveTerminal("T3");
                         segment.setArriveDateTime(segArriveTime);
                         segment.setFlightDuration(
-                            airService.calcDuration(segmentDepart, segDepart, segArriveTime, segArrive));
+                            airService.calcDuration(departDateTime, depart.getCityCode(), arriveDateTime, arrive.getCityCode()));
 
                         if (s != 0) {
                             Air.FlightSegment lastSegment = segments.get(segments.size() - 1); // getLast() 대신
-                            lastSegment.setWaitDuration(airService.calcDuration(
-                                    lastSegment.getArriveDateTime(),
-                                    lastSegment.getArriveAirport(),
-                                    segmentDepart,
-                                    segDepart));
+                            lastSegment.setWaitDuration(airService.calcDuration(departDateTime, depart.getCityCode(), arriveDateTime, arrive.getCityCode()));
                         }
 
                         segments.add(segment);

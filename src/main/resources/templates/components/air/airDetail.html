@@ -2,7 +2,7 @@
     <!-- 헤더 -->
     <div class="sm:flex sm:items-center">
       <div class="sm:flex-auto">
-        <h1 class="text-base font-semibold leading-6 text-gray-900" th:text="${air.id == null} ? '항공편 등록' : '항공편 상세'">항공편 상세</h1>
+        <h1 class="text-base font-semibold leading-6 text-gray-900" th:text="${air.id == null} ? '항공 등록' : '항공 상세'">항공 상세</h1>
         <p class="mt-2 text-sm text-gray-700" th:text="${air.id == null} ? '새로운 항공편을 등록합니다.' : '항공편 정보를 확인하고 수정할 수 있습니다.'">항공편 정보를 확인하고 수정할 수 있습니다.</p>
       </div>
       <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none" th:if="${air.id != null}">
@@ -44,26 +44,7 @@
             
             <div>
               <label class="block text-sm font-medium leading-6 text-gray-900">비행 유형</label>
-              <select th:field="*{flightType}" 
-                      class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
-                <option value="DIRECT">직항</option>
-                <option value="STOP_OVER">경유</option>
-              </select>
-            </div>
-            
-            <div>
-              <label class="block text-sm font-medium leading-6 text-gray-900">상태</label>
-              <select th:field="*{status}" 
-                      class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
-                <option value="ACTIVE">활성</option>
-                <option value="INACTIVE">비활성</option>
-                <option value="HIDDEN">숨김</option>
-              </select>
-            </div>
-            
-            <div>
-              <label class="block text-sm font-medium leading-6 text-gray-900">경유 횟수</label>
-              <input type="number" th:field="*{stopovers}" id="stopovers" min="0" readonly 
+              <input type="text" th:field="*{flightType}" readonly 
                      class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 bg-gray-50 sm:text-sm sm:leading-6" />
             </div>
             
@@ -73,6 +54,12 @@
                       class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
                 <option th:each="st : ${T(renewal.common.entity.Air.AirStatus).values()}" th:value="${st}" th:text="${st}">STATUS</option>
               </select>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium leading-6 text-gray-900">경유 횟수</label>
+              <input type="number" th:field="*{stopovers}" id="stopovers" min="0" readonly 
+                     class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 bg-gray-50 sm:text-sm sm:leading-6" />
             </div>
           </div>
         </div>
@@ -86,64 +73,53 @@
           <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <!-- 출발지 -->
             <div>
-              <label class="block text-sm font-medium leading-6 text-gray-900">출발 공항</label>
-              <select th:field="*{departAirport.airportCode}" required 
-                      class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
-                <option value="" disabled>-- 출발 공항 선택 --</option>
-                <option th:each="city : ${allCities}" th:value="${city.airportCode}" th:text="${city.cityKor} + ' (' + ${city.airportCode} + ')'"></option>
-              </select>
+              <label class="block text-sm font-medium leading-6 text-gray-900">출발지</label>
+              <input type="text" th:field="*{departAirport}" list="airportList" onchange="stripAfterPipe(this);syncFirstLastReadonly(false)" required 
+                     class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" 
+                     placeholder="출발지 입력" />
             </div>
             
             <!-- 도착지 -->
             <div>
-              <label class="block text-sm font-medium leading-6 text-gray-900">도착 공항</label>
-              <select th:field="*{arriveAirport.airportCode}" required 
-                      class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
-                <option value="" disabled>-- 도착 공항 선택 --</option>
-                <option th:each="city : ${allCities}" th:value="${city.airportCode}" th:text="${city.cityKor} + ' (' + ${city.airportCode} + ')'"></option>
-              </select>
+              <label class="block text-sm font-medium leading-6 text-gray-900">도착지</label>
+              <input type="text" th:field="*{arriveAirport}" list="airportList" onchange="stripAfterPipe(this);syncFirstLastReadonly(false)" required 
+                     class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" 
+                     placeholder="도착지 입력" />
             </div>
             
             <!-- 출발 터미널 -->
             <div>
-              <label class="block text-sm font-medium leading-6 text-gray-900">출발 터미널</label>
-              <input type="text" th:field="*{departTerminal}" 
+              <label class="block text-sm font-medium leading-6 text-gray-900">출발지 터미널</label>
+              <input type="text" th:field="*{departTerminal}" onchange="syncFirstLastReadonly(false)" required 
                      class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
             </div>
             
             <!-- 도착 터미널 -->
             <div>
-              <label class="block text-sm font-medium leading-6 text-gray-900">도착 터미널</label>
-              <input type="text" th:field="*{arriveTerminal}" 
+              <label class="block text-sm font-medium leading-6 text-gray-900">도착지 터미널</label>
+              <input type="text" th:field="*{arriveTerminal}" onchange="syncFirstLastReadonly(false)" required 
                      class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
             </div>
             
             <!-- 출발 일시 -->
             <div>
               <label class="block text-sm font-medium leading-6 text-gray-900">출발 일시</label>
-              <input type="datetime-local" th:field="*{departDateTime}" required 
+              <input type="datetime-local" th:field="*{departDateTime}" onchange="syncFirstLastReadonly(false)" required 
                      class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
             </div>
             
             <!-- 도착 일시 -->
             <div>
               <label class="block text-sm font-medium leading-6 text-gray-900">도착 일시</label>
-              <input type="datetime-local" th:field="*{arriveDateTime}" required 
+              <input type="datetime-local" th:field="*{arriveDateTime}" onchange="syncFirstLastReadonly(false)" required 
                      class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
             </div>
             
             <!-- 비행 시간 (분) -->
             <div>
-              <label class="block text-sm font-medium leading-6 text-gray-900">비행 시간 (분)</label>
-              <input type="number" th:field="*{flightDuration}" min="0" required 
-                     class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
-            </div>
-            
-            <!-- 경유 횟수 -->
-            <div>
-              <label class="block text-sm font-medium leading-6 text-gray-900">경유 횟수</label>
-              <input type="number" th:field="*{stopovers}" min="0" 
-                     class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+              <label class="block text-sm font-medium leading-6 text-gray-900">총 비행시간</label>
+              <input type="number" th:field="*{flightDuration}" readonly 
+                     class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 bg-gray-50 sm:text-sm sm:leading-6" />
             </div>
           </div>
         </div>
@@ -154,18 +130,18 @@
         <div class="px-4 py-5 sm:p-6">
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-base font-semibold leading-6 text-gray-900">경유지 정보</h3>
-            <button type="button" onclick="addStopover()" 
+            <button type="button" onclick="addSegment()" 
                     class="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500">
               <i class="fas fa-plus -ml-0.5 mr-1.5 h-4 w-4"></i>
-              경유지 추가
+              세그먼트 추가
             </button>
           </div>
           
-          <div id="stopoverContainer" class="space-y-4">
-            <div th:each="segment, iterStat : *{flightSegments}" class="border rounded-lg p-4">
+          <div id="segmentContainer" class="space-y-4">
+            <div th:each="seg, iterStat : *{flightSegments}" class="segment-entry border rounded-lg p-4">
               <div class="flex items-center justify-between mb-3">
                 <h4 class="text-sm font-medium text-gray-900">구간 <span th:text="${iterStat.index + 1}">1</span></h4>
-                <button type="button" onclick="removeStopover(this)" 
+                <button type="button" th:if="${iterStat.index > 0}" onclick="removeSegment(this)" 
                         class="inline-flex items-center rounded-md bg-red-600 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-red-500">
                   <i class="fas fa-trash h-3 w-3"></i>
                 </button>
@@ -175,63 +151,67 @@
                 <!-- 출발 공항 -->
                 <div>
                   <label class="block text-xs font-medium text-gray-700">출발 공항</label>
-                  <select th:field="*{flightSegments[__${iterStat.index}__].departAirport.airportCode}" 
-                          class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
-                    <option value="">-- 선택 --</option>
-                    <option th:each="city : ${allCities}" th:value="${city.airportCode}" th:text="${city.airportCode}"></option>
-                  </select>
+                  <input type="text" th:field="*{flightSegments[__${iterStat.index}__].departAirport}" list="airportList"
+                         onchange="stripAfterPipe(this);onAirportChange(this)" required th:readonly="${iterStat.index == 0}"
+                         class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" 
+                         placeholder="출발 공항 입력" />
                 </div>
                 
                 <!-- 도착 공항 -->
                 <div>
                   <label class="block text-xs font-medium text-gray-700">도착 공항</label>
-                  <select th:field="*{flightSegments[__${iterStat.index}__].arriveAirport.airportCode}" 
-                          class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
-                    <option value="">-- 선택 --</option>
-                    <option th:each="city : ${allCities}" th:value="${city.airportCode}" th:text="${city.airportCode}"></option>
-                  </select>
-                </div>
-                
-                <!-- 출발 일시 -->
-                <div>
-                  <label class="block text-xs font-medium text-gray-700">출발 일시</label>
-                  <input type="datetime-local" th:field="*{flightSegments[__${iterStat.index}__].departDateTime}" 
-                         class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
-                </div>
-                
-                <!-- 도착 일시 -->
-                <div>
-                  <label class="block text-xs font-medium text-gray-700">도착 일시</label>
-                  <input type="datetime-local" th:field="*{flightSegments[__${iterStat.index}__].arriveDateTime}" 
-                         class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                  <input type="text" th:field="*{flightSegments[__${iterStat.index}__].arriveAirport}" list="airportList"
+                         onchange="stripAfterPipe(this);onAirportChange(this)" required th:readonly="${iterStat.index == (air.flightSegments.size() - 1)}"
+                         class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" 
+                         placeholder="도착 공항 입력" />
                 </div>
                 
                 <!-- 출발 터미널 -->
                 <div>
                   <label class="block text-xs font-medium text-gray-700">출발 터미널</label>
-                  <input type="text" th:field="*{flightSegments[__${iterStat.index}__].departTerminal}" 
+                  <input type="text" th:field="*{flightSegments[__${iterStat.index}__].departTerminal}" required
+                         th:readonly="${iterStat.index == 0}"
                          class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
                 </div>
                 
                 <!-- 도착 터미널 -->
                 <div>
                   <label class="block text-xs font-medium text-gray-700">도착 터미널</label>
-                  <input type="text" th:field="*{flightSegments[__${iterStat.index}__].arriveTerminal}" 
+                  <input type="text" th:field="*{flightSegments[__${iterStat.index}__].arriveTerminal}" required
+                         th:readonly="${iterStat.index == (air.flightSegments.size() - 1)}"
                          class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                </div>
+                
+                <!-- 출발 일시 -->
+                <div>
+                  <label class="block text-xs font-medium text-gray-700">출발 일시</label>
+                  <input type="datetime-local" th:field="*{flightSegments[__${iterStat.index}__].departDateTime}" required
+                         th:readonly="${iterStat.index == 0}"
+                         class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                </div>
+                
+                <!-- 도착 일시 -->
+                <div>
+                  <label class="block text-xs font-medium text-gray-700">도착 일시</label>
+                  <input type="datetime-local" th:field="*{flightSegments[__${iterStat.index}__].arriveDateTime}" required
+                         th:readonly="${iterStat.index == (air.flightSegments.size() - 1)}"
+                         class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
                 </div>
                 
                 <!-- 비행 시간 -->
                 <div>
-                  <label class="block text-xs font-medium text-gray-700">비행 시간 (분)</label>
-                  <input type="number" th:field="*{flightSegments[__${iterStat.index}__].flightDuration}" min="0" 
-                         class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                  <label class="block text-xs font-medium text-gray-700">비행 시간(분)</label>
+                  <input type="number" th:field="*{flightSegments[__${iterStat.index}__].flightDuration}" min="0"
+                         placeholder='등록완료시 계산' readonly
+                         class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 bg-gray-50 sm:text-sm sm:leading-6" />
                 </div>
                 
                 <!-- 대기 시간 -->
                 <div>
-                  <label class="block text-xs font-medium text-gray-700">대기 시간 (분)</label>
-                  <input type="number" th:field="*{flightSegments[__${iterStat.index}__].waitDuration}" min="0" 
-                         class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                  <label class="block text-xs font-medium text-gray-700">대기 시간(분)</label>
+                  <input type="number" th:field="*{flightSegments[__${iterStat.index}__].waitDuration}"
+                         placeholder='등록완료시 계산' readonly
+                         class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 bg-gray-50 sm:text-sm sm:leading-6" />
                 </div>
               </div>
             </div>
@@ -244,38 +224,36 @@
         <div class="px-4 py-5 sm:p-6">
           <h3 class="text-base font-semibold leading-6 text-gray-900 mb-4">좌석 등급 정보</h3>
           
-          <div class="space-y-6">
-            <div th:each="seat, iterStat : ${air.seatClasses}" class="border border-gray-200 rounded-lg p-4">
-              <div class="flex items-center justify-between mb-4">
-                <h4 class="text-sm font-medium text-gray-900" th:text="${seat.classType}">ECONOMY</h4>
-                <button th:if="${seat.id != null}" type="button" th:onclick="window.open('/air/seat/[[${seat.id}]]', 'popup', 'width=400,height=600')" 
-                        class="inline-flex items-center rounded-md bg-gray-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500">
-                  <i class="fas fa-eye -ml-0.5 mr-1.5 h-4 w-4"></i>
-                  예약 조회
-                </button>
-              </div>
-              
-              <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div class="space-y-4">
+            <div th:each="seat, iterStat : ${air.seatClasses}" class="border rounded-lg p-4">
+              <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div>
-                  <label class="block text-sm font-medium leading-6 text-gray-900">등급</label>
+                  <label class="block text-sm font-medium text-gray-700">등급</label>
                   <input type="text" th:field="*{seatClasses[__${iterStat.index}__].classType}" readonly 
                          class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 bg-gray-50 sm:text-sm sm:leading-6" />
                 </div>
-                
                 <div>
-                  <label class="block text-sm font-medium leading-6 text-gray-900">가격</label>
-                  <input type="number" th:field="*{seatClasses[__${iterStat.index}__].price}" min="0" required 
+                  <label class="block text-sm font-medium text-gray-700">가격[성인]</label>
+                  <input type="number" th:field="*{seatClasses[__${iterStat.index}__].priceAdult}" min="0" required 
                          class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
                 </div>
-                
                 <div>
-                  <label class="block text-sm font-medium leading-6 text-gray-900">최대 좌석 수</label>
+                  <label class="block text-sm font-medium text-gray-700">가격[청소년]</label>
+                  <input type="number" th:field="*{seatClasses[__${iterStat.index}__].priceYouth}" min="0" required 
+                         class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">가격[영유아]</label>
+                  <input type="number" th:field="*{seatClasses[__${iterStat.index}__].priceInfant}" min="0" required 
+                         class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">최대 좌석 수</label>
                   <input type="number" th:field="*{seatClasses[__${iterStat.index}__].maxSeats}" min="0" required 
                          class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
                 </div>
-                
                 <div>
-                  <label class="block text-sm font-medium leading-6 text-gray-900">잔여 좌석 수</label>
+                  <label class="block text-sm font-medium text-gray-700">잔여 좌석 수</label>
                   <input type="number" th:field="*{seatClasses[__${iterStat.index}__].availableSeats}" min="0" required 
                          class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
                 </div>
@@ -285,151 +263,257 @@
         </div>
       </div>
 
-      <!-- 버튼 -->
-      <div class="flex justify-end space-x-3">
-        <a th:href="@{/air}" 
-           class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-          <i class="fas fa-arrow-left -ml-0.5 mr-1.5 h-4 w-4"></i>
-          목록으로
-        </a>
-        <button type="submit" 
-                class="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
-                th:text="${air.id == null} ? '등록' : '수정'">등록</button>
+      <!-- 저장 버튼 -->
+      <div class="mt-6 flex items-center justify-end gap-x-6">
+        <button type="button" onclick="location.href='/air'" class="text-sm font-semibold leading-6 text-gray-900">취소</button>
+        <button type="submit" th:text="${air.id == null} ? '등록' : '수정'" 
+                class="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"></button>
       </div>
     </form>
 
+    <div th:replace="components/datalist/airportList :: airportDatalistFragment"></div>
+
     <script src="/js/util.js"></script>
     <script>
+
         function deleteAir(id) {
             if (confirm('정말로 삭제하시겠습니까?')) {
                 fetch('/air/' + id, { method: 'DELETE' })
-                    .then(res => {
-                        if (res.ok) {
-                            alert('삭제 성공');
-                            window.location.href = '/air';
-                        } else {
-                            alert('삭제 실패');
-                        }
-                    });
+                    .then(res => res.ok ? location.href = '/air' : alert('삭제 실패'));
             }
         }
 
-        // 페이지 로딩 시 stopovers 값으로 초기화
-        let stopoverCount = parseInt(document.getElementById("stopovers").value) || 0;
+        function addSegment() {
+            const container = document.getElementById('segmentContainer');
+            const segmentIdx = document.querySelectorAll('.segment-entry').length;
 
-        function addStopover() {
-            const container = document.getElementById("stopoverContainer");
-            const stopoverDiv = document.createElement("div");
-            stopoverDiv.className = "border rounded-lg p-4";
+            const wrapper = document.createElement('div');
+            wrapper.className = 'segment-entry border rounded-lg p-4';
+            wrapper.style.marginBottom = '1rem';
 
-            stopoverDiv.innerHTML = `
-                <div class="flex items-center justify-between mb-3">
-                    <h4 class="text-sm font-medium text-gray-900">구간 ${stopoverCount + 1}</h4>
-                    <button type="button" onclick="removeStopover(this)" 
-                            class="inline-flex items-center rounded-md bg-red-600 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-red-500">
-                        <i class="fas fa-trash h-3 w-3"></i>
-                    </button>
-                </div>
-                
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <!-- 출발 공항 -->
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700">출발 공항</label>
-                        <select name="flightSegments[${stopoverCount}].departAirport.airportCode" 
-                                class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
-                            <option value="">-- 선택 --</option>
-                        </select>
-                    </div>
-                    
-                    <!-- 도착 공항 -->
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700">도착 공항</label>
-                        <select name="flightSegments[${stopoverCount}].arriveAirport.airportCode" 
-                                class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
-                            <option value="">-- 선택 --</option>
-                        </select>
-                    </div>
-                    
-                    <!-- 출발 일시 -->
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700">출발 일시</label>
-                        <input type="datetime-local" name="flightSegments[${stopoverCount}].departDateTime" 
-                               class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
-                    </div>
-                    
-                    <!-- 도착 일시 -->
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700">도착 일시</label>
-                        <input type="datetime-local" name="flightSegments[${stopoverCount}].arriveDateTime" 
-                               class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
-                    </div>
-                    
-                    <!-- 출발 터미널 -->
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700">출발 터미널</label>
-                        <input type="text" name="flightSegments[${stopoverCount}].departTerminal" 
-                               class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
-                    </div>
-                    
-                    <!-- 도착 터미널 -->
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700">도착 터미널</label>
-                        <input type="text" name="flightSegments[${stopoverCount}].arriveTerminal" 
-                               class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
-                    </div>
-                    
-                    <!-- 비행 시간 -->
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700">비행 시간 (분)</label>
-                        <input type="number" name="flightSegments[${stopoverCount}].flightDuration" min="0" 
-                               class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
-                    </div>
-                    
-                    <!-- 대기 시간 -->
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700">대기 시간 (분)</label>
-                        <input type="number" name="flightSegments[${stopoverCount}].waitDuration" min="0" 
-                               class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
-                    </div>
-                </div>
-            `;
+            // 헤더
+            const header = document.createElement('div');
+            header.className = 'flex items-center justify-between mb-3';
+            
+            const title = document.createElement('h4');
+            title.className = 'text-sm font-medium text-gray-900';
+            title.textContent = `구간 ${segmentIdx + 1}`;
+            header.appendChild(title);
 
-            container.appendChild(stopoverDiv);
-            stopoverCount++;
-            updateStopoverCount();
+            if (segmentIdx > 0) {
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'inline-flex items-center rounded-md bg-red-600 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-red-500';
+                removeBtn.innerHTML = '<i class="fas fa-trash h-3 w-3"></i>';
+                removeBtn.addEventListener('click', () => {
+                    wrapper.remove();
+                    reindexSegments();
+                    syncFirstLastReadonly();
+                    updateStopovers();
+                });
+                header.appendChild(removeBtn);
+            }
+            wrapper.appendChild(header);
+
+            // 폼 필드들
+            const fieldsContainer = document.createElement('div');
+            fieldsContainer.className = 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4';
+
+            // 출발 공항
+            const departAirDiv = createFieldDiv('출발 공항', 'text');
+            const departInput = createInput('text', `flightSegments[${segmentIdx}].departAirport`, true);
+            departInput.setAttribute('list', 'airportList');
+            departInput.placeholder = '출발 공항 입력';
+            departInput.onchange = function() {stripAfterPipe(this);onAirportChange(this);};
+            departAirDiv.appendChild(departInput);
+            fieldsContainer.appendChild(departAirDiv);
+
+            // 도착 공항
+            const arriveAirDiv = createFieldDiv('도착 공항', 'text');
+            const arriveInput = createInput('text', `flightSegments[${segmentIdx}].arriveAirport`, true);
+            arriveInput.setAttribute('list', 'airportList');
+            arriveInput.placeholder = '도착 공항 입력';
+            arriveInput.onchange = function() {stripAfterPipe(this);onAirportChange(this);};
+            arriveAirDiv.appendChild(arriveInput);
+            fieldsContainer.appendChild(arriveAirDiv);
+
+            // 출발 터미널
+            const departTermDiv = createFieldDiv('출발 터미널', 'text');
+            const departTermInput = createInput('text', `flightSegments[${segmentIdx}].departTerminal`, true);
+            departTermDiv.appendChild(departTermInput);
+            fieldsContainer.appendChild(departTermDiv);
+
+            // 도착 터미널
+            const arriveTermDiv = createFieldDiv('도착 터미널', 'text');
+            const arriveTermInput = createInput('text', `flightSegments[${segmentIdx}].arriveTerminal`, true);
+            arriveTermDiv.appendChild(arriveTermInput);
+            fieldsContainer.appendChild(arriveTermDiv);
+
+            // 출발 일시
+            const departTimeDiv = createFieldDiv('출발 일시', 'datetime-local');
+            const departTimeInput = createInput('datetime-local', `flightSegments[${segmentIdx}].departDateTime`, true);
+            departTimeDiv.appendChild(departTimeInput);
+            fieldsContainer.appendChild(departTimeDiv);
+
+            // 도착 일시
+            const arriveTimeDiv = createFieldDiv('도착 일시', 'datetime-local');
+            const arriveTimeInput = createInput('datetime-local', `flightSegments[${segmentIdx}].arriveDateTime`, true);
+            arriveTimeDiv.appendChild(arriveTimeInput);
+            fieldsContainer.appendChild(arriveTimeDiv);
+
+            // 비행 시간
+            const flightDurationDiv = createFieldDiv('비행 시간(분)', 'number');
+            const flightDurationInput = createInput('number', `flightSegments[${segmentIdx}].flightDuration`, false);
+            flightDurationInput.min = 0;
+            flightDurationInput.readOnly = true;
+            flightDurationInput.placeholder = '등록완료시 계산';
+            flightDurationDiv.appendChild(flightDurationInput);
+            fieldsContainer.appendChild(flightDurationDiv);
+
+            // 대기 시간
+            const waitDurationDiv = createFieldDiv('대기 시간(분)', 'number');
+            const waitDurationInput = createInput('number', `flightSegments[${segmentIdx}].waitDuration`, false);
+            waitDurationInput.placeholder = '등록완료시 계산';
+            waitDurationInput.readOnly = true;
+            waitDurationDiv.appendChild(waitDurationInput);
+            fieldsContainer.appendChild(waitDurationDiv);
+
+            wrapper.appendChild(fieldsContainer);
+            container.appendChild(wrapper);
+
+            syncFirstLastReadonly();
+            updateStopovers();
         }
 
-        function removeStopover(button) {
-            button.parentElement.remove();
-            stopoverCount = Math.max(0, stopoverCount - 1);
-            updateStopoverCount();
+        function createFieldDiv(labelText, inputType) {
+            const div = document.createElement('div');
+            const label = document.createElement('label');
+            label.className = 'block text-xs font-medium text-gray-700';
+            label.textContent = labelText;
+            div.appendChild(label);
+            return div;
         }
 
-        function updateStopoverCount() {
-            document.getElementById("stopovers").value = stopoverCount;
+        function createInput(type, name, required) {
+            const input = document.createElement('input');
+            input.type = type;
+            input.name = name;
+            input.required = required;
+            input.className = 'mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6';
+            return input;
         }
 
-        function searchAir(button) {
-            const locPoint = button.closest('.location-point');
-            const from = locPoint.querySelector('input[list="cityList"]').value;
-            const to = locPoint.querySelectorAll('input[list="cityList"]')[1].value;
-            const count = document.querySelector('input[name="count"]').value;
-            window.open(
-                `/air/search?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&count=${encodeURIComponent(count)}`,
-                'airSearchPopup',
-                'width=800,height=600,scrollbars=yes'
-            );
-            window.__lastSeatInput__ = locPoint.querySelector('input[data-role="seatClass"]');
+        // 세그먼트 삭제
+        function removeSegment(button) {
+            const wrapper = button.closest('.segment-entry');
+            wrapper.remove();
+            reindexSegments();
+            syncFirstLastReadonly();
+            updateStopovers();
         }
 
-        function __fillSelectedAirId__(selectedId) {
-            if (window.__lastSeatInput__) {
-                window.__lastSeatInput__.value = selectedId;
+        // 재인덱싱
+        function reindexSegments() {
+            const container = document.getElementById('segmentContainer');
+            container.querySelectorAll('.segment-entry').forEach((entry, i) => {
+                entry.querySelectorAll('input[name]').forEach(input => {
+                    input.name = input.name.replace(/\[\d+\]/g, `[${i}]`);
+                });
+            });
+        }
+
+        // 첫/마지막 segment의 출발·도착 정보를 기본 출발·도착으로 동기화 & readonly
+        function syncFirstLastReadonly(reset = true) {
+            const entries = document.querySelectorAll('#segmentContainer .segment-entry');
+
+            // 마지막 전 segment의 도착 정보 초기화
+            if (reset && entries.length > 1) {
+                const lastBefore = entries[entries.length - 2];
+                if (lastBefore) {
+                    const arriveAirPrev = lastBefore.querySelector('input[name$=".arriveAirport"]');
+                    const arriveTimePrev = lastBefore.querySelector('input[name$=".arriveDateTime"]');
+                    const arriveTermPrev = lastBefore.querySelector('input[name$=".arriveTerminal"]');
+                    if (arriveAirPrev) arriveAirPrev.value = '';
+                    if (arriveTimePrev) arriveTimePrev.value = '';
+                    if (arriveTermPrev) arriveTermPrev.value = '';
+                }
+            }
+
+            entries.forEach((entry, idx) => {
+                const departAir = entry.querySelector('input[name$=".departAirport"]');
+                const departTime = entry.querySelector('input[name$=".departDateTime"]');
+                const departTerm = entry.querySelector('input[name$=".departTerminal"]');
+
+                const arriveAir = entry.querySelector('input[name$=".arriveAirport"]');
+                const arriveTime = entry.querySelector('input[name$=".arriveDateTime"]');
+                const arriveTerm = entry.querySelector('input[name$=".arriveTerminal"]');
+
+                if (idx === 0) {
+                    departAir.readOnly = true;
+                    departTime.readOnly = true;
+                    departTerm.readOnly = true;
+
+                    departAir.value = document.querySelector('[name="departAirport"]').value;
+                    departTime.value = document.querySelector('[name="departDateTime"]').value;
+                    departTerm.value = document.querySelector('[name="departTerminal"]').value;
+                } else {
+                    departAir.readOnly = false;
+                    departTime.readOnly = false;
+                    departTerm.readOnly = false;
+                }
+
+                if (idx === entries.length - 1) {
+                    arriveAir.readOnly = true;
+                    arriveTime.readOnly = true;
+                    arriveTerm.readOnly = true;
+                    arriveAir.value = document.querySelector('[name="arriveAirport"]').value;
+                    arriveTime.value = document.querySelector('[name="arriveDateTime"]').value;
+                    arriveTerm.value = document.querySelector('[name="arriveTerminal"]').value;
+                } else {
+                    arriveAir.readOnly = false;
+                    arriveTime.readOnly = false;
+                    arriveTerm.readOnly = false;
+                }
+            });
+        }
+
+        function onAirportChange(input) {
+            const container = document.getElementById('segmentContainer');
+            const entries = Array.from(container.querySelectorAll('.segment-entry'));
+            const currentSegment = input.closest('.segment-entry');
+            const idx = entries.indexOf(currentSegment);
+
+            if (input.name.endsWith('.departAirport')) {
+                // 출발공항 input 변경 → 이전 segment 도착공항 수정
+                if (idx > 0) {
+                    const prevSegment = entries[idx - 1];
+                    const prevArriveInput = prevSegment.querySelector('input[name$=".arriveAirport"]');
+                    prevArriveInput.value = input.value;
+                }
+            } else if (input.name.endsWith('.arriveAirport')) {
+                // 도착공항 input 변경 → 다음 segment 출발공항 수정
+                if (idx < entries.length - 1) {
+                    const nextSegment = entries[idx + 1];
+                    const nextDepartInput = nextSegment.querySelector('input[name$=".departAirport"]');
+                    nextDepartInput.value = input.value;
+                }
             }
         }
+
+        // stopovers 반영
+        function updateStopovers() {
+            const stopoversInput = document.getElementById('stopovers');
+            const count = document.querySelectorAll('#segmentContainer .segment-entry').length;
+            stopoversInput.value = count > 0 ? count - 1 : 0;
+        }
+
+        // 페이지 로딩 시 segment 없으면 기본 추가
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('segmentContainer');
+            const airIdInput = document.getElementById('id');
+            if (container && (!airIdInput || !airIdInput.value)) {
+                addSegment();
+            }
+        });
     </script>
-
-    <datalist id="cityList">
-        <option th:each="cc : ${cityCode}" th:value="${cc.code} + ' | ' + ${cc.country} + ' | ' + ${cc.eng} + ' | ' + ${cc.kor}"></option>
-    </datalist>
 </div>

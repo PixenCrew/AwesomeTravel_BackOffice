@@ -5,8 +5,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import renewal.awesome_travel_backoffice.citycode.repository.CityCodeRepository;
+
 import renewal.common.entity.CityCode;
+import renewal.common.repository.CityCodeRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -67,8 +68,8 @@ public class CityCodeService {
     @Transactional
     public CityCode createCityCode(CityCode cityCode) {
         // 코드 중복 체크
-        if (cityCodeRepository.existsById(cityCode.getCode())) {
-            throw new RuntimeException("이미 존재하는 도시 코드입니다: " + cityCode.getCode());
+        if (cityCodeRepository.existsById(cityCode.getCityCode())) {
+            throw new RuntimeException("이미 존재하는 도시 코드입니다: " + cityCode.getCityCode());
         }
         return cityCodeRepository.save(cityCode);
     }

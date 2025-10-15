@@ -15,8 +15,10 @@ import org.springframework.web.multipart.MultipartFile;
 import renewal.awesome_travel_backoffice.citycode.service.CityCodeService;
 import renewal.awesome_travel_backoffice.common.service.ExcelService;
 import renewal.awesome_travel_backoffice.countrycode.service.CountryCodeService;
+import renewal.common.entity.AirportCode;
 import renewal.common.entity.CityCode;
 import renewal.common.entity.CountryCode;
+import renewal.common.repository.CityCodeRepository;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,6 +30,7 @@ import java.util.Optional;
 public class CityCodeController {
 
     private final CityCodeService cityCodeService;
+    private final CityCodeRepository cityCodeRepo;
     private final CountryCodeService countryCodeService;
     private final ExcelService excelService;
 
@@ -147,38 +150,34 @@ public class CityCodeController {
     // 도시 코드 저장 (생성/수정)
     @PostMapping
     public String saveCityCode(
-            @RequestParam(required = false) String originalCode,
-            @RequestParam String code,
-            @RequestParam String country,
-            @RequestParam String kor,
-            @RequestParam String eng,
+            @ModelAttribute CityCode cityCode,
             Model model) {
-
         try {
-            CityCode cityCode = new CityCode(country, code, kor, eng);
+            cityCodeRepo.save(cityCode);
+            // CityCode cityCode = new CityCode(country, code, kor, eng);
 
-            if (originalCode != null && !originalCode.isEmpty()) {
-                // 수정: 코드가 변경되었는지 확인
-                if (!originalCode.equals(code)) {
-                    // 코드가 변경된 경우, 기존 코드 삭제 후 새 코드로 생성
-                    cityCodeService.deleteCityCode(originalCode);
-                    cityCodeService.createCityCode(cityCode);
-                } else {
-                    // 코드가 변경되지 않은 경우, 업데이트
-                    cityCodeService.updateCityCode(originalCode, cityCode);
-                }
-            } else {
-                // 생성
-                cityCodeService.createCityCode(cityCode);
-            }
+            // if (originalCode != null && !originalCode.isEmpty()) {
+            //     // 수정: 코드가 변경되었는지 확인
+            //     if (!originalCode.equals(code)) {
+            //         // 코드가 변경된 경우, 기존 코드 삭제 후 새 코드로 생성
+            //         cityCodeService.deleteCityCode(originalCode);
+            //         cityCodeService.createCityCode(cityCode);
+            //     } else {
+            //         // 코드가 변경되지 않은 경우, 업데이트
+            //         cityCodeService.updateCityCode(originalCode, cityCode);
+            //     }
+            // } else {
+            //     // 생성
+            //     cityCodeService.createCityCode(cityCode);
+            // }
 
             return "redirect:/city-code?message=success";
         } catch (Exception e) {
             List<CountryCode> countryList = countryCodeService.getAllCountryCodesList();
             model.addAttribute("error", "도시 코드 저장 중 오류가 발생했습니다: " + e.getMessage());
-            model.addAttribute("cityCode", new CityCode(country, code, kor, eng));
+            model.addAttribute("cityCode", cityCode);
             model.addAttribute("countryList", countryList);
-            model.addAttribute("title", originalCode != null ? "도시 코드 수정" : "새 도시 코드 등록");
+            model.addAttribute("title", cityCode.getCityCode() != null ? "도시 코드 수정" : "새 도시 코드 등록");
             model.addAttribute("content", "components/citycode/citycodeForm");
             return "layout";
         }

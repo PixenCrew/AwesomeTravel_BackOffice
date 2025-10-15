@@ -14,6 +14,7 @@ import renewal.common.entity.Air;
 import renewal.common.entity.Air.AirStatus;
 import renewal.common.entity.Air.FlightType;
 import renewal.common.entity.Airline;
+import renewal.common.entity.AirportCode;
 import renewal.common.entity.CityCode;
 import renewal.common.entity.SeatClass;
 
@@ -87,7 +88,7 @@ public class AirSpecification {
     }
 
     // departAirport == value
-    public static Specification<SeatClass> departEquals(CityCode depart) {
+    public static Specification<SeatClass> departEquals(AirportCode depart) {
         return (root, query, builder) -> {
             Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT);
             if (depart==null)
@@ -97,7 +98,7 @@ public class AirSpecification {
     }
 
     // arriveAirport == value
-    public static Specification<SeatClass> arriveEquals(CityCode arrive) {
+    public static Specification<SeatClass> arriveEquals(AirportCode arrive) {
         return (root, query, builder) -> {
             Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT);
             if (arrive==null)
@@ -158,11 +159,11 @@ public class AirSpecification {
             if (min == null && max == null)
                 return null;
             if (min != null && max != null) {
-                return builder.between(root.get("price"), min, max);
+                return builder.between(root.get("priceAdult"), min, max);
             } else if (min != null) {
-                return builder.greaterThanOrEqualTo(root.get("price"), min);
+                return builder.greaterThanOrEqualTo(root.get("priceAdult"), min);
             } else {
-                return builder.lessThanOrEqualTo(root.get("price"), max);
+                return builder.lessThanOrEqualTo(root.get("priceAdult"), max);
             }
         };
     }

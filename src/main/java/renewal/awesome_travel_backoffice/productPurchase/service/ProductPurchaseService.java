@@ -23,9 +23,9 @@ import renewal.common.entity.PurchaseProduct;
 import renewal.common.entity.PassengerProduct;
 import renewal.common.entity.Product;
 import renewal.common.entity.PurchaseBase.PurchaseStatus;
+import renewal.common.repository.CountryCodeRepository;
 import renewal.common.entity.SpecialRequest;
 import renewal.common.entity.CountryCode;
-import renewal.awesome_travel_backoffice.countrycode.repository.CountryCodeRepository;
 import renewal.awesome_travel_backoffice.productPurchase.controller.ProductPurchaseAdminController.CountryCodeDto;
 
 import java.time.LocalDate;

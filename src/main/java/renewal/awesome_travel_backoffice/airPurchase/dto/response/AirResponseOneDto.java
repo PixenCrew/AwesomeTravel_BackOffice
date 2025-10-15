@@ -2,6 +2,7 @@ package renewal.awesome_travel_backoffice.airPurchase.dto.response;
 
 import java.time.LocalDateTime;
 
+import renewal.common.entity.AirportCode;
 import renewal.common.entity.Air.FlightType;
 import renewal.common.entity.SeatClass.SeatClassType;
 
@@ -19,8 +20,8 @@ public class AirResponseOneDto {
     private String airlineNameKor;
     private String airlineNameEng;
 
-    private String depart;
-    private String arrive;
+    private AirportCode depart;
+    private AirportCode arrive;
     private LocalDateTime departTime;
     private LocalDateTime arriveTime;
     private int stopovers;

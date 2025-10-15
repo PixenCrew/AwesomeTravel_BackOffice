@@ -22,8 +22,8 @@ import renewal.awesome_travel_backoffice.airPurchase.repository.PurchaseAirRepos
 import renewal.common.entity.PurchaseAir;
 import renewal.common.entity.PassengerAir;
 import renewal.common.entity.PurchaseBase.PurchaseStatus;
+import renewal.common.repository.CountryCodeRepository;
 import renewal.common.entity.PassengerBase.Sex;
-import renewal.awesome_travel_backoffice.countrycode.repository.CountryCodeRepository;
 import renewal.awesome_travel_backoffice.airPurchase.controller.PurchaseAirAdminController.CountryCodeDto;
 import lombok.RequiredArgsConstructor;
 
@@ -142,8 +142,8 @@ public class PurchaseAirService {
                 .airlineCode(air.getAirline().getCode())
                 .airlineNameKor(air.getAirline().getNameKor())
                 .airlineNameEng(air.getAirline().getNameEng())
-                .depart(air.getDepartAirport() != null ? air.getDepartAirport().getCityKor() : "")
-                .arrive(air.getArriveAirport() != null ? air.getArriveAirport().getCityKor() : "")
+                .depart(air.getDepartAirport() != null ? air.getDepartAirport() : null)
+                .arrive(air.getArriveAirport() != null ? air.getArriveAirport() : null)
                 .departTime(air.getDepartDateTime())
                 .arriveTime(air.getArriveDateTime())
                 .stopovers(air.getStopovers())

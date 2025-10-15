@@ -27,7 +27,7 @@ function get(page, event, sortField = null, sortDir = null) {
     // }
 }
 
-function reset(event) {
+function resetFilter(event) {
     console.log("sadasd")
     event.preventDefault();
 

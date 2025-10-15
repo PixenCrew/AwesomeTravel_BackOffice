@@ -5,8 +5,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import renewal.awesome_travel_backoffice.countrycode.repository.CountryCodeRepository;
+
 import renewal.common.entity.CountryCode;
+import renewal.common.repository.CountryCodeRepository;
 
 import java.util.List;
 import java.util.Optional;

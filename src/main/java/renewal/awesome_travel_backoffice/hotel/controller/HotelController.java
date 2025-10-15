@@ -22,7 +22,7 @@ import renewal.awesome_travel_backoffice.hotel.service.HotelService;
 import renewal.common.entity.Hotel;
 // import renewal.common.entity.HotelReservation;
 import renewal.common.entity.Hotel.HotelType;
-import renewal.awesome_travel_backoffice.citycode.repository.CityCodeRepository;
+import renewal.common.repository.CityCodeRepository;
 import renewal.awesome_travel_backoffice.hotel.repository.AmenityRepository;
 
 import lombok.RequiredArgsConstructor;

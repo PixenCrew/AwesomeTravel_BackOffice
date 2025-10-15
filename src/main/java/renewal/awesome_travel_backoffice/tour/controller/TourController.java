@@ -28,10 +28,10 @@ import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
 // import renewal.common.entity.HotelReservation.HotelReservationStatus;
 import renewal.common.entity.Location;
 import renewal.common.entity.Location.LocationType;
+import renewal.common.repository.CityCodeRepository;
+import renewal.common.repository.CountryCodeRepository;
 import renewal.common.entity.Schedule;
 import renewal.common.entity.Tour;
-import renewal.awesome_travel_backoffice.citycode.repository.CityCodeRepository;
-import renewal.awesome_travel_backoffice.countrycode.repository.CountryCodeRepository;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

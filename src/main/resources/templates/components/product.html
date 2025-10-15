@@ -67,7 +67,7 @@
     </form>
 
     <!-- 조건 초기화 버튼 -->
-    <button type="button" onclick="reset(event)">검색 초기화</button>
+    <button type="button" onclick="resetFilter(event)">검색 초기화</button>
 
     <!-- 2) 결과 테이블 -->
     <table border="1">
@@ -131,7 +131,7 @@
     <script src="/js/util.js"></script>
 
     <datalist id="cityList">
-        <option th:each="cc : ${cityCode}" th:value="${cc.airportCode} + ' | ' + ${cc.airportEng} + ' | ' + ${cc.countryCode.countryCode}"></option>
+        <option th:each="cc : ${cityCode}" th:value="${cc.cityCode} + ' | ' + ${cc.cityEng} + ' | ' + ${cc.countryCode.countryCode} + ' | ' + ${cc.countryCode.countryKor}"></option>
     </datalist>
 
     <datalist id="countryList">

@@ -29,11 +29,12 @@ import renewal.common.entity.AirReservation;
 import renewal.common.entity.Airline;
 import renewal.common.entity.SeatClass;
 import renewal.common.entity.SeatClass.SeatClassType;
+import renewal.common.repository.CityCodeRepository;
 import renewal.awesome_travel_backoffice.air.repository.AirRepository;
 import renewal.awesome_travel_backoffice.air.repository.AirReservationRepository;
 import renewal.awesome_travel_backoffice.air.repository.AirlineRepository;
 import renewal.awesome_travel_backoffice.air.service.AirService;
-import renewal.awesome_travel_backoffice.citycode.repository.CityCodeRepository;
+import renewal.awesome_travel_backoffice.airport.repository.AirportCodeRepository;
 
 @Controller
 @RequestMapping("/air")
@@ -44,7 +45,7 @@ public class AirController {
     private final AirRepository airRepo;
     private final AirlineRepository airlineRepo;
     private final AirReservationRepository airReservationRepo;
-    private final CityCodeRepository cityRepo;
+    private final AirportCodeRepository airportRepo;
 
     // 항공 목록
     @GetMapping
@@ -69,8 +70,8 @@ public class AirController {
         Pageable pageable = PageRequest.of(page, 50, sort);
         Page<SeatClass> airPage = airService.searchAirs(filter, pageable);
 
-        // 도시코드
-        model.addAttribute("cityCode", cityRepo.findAll());
+        // 공항 코드
+        model.addAttribute("airportCode", airportRepo.findAll());
 
         // 3) View에서 쓸 속성들
         model.addAttribute("airPage", airPage);
@@ -105,8 +106,8 @@ public class AirController {
         List<Airline> allAirlines = airlineRepo.findAll();
         model.addAttribute("allAirlines", allAirlines);
 
-        // 도시코드 목록 (드롭박스용)
-        model.addAttribute("allCities", cityRepo.findAll());
+        // 공항코드 목록 (드롭박스용)
+        model.addAttribute("airportCode", airportRepo.findAll());
 
         model.addAttribute("air", air);
         model.addAttribute("title", "New Air");
@@ -137,8 +138,8 @@ public class AirController {
         List<Airline> allAirlines = airlineRepo.findAll();
         model.addAttribute("allAirlines", allAirlines);
 
-        // 도시코드 목록 (드롭박스용)
-        model.addAttribute("allCities", cityRepo.findAll());
+        // 공항코드 목록 (드롭박스용)
+        model.addAttribute("airportCode", airportRepo.findAll());
 
         model.addAttribute("air", air);
         model.addAttribute("title", "Air Detail");
@@ -210,7 +211,7 @@ public class AirController {
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("title", "Air Select");
-        model.addAttribute("cityCode", cityRepo.findAll());
+        model.addAttribute("airportCode", airportRepo.findAll());
         
         // 항공선택 플래그
         model.addAttribute("isSelectionPage", true);

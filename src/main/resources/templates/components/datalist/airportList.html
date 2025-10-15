@@ -1,0 +1,7 @@
+<div th:fragment="airportDatalistFragment">
+    <datalist id="airportList">
+        <option th:each="ap : ${airportCode}"
+                th:value="${ap.airportCode} + ' | ' + ${ap.airportKor} + ' | ' + ${ap.airportEng} + ' | ' + ${ap.cityCode.cityCode}">
+        </option>
+    </datalist>
+</div>

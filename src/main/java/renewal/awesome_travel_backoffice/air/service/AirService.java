@@ -57,13 +57,13 @@ public class AirService {
 
         // 1. 전체 소요시간 계산
         air.setFlightDuration(
-            calcDuration(air.getDepartDateTime(), air.getDepartAirport(), air.getArriveDateTime(), air.getArriveAirport())
+            calcDuration(air.getDepartDateTime(), air.getDepartAirport().getCityCode(), air.getArriveDateTime(), air.getArriveAirport().getCityCode())
             );
 
         // 2. 각 segment별 소요시간 계산
         for (FlightSegment segment : air.getFlightSegments()) {
             segment.setFlightDuration(
-                calcDuration(segment.getDepartDateTime(), segment.getDepartAirport(), segment.getArriveDateTime(), segment.getArriveAirport())
+                calcDuration(segment.getDepartDateTime(), segment.getDepartAirport().getCityCode(), segment.getArriveDateTime(), segment.getArriveAirport().getCityCode())
                 );
         }
 
@@ -73,11 +73,11 @@ public class AirService {
         for (int i = 0; i < segments.size()-1; i++) {
             FlightSegment currentSegment = segments.get(i);
             LocalDateTime currentArriveTime = currentSegment.getArriveDateTime();
-            CityCode currentArriveAirport = currentSegment.getArriveAirport();
+            CityCode currentArriveAirport = currentSegment.getArriveAirport().getCityCode();
             
             FlightSegment nextSegment = segments.get(i+1);
             LocalDateTime nextDepartTime = nextSegment.getDepartDateTime();
-            CityCode nextDepartAirport = nextSegment.getDepartAirport();
+            CityCode nextDepartAirport = nextSegment.getDepartAirport().getCityCode();
 
             currentSegment.setWaitDuration(calcDuration(currentArriveTime, currentArriveAirport, nextDepartTime, nextDepartAirport));
         }
