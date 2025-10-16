@@ -13,7 +13,6 @@ import renewal.common.entity.Location;
 import renewal.common.entity.Product;
 import renewal.common.entity.Schedule;
 import renewal.common.entity.Tour;
-import renewal.common.entity.Product;
 
 public class TourSpecification {
 

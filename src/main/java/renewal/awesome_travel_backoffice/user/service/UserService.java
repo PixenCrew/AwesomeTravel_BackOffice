@@ -1,21 +1,16 @@
 package renewal.awesome_travel_backoffice.user.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.user.dto.request.UserRequestDto;
 import renewal.awesome_travel_backoffice.user.dto.response.UserResponseDto;
 import renewal.awesome_travel_backoffice.user.repository.UserRepository;
 import renewal.common.entity.User;
-import renewal.common.entity.User.UserProvider;
-import renewal.common.entity.User.UserRole;
 import renewal.common.entity.User.UserStatus;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

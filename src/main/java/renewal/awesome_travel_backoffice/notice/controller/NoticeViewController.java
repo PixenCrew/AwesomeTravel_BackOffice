@@ -1,7 +1,5 @@
 package renewal.awesome_travel_backoffice.notice.controller;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -16,14 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.notice.dto.request.NoticeRequestDto;
 import renewal.awesome_travel_backoffice.notice.dto.request.NoticeSearchRequest;
 import renewal.awesome_travel_backoffice.notice.dto.response.NoticeResponseDto;
 import renewal.awesome_travel_backoffice.notice.service.NoticeService;
 import renewal.common.entity.Notice.NoticeCategory;
 import renewal.common.entity.Notice.SearchType;
-
-import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequestMapping("/notice")

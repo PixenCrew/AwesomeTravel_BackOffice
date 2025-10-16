@@ -9,13 +9,11 @@ import org.springframework.util.StringUtils;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
-
 import renewal.common.entity.Air;
 import renewal.common.entity.Air.AirStatus;
 import renewal.common.entity.Air.FlightType;
 import renewal.common.entity.Airline;
 import renewal.common.entity.AirportCode;
-import renewal.common.entity.CityCode;
 import renewal.common.entity.SeatClass;
 
 public class AirSpecification {
