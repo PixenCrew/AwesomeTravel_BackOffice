@@ -91,7 +91,7 @@ public class RefundService {
             // 좌석 수 복구
             SeatClass seatClass = airPurchase.getSeatClass();
             seatClass.setAvailableSeats(seatClass.getAvailableSeats() + 
-                airPurchase.getPassengerAirs().size());
+                airPurchase.getPassengers().size());
 
             System.out.printf("[환불 처리 완료 - 항공권] 환불ID=%d, 주문ID=%d, 금액=%d, 처리자=%s\n",
                     refundId, refund.getPurchaseId(), refund.getAmount(), processedBy);

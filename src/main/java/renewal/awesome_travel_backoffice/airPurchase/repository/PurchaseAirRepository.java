@@ -26,7 +26,7 @@ public interface PurchaseAirRepository extends JpaRepository<PurchaseAir, Long>,
     }
 
     @Query("SELECT ap FROM PurchaseAir ap " +
-           "LEFT JOIN FETCH ap.airPassengers passengers " +
+           "LEFT JOIN FETCH ap.passengers passengers " +
            "WHERE ap.id = :id")
     Optional<PurchaseAir> findByIdWithPassengers(@Param("id") Long id);
 

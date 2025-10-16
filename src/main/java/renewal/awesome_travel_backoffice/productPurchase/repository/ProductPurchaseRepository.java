@@ -10,8 +10,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import renewal.common.entity.PurchaseProduct;
 import renewal.common.entity.PurchaseBase.PurchaseStatus;
+import renewal.common.entity.PurchaseProduct;
 
 public interface ProductPurchaseRepository extends JpaRepository<PurchaseProduct, Long>, ProductPurchaseRepositoryCustom {
 
@@ -27,7 +27,7 @@ public interface ProductPurchaseRepository extends JpaRepository<PurchaseProduct
     }
 
     @Query("SELECT pp FROM PurchaseProduct pp " +
-           "LEFT JOIN FETCH pp.productPassengers passengers " +
+           "LEFT JOIN FETCH pp.passengers passengers " +
            "WHERE pp.id = :id")
     Optional<PurchaseProduct> findByIdWithPassengers(@Param("id") Long id);
 

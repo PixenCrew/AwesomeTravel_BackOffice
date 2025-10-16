@@ -21,12 +21,10 @@ import renewal.awesome_travel_backoffice.productPurchase.dto.response.ProductPur
 import renewal.awesome_travel_backoffice.productPurchase.dto.response.ProductResponseDto;
 import renewal.awesome_travel_backoffice.productPurchase.repository.ProductPurchaseRepository;
 import renewal.common.entity.CountryCode;
-import renewal.common.entity.PassengerBase;
-import renewal.common.entity.PassengerProduct;
+import renewal.common.entity.Passenger;
 import renewal.common.entity.Product;
 import renewal.common.entity.PurchaseBase.PurchaseStatus;
 import renewal.common.entity.PurchaseProduct;
-import renewal.common.entity.SpecialRequest;
 import renewal.common.repository.CountryCodeRepository;
 
 @Service
@@ -72,16 +70,16 @@ public class ProductPurchaseService {
         System.out.println("=== PurchaseProduct 디버깅 정보 ===");
         System.out.println("PurchaseProduct ID: " + purchase.getPurchaseProductId());
         System.out.println("Expected Passengers: " + purchase.getExpectedPassengerCount());
-        System.out.println("Actual Passengers: " + (purchase.getPassengerProducts() != null ? purchase.getPassengerProducts().size() : "null"));
+        System.out.println("Actual Passengers: " + (purchase.getPassengers() != null ? purchase.getPassengers().size() : "null"));
         System.out.println("Passenger Info Complete: " + purchase.isPassengerInfoComplete());
         System.out.println("Transaction Complete: " + purchase.isTransactionComplete());
-        if (purchase.getPassengerProducts() != null && !purchase.getPassengerProducts().isEmpty()) {
-            purchase.getPassengerProducts().forEach(passenger -> {
+        if (purchase.getPassengers() != null && !purchase.getPassengers().isEmpty()) {
+            purchase.getPassengers().forEach(passenger -> {
                 System.out.println("  - 승객: " + (passenger.getName() != null ? passenger.getName() : "null") + " (ID: " + passenger.getId() + ")");
-                System.out.println("    특별요청: " + passenger.getSpecialRequests().size() + "개");
+                System.out.println("    특별요청: " + passenger.getSpecialRequests());
             });
         } else {
-            System.out.println("  ⚠️ PassengerProducts가 비어있습니다!");
+            System.out.println("  ⚠️ Passengers가 비어있습니다!");
         }
         System.out.println("===============================");
         
@@ -147,19 +145,18 @@ public class ProductPurchaseService {
         
         // 승객 정보 추가 (빈 필드가 있어도 객체 생성)
         for (ProductPassengerUpdateRequestDto dto : passengerDtos) {
-            PassengerProduct passenger = new PassengerProduct();
-            
+            Passenger passenger = new Passenger();
+
             // 입력된 정보만 설정, 빈 필드는 null로 유지
             passenger.setName(dto.getName());
             passenger.setNumber(dto.getNumber());
             passenger.setEmail(dto.getEmail());
             passenger.setBirth(dto.getBirth());
-            passenger.setSex(PassengerBase.Sex.valueOf(dto.getSex().toLowerCase()));
+            passenger.setSex(Passenger.Sex.valueOf(dto.getSex().toLowerCase()));
             passenger.setPassport_num(dto.getPassportNum());
             passenger.setLastName(dto.getLastName());
             passenger.setFirstName(dto.getFirstName());
             passenger.setExpire(dto.getExpire());
-            passenger.setPurchaseProduct(purchase);
             
             // 국적은 유효한 경우에만 설정
             if (dto.getNationality() != null && !dto.getNationality().trim().isEmpty()) {
@@ -168,22 +165,21 @@ public class ProductPurchaseService {
                 passenger.setNationality(nationality);
             }
             
-            purchase.getPassengerProducts().add(passenger);
+            purchase.getPassengers().add(passenger);
         }
         
         // 예상 승객 수만큼 빈 승객 객체 생성 (부족한 경우)
-        while (purchase.getPassengerProducts().size() < expectedPassengerCount) {
-            PassengerProduct emptyPassenger = new PassengerProduct();
-            emptyPassenger.setPurchaseProduct(purchase);
+        while (purchase.getPassengers().size() < expectedPassengerCount) {
+            Passenger emptyPassenger = new Passenger();
             // 모든 필드를 null로 유지 (빈 객체)
-            purchase.getPassengerProducts().add(emptyPassenger);
+            purchase.getPassengers().add(emptyPassenger);
         }
         
         System.out.println("=== 패키지 빈 객체 생성 완료 ===");
         System.out.println("예상 승객 수: " + expectedPassengerCount);
-        System.out.println("생성된 승객 수: " + purchase.getPassengerProducts().size());
+        System.out.println("생성된 승객 수: " + purchase.getPassengers().size());
         System.out.println("입력된 승객 수: " + passengerDtos.size());
-        System.out.println("빈 객체 수: " + (purchase.getPassengerProducts().size() - passengerDtos.size()));
+        System.out.println("빈 객체 수: " + (purchase.getPassengers().size() - passengerDtos.size()));
         
         // 승객 정보 완료 상태 확인 및 설정
         checkPassengerInfoComplete(purchase);
@@ -219,7 +215,7 @@ public class ProductPurchaseService {
         }
 
         // 빈 승객 객체 찾기 (이름이 null이거나 비어있는 경우)
-        PassengerProduct emptyPassenger = purchase.getPassengerProducts().stream()
+        Passenger emptyPassenger = purchase.getPassengers().stream()
                 .filter(p -> p.getName() == null || p.getName().trim().isEmpty())
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("더 이상 승객 정보를 추가할 수 없습니다."));
@@ -229,7 +225,7 @@ public class ProductPurchaseService {
         emptyPassenger.setNumber(passengerDto.getNumber());
         emptyPassenger.setEmail(passengerDto.getEmail());
         emptyPassenger.setBirth(passengerDto.getBirth());
-        emptyPassenger.setSex(PassengerBase.Sex.valueOf(passengerDto.getSex().toLowerCase()));
+        emptyPassenger.setSex(Passenger.Sex.valueOf(passengerDto.getSex().toLowerCase()));
         emptyPassenger.setPassport_num(passengerDto.getPassportNum());
         emptyPassenger.setLastName(passengerDto.getLastName());
         emptyPassenger.setFirstName(passengerDto.getFirstName());
@@ -265,7 +261,7 @@ public class ProductPurchaseService {
         // 승객 정보가 완료되지 않은 경우 경고 로그
         if (!purchase.isPassengerInfoComplete()) {
             System.out.printf("[경고] 패키지 상품 결제 완료 - 승객 정보 미완료: 구매ID=%d, 예상승객수=%d, 현재승객수=%d\n",
-                    purchaseId, purchase.getExpectedPassengerCount(), purchase.getPassengerProducts().size());
+                    purchaseId, purchase.getExpectedPassengerCount(), purchase.getPassengers().size());
         }
         
         productPurchaseRepository.save(purchase);
@@ -301,9 +297,9 @@ public class ProductPurchaseService {
      * 승객 정보 완료 상태 확인
      */
     private void checkPassengerInfoComplete(PurchaseProduct purchase) {
-        if (purchase.getPassengerProducts().size() == purchase.getExpectedPassengerCount()) {
+        if (purchase.getPassengers().size() == purchase.getExpectedPassengerCount()) {
             // 모든 승객의 필수 정보가 입력되었는지 확인
-            boolean allComplete = purchase.getPassengerProducts().stream()
+            boolean allComplete = purchase.getPassengers().stream()
                 .allMatch(passenger -> 
                     passenger.getName() != null && !passenger.getName().trim().isEmpty() &&
                     passenger.getNumber() != null && !passenger.getNumber().trim().isEmpty() &&
@@ -328,7 +324,7 @@ public class ProductPurchaseService {
                 .orElseThrow(() -> new IllegalArgumentException("구매 내역을 찾을 수 없습니다."));
 
         // 승객 정보 조회
-        PassengerProduct passenger = purchase.getPassengerProducts().stream()
+        Passenger passenger = purchase.getPassengers().stream()
                 .filter(p -> p.getId().equals(passengerId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("승객 정보를 찾을 수 없습니다."));
@@ -347,7 +343,7 @@ public class ProductPurchaseService {
         }
         
         // 승객 정보 업데이트
-        passenger.updateInfo(updateRequest, newCountry, null);
+        // passenger.updateInfo(updateRequest, newCountry, null);
         
         System.out.println("수정 후 승객 정보: " + passenger.getName() + ", " + passenger.getNumber() + ", " + passenger.getEmail());
         System.out.println("===============================");
@@ -388,15 +384,9 @@ public class ProductPurchaseService {
 
         // 승객 정보 DTO 생성
         List<ProductPassengerResponseDto> passengerDtos = new ArrayList<>();
-        if (purchase.getPassengerProducts() != null && !purchase.getPassengerProducts().isEmpty()) {
-            passengerDtos = purchase.getPassengerProducts().stream()
-                    .map(passenger -> {
-                        List<String> requestList = new ArrayList<>();
-                        if (passenger.getSpecialRequests() != null) {
-                            requestList = passenger.getSpecialRequests().stream()
-                                    .map(SpecialRequest::getRequestType)
-                                    .toList();
-                        }
+        if (purchase.getPassengers() != null && !purchase.getPassengers().isEmpty()) {
+            passengerDtos = purchase.getPassengers().stream()
+                    .map(passenger -> {                        
                         return new ProductPassengerResponseDto(
                                 passenger.getId(),
                                 passenger.getName(),
@@ -409,7 +399,7 @@ public class ProductPurchaseService {
                                 passenger.getLastName(),
                                 passenger.getFirstName(),
                                 passenger.getExpire(),
-                                requestList
+                                passenger.getSpecialRequests()
                         );
                     }).toList();
         }
@@ -453,8 +443,8 @@ public class ProductPurchaseService {
                 .filter(purchase -> purchase.getPurchaseStatus() == PurchaseStatus.HOLDING ||
                                   purchase.getPurchaseStatus() == PurchaseStatus.PAID)
                 .mapToLong(purchase -> 
-                    purchase.getPassengerProducts() != null ? 
-                    (long) purchase.getPassengerProducts().size() : 0L
+                    purchase.getPassengers() != null ? 
+                    (long) purchase.getPassengers().size() : 0L
                 )
                 .sum();
     }

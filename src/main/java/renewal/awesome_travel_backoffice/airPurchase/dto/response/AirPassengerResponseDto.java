@@ -1,7 +1,6 @@
 package renewal.awesome_travel_backoffice.airPurchase.dto.response;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,6 +25,6 @@ public class AirPassengerResponseDto {
     private String firstName;
     private LocalDate expire;
 
-    private List<String> specialRequests; // "Wheelchair", "Vegetarian" 등
+    private String specialRequests; // "Wheelchair", "Vegetarian" 등
 }
 
