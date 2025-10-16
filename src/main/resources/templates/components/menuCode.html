@@ -1,6 +1,8 @@
 <div th:fragment="content" th:inline="text">
     <h1>메뉴 코드 목록</h1>
 
+    <a th:href="@{/menu-code/new}">새 메뉴 코드 등록</a>
+
     <table border="1" style="border-collapse: collapse; text-align: center;">
         <thead>
             <tr>
@@ -11,7 +13,8 @@
         </thead>
         <tbody>
             <th:block th:each="mc : ${menuCodes}">
-                <tr th:each="det, iter : ${mc.details}" th:onclick="'window.location.href=\'/menu-code/' + ${mc.code} + '\';'">
+                <tr th:each="det, iter : ${mc.details}"
+                    th:onclick="'window.location.href=\'/menu-code/' + ${mc.code} + '\';'">
                     <td th:if="${iter.index == 0}" th:text="${mc.code}" th:rowspan="${#lists.size(mc.details)}"></td>
                     <td th:text="${det.targetColumn}"></td>
                     <td th:text="${det.value}"></td>

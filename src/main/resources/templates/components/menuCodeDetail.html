@@ -5,9 +5,9 @@
         th:action="${menuCode.code} == null ? @{/menu-code/new} : @{/menu-code/{code}(code=${menuCode.code})}"
         method="post">
 
-        <div th:if="${menuCode.code} != null">
+        <div>
             <label>코드:</label>
-            <input type="text" th:field="*{code}" readonly /><br>
+            <input type="text" th:field="*{code}" th:readonly="${menuCode.code != null}"/><br>
         </div>
 
         <div>
@@ -69,9 +69,22 @@
             });
         }
 
-        function deleteMenuCode(code) {
-            if (confirm('정말 삭제하시겠습니까?')) {
-                window.location.href = `/menu-code/delete/${code}`;
+        // function deleteMenuCode(code) {
+        //     if (confirm('정말 삭제하시겠습니까?')) {
+        //         window.location.href = `/menu-code/delete/${code}`;
+        //     }
+        // }
+        function deleteMenuCode(id) {
+            if (confirm('정말로 삭제하시겠습니까?')) {
+                fetch('/menu-code/' + id, { method: 'DELETE' })
+                    .then(res => {
+                        if (res.ok) {
+                            alert('삭제 성공');
+                            window.location.href = '/menu-code';
+                        } else {
+                            alert('삭제 실패');
+                        }
+                    });
             }
         }
 
