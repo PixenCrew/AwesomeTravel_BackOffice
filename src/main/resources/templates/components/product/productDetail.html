@@ -494,12 +494,47 @@
                 </div>
 
                 <div class="form-group">
+                    <label class="form-label">상품 타입</label>
+                    <select th:field="*{productType}" class="form-input">
+                        <option th:each="type : ${T(renewal.common.entity.Product.ProductType).values()}"
+                            th:value="${type}" th:text="${type}">TYPE</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label class="form-label">가격</label>
                     <div class="input-group">
                         <input type="number" th:field="*{price}" required class="form-input" placeholder="가격을 입력하세요" />
                         <span class="unit">원</span>
                     </div>
                 </div>
+
+                <div class="form-group">
+                    <label class="form-label">예약 여유일</label>
+                    <div class="input-group">
+                        <input type="number" th:field="*{cutoffDays}" required class="form-input"
+                            placeholder="예약 여유일을 입력하세요" />
+                        <span class="unit">일</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 좌석 등급 섹션 -->
+        <div class="form-section">
+            <h2 class="section-title">좌석 등급 선택</h2>
+
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <th:block th:each="seatType : ${T(renewal.common.entity.SeatClass.SeatClassType).values()}">
+                        <label class="checkbox-item">
+                            <input type="checkbox" th:field="*{seatClassTypes}" th:value="${seatType}" />
+                            <span th:text="${seatType}"></span>
+                        </label>
+                        <br>
+                    </th:block>
+                </div>
+                <div class="form-hint">※ 최소 1개 이상 선택해야 합니다.</div>
             </div>
         </div>
 
