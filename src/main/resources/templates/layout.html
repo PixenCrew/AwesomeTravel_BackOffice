@@ -18,13 +18,24 @@
     <script>
         tailwind.config = {
             theme: {
-                extend: {}
+                extend: {
+                    fontFamily: {
+                        'sans': ['"Pretendard Variable"', 'Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', '"Helvetica Neue"', '"Segoe UI"', '"Apple SD Gothic Neo"', '"Noto Sans KR"', '"Malgun Gothic"', '"Apple Color Emoji"', '"Segoe UI Emoji"', '"Segoe UI Symbol"', 'sans-serif']
+                    }
+                }
             }
         }
     </script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Pretendard 폰트 -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
     <style type="text/tailwindcss">
+        /* Pretendard 폰트 설정 */
+        * {
+            font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+        }
+        
         @layer components {
             .menu-item {
                 @apply text-gray-700 hover:text-blue-600;
@@ -45,10 +56,10 @@
                 @apply w-64;
             }
             .content-shifted {
-                @apply pl-16;
+                @apply ml-16;
             }
             .content-normal {
-                @apply pl-64;
+                @apply ml-64;
             }
             /* 접힌 상태일 때의 스타일 */
             .sidebar-collapsed .menu-link,
@@ -149,6 +160,13 @@
             /* 메뉴 리스트 */
             .menu-list {
                 @apply space-y-1;
+            }
+            /* 테이블 반응형 처리 */
+            .table-responsive {
+                @apply w-full overflow-x-auto;
+            }
+            .table-responsive table {
+                @apply min-w-full;
             }
         }
     </style>
@@ -263,7 +281,7 @@
                             <span class="toggle-icon">+</span>
                         </div>
                         <ul class="submenu hidden">
-                            <li><a href="/menu-code" class="submenu-link">지역 카테고리 관리</a></li>
+                            <li><a href="/region-category" class="submenu-link">지역 카테고리 관리</a></li>
                             <li><a href="/country-code" class="submenu-link">국가 코드 관리</a></li>
                             <li><a href="/city-code" class="submenu-link">도시 코드 관리</a></li>
                             <li><a href="/airport" class="submenu-link">공항 관리</a></li>
@@ -311,7 +329,7 @@
     </aside>
 
     <!-- Main Content -->
-    <main id="mainContent" class="flex-1 flex flex-col min-h-screen transition-all duration-300 content-normal">
+    <main id="mainContent" class="flex-1 flex flex-col min-h-screen transition-all duration-300 content-normal w-full">
         <!-- Header -->
         <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
             <!-- 현재 페이지 제목 -->
@@ -340,9 +358,9 @@
         </header>
 
         <!-- Dynamic Content Area -->
-        <div class="flex-1 p-6 bg-gray-50 overflow-y-auto">
+        <div class="flex-1 p-6 bg-gray-50 overflow-x-auto">
             <!-- 동적으로 교체될 컨텐츠 영역 -->
-            <div th:replace="~{${content} :: content}"></div>
+            <div th:replace="~{${content} :: content}" class="h-full min-w-0"></div>
         </div>
 
         <!-- Footer -->
@@ -429,6 +447,9 @@
             }
         });
     </script>
+    
+    <!-- 공통 필터 스크립트 -->
+    <script src="/js/filter.js"></script>
 </body>
 
 </html>

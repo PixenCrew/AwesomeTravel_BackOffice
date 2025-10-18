@@ -1,8 +1,34 @@
-function get(page, event, sortField = null, sortDir = null) {
-    if (event) {
-        event.preventDefault(); // form+button 기본 동작 방지
+// ✅ 전역 함수들 정의 - 모든 페이지에서 공통 사용
+function toggleFilter() {
+    const filterForm = document.getElementById('filterForm');
+    const toggleBtn = document.getElementById('toggleFilterBtn');
+    
+    if (!filterForm || !toggleBtn) {
+        console.error('Filter elements not found');
+        return;
     }
+    
+    if (filterForm.classList.contains('hidden')) {
+        filterForm.classList.remove('hidden');
+        toggleBtn.innerHTML = '<i class="fas fa-chevron-up mr-1"></i>접기';
+    } else {
+        filterForm.classList.add('hidden');
+        toggleBtn.innerHTML = '<i class="fas fa-filter mr-1"></i>필터';
+    }
+}
+
+// ✅ 통합된 검색 함수 (기존 get, performSearch 통합)
+function performSearch(page = 0, event = null, sortField = null, sortDir = null) {
+    if (event) {
+        event.preventDefault();
+    }
+    
     const form = document.getElementById('filterForm');
+    if (!form) {
+        console.error('Filter form not found');
+        return;
+    }
+    
     const formData = new FormData(form);
     const params = new URLSearchParams();
 
@@ -17,28 +43,31 @@ function get(page, event, sortField = null, sortDir = null) {
         params.set('page', page);
     }
 
-    // console.log("params:"+params.getAll())
+    // 정렬 파라미터 (toggleSort에서 사용)
+    if (sortField && sortDir) {
+        params.set('sortField', sortField);
+        params.set('sortDir', sortDir);
+    }
+
     const baseUrl = location.pathname;
     const qs = params.toString();
     const url = baseUrl + (qs ? `?${qs}` : '');
-
-    // if (confirm("GET?")) {
+    
+    console.log('Searching with URL:', url);
     window.location.href = url;
-    // }
 }
 
-function resetFilter(event) {
-    console.log("sadasd")
-    event.preventDefault();
-
+// ✅ 통합된 초기화 함수 (기존 resetFilter, resetFilterForm 통합)
+function resetFilterForm(event = null) {
+    if (event) {
+        event.preventDefault();
+    }
+    
     if (confirm("필터를 초기화합니다.")) {
-        // form 선택
         const form = document.getElementById("filterForm");
-
-        // form 항목 모두 빈값으로 초기화
-        form.reset();
-
-        // 기본 페이지로 이동
+        if (form) {
+            form.reset();
+        }
         const baseUrl = location.pathname;
         window.location.href = baseUrl;
     }
@@ -56,5 +85,16 @@ function toggleSort(el, event) {
     form.querySelector('input[name="sortField"]').value = field;
     form.querySelector('input[name="sortDir"]').value = nextDir;
 
-    get(0, event, field, nextDir);
+    performSearch(0, event, field, nextDir);
 }
+
+// ✅ 전역(window)에 수동 등록 - onclick에서 접근 가능하도록
+window.toggleFilter = toggleFilter;
+window.performSearch = performSearch;  // 통합된 검색 함수
+window.resetFilterForm = resetFilterForm;  // 통합된 초기화 함수
+window.toggleSort = toggleSort;
+
+// ✅ 별칭 제거 - 모든 파일에서 통일된 함수명 사용
+
+// ✅ 로드 확인용 로그
+console.log("filter.js loaded - toggleFilter available globally");

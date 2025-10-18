@@ -1,312 +1,247 @@
-<div th:fragment="content" class="min-h-screen bg-gray-50 py-6">
+<div th:fragment="content" class="flex flex-col h-full bg-gray-50 py-6">
     <!-- 헤더 -->
-    <div class="sm:flex sm:items-center">
+    <div class="sm:flex sm:items-center flex-shrink-0 mb-6">
         <div class="sm:flex-auto">
             <h1 class="text-base font-semibold leading-6 text-gray-900">호텔 목록</h1>
             <p class="mt-2 text-sm text-gray-700">호텔 정보를 조회하고 관리할 수 있습니다.</p>
         </div>
         <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-            <a th:href="@{/hotel/new}"
-                class="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500">
-                <i class="fas fa-plus -ml-0.5 mr-1.5 h-4 w-4"></i>
-                새 호텔 등록
+            <a th:href="@{/hotel/new}" class="inline-flex items-center px-6 py-3 text-white font-semibold rounded-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <i class="fas fa-plus mr-2"></i>새 호텔 등록
             </a>
         </div>
     </div>
 
-    <!-- 필터 패널 -->
-    <div class="mt-6 bg-white shadow rounded-lg">
-        <div class="px-4 py-5 sm:p-6">
-            <h3 class="text-base font-semibold leading-6 text-gray-900 mb-4">검색 필터</h3>
-
-            <form id="filterForm" th:object="${filter}" class="space-y-6">
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    <div>
-                        <label class="block text-sm font-medium leading-6 text-gray-900">호텔 이름</label>
-                        <input type="text" th:field="*{name}" placeholder="호텔 이름을 입력하세요"
-                            class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium leading-6 text-gray-900">도시</label>
-                        <input type="text" th:field="*{city}" placeholder="도시를 입력하세요" list="cityList"
-                            onchange="stripAfterPipe(this)" th:attr="readonly=${isSelectionPage} ? 'readonly' : null"
-                            class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium leading-6 text-gray-900">주소</label>
-                        <input type="text" th:field="*{address}" placeholder="주소를 입력하세요"
-                            class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium leading-6 text-gray-900">이메일</label>
-                        <input type="email" th:field="*{email}" placeholder="이메일을 입력하세요"
-                            class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium leading-6 text-gray-900">최소 가격</label>
-                        <input type="number" step="1" th:field="*{minPrice}" placeholder="0"
-                            class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium leading-6 text-gray-900">최대 가격</label>
-                        <input type="number" step="1" th:field="*{maxPrice}" placeholder="1000000"
-                            class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium leading-6 text-gray-900">호텔 유형</label>
-                        <select th:field="*{hotelType}"
-                            class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
-                            <option value="">-- 선택 --</option>
-                            <option th:each="type : ${T(renewal.common.entity.Hotel.HotelType).values()}"
-                                th:value="${type}" th:text="${type}"></option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium leading-6 text-gray-900">사용 가능</label>
-                        <select th:field="*{isActive}"
-                            class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
-                            <option value="">-- 선택 --</option>
-                            <option value="true">Yes</option>
-                            <option value="false">No</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- 예약 조회 섹션 -->
-                <!-- <div class="border-t border-gray-200 pt-6">
-                    <h4 class="text-sm font-medium text-gray-900 mb-4">예약 조회</h4>
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        <div>
-                            <label class="block text-sm font-medium leading-6 text-gray-900">체크인</label>
-                            <input type="date" th:field="*{startDate}" 
-                                   class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium leading-6 text-gray-900">체크아웃</label>
-                            <input type="date" th:field="*{endDate}" 
-                                   class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium leading-6 text-gray-900">특정날짜</label>
-                            <input type="date" th:field="*{targetDate}" 
-                                   th:attr="readonly=${isSelectionPage} ? 'readonly' : null"
-                                   class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium leading-6 text-gray-900">필요 인원수</label>
-                            <input type="number" min="1" th:field="*{requiredPersons}" 
-                                   th:attr="readonly=${isSelectionPage} ? 'readonly' : null"
-                                   class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
-                        </div>
-                    </div>
-                </div> -->
-
-                <div class="flex justify-end space-x-3">
-                    <button type="button" onclick="resetFilter(event)"
-                        class="inline-flex items-center rounded-md bg-gray-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500">
-                        <i class="fas fa-undo -ml-0.5 mr-1.5 h-4 w-4"></i>
-                        검색 초기화
-                    </button>
-                    <button type="button" onclick="get(0, event)"
-                        class="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500">
-                        <i class="fas fa-search -ml-0.5 mr-1.5 h-4 w-4"></i>
-                        검색
-                    </button>
-                </div>
-
-                <input type="hidden" name="sortField" th:value="${sortField}" />
-                <input type="hidden" name="sortDir" th:value="${sortDir}" />
-            </form>
+    <!-- 필터 섹션 -->
+    <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 mb-6 flex-shrink-0">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold text-gray-700">검색 필터 <span id="filterCountBadge" class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-md text-xs font-semibold ml-2 hidden">0</span></h3>
+            <button type="button" id="toggleFilterBtn" class="bg-blue-600 text-white border-0 px-4 py-2 rounded-md cursor-pointer text-sm transition-colors duration-200 hover:bg-blue-700" onclick="toggleFilter()"><i class="fas fa-filter mr-1"></i>필터</button>
         </div>
-    </div>
-
-    <!-- 결과 테이블 -->
-    <div class="mt-8 flow-root">
-        <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-            <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-300">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col"
-                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">
-                                        <a href="#" data-sortfield="id"
-                                            th:data-sortdir="${sortField=='id' and sortDir=='asc' ? 'asc' : 'desc'}"
-                                            onclick="toggleSort(this, event)" class="group inline-flex">
-                                            ID
-                                            <span th:if="${sortField=='id'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"
-                                                class="ml-1 flex-none rounded text-gray-400 group-hover:text-gray-500"></span>
-                                        </a>
-                                    </th>
-                                    <th scope="col"
-                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
-                                        호텔명</th>
-                                    <th scope="col"
-                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20 hidden sm:table-cell">
-                                        도시</th>
-                                    <th scope="col"
-                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32 hidden lg:table-cell">
-                                        주소</th>
-                                    <th scope="col"
-                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
-                                        유형</th>
-                                    <th scope="col"
-                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
-                                        <a href="#" data-sortfield="price"
-                                            th:data-sortdir="${sortField=='price' and sortDir=='asc' ? 'asc' : 'desc'}"
-                                            onclick="toggleSort(this, event)" class="group inline-flex">
-                                            가격
-                                            <span th:if="${sortField=='price'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"
-                                                class="ml-1 flex-none rounded text-gray-400 group-hover:text-gray-500"></span>
-                                        </a>
-                                    </th>
-                                    <th scope="col"
-                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20 hidden md:table-cell">
-                                        상태</th>
-                                    <th scope="col"
-                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20 hidden lg:table-cell">
-                                        <a href="#" data-sortfield="maxRoomCount"
-                                            th:data-sortdir="${sortField=='maxRoomCount' and sortDir=='asc' ? 'asc' : 'desc'}"
-                                            onclick="toggleSort(this, event)" class="group inline-flex">
-                                            객실 수
-                                            <span th:if="${sortField=='maxRoomCount'}"
-                                                th:text="${sortDir=='asc' ? '▲' : '▼'}"
-                                                class="ml-1 flex-none rounded text-gray-400 group-hover:text-gray-500"></span>
-                                        </a>
-                                    </th>
-                                    <th scope="col" class="relative px-3 py-3 w-20">
-                                        <span class="sr-only">Actions</span>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <th:block th:each="hotel : ${hotelPage.content}">
-                                    <tr th:onclick="${isSelectionPage} ? |returnNumber(${hotel.id})| : |window.location.href='@{/hotel/{id}(id=${hotel.id})}'|"
-                                        class="hover:bg-gray-50 cursor-pointer">
-                                        <td class="px-3 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-                                            th:text="${hotel.id}">1</td>
-                                        <td class="px-3 py-4">
-                                            <div class="text-sm font-medium text-gray-900" th:text="${hotel.name}">호텔명
-                                            </div>
-                                            <div class="text-sm text-gray-500"
-                                                th:text="${#strings.abbreviate(hotel.description, 50)}">설명</div>
-                                            <div class="text-xs text-gray-400 sm:hidden" th:text="${hotel.city}">도시
-                                            </div>
-                                        </td>
-                                        <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell"
-                                            th:text="${hotel.city}">도시</td>
-                                        <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell"
-                                            th:text="${#strings.abbreviate(hotel.address, 30)}">주소</td>
-                                        <td class="px-3 py-4 whitespace-nowrap">
-                                            <span
-                                                class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10"
-                                                th:text="${hotel.hotelType}">HOTEL</span>
-                                        </td>
-                                        <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900"
-                                            th:text="${#numbers.formatInteger(hotel.price, 0, 'COMMA')}">100,000</td>
-                                        <td class="px-3 py-4 whitespace-nowrap hidden md:table-cell">
-                                            <span th:if="${hotel.isActive}"
-                                                class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                                                활성
-                                            </span>
-                                            <span th:unless="${hotel.isActive}"
-                                                class="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20">
-                                                비활성
-                                            </span>
-                                        </td>
-                                        <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell"
-                                            th:text="${hotel.maxRoomCount}">20</td>
-                                        <td class="px-3 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <a th:if="${!isSelectionPage}" th:href="@{/hotel/{id}(id=${hotel.id})}"
-                                                class="text-blue-600 hover:text-blue-900">상세보기</a>
-                                            <span th:if="${isSelectionPage}" class="text-gray-400">선택</span>
-                                        </td>
-                                    </tr>
-                                </th:block>
-                            </tbody>
-                        </table>
-                    </div>
+        <form id="filterForm" th:object="${filter}" class="hidden">
+            <div class="grid grid-cols-1 gap-4 mb-4" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+                <div class="flex flex-col">
+                    <label class="font-medium text-gray-700 mb-2 text-sm">호텔 이름</label>
+                    <input type="text" th:field="*{name}" placeholder="호텔 이름을 입력하세요" class="p-3 border border-gray-300 rounded-lg text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100" />
+                </div>
+                <div class="flex flex-col">
+                    <label class="font-medium text-gray-700 mb-2 text-sm">도시</label>
+                    <input type="text" th:field="*{city}" placeholder="도시를 입력하세요" list="cityList" onchange="stripAfterPipe(this)" th:attr="readonly=${isSelectionPage} ? 'readonly' : null" class="p-3 border border-gray-300 rounded-lg text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100" />
+                </div>
+                <div class="flex flex-col">
+                    <label class="font-medium text-gray-700 mb-2 text-sm">주소</label>
+                    <input type="text" th:field="*{address}" placeholder="주소를 입력하세요" class="p-3 border border-gray-300 rounded-lg text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100" />
+                </div>
+                <div class="flex flex-col">
+                    <label class="font-medium text-gray-700 mb-2 text-sm">이메일</label>
+                    <input type="email" th:field="*{email}" placeholder="이메일을 입력하세요" class="p-3 border border-gray-300 rounded-lg text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100" />
+                </div>
+                <div class="flex flex-col">
+                    <label class="font-medium text-gray-700 mb-2 text-sm">최소 가격</label>
+                    <input type="number" step="1" th:field="*{minPrice}" placeholder="0" class="p-3 border border-gray-300 rounded-lg text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100" />
+                </div>
+                <div class="flex flex-col">
+                    <label class="font-medium text-gray-700 mb-2 text-sm">최대 가격</label>
+                    <input type="number" step="1" th:field="*{maxPrice}" placeholder="1000000" class="p-3 border border-gray-300 rounded-lg text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100" />
+                </div>
+                <div class="flex flex-col">
+                    <label class="font-medium text-gray-700 mb-2 text-sm">호텔 유형</label>
+                    <select th:field="*{hotelType}" class="p-3 border border-gray-300 rounded-lg text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100">
+                        <option value="">-- 선택 --</option>
+                        <option th:each="type : ${T(renewal.common.entity.Hotel.HotelType).values()}" th:value="${type}" th:text="${type}"></option>
+                    </select>
+                </div>
+                <div class="flex flex-col">
+                    <label class="font-medium text-gray-700 mb-2 text-sm">사용 가능</label>
+                    <select th:field="*{isActive}" class="p-3 border border-gray-300 rounded-lg text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100">
+                        <option value="">-- 선택 --</option>
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+                    </select>
                 </div>
             </div>
-        </div>
+            <div class="flex gap-4 justify-end">
+                <button type="button" class="bg-gray-500 text-white border-0 px-6 py-3 rounded-lg cursor-pointer font-semibold transition-colors duration-200 hover:bg-gray-600" onclick="resetFilterForm(event)"><i class="fas fa-undo mr-1"></i>초기화</button>
+                <button type="button" class="bg-emerald-600 text-white border-0 px-6 py-3 rounded-lg cursor-pointer font-semibold transition-colors duration-200 hover:bg-emerald-700" onclick="performSearch(0, event)"><i class="fas fa-search mr-1"></i>검색</button>
+            </div>
+            <input type="hidden" name="sortField" th:value="${sortField}" />
+            <input type="hidden" name="sortDir" th:value="${sortDir}" />
+        </form>
     </div>
 
-    <!-- 페이징 -->
-    <div class="mt-6 flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
-        <div class="flex flex-1 justify-between sm:hidden">
-            <a th:if="${hotelPage.hasPrevious()}" th:onclick="|get(${hotelPage.number - 1})|"
-                class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">이전</a>
-            <a th:if="${hotelPage.hasNext()}" th:onclick="|get(${hotelPage.number + 1})|"
-                class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">다음</a>
+    <script>
+        // toggleFilter 함수는 filter.js에서 전역으로 제공됨
+
+        function countActiveFilters(form) {
+            if (!form) return 0;
+            const seenNames = new Set();
+            let count = 0;
+            const elements = Array.from(form.elements);
+            const skip = new Set(['page','size','sort','sortField','sortDir','_csrf']);
+            elements.forEach(el => {
+                if (!el.name || skip.has(el.name)) return;
+                if (el.type === 'hidden') return;
+                if (el.type === 'radio') {
+                    if (seenNames.has(el.name)) return;
+                    seenNames.add(el.name);
+                    const checked = form.querySelector(`input[name="${el.name}"]:checked`);
+                    if (checked && checked.value !== '' && checked.value != null) count++;
+                    return;
+                }
+                if (el.type === 'checkbox') {
+                    if (seenNames.has(el.name)) return;
+                    seenNames.add(el.name);
+                    const anyChecked = form.querySelectorAll(`input[name="${el.name}"]:checked`).length > 0;
+                    if (anyChecked) count++;
+                    return;
+                }
+                const val = (el.value || '').toString().trim();
+                if (val !== '') count++;
+            });
+            return count;
+        }
+
+        function updateFilterCount() {
+            const form = document.getElementById('filterForm');
+            const badge = document.getElementById('filterCountBadge');
+            if (!form || !badge) return;
+            const n = countActiveFilters(form);
+            if (n > 0) { badge.textContent = n; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); }
+        }
+
+        (function(){
+            const form = document.getElementById('filterForm');
+            if (form) {
+                form.addEventListener('input', updateFilterCount, true);
+                form.addEventListener('change', updateFilterCount, true);
+                updateFilterCount();
+            }
+        })();
+
+        function toggleSort(element, event) {
+            if (event) event.preventDefault();
+            const sortField = element.getAttribute('data-sortfield');
+            const currentSortField = document.querySelector('input[name="sortField"]').value;
+            const currentSortDir = document.querySelector('input[name="sortDir"]').value;
+            
+            let newSortDir = 'asc';
+            if (sortField === currentSortField && currentSortDir === 'asc') {
+                newSortDir = 'desc';
+            }
+            
+            // URL 파라미터로 정렬 정보 전달
+            const url = new URL(window.location);
+            url.searchParams.set('sortField', sortField);
+            url.searchParams.set('sortDir', newSortDir);
+            window.location.href = url.toString();
+        }
+    </script>
+
+    <!-- 결과 테이블 -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex-1 flex flex-col">
+        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex-shrink-0">
+            <h3 class="text-lg font-semibold text-gray-800">호텔 목록 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 ml-2" th:text="'총 ' + ${hotelPage.totalElements} + '개'"></span></h3>
         </div>
-        <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+        
+        <div class="flex-1 overflow-auto table-responsive" style="max-height: calc(100vh - 500px); min-height: 200px;">
+            <table class="min-w-full divide-y divide-gray-200" style="table-layout: fixed; width: 100%;">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 8%;">ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 25%;">
+                            <a href="#" data-sortfield="id" onclick="toggleSort(this, event)" class="group inline-flex items-center hover:text-gray-700">
+                                호텔명
+                                <i th:if="${sortField=='id'}" th:class="${sortDir=='asc' ? 'fas fa-sort-up ml-1' : 'fas fa-sort-down ml-1'}"></i>
+                            </a>
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 12%;">도시</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 20%;">주소</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 10%;">유형</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 12%;">
+                            <a href="#" data-sortfield="price" onclick="toggleSort(this, event)" class="group inline-flex items-center hover:text-gray-700">
+                                가격
+                                <i th:if="${sortField=='price'}" th:class="${sortDir=='asc' ? 'fas fa-sort-up ml-1' : 'fas fa-sort-down ml-1'}"></i>
+                            </a>
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 8%;">상태</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 10%;">
+                            <a href="#" data-sortfield="maxRoomCount" onclick="toggleSort(this, event)" class="group inline-flex items-center hover:text-gray-700">
+                                객실 수
+                                <i th:if="${sortField=='maxRoomCount'}" th:class="${sortDir=='asc' ? 'fas fa-sort-up ml-1' : 'fas fa-sort-down ml-1'}"></i>
+                            </a>
+                        </th>
+                    </tr>
+                </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                    <th:block th:each="hotel : ${hotelPage.content}">
+                        <tr th:onclick="${isSelectionPage} ? |returnNumber(${hotel.id})| : |window.location.href='@{/hotel/{id}(id=${hotel.id})}'|"
+                            class="hover:bg-gray-50 cursor-pointer transition-colors duration-150">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="${hotel.id}">1</td>
+                            <td class="px-6 py-4 text-sm text-gray-900">
+                                <div class="font-semibold text-gray-900 truncate" th:text="${hotel.name}" th:title="${hotel.name}">호텔명</div>
+                                <div class="text-sm text-gray-500 truncate" th:text="${#strings.abbreviate(hotel.description, 50)}" th:title="${hotel.description}">설명</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${hotel.city}">도시</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">
+                                <div class="truncate" th:text="${#strings.abbreviate(hotel.address, 30)}" th:title="${hotel.address}">주소</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800" th:text="${hotel.hotelType}">HOTEL</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold" th:text="${#numbers.formatInteger(hotel.price, 0, 'COMMA') + '원'}">100,000원</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <span th:if="${hotel.isActive}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">활성</span>
+                                <span th:unless="${hotel.isActive}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">비활성</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${hotel.maxRoomCount + '개'}">20개</td>
+                        </tr>
+                    </th:block>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 페이징 -->
+        <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 flex-shrink-0">
+        <div class="flex-1 flex justify-between sm:hidden">
+            <a th:if="${hotelPage.hasPrevious()}" href="#" th:onclick="|performSearch(${hotelPage.number - 1}, event)|" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                이전
+            </a>
+            <a th:if="${hotelPage.hasNext()}" href="#" th:onclick="|performSearch(${hotelPage.number + 1}, event)|" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                다음
+            </a>
+        </div>
+        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
             <div>
                 <p class="text-sm text-gray-700">
-                    <span class="font-medium" th:text="${hotelPage.number * hotelPage.size + 1}">1</span>
-                    -
-                    <span class="font-medium"
-                        th:text="${hotelPage.number * hotelPage.size + hotelPage.numberOfElements > hotelPage.totalElements ? hotelPage.totalElements : hotelPage.number * hotelPage.size + hotelPage.numberOfElements}">10</span>
-                    of
-                    <span class="font-medium" th:text="${hotelPage.totalElements}">97</span>
-                    results
+                    총 <span class="font-medium" th:text="${hotelPage.totalElements}">0</span>개 중 
+                    <span class="font-medium" th:text="${hotelPage.number * hotelPage.size + 1}">1</span>-<span class="font-medium" th:text="${(hotelPage.number + 1) * hotelPage.size > hotelPage.totalElements ? hotelPage.totalElements : (hotelPage.number + 1) * hotelPage.size}">10</span>개 표시
                 </p>
             </div>
             <div>
-                <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-                    <a th:if="${hotelPage.hasPrevious()}" th:onclick="|get(${hotelPage.number - 1})|"
-                        class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
-                        <span class="sr-only">Previous</span>
-                        <i class="fas fa-chevron-left h-5 w-5"></i>
+                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                    <!-- 이전 페이지 버튼 -->
+                    <a th:if="${hotelPage.hasPrevious()}" href="#" th:onclick="|performSearch(${hotelPage.number - 1}, event)|" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <i class="fas fa-chevron-left"></i>
                     </a>
-
-                    <!-- 첫 페이지 -->
-                    <th:block th:if="${hotelPage.number > 2}">
-                        <a th:onclick="|get(0)|"
-                            class="relative inline-flex items-center px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">1</a>
-                        <span th:if="${hotelPage.number > 3}"
-                            class="relative inline-flex items-center px-3 py-2 text-sm font-semibold text-gray-700">...</span>
-                    </th:block>
-
-                    <!-- 현재 페이지 주변 -->
-                    <th:block
-                        th:each="i : ${#numbers.sequence(T(java.lang.Math).max(0, hotelPage.number - 1), T(java.lang.Math).min(hotelPage.totalPages - 1, hotelPage.number + 1))}">
-                        <a th:onclick="|get(${i})|"
-                            th:class="${i == hotelPage.number} ? 'relative z-10 inline-flex items-center bg-blue-600 px-3 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600' : 'relative inline-flex items-center px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'"
-                            th:text="${i + 1}">1</a>
-                    </th:block>
-
-                    <!-- 마지막 페이지 -->
-                    <th:block th:if="${hotelPage.number < hotelPage.totalPages - 3}">
-                        <span th:if="${hotelPage.number < hotelPage.totalPages - 4}"
-                            class="relative inline-flex items-center px-3 py-2 text-sm font-semibold text-gray-700">...</span>
-                        <a th:onclick="|get(${hotelPage.totalPages - 1})|"
-                            class="relative inline-flex items-center px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                            th:text="${hotelPage.totalPages}">1</a>
-                    </th:block>
-
-                    <a th:if="${hotelPage.hasNext()}" th:onclick="|get(${hotelPage.number + 1})|"
-                        class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
-                        <span class="sr-only">Next</span>
-                        <i class="fas fa-chevron-right h-5 w-5"></i>
+                    
+                    <!-- 페이지 번호들 (최대 10개만 표시) -->
+                    <a th:each="i : ${#numbers.sequence(0, hotelPage.totalPages - 1)}" 
+                      th:if="${i >= (hotelPage.number > 5 ? hotelPage.number - 5 : 0) and i <= (hotelPage.number + 5 < hotelPage.totalPages ? hotelPage.number + 5 : hotelPage.totalPages - 1)}"
+                      href="#" th:onclick="|performSearch(${i}, event)|" 
+                      th:class="${i == hotelPage.number} ? 'z-10 bg-blue-50 border-blue-500 text-blue-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium'" 
+                      th:text="${i + 1}">1</a>
+                    
+                    <!-- 다음 페이지 버튼 -->
+                    <a th:if="${hotelPage.hasNext()}" href="#" th:onclick="|performSearch(${hotelPage.number + 1}, event)|" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <i class="fas fa-chevron-right"></i>
                     </a>
                 </nav>
             </div>
         </div>
+        </div>
     </div>
 
     <script src="/js/util.js"></script>
-    <script src="/js/filter.js"></script>
 
     <div th:replace="components/datalist/cityList :: cityDatalistFragment"></div>
 </div>
