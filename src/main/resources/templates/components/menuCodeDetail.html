@@ -7,7 +7,10 @@
 
         <div>
             <label>코드:</label>
-            <input type="text" th:field="*{code}" th:readonly="${menuCode.code != null}"/><br>
+            <input type="text" id="codeInput" th:field="*{code}" oninput="clearHidden()" />
+            <button type="button" id="checkBtn" onclick="checkDupe()">중복검사</button>
+            <span id="checkResult" style="margin-left:10px;color:red;"></span>
+            <input type="hidden" id="codeValidInput" name="codeValid" required />
         </div>
 
         <div>
@@ -33,20 +36,78 @@
     <button th:if="${menuCode.code != null}" th:onclick="deleteMenuCode([[${menuCode.code}]])">삭제</button>
 
     <script>
-        
+
+        function checkDupe() {
+            const code = document.getElementById('codeInput').value.trim();
+            const resultSpan = document.getElementById("checkResult");
+            const hiddenInput = document.getElementById('codeValidInput');
+
+            if (!code) {
+                resultSpan.textContent = '코드를 입력해주세요.';
+                resultSpan.style.color = 'red';
+                hiddenInput.value = '';
+                return;
+            }
+
+            fetch(`/menu-code/check/${code}`, { method: "GET" })
+                .then(response => response.json())
+                .then(data => {
+
+                    if (data.duplicate) {
+                        resultSpan.textContent = "이미 사용 중인 코드입니다.";
+                        resultSpan.style.color = "red";
+                        hiddenInput.value = '';
+                    } else {
+                        resultSpan.textContent = "사용 가능한 코드입니다.";
+                        resultSpan.style.color = "green";
+                        hiddenInput.value = code;
+                    }
+                })
+        }
+
+        function clearHidden() {
+            const hiddenInput = document.getElementById('codeValidInput');
+            hiddenInput.value = ''; // hidden 초기화
+            document.getElementById('checkResult').textContent = ''; // 메시지 초기화
+        }
+
         function addDetailField() {
             const container = document.getElementById('details-container');
             const index = container.children.length;
+
+            // div 생성
             const div = document.createElement('div');
-            div.innerHTML = `
-            <select name="details[${index}].targetColumn">
-                <option value="ID">ID</option>
-                <option value="COUNTRY">COUNTRY</option>
-                <option value="CITY">CITY</option>
-            </select>
-            <input type="text" name="details[${index}].value" placeholder="값" />
-            <button type="button" onclick="removeDetailField(this)">삭제</button>
-        `;
+
+            // select 생성
+            const select = document.createElement('select');
+            select.name = `details[${index}].targetColumn`;
+
+            const options = ['ID', 'COUNTRY', 'CITY'];
+            options.forEach(optValue => {
+                const option = document.createElement('option');
+                option.value = optValue;
+                option.textContent = optValue;
+                select.appendChild(option);
+            });
+
+            // input 생성
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.name = `details[${index}].value`;
+            input.placeholder = '값';
+
+            // 삭제 버튼 생성
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = '삭제';
+            btn.onclick = function () { removeDetailField(this); };
+
+            // div에 append
+            div.appendChild(select);
+            div.appendChild(input);
+            div.appendChild(btn);
+
+            // container에 append
             container.appendChild(div);
         }
 

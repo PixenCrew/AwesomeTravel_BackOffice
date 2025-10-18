@@ -1,6 +1,9 @@
 package renewal.awesome_travel_backoffice.menuCode.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -43,6 +46,23 @@ public class MenuCodeController {
         model.addAttribute("menuCode", menuCode);
         model.addAttribute("content", "components/menuCodeDetail");
         return "layout";
+    }
+
+    @GetMapping("/check/{id}")
+    public ResponseEntity<Map<String, Object>> checkMenuCodeDupe(@PathVariable Long id) {
+
+        Optional<MenuCode> menuCode = menuCodeRepository.findById(id);
+
+        Map<String, Object> response = new HashMap<>();
+        if (menuCode.isPresent()) {
+            response.put("duplicate", true);
+            response.put("message", "이미 사용 중인 코드입니다.");
+            return ResponseEntity.status(409).body(response); // 409 Conflict
+        } else {
+            response.put("duplicate", false);
+            response.put("message", "사용 가능한 코드입니다.");
+            return ResponseEntity.ok(response); // 200 OK
+        }
     }
 
     @GetMapping("/new")
