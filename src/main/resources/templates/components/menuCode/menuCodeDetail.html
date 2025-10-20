@@ -1,0 +1,153 @@
+<div th:fragment="content" th:inline="text">
+    <h1 th:text="${menuCode.code} == null ? '메뉴코드 등록' : '메뉴코드 상세'"></h1>
+
+    <form th:object="${menuCode}"
+        th:action="${menuCode.code} == null ? @{/menu-code/new} : @{/menu-code/{code}(code=${menuCode.code})}"
+        method="post">
+
+        <div>
+            <label>코드:</label>
+            <input type="text" id="codeInput" th:field="*{code}" oninput="clearHidden()" />
+            <button type="button" id="checkBtn" onclick="checkDupe()">중복검사</button>
+            <span id="checkResult" style="margin-left:10px;color:red;"></span>
+            <input type="hidden" id="codeValidInput" name="codeValid" required />
+        </div>
+
+        <div>
+            <label>항목:</label>
+            <div id="details-container">
+                <div th:each="det, iterStat : *{details}">
+                    <select th:field="*{details[__${iterStat.index}__].targetColumn}">
+                        <option
+                            th:each="col : ${T(renewal.common.entity.MenuCode$MenuCodeDetail.TargetColumn).values()}"
+                            th:value="${col}" th:text="${col}"></option>
+                    </select>
+                    <input type="text" th:field="*{details[__${iterStat.index}__].value}" placeholder="값" />
+                    <button type="button" onclick="removeDetailField(this)">삭제</button>
+                </div>
+            </div>
+            <button type="button" onclick="addDetailField()">항목 추가</button>
+        </div>
+
+        <button type="submit" th:text="${menuCode.code} == null ? '등록' : '수정'"></button>
+    </form>
+
+    <!-- 삭제 버튼 -->
+    <button th:if="${menuCode.code != null}" th:onclick="deleteMenuCode([[${menuCode.code}]])">삭제</button>
+
+    <script>
+
+        function checkDupe() {
+            const code = document.getElementById('codeInput').value.trim();
+            const resultSpan = document.getElementById("checkResult");
+            const hiddenInput = document.getElementById('codeValidInput');
+
+            if (!code) {
+                resultSpan.textContent = '코드를 입력해주세요.';
+                resultSpan.style.color = 'red';
+                hiddenInput.value = '';
+                return;
+            }
+
+            fetch(`/menu-code/check/${code}`, { method: "GET" })
+                .then(response => response.json())
+                .then(data => {
+
+                    if (data.duplicate) {
+                        resultSpan.textContent = "이미 사용 중인 코드입니다.";
+                        resultSpan.style.color = "red";
+                        hiddenInput.value = '';
+                    } else {
+                        resultSpan.textContent = "사용 가능한 코드입니다.";
+                        resultSpan.style.color = "green";
+                        hiddenInput.value = code;
+                    }
+                })
+        }
+
+        function clearHidden() {
+            const hiddenInput = document.getElementById('codeValidInput');
+            hiddenInput.value = ''; // hidden 초기화
+            document.getElementById('checkResult').textContent = ''; // 메시지 초기화
+        }
+
+        function addDetailField() {
+            const container = document.getElementById('details-container');
+            const index = container.children.length;
+
+            // div 생성
+            const div = document.createElement('div');
+
+            // select 생성
+            const select = document.createElement('select');
+            select.name = `details[${index}].targetColumn`;
+
+            const options = ['ID', 'COUNTRY', 'CITY'];
+            options.forEach(optValue => {
+                const option = document.createElement('option');
+                option.value = optValue;
+                option.textContent = optValue;
+                select.appendChild(option);
+            });
+
+            // input 생성
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.name = `details[${index}].value`;
+            input.placeholder = '값';
+
+            // 삭제 버튼 생성
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = '삭제';
+            btn.onclick = function () { removeDetailField(this); };
+
+            // div에 append
+            div.appendChild(select);
+            div.appendChild(input);
+            div.appendChild(btn);
+
+            // container에 append
+            container.appendChild(div);
+        }
+
+        function removeDetailField(btn) {
+            const container = document.getElementById('details-container');
+            btn.parentNode.remove(); // 해당 div 삭제
+
+            // 재인덱싱
+            const detailDivs = container.querySelectorAll('div');
+            detailDivs.forEach((div, index) => {
+                const select = div.querySelector('select');
+                const input = div.querySelector('input');
+
+                // name 속성 재설정
+                select.name = `details[${index}].targetColumn`;
+                select.id = `details${index}.targetColumn`;
+
+                input.name = `details[${index}].value`;
+                input.id = `details${index}.value`;
+            });
+        }
+
+        // function deleteMenuCode(code) {
+        //     if (confirm('정말 삭제하시겠습니까?')) {
+        //         window.location.href = `/menu-code/delete/${code}`;
+        //     }
+        // }
+        function deleteMenuCode(id) {
+            if (confirm('정말로 삭제하시겠습니까?')) {
+                fetch('/menu-code/' + id, { method: 'DELETE' })
+                    .then(res => {
+                        if (res.ok) {
+                            alert('삭제 성공');
+                            window.location.href = '/menu-code';
+                        } else {
+                            alert('삭제 실패');
+                        }
+                    });
+            }
+        }
+
+    </script>
+</div>
