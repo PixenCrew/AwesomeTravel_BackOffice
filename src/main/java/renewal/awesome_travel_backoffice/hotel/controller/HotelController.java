@@ -1,21 +1,23 @@
 package renewal.awesome_travel_backoffice.hotel.controller;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.hotel.dto.HotelFilterDTO;
+import renewal.awesome_travel_backoffice.hotel.repository.AmenityRepository;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelRepository;
 // import renewal.awesome_travel_backoffice.hotel.repository.HotelReservationRepository;
 import renewal.awesome_travel_backoffice.hotel.service.HotelService;
@@ -23,9 +25,6 @@ import renewal.common.entity.Hotel;
 // import renewal.common.entity.HotelReservation;
 import renewal.common.entity.Hotel.HotelType;
 import renewal.common.repository.CityCodeRepository;
-import renewal.awesome_travel_backoffice.hotel.repository.AmenityRepository;
-
-import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RequestMapping("/hotel")
@@ -167,8 +166,8 @@ public class HotelController {
         
         // 호텔선택 플래그
         model.addAttribute("isSelectionPage", true);
+        model.addAttribute("content", "components/hotel/hotel"); // layout 안에서 이 fragment를 렌더
 
-        // return "hotelSelect";
-        return "components/hotel/hotelSearchPopup";
+        return "popup";
     }
 }

@@ -3,22 +3,23 @@ package renewal.awesome_travel_backoffice.tour.controller;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import lombok.RequiredArgsConstructor;
 // import renewal.awesome_travel_backoffice.hotel.repository.HotelReservationRepository;
 import renewal.awesome_travel_backoffice.product.repository.ProductRepository;
 import renewal.awesome_travel_backoffice.tour.TourService;
@@ -28,11 +29,10 @@ import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
 // import renewal.common.entity.HotelReservation.HotelReservationStatus;
 import renewal.common.entity.Location;
 import renewal.common.entity.Location.LocationType;
-import renewal.common.repository.CityCodeRepository;
-import renewal.common.repository.CountryCodeRepository;
 import renewal.common.entity.Schedule;
 import renewal.common.entity.Tour;
-import lombok.RequiredArgsConstructor;
+import renewal.common.repository.CityCodeRepository;
+import renewal.common.repository.CountryCodeRepository;
 
 @RequiredArgsConstructor
 @RequestMapping("/tour")
@@ -135,13 +135,13 @@ public class TourController {
     @PostMapping("/new")
     public String submitTravel(@ModelAttribute Tour tour) throws Exception {
         // 모든 Schedule 객체에 tour 참조를 세팅
-        for (Schedule schedule : tour.getSchedules()) {
-            schedule.setTour(tour);
-            // 모든 location 객체에 schedule 참조를 세팅
-            for (Location location : schedule.getLocations()) {
-                location.updateSchedule(schedule);
-            }
-        }
+        // for (Schedule schedule : tour.getSchedules()) {
+        //     schedule.setTour(tour);
+        //     // 모든 location 객체에 schedule 참조를 세팅
+        //     for (Location location : schedule.getLocations()) {
+        //         location.updateSchedule(schedule);
+        //     }
+        // }
 
         // tour.id 생성을 위한 1차 저장
         tourRepo.save(tour);
@@ -156,10 +156,14 @@ public class TourController {
     public String selectTravel(@PathVariable Long id, Model model) {
 
         Tour tour = tourService.findById(id);
+        // Tour tour = tourRepo.findByIdWithAll(id).get();
+        // Tour tour = tourRepo.findWithSchedulesAndLocationsById(id);
+        Long connectedProduct = productRepo.findByTourId(id).get(0).getId();
         model.addAttribute("types", LocationType.class);
         model.addAttribute("countryCode", countryRepo.findAll());
         model.addAttribute("cityCode", cityRepo.findAll());
         model.addAttribute("tour", tour);
+        model.addAttribute("connectedProduct", connectedProduct);
         model.addAttribute("isSelectionPage", false);
         model.addAttribute("title", "Tour " + tour.getName());
         model.addAttribute("content", "components/tour/tourDetail");
@@ -171,14 +175,14 @@ public class TourController {
     @PostMapping("/{id}")
     public String submitSelectedTravel(@ModelAttribute Tour tour) throws Exception {
         // 모든 Schedule 객체에 tour 참조를 세팅
-        for (Schedule schedule : tour.getSchedules()) {
-            schedule.setTour(tour);
-            // 모든 location 객체에 schedule 참조를 세팅
-            for (Location location : schedule.getLocations()) {
-                location.updateSchedule(schedule);
-            }
-        }
-        ;
+        // for (Schedule schedule : tour.getSchedules()) {
+        //     schedule.setTour(tour);
+        //     // 모든 location 객체에 schedule 참조를 세팅
+        //     for (Location location : schedule.getLocations()) {
+        //         location.updateSchedule(schedule);
+        //     }
+        // }
+        // ;
 
         tourRepo.save(processTour(tour));
 
@@ -242,8 +246,9 @@ public class TourController {
 
         // 투어선택 플래그
         model.addAttribute("isSelectionPage", true);
+        model.addAttribute("content", "components/hotel/hotel"); // layout 안에서 이 fragment를 렌더
 
-        return "components/tour/tour";
+        return "popup";
     }
 
     // 투어 공용함수 분리

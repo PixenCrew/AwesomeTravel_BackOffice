@@ -213,9 +213,8 @@ public class AirController {
         
         // 항공선택 플래그
         model.addAttribute("isSelectionPage", true);
-
-        // return "airSelect";
-        return "components/air/airSearchPopup";
+        model.addAttribute("content", "components/air/air");
+        return "popup";
     }
 
     @GetMapping("/seat/{id}")

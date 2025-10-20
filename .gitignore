@@ -47,3 +47,4 @@ src/main/generated/
 images/
 src/main/resources/META-INF/additional-spring-configuration-metadata.json
 certificate.p12
+src/main/resources/templates/components/.old/
