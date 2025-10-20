@@ -17,18 +17,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.product.dto.ProductFilterDTO;
 import renewal.awesome_travel_backoffice.product.repository.ProductRepository;
 import renewal.awesome_travel_backoffice.product.service.ProductService;
+import renewal.awesome_travel_backoffice.productPurchase.repository.ProductPurchaseRepository;
 import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
 import renewal.common.entity.Product;
+import renewal.common.entity.Product.Info;
 import renewal.common.entity.Product.ProductType;
 import renewal.common.entity.Tour;
-import renewal.common.entity.Product.Info;
 import renewal.common.repository.CityCodeRepository;
 import renewal.common.repository.CountryCodeRepository;
-import renewal.awesome_travel_backoffice.productPurchase.repository.ProductPurchaseRepository;
-import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RequestMapping("/product")
@@ -144,12 +144,12 @@ public class ProductController {
         // 기존 Tour productId 삭제
         Long lastTourId = existingProduct.getTour().getId();
         Tour lastTour = tourRepo.findById(lastTourId).get();
-        lastTour.setProduct(null);
+        // lastTour.setProduct(null);
         tourRepo.save(lastTour);
 
         // 투어 productId 업데이트
         Tour tour = tourRepo.findById(product.getTour().getId()).get();
-        tour.setProduct(product);
+        // tour.setProduct(product);
         tourRepo.save(tour);
 
         // 리뷰 데이터 보존하면서 Product 업데이트
@@ -225,7 +225,7 @@ public class ProductController {
         Product product = productRepo.findById(id).get();
         Tour tour = product.getTour();
         if (tour != null) {
-            tour.setProduct(null); // FK를 null로 만들어서 참조 끊기
+            // tour.setProduct(null); // FK를 null로 만들어서 참조 끊기
             tourRepo.save(tour); // 업데이트 필요
         }
 
