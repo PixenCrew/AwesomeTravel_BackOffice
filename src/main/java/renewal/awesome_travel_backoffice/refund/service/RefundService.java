@@ -1,10 +1,11 @@
 package renewal.awesome_travel_backoffice.refund.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.airPurchase.repository.PurchaseAirRepository;
 import renewal.awesome_travel_backoffice.productPurchase.repository.ProductPurchaseRepository;
 import renewal.awesome_travel_backoffice.refund.repository.RefundRepository;
@@ -13,8 +14,6 @@ import renewal.common.entity.PurchaseBase.PurchaseStatus;
 import renewal.common.entity.PurchaseProduct;
 import renewal.common.entity.Refund;
 import renewal.common.entity.SeatClass;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -92,7 +91,7 @@ public class RefundService {
             // 좌석 수 복구
             SeatClass seatClass = airPurchase.getSeatClass();
             seatClass.setAvailableSeats(seatClass.getAvailableSeats() + 
-                airPurchase.getPassengerAirs().size());
+                airPurchase.getPassengers().size());
 
             System.out.printf("[환불 처리 완료 - 항공권] 환불ID=%d, 주문ID=%d, 금액=%d, 처리자=%s\n",
                     refundId, refund.getPurchaseId(), refund.getAmount(), processedBy);

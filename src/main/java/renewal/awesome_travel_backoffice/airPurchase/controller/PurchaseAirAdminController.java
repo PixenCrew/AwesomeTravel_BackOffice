@@ -5,22 +5,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import renewal.awesome_travel_backoffice.airPurchase.dto.request.PurchaseAirSearchCondition;
-import renewal.awesome_travel_backoffice.airPurchase.dto.request.AirPassengerUpdateRequestDto;
-import renewal.awesome_travel_backoffice.airPurchase.service.PurchaseAirService;
-import renewal.common.entity.PurchaseBase.PurchaseStatus;
-import renewal.common.entity.PurchaseAir;
 import lombok.RequiredArgsConstructor;
+import renewal.awesome_travel_backoffice.airPurchase.dto.request.AirPassengerUpdateRequestDto;
+import renewal.awesome_travel_backoffice.airPurchase.dto.request.PurchaseAirSearchCondition;
+import renewal.awesome_travel_backoffice.airPurchase.service.PurchaseAirService;
+import renewal.common.entity.PurchaseAir;
+import renewal.common.entity.PurchaseBase.PurchaseStatus;
 
 @RestController
 @RequiredArgsConstructor

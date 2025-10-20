@@ -2,14 +2,12 @@ package renewal.awesome_travel_backoffice.tour;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 // import renewal.awesome_travel_backoffice.hotel.repository.HotelReservationRepository;
 import renewal.awesome_travel_backoffice.product.repository.ProductRepository;
 import renewal.awesome_travel_backoffice.tour.dto.TourFilterDTO;
@@ -36,7 +34,8 @@ public class TourService {
     }
     
     public Page<Tour> searchTours(TourFilterDTO filter, Pageable pageable, boolean excludeConnected) {
-        Specification<Tour> spec = Specification.where(TourSpecification.withProductJoin()); // 기본적으로 Product와 JOIN
+        // Specification<Tour> spec = Specification.where(TourSpecification.withProductJoin()); // 기본적으로 Product와 JOIN
+        Specification<Tour> spec = Specification.where(null);
 
         if (filter.getName() != null && !filter.getName().isEmpty()) {
             spec = spec.and(TourSpecification.nameContains(filter.getName()));
@@ -78,7 +77,7 @@ public class TourService {
     public Tour findById(Long id) {
         Tour tour = tourRepository.findById(id).orElseThrow(() -> new RuntimeException("Tour not found with id: " + id));
         // 스케줄을 명시적으로 로드
-        tour.getSchedules().size();
+        // tour.getSchedules().size();
         return tour;
     }
 

@@ -1,8 +1,8 @@
-package renewal.awesome_travel_backoffice.specialRequest.repository;
+// package renewal.awesome_travel_backoffice.specialRequest.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+// import org.springframework.data.jpa.repository.JpaRepository;
 
-import renewal.common.entity.SpecialRequest;
+// import renewal.common.entity.SpecialRequest;
 
-public interface SpecialRequestRepository extends JpaRepository<SpecialRequest, Long> {
-}
+// public interface SpecialRequestRepository extends JpaRepository<SpecialRequest, Long> {
+// }

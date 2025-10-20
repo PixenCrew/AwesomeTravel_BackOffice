@@ -7,13 +7,13 @@ import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import renewal.common.entity.CountryCode;
 import renewal.common.entity.Location;
 import renewal.common.entity.Product;
 import renewal.common.entity.Schedule;
 import renewal.common.entity.Tour;
-import renewal.common.entity.Product;
 
 public class TourSpecification {
 
@@ -125,21 +125,45 @@ public class TourSpecification {
     }
 
     // Tour.product_id == NULL Product가 연결 안된 Tour만 찾기
+    // public static Specification<Tour> productIsEmptyOrNull() {
+    // return (root, query, cb) -> {
+    // // Tour LEFT JOIN Product
+    // Join<Tour, Product> productJoin = root.join("product", JoinType.LEFT);
+    // // Product가 없는 Tour만
+    // return cb.isNull(productJoin.get("id"));
+    // };
+    // }
     public static Specification<Tour> productIsEmptyOrNull() {
         return (root, query, cb) -> {
-            // Tour LEFT JOIN Product
-            Join<Tour, Product> productJoin = root.join("product", JoinType.LEFT);
-            // Product가 없는 Tour만
-            return cb.isNull(productJoin.get("id"));
+            // 서브쿼리: Product에서 연결된 Tour ID 찾기
+            Subquery<Long> subquery = query.subquery(Long.class);
+            Root<Product> productRoot = subquery.from(Product.class);
+            subquery.select(productRoot.get("tour").get("id"));
+
+            // Tour.id NOT IN (Product.tour.id)
+            return cb.not(root.get("id").in(subquery));
         };
     }
 
-    // Product와 연결 여부 확인용
+    // // Product와 연결 여부 확인용
+    // public static Specification<Tour> withProductJoin() {
+    // return (root, query, cb) -> {
+    // // fetch join 설정 (JPA가 Tour.product를 조회할 수 있도록)
+    // root.fetch("product", JoinType.LEFT);
+    // return cb.conjunction(); // 아무 조건 없는 기본 쿼리
+    // };
+    // }
     public static Specification<Tour> withProductJoin() {
         return (root, query, cb) -> {
-            // fetch join 설정 (JPA가 Tour.product를 조회할 수 있도록)
-            root.fetch("product", JoinType.LEFT);
-            return cb.conjunction(); // 아무 조건 없는 기본 쿼리
+            // 서브쿼리 생성
+            Subquery<Long> subquery = query.subquery(Long.class);
+            Root<Product> productRoot = subquery.from(Product.class);
+            subquery.select(productRoot.get("tour").get("id")); // Product.tour.id
+            subquery.where(cb.equal(productRoot.get("tour").get("id"), root.get("id")));
+
+            // Product가 있는 Tour만 조회 (exists)
+            return cb.exists(subquery);
         };
     }
+
 }

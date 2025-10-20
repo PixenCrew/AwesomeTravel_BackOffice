@@ -1,8 +1,12 @@
 package renewal.awesome_travel_backoffice.air;
 
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -11,19 +15,16 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import jakarta.transaction.Transactional;
 import renewal.awesome_travel_backoffice.air.repository.AirRepository;
 import renewal.awesome_travel_backoffice.air.repository.AirlineRepository;
 import renewal.awesome_travel_backoffice.air.repository.SeatClassRepository;
 import renewal.awesome_travel_backoffice.air.service.AirService;
 import renewal.awesome_travel_backoffice.airport.repository.AirportCodeRepository;
 import renewal.common.entity.Air;
+import renewal.common.entity.Air.FlightType;
 import renewal.common.entity.Airline;
 import renewal.common.entity.AirportCode;
-import renewal.common.entity.CityCode;
 import renewal.common.entity.SeatClass;
-import renewal.common.entity.Air.FlightType;
-import renewal.common.repository.CityCodeRepository;
 import renewal.common.repository.CountryCodeRepository;
 
 @Configuration

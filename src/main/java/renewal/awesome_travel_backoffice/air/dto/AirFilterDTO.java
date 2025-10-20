@@ -6,14 +6,12 @@ import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import renewal.common.entity.AirportCode;
-import renewal.common.entity.CityCode;
-import renewal.common.entity.Air.AirStatus;
-import renewal.common.entity.Air.FlightType;
-import renewal.common.entity.SeatClass.SeatClassType;
-
 import lombok.Getter;
 import lombok.Setter;
+import renewal.common.entity.Air.AirStatus;
+import renewal.common.entity.Air.FlightType;
+import renewal.common.entity.AirportCode;
+import renewal.common.entity.SeatClass.SeatClassType;
 
 @Getter
 @Setter

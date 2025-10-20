@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title th:text="${title}">BackOffice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['"Pretendard Variable"', 'Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', '"Helvetica Neue"', '"Segoe UI"', '"Apple SD Gothic Neo"', '"Noto Sans KR"', '"Malgun Gothic"', '"Apple Color Emoji"', '"Segoe UI Emoji"', '"Segoe UI Symbol"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Pretendard 폰트 -->
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+    <style type="text/tailwindcss">
+        /* Pretendard 폰트 설정 */
+        * {
+            font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+        }
+        
+        @layer components {
+            .menu-item {
+                @apply text-gray-700 hover:text-blue-600;
+            }
+            .menu-item.active {
+                @apply text-blue-600;
+            }
+            .menu-item .submenu-link.active {
+                @apply bg-blue-600 text-white;
+            }
+            .menu-item .submenu-link:hover {
+                @apply bg-blue-100;
+            }
+            .sidebar-collapsed {
+                @apply w-16;
+            }
+            .sidebar-expanded {
+                @apply w-64;
+            }
+            .content-shifted {
+                @apply ml-16;
+            }
+            .content-normal {
+                @apply ml-64;
+            }
+            /* 접힌 상태일 때의 스타일 */
+            .sidebar-collapsed .menu-link,
+            .sidebar-collapsed .menu-item a {
+                @apply justify-center;
+            }
+            .sidebar-collapsed .submenu {
+                @apply hidden;
+            }
+            .sidebar-collapsed .toggle-icon {
+                @apply hidden;
+            }
+            .sidebar-collapsed .menu-icon {
+                @apply mx-auto;
+            }
+            .sidebar-collapsed .sidebar-header {
+                @apply justify-center;
+            }
+            .sidebar-collapsed .header-content {
+                @apply justify-center;
+            }
+            .sidebar-collapsed .sidebar-text {
+                @apply hidden;
+            }
+            /* 메뉴 아이템 스타일 */
+            .menu-item-content {
+                @apply flex items-center w-full rounded hover:bg-blue-100 transition-colors duration-200 h-10;
+            }
+            /* 사이드바 접힘 상태 스타일 */
+            .sidebar-collapsed .menu-item-content {
+                @apply justify-center;
+            }
+            .sidebar-collapsed .menu-icon-container {
+                @apply w-16 mx-auto;
+            }
+            .sidebar-collapsed .sidebar-text,
+            .sidebar-collapsed .toggle-icon {
+                @apply hidden;
+            }
+            /* 메뉴 아이콘 컨테이너 */
+            .menu-icon-container {
+                @apply w-16 h-10 flex justify-center items-center flex-shrink-0;
+            }
+            /* 메뉴 아이콘 */
+            .menu-icon {
+                @apply text-xl;
+            }
+            /* 토글 아이콘 */
+            .toggle-icon {
+                @apply ml-auto h-10 flex items-center pr-2;
+            }
+            /* 사이드바 그림자 */
+            .sidebar-shadow {
+                @apply shadow-lg;
+            }
+            /* 헤더 버튼 컨테이너 */
+            .header-content {
+                @apply flex items-center justify-between w-full px-4;
+            }
+            /* 검색창 스타일 */
+            .header-search {
+                @apply flex-1 mx-4;
+            }
+            .header-search input {
+                @apply w-96 px-4 py-2 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200;
+            }
+            /* 사이드바 내용 컨테이너 */
+            .sidebar-inner {
+                @apply h-full flex flex-col overflow-hidden;
+            }
+            /* 메뉴 컨테이너 */
+            .menu-container {
+                @apply flex-1 overflow-y-auto py-4 px-4 space-y-1;
+            }
+            /* 서브메뉴 스타일 */
+            .submenu {
+                @apply ml-8 mt-1 text-sm text-gray-700 space-y-0.5;
+            }
+            .submenu-link {
+                @apply block rounded hover:bg-blue-50 transition-colors duration-200 h-8 leading-8 px-3;
+            }
+            /* 활성화된 메뉴 아이템 */
+            .menu-item-active {
+                @apply bg-blue-50;
+            }
+            /* 메뉴 아이콘 */
+            .menu-icon {
+                @apply text-gray-500;
+            }
+            /* 메뉴 텍스트 */
+            .sidebar-text {
+                @apply truncate flex-shrink-0 leading-10;
+            }
+            /* 메뉴 섹션 */
+            .menu-section {
+                @apply text-xs text-gray-500 font-semibold h-8 flex items-center;
+            }
+            /* 메뉴 리스트 */
+            .menu-list {
+                @apply space-y-1;
+            }
+            /* 테이블 반응형 처리 */
+            .table-responsive {
+                @apply w-full overflow-x-auto;
+            }
+            .table-responsive table {
+                @apply min-w-full;
+            }
+        }
+    </style>
+</head>
+
+<body class="flex h-screen bg-gray-100">
+
+    <!-- 동적으로 교체될 컨텐츠 영역 -->
+    <div th:replace="~{${content} :: content}" class="h-full min-w-0"></div>
+
+    <!-- 공통 필터 스크립트 -->
+    <script src="/js/filter.js"></script>
+</body>
+
+</html>

@@ -1,10 +1,13 @@
 package renewal.awesome_travel_backoffice.tour.repository;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import renewal.common.entity.Tour;
 
@@ -13,4 +16,18 @@ public interface TourRepository extends JpaRepository<Tour, Long>, JpaSpecificat
     // 투어 등록한 회사들 목록 조회
     @Query("SELECT DISTINCT t.company FROM Tour t WHERE t.company IS NOT NULL")
     List<String> findDistinctCompanies();
+    
+    @EntityGraph(attributePaths = {
+        "schedules",
+        "schedules.locations",
+        "schedules.locations.hotel"
+    })
+    Tour findWithSchedulesAndLocationsById(Long id);
+
+    @Query("SELECT DISTINCT t FROM Tour t " +
+       "LEFT JOIN FETCH t.schedules s " +
+       "LEFT JOIN FETCH s.locations l " +
+       "LEFT JOIN FETCH l.hotel h " +
+       "WHERE t.id = :id")
+    Optional<Tour> findByIdWithAll(@Param("id") Long id);
 }

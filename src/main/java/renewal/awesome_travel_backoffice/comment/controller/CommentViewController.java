@@ -10,10 +10,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.comment.dto.response.CommentResponseDto;
 import renewal.awesome_travel_backoffice.comment.service.CommentService;
-import renewal.common.entity.ReviewReport.ReportReason;
-import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RequestMapping("/comment")

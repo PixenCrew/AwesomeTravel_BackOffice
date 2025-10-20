@@ -1,12 +1,11 @@
 package renewal.awesome_travel_backoffice.productPurchase.dto.response;
 
+import java.time.LocalDate;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @Getter
 @Setter
@@ -25,7 +24,7 @@ public class ProductPassengerResponseDto {
     private String lastName;        // 영문 성
     private String firstName;       // 영문 이름
     private LocalDate expire;       // 여권 만료일
-    private List<String> specialRequests;  // 특별 요청사항
+    private String specialRequests;  // 특별 요청사항
 }
 
 
