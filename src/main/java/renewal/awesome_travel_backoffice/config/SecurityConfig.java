@@ -10,9 +10,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import renewal.awesome_travel_backoffice.admin.AdminService;
-
 import lombok.RequiredArgsConstructor;
+import renewal.awesome_travel_backoffice.admin.AdminService;
 
 @Configuration
 @EnableWebSecurity
@@ -37,7 +36,7 @@ public class SecurityConfig {
                 .authenticationManager(authManager)
                 .csrf(csrf -> csrf.disable()) // 개발 중 비활성화, 운영 시 검토
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/admin").permitAll()
+                        .requestMatchers("/login", "/admin","/icon/**","/favicon.ico").permitAll()
                         // .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .formLogin(form -> form
