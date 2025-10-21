@@ -18,17 +18,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.RequiredArgsConstructor;
+import renewal.awesome_travel_backoffice.common.service.CommonCodeService;
 import renewal.awesome_travel_backoffice.product.dto.ProductFilterDTO;
 import renewal.awesome_travel_backoffice.product.repository.ProductRepository;
 import renewal.awesome_travel_backoffice.product.service.ProductService;
-import renewal.awesome_travel_backoffice.productPurchase.repository.ProductPurchaseRepository;
 import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
 import renewal.common.entity.Product;
 import renewal.common.entity.Product.Info;
 import renewal.common.entity.Product.ProductType;
 import renewal.common.entity.Tour;
-import renewal.common.repository.CityCodeRepository;
-import renewal.common.repository.CountryCodeRepository;
 
 @RequiredArgsConstructor
 @RequestMapping("/product")
@@ -38,9 +36,8 @@ public class ProductController {
     private final ProductRepository productRepo;
     private final TourRepository tourRepo;
     private final ProductService productService;
-    private final CountryCodeRepository countryRepo;
-    private final CityCodeRepository cityRepo;
-    private final ProductPurchaseRepository productPurchaseRepo;
+
+    private final CommonCodeService commonCodeService;
 
     @GetMapping
     public String listAndFilter(
@@ -70,8 +67,8 @@ public class ProductController {
 
         // 3) View에서 쓸 속성들
         model.addAttribute("filter", filter); // 필터 객체 추가
-        model.addAttribute("countryCode", countryRepo.findAll());
-        model.addAttribute("cityCode", cityRepo.findAll());
+        model.addAttribute("countryCode", commonCodeService.getAllCountryCodes());
+        model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
         model.addAttribute("productPage", productPage);
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
@@ -91,8 +88,8 @@ public class ProductController {
         blankProduct.setImages(new ArrayList<String>());
         blankProduct.setInfo(new ArrayList<Info>());
 
-        model.addAttribute("countryCode", countryRepo.findAll());
-        model.addAttribute("cityCode", cityRepo.findAll());
+        model.addAttribute("countryCode", commonCodeService.getAllCountryCodes());
+        model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
         model.addAttribute("productTypes", ProductType.values());
         model.addAttribute("product", blankProduct);
         model.addAttribute("title", "New Product");

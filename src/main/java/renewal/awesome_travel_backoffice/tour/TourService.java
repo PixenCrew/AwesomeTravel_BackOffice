@@ -74,13 +74,6 @@ public class TourService {
         return tourRepository.findAll(spec, pageable);
     }
 
-    public Tour findById(Long id) {
-        Tour tour = tourRepository.findById(id).orElseThrow(() -> new RuntimeException("Tour not found with id: " + id));
-        // 스케줄을 명시적으로 로드
-        // tour.getSchedules().size();
-        return tour;
-    }
-
     // public void cancelHotelAir(Long tourId) throws Exception{
 
     //     // 연결된 Air, Hotel 예약 CANCELED로 변경

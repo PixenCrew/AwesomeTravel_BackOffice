@@ -22,14 +22,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.air.dto.AirFilterDTO;
 import renewal.awesome_travel_backoffice.air.repository.AirRepository;
-import renewal.awesome_travel_backoffice.air.repository.AirReservationRepository;
-import renewal.awesome_travel_backoffice.air.repository.AirlineRepository;
 import renewal.awesome_travel_backoffice.air.service.AirService;
-import renewal.awesome_travel_backoffice.airport.repository.AirportCodeRepository;
+import renewal.awesome_travel_backoffice.common.service.CommonCodeService;
 import renewal.common.entity.Air;
 import renewal.common.entity.Air.AirStatus;
 import renewal.common.entity.Air.FlightType;
-import renewal.common.entity.AirReservation;
 import renewal.common.entity.Airline;
 import renewal.common.entity.SeatClass;
 import renewal.common.entity.SeatClass.SeatClassType;
@@ -41,10 +38,9 @@ public class AirController {
 
     private final AirService airService;
     private final AirRepository airRepo;
-    private final AirlineRepository airlineRepo;
-    private final AirReservationRepository airReservationRepo;
-    private final AirportCodeRepository airportRepo;
 
+    private final CommonCodeService commonCodeService;
+    
     // 항공 목록
     @GetMapping
     // @PreAuthorize("hasRole('ADMIN')")
@@ -61,7 +57,7 @@ public class AirController {
 
         // 1) 회사 목록 (체크박스용)
         // List<String> allAirlines = airService.getAllCompanies();
-        List<Airline> allAirlines = airlineRepo.findAll();
+        List<Airline> allAirlines = commonCodeService.getAllAirlines();
         model.addAttribute("allAirlines", allAirlines);
 
         // 2) 페이징(50개 고정) + 필터링 로직
@@ -69,7 +65,7 @@ public class AirController {
         Page<SeatClass> airPage = airService.searchAirs(filter, pageable);
 
         // 공항 코드
-        model.addAttribute("airportCode", airportRepo.findAll());
+        model.addAttribute("airportCode", commonCodeService.getAllAirports());
 
         // 3) View에서 쓸 속성들
         model.addAttribute("airPage", airPage);
@@ -101,11 +97,11 @@ public class AirController {
         }
 
         // 항공사 목록 (드롭박스용)
-        List<Airline> allAirlines = airlineRepo.findAll();
+        List<Airline> allAirlines = commonCodeService.getAllAirlines();
         model.addAttribute("allAirlines", allAirlines);
 
         // 공항코드 목록 (드롭박스용)
-        model.addAttribute("airportCode", airportRepo.findAll());
+        model.addAttribute("airportCode", commonCodeService.getAllAirports());
 
         model.addAttribute("air", air);
         model.addAttribute("title", "New Air");
@@ -133,11 +129,11 @@ public class AirController {
         Air air = airRepo.getReferenceById(id);
 
         // 항공사 목록 (드롭박스용)
-        List<Airline> allAirlines = airlineRepo.findAll();
+        List<Airline> allAirlines = commonCodeService.getAllAirlines();
         model.addAttribute("allAirlines", allAirlines);
 
         // 공항코드 목록 (드롭박스용)
-        model.addAttribute("airportCode", airportRepo.findAll());
+        model.addAttribute("airportCode", commonCodeService.getAllAirports());
 
         model.addAttribute("air", air);
         model.addAttribute("title", "Air Detail");
@@ -209,7 +205,7 @@ public class AirController {
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("title", "Air Select");
-        model.addAttribute("airportCode", airportRepo.findAll());
+        model.addAttribute("airportCode", commonCodeService.getAllAirports());
         
         // 항공선택 플래그
         model.addAttribute("isSelectionPage", true);
@@ -217,12 +213,12 @@ public class AirController {
         return "popup";
     }
 
-    @GetMapping("/seat/{id}")
-    public String showReservation(@PathVariable Long id, Model model) {
+    // @GetMapping("/seat/{id}")
+    // public String showReservation(@PathVariable Long id, Model model) {
 
-        List<AirReservation> reservations = airReservationRepo.findAllBySeatClassId(id);
-        model.addAttribute("reservations", reservations);
+    //     List<AirReservation> reservations = airReservationRepo.findAllBySeatClassId(id);
+    //     model.addAttribute("reservations", reservations);
         
-        return "components/air/airReservation";
-    }
+    //     return "components/air/airReservation";
+    // }
 }

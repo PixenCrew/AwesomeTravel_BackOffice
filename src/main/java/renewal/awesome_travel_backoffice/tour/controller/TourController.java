@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.RequiredArgsConstructor;
+import renewal.awesome_travel_backoffice.common.service.CommonCodeService;
 import renewal.awesome_travel_backoffice.product.repository.ProductRepository;
 import renewal.awesome_travel_backoffice.tour.TourService;
 import renewal.awesome_travel_backoffice.tour.dto.TourFilterDTO;
@@ -30,8 +31,6 @@ import renewal.common.entity.Location.LocationType;
 import renewal.common.entity.Product;
 import renewal.common.entity.Schedule;
 import renewal.common.entity.Tour;
-import renewal.common.repository.CityCodeRepository;
-import renewal.common.repository.CountryCodeRepository;
 
 @RequiredArgsConstructor
 @RequestMapping("/tour")
@@ -42,8 +41,7 @@ public class TourController {
     private final TourService tourService;
     private final ProductRepository productRepo;
 
-    private final CountryCodeRepository countryRepo;
-    private final CityCodeRepository cityRepo;
+    private final CommonCodeService commonCodeService;
 
     // 투어 목록
     // 필터 폼과 결과 리스트(또는 전체 리스트)를 동일하게 렌더링
@@ -68,8 +66,8 @@ public class TourController {
         Page<Tour> tourPage = tourService.searchTours(filter, pageable);
 
         // 3) View에서 쓸 속성들
-        model.addAttribute("countryCode", countryRepo.findAll());
-        model.addAttribute("cityCode", cityRepo.findAll());
+        model.addAttribute("countryCode", commonCodeService.getAllCountryCodes());
+        model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
         model.addAttribute("tourPage", tourPage);
         model.addAttribute("filter", filter); // 필터 객체 추가
         model.addAttribute("sortField", sortField);
@@ -103,8 +101,8 @@ public class TourController {
         blankTour.getSchedules().add(blankSchedule);
 
         model.addAttribute("types", LocationType.values());
-        model.addAttribute("countryCode", countryRepo.findAll());
-        model.addAttribute("cityCode", cityRepo.findAll());
+        model.addAttribute("countryCode", commonCodeService.getAllCountryCodes());
+        model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
         model.addAttribute("tour", blankTour);
         model.addAttribute("connectedProduct", new Product());
         model.addAttribute("isSelectionPage", false);
@@ -135,11 +133,11 @@ public class TourController {
     @GetMapping("/{id}")
     public String selectTravel(@PathVariable Long id, Model model) {
 
-        Tour tour = tourService.findById(id);
+        Tour tour = tourRepo.findById(id).get();
         Product connectedProduct = productRepo.findByTourId(id);
         model.addAttribute("types", LocationType.class);
-        model.addAttribute("countryCode", countryRepo.findAll());
-        model.addAttribute("cityCode", cityRepo.findAll());
+        model.addAttribute("countryCode", commonCodeService.getAllCountryCodes());
+        model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
         model.addAttribute("tour", tour);
         model.addAttribute("connectedProduct", connectedProduct==null ? 0 : connectedProduct.getId());
         model.addAttribute("isSelectionPage", false);

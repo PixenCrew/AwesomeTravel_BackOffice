@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.RequiredArgsConstructor;
+import renewal.awesome_travel_backoffice.common.service.CommonCodeService;
 import renewal.awesome_travel_backoffice.hotel.dto.HotelFilterDTO;
 import renewal.awesome_travel_backoffice.hotel.repository.AmenityRepository;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelRepository;
@@ -24,7 +25,6 @@ import renewal.awesome_travel_backoffice.hotel.service.HotelService;
 import renewal.common.entity.Hotel;
 // import renewal.common.entity.HotelReservation;
 import renewal.common.entity.Hotel.HotelType;
-import renewal.common.repository.CityCodeRepository;
 
 @RequiredArgsConstructor
 @RequestMapping("/hotel")
@@ -33,9 +33,9 @@ public class HotelController {
 
     private final HotelService hotelService;
     private final HotelRepository hotelRepo;
-    // private final HotelReservationRepository hotelReservationRepo;
     private final AmenityRepository amenityRepo;
-    private final CityCodeRepository cityRepo;
+    
+    private final CommonCodeService commonCodeService;
 
     // 호텔 목록 + 필터 + 페이징
     @GetMapping
@@ -53,7 +53,7 @@ public class HotelController {
         Page<Hotel> hotelPage = hotelService.searchHotels(filter, pageable);
 
         // 도시코드
-        model.addAttribute("cityCode", cityRepo.findAll());
+        model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
 
         model.addAttribute("hotelPage", hotelPage);
         model.addAttribute("filter", filter); // 필터 객체 추가
@@ -73,7 +73,7 @@ public class HotelController {
         Hotel hotel = new Hotel();
         
         // 도시코드
-        model.addAttribute("cityCode", cityRepo.findAll());
+        model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
         
         model.addAttribute("hotel", hotel);
         model.addAttribute("hotelTypes", HotelType.values());
@@ -96,7 +96,7 @@ public class HotelController {
         Hotel hotel = hotelRepo.getReferenceById(id);
 
         // 도시코드
-        model.addAttribute("cityCode", cityRepo.findAll());
+        model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
         
         model.addAttribute("hotel", hotel);
         model.addAttribute("hotelTypes", HotelType.values());
@@ -162,7 +162,7 @@ public class HotelController {
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("title", "Hotel Select");
-        model.addAttribute("cityCode", cityRepo.findAll());
+        model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
         
         // 호텔선택 플래그
         model.addAttribute("isSelectionPage", true);
