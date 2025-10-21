@@ -103,6 +103,7 @@ public class TourController {
         model.addAttribute("types", LocationType.values());
         model.addAttribute("countryCode", commonCodeService.getAllCountryCodes());
         model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
+        model.addAttribute("airportCode", commonCodeService.getAllAirports());
         model.addAttribute("tour", blankTour);
         model.addAttribute("connectedProduct", new Product());
         model.addAttribute("isSelectionPage", false);
@@ -138,6 +139,7 @@ public class TourController {
         model.addAttribute("types", LocationType.class);
         model.addAttribute("countryCode", commonCodeService.getAllCountryCodes());
         model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
+        model.addAttribute("airportCode", commonCodeService.getAllAirports());
         model.addAttribute("tour", tour);
         model.addAttribute("connectedProduct", connectedProduct==null ? 0 : connectedProduct.getId());
         model.addAttribute("isSelectionPage", false);

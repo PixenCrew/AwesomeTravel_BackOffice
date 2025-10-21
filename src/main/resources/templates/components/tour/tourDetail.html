@@ -507,14 +507,14 @@
                                         <label>출발지</label>
                                         <input type="text"
                                             th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].departAirport}"
-                                            placeholder="출발지 선택" list="cityList" onchange="stripAfterPipe(this)"
+                                            placeholder="출발지 선택" list="airportList" onchange="stripAfterPipe(this)"
                                             class="form-control" />
                                     </div>
                                     <div class="form-group">
                                         <label>도착지</label>
                                         <input type="text"
                                             th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].arriveAirport}"
-                                            placeholder="도착지 선택" list="cityList" onchange="stripAfterPipe(this)"
+                                            placeholder="도착지 선택" list="airportList" onchange="stripAfterPipe(this)"
                                             class="form-control" />
                                     </div>
                                     <!-- <div class="form-group">
@@ -793,7 +793,7 @@
             // 타입별 필드
             if (type === 'AIR') {
                 const depGroup = createFormGroup('출발지', `schedules[${schedIdx}].locations[${locIdx}].departAirport`, '출발지 선택', {
-                    list: 'cityList',
+                    list: 'airportList',
                     onchange: 'stripAfterPipe(this)',
                 });
                 content.appendChild(depGroup);
@@ -1016,6 +1016,7 @@
 
     <div th:replace="components/datalist/countryList :: countryDatalistFragment"></div>
     <div th:replace="components/datalist/cityList :: cityDatalistFragment"></div>
+    <div th:replace="components/datalist/airportList :: airportDatalistFragment"></div>
 
     <datalist id="types">
         <option th:each="type : ${types}" th:value="${type}"></option>
