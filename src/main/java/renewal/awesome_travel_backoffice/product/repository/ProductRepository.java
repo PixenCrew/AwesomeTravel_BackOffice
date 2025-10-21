@@ -10,7 +10,7 @@ import renewal.common.entity.Product;
 
 public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product>{
     
-    List<Product> findByTourId(Long id);
+    Product findByTourId(Long id);
     
     // 사용 중인 tour_id 목록 조회
     @Query("SELECT p.tour.id FROM Product p WHERE p.tour.id IS NOT NULL")

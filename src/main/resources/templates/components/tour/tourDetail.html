@@ -28,7 +28,7 @@
         .form-section {
             background: #fff;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             margin-bottom: 2rem;
             overflow: hidden;
         }
@@ -81,7 +81,7 @@
         .form-control:focus {
             border-color: #80bdff;
             outline: 0;
-            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
         }
 
         .input-group {
@@ -179,7 +179,9 @@
             padding: 1rem;
         }
 
-        .air-fields, .location-fields, .hotel-fields {
+        .air-fields,
+        .location-fields,
+        .hotel-fields {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1rem;
@@ -300,17 +302,19 @@
             .form-grid {
                 grid-template-columns: 1fr;
             }
-            
-            .air-fields, .location-fields, .hotel-fields {
+
+            .air-fields,
+            .location-fields,
+            .hotel-fields {
                 grid-template-columns: 1fr;
             }
-            
+
             .page-header {
                 flex-direction: column;
                 gap: 1rem;
                 align-items: stretch;
             }
-            
+
             .header-actions {
                 justify-content: center;
             }
@@ -365,7 +369,8 @@
                 <div class="form-group">
                     <label for="price">가격 <span class="required">*</span></label>
                     <div class="input-group">
-                        <input type="number" th:field="*{priceAdult}" min="1" required class="form-control" placeholder="가격을 입력하세요" />
+                        <input type="number" th:field="*{priceAdult}" min="1" required class="form-control"
+                            placeholder="가격을 입력하세요" />
                         <span class="input-group-text">원</span>
                     </div>
                 </div>
@@ -373,7 +378,8 @@
                 <div class="form-group">
                     <label for="price">가격(청소년) <span class="required">*</span></label>
                     <div class="input-group">
-                        <input type="number" th:field="*{priceYouth}" min="1" required class="form-control" placeholder="가격을 입력하세요" />
+                        <input type="number" th:field="*{priceYouth}" min="1" required class="form-control"
+                            placeholder="가격을 입력하세요" />
                         <span class="input-group-text">원</span>
                     </div>
                 </div>
@@ -381,32 +387,36 @@
                 <div class="form-group">
                     <label for="price">가격(영유아) <span class="required">*</span></label>
                     <div class="input-group">
-                        <input type="number" th:field="*{priceInfant}" min="1" required class="form-control" placeholder="가격을 입력하세요" />
+                        <input type="number" th:field="*{priceInfant}" min="1" required class="form-control"
+                            placeholder="가격을 입력하세요" />
                         <span class="input-group-text">원</span>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="country">국가 <span class="required">*</span></label>
-                    <input type="text" th:field="*{country}" onchange="stripAfterPipe(this)" list="countryList" required class="form-control" placeholder="국가를 선택하세요" />
+                    <input type="text" th:field="*{country}" onchange="stripAfterPipe(this)" list="countryList" required
+                        class="form-control" placeholder="국가를 선택하세요" />
                 </div>
 
                 <div class="form-group">
                     <label for="count">최대인원 <span class="required">*</span></label>
                     <div class="input-group">
-                        <input type="number" th:field="*{maxCapacity}" min="1" required class="form-control" placeholder="인원수를 입력하세요" />
+                        <input type="number" th:field="*{maxCapacity}" min="1" required class="form-control"
+                            placeholder="인원수를 입력하세요" />
                         <span class="input-group-text">명</span>
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="count">최소인원 <span class="required">*</span></label>
                     <div class="input-group">
-                        <input type="number" th:field="*{minCapacity}" min="1" required class="form-control" placeholder="인원수를 입력하세요" />
+                        <input type="number" th:field="*{minCapacity}" min="1" required class="form-control"
+                            placeholder="인원수를 입력하세요" />
                         <span class="input-group-text">명</span>
                     </div>
                 </div>
-<!-- 
+                <!-- 
                 <div class="form-group">
                     <label for="airPriceSum">항공권 가격 합</label>
                     <div class="input-group">
@@ -425,7 +435,7 @@
 
                 <div class="form-group">
                     <label for="productId">패키지 상품 ID</label>
-                    <input type="number" th:field="${connectedProduct}" disabled class="form-control" />
+                    <input type="number" th:value="${connectedProduct}" disabled class="form-control" />
                 </div>
             </div>
         </div>
@@ -441,11 +451,13 @@
 
             <!-- 스케줄 컨테이너 -->
             <div id="scheduleContainer">
-                <div th:if="${tour.id != null}" th:each="sched, schedStat : *{schedules}" class="schedule-point" th:attr="data-sched-idx=${schedStat.index}">
+                <div th:if="${tour.id != null}" th:each="sched, schedStat : *{schedules}" class="schedule-point"
+                    th:attr="data-sched-idx=${schedStat.index}">
                     <div class="schedule-header">
                         <div class="schedule-date">
                             <label>날짜</label>
-                            <input type="number" th:field="*{schedules[__${schedStat.index}__].day}" class="form-control" />
+                            <input type="number" th:field="*{schedules[__${schedStat.index}__].day}"
+                                class="form-control" />
                         </div>
                         <button type="button" class="btn btn-danger btn-sm" onclick="removeSchedule(this)">
                             <i class="fas fa-trash"></i> 스케줄 삭제
@@ -455,16 +467,19 @@
                     <!-- 위치 컨테이너 -->
                     <div class="location-container" th:attr="id=|locationContainer-${schedStat.index}|">
                         <!-- 기존 위치들 -->
-                        <div class="location-point" th:each="loc, locStat : *{schedules[__${schedStat.index}__].locations}" th:if="${loc != null}">
+                        <div class="location-point"
+                            th:each="loc, locStat : *{schedules[__${schedStat.index}__].locations}"
+                            th:if="${loc != null}">
                             <!-- locationType hidden 필드 (이름을 직접 지정하여 바인딩 오류 방지) -->
                             <input type="hidden"
-                                   th:name="${'schedules[' + schedStat.index + '].locations[' + locStat.index + '].locationType'}"
-                                   th:value="${loc.locationType != null ? loc.locationType : 'POINT'}" />
-                            
+                                th:name="${'schedules[' + schedStat.index + '].locations[' + locStat.index + '].locationType'}"
+                                th:value="${loc.locationType != null ? loc.locationType : 'POINT'}" />
+
                             <div class="location-header">
                                 <div class="location-type">
                                     <label>타입</label>
-                                    <span class="type-badge" th:text="${loc.locationType != null ? loc.locationType : 'POINT'}">POINT</span>
+                                    <span class="type-badge"
+                                        th:text="${loc.locationType != null ? loc.locationType : 'POINT'}">POINT</span>
                                 </div>
                                 <button type="button" class="btn btn-danger btn-sm" onclick="removeLocation(this)">
                                     <i class="fas fa-times"></i>
@@ -473,22 +488,34 @@
 
                             <div class="location-content">
                                 <div class="form-group">
+                                    <label>이름</label>
+                                    <input type="text"
+                                        th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].name}"
+                                        placeholder="이름을 입력하세요" class="form-control" />
+                                </div>
+                                <div class="form-group">
                                     <label>설명</label>
-                                    <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].description}" 
-                                           placeholder="설명을 입력하세요" class="form-control" />
+                                    <input type="text"
+                                        th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].description}"
+                                        placeholder="설명을 입력하세요" class="form-control" />
                                 </div>
 
                                 <!-- AIR 타입인 경우 -->
-                                <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType == T(renewal.common.entity.Location.LocationType).AIR}" class="air-fields">
+                                <div th:if="*{T(renewal.common.entity.Location.LocationType).AIR == schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType}"
+                                    class="air-fields">
                                     <div class="form-group">
                                         <label>출발지</label>
-                                        <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].departAirport}" 
-                                               placeholder="출발지 선택" list="cityList" onchange="stripAfterPipe(this)" class="form-control" />
+                                        <input type="text"
+                                            th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].departAirport}"
+                                            placeholder="출발지 선택" list="cityList" onchange="stripAfterPipe(this)"
+                                            class="form-control" />
                                     </div>
                                     <div class="form-group">
                                         <label>도착지</label>
-                                        <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].arriveAirport}" 
-                                               placeholder="도착지 선택" list="cityList" onchange="stripAfterPipe(this)" class="form-control" />
+                                        <input type="text"
+                                            th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].arriveAirport}"
+                                            placeholder="도착지 선택" list="cityList" onchange="stripAfterPipe(this)"
+                                            class="form-control" />
                                     </div>
                                     <!-- <div class="form-group">
                                         <label>항공편 선택</label>
@@ -503,21 +530,28 @@
                                 </div>
 
                                 <!-- POINT 또는 HOTEL 타입인 경우 -->
-                                <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType != T(renewal.common.entity.Location.LocationType).AIR}" class="location-fields">
+                                <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType != T(renewal.common.entity.Location.LocationType).AIR}"
+                                    class="location-fields">
                                     <div class="form-group">
                                         <label>도시</label>
-                                        <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].city}" 
-                                               placeholder="예: KR | South Korea | 대한민국" list="cityList" class="form-control" />
+                                        <input type="text"
+                                            th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].city}"
+                                            placeholder="예: KR | South Korea | 대한민국" list="cityList"
+                                            class="form-control" />
                                     </div>
 
                                     <!-- HOTEL 타입인 경우 -->
-                                    <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType == T(renewal.common.entity.Location.LocationType).HOTEL}" class="hotel-fields">
+                                    <div th:if="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].locationType == T(renewal.common.entity.Location.LocationType).HOTEL}"
+                                        class="hotel-fields">
                                         <div class="form-group">
                                             <label>호텔 선택</label>
                                             <div class="input-group">
-                                                <input type="text" th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].hotel.id}" 
-                                                       placeholder="호텔을 검색하세요" onclick="searchHotel(this)" class="form-control" readonly />
-                                                <button type="button" class="btn btn-outline-primary" onclick="searchHotel(this)">
+                                                <input type="text"
+                                                    th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].hotel.id}"
+                                                    placeholder="호텔을 검색하세요" onclick="searchHotel(this)"
+                                                    class="form-control" readonly />
+                                                <button type="button" class="btn btn-outline-primary"
+                                                    onclick="searchHotel(this)">
                                                     <i class="fas fa-search"></i> 검색
                                                 </button>
                                             </div>
@@ -530,13 +564,15 @@
 
                     <!-- 위치 추가 버튼들 -->
                     <div class="location-actions">
-                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addLocation(this,'POINT')">
+                        <button type="button" class="btn btn-outline-primary btn-sm"
+                            onclick="addLocation(this,'POINT')">
                             <i class="fas fa-map-marker-alt"></i> POINT 추가
                         </button>
                         <button type="button" class="btn btn-outline-info btn-sm" onclick="addLocation(this, 'AIR')">
                             <i class="fas fa-plane"></i> AIR 추가
                         </button>
-                        <button type="button" class="btn btn-outline-success btn-sm" onclick="addLocation(this, 'HOTEL')">
+                        <button type="button" class="btn btn-outline-success btn-sm"
+                            onclick="addLocation(this, 'HOTEL')">
                             <i class="fas fa-bed"></i> HOTEL 추가
                         </button>
                     </div>
@@ -592,48 +628,74 @@
             const idx = document.querySelectorAll("#scheduleContainer .schedule-point").length;
             const container = document.getElementById("scheduleContainer");
 
+            // schedule-point wrapper
             const schedDiv = document.createElement("div");
-            schedDiv.className = "schedule-point";
+            schedDiv.className = "schedule-point card mb-3 p-3 shadow-sm"; // 카드 스타일 적용
             schedDiv.dataset.schedIdx = idx;
 
-            // 일차 입력 (name 패턴 유지)
-            schedDiv.appendChild(createLabel("일차:"));
-            const dayInput = createInput("number", `schedules[${idx}].day`);
-            dayInput.value = idx;
-            schedDiv.appendChild(dayInput);
-            schedDiv.appendChild(document.createElement("br"));
+            // schedule-header
+            const headerDiv = document.createElement("div");
+            headerDiv.className = "schedule-header d-flex justify-content-between align-items-center mb-2";
 
-            // 스케줄 삭제 버튼
+            // 날짜 입력
+            const dateDiv = document.createElement("div");
+            dateDiv.className = "schedule-date";
+
+            const dateLabel = document.createElement("label");
+            dateLabel.textContent = "날짜";
+            dateDiv.appendChild(dateLabel);
+
+            const dateInput = document.createElement("input");
+            dateInput.type = "number";
+            dateInput.name = `schedules[${idx}].day`;
+            dateInput.className = "form-control";
+            dateInput.value = idx; // 기본 값
+            dateDiv.appendChild(dateInput);
+
+            headerDiv.appendChild(dateDiv);
+
+            // 삭제 버튼
             const removeBtn = document.createElement("button");
             removeBtn.type = "button";
-            removeBtn.textContent = "스케줄 삭제";
+            removeBtn.className = "btn btn-danger btn-sm";
+            removeBtn.innerHTML = '<i class="fas fa-trash"></i> 스케줄 삭제';
             removeBtn.addEventListener("click", () => removeSchedule(removeBtn));
-            schedDiv.appendChild(removeBtn);
+            headerDiv.appendChild(removeBtn);
 
-            // location container (id는 data-sched-idx에 연동)
+            schedDiv.appendChild(headerDiv);
+
+            // location container
             const locContainer = document.createElement("div");
             locContainer.id = `locationContainer-${idx}`;
             locContainer.className = "location-container";
             schedDiv.appendChild(locContainer);
 
-            // 추가 버튼들
+            // location 추가 버튼 그룹
+            const btnGroup = document.createElement("div");
+            btnGroup.className = "location-actions mt-2 d-flex gap-2";
+
             const pBtn = document.createElement("button");
             pBtn.type = "button";
-            pBtn.textContent = "POINT 추가";
+            pBtn.className = "btn btn-outline-primary btn-sm";
+            pBtn.innerHTML = '<i class="fas fa-map-marker-alt"></i> POINT 추가';
             pBtn.addEventListener("click", () => addLocation(pBtn, 'POINT'));
-            schedDiv.appendChild(pBtn);
+            btnGroup.appendChild(pBtn);
 
             const aBtn = document.createElement("button");
             aBtn.type = "button";
-            aBtn.textContent = "AIR 추가";
+            aBtn.className = "btn btn-outline-info btn-sm";
+            aBtn.innerHTML = '<i class="fas fa-plane"></i> AIR 추가';
             aBtn.addEventListener("click", () => addLocation(aBtn, 'AIR'));
-            schedDiv.appendChild(aBtn);
+            btnGroup.appendChild(aBtn);
 
             const hBtn = document.createElement("button");
             hBtn.type = "button";
-            hBtn.textContent = "HOTEL 추가";
+            hBtn.className = "btn btn-outline-success btn-sm";
+            hBtn.innerHTML = '<i class="fas fa-bed"></i> HOTEL 추가';
             hBtn.addEventListener("click", () => addLocation(hBtn, 'HOTEL'));
-            schedDiv.appendChild(hBtn);
+            btnGroup.appendChild(hBtn);
+
+            schedDiv.appendChild(btnGroup);
 
             container.appendChild(schedDiv);
         }
@@ -679,7 +741,6 @@
             }
 
             const schedIdx = parseInt(schedDiv.dataset.schedIdx, 10);
-
             const container = schedDiv.querySelector(`#locationContainer-${schedIdx}`);
             if (!container) {
                 console.warn(`addLocation: location container not found for schedule ${schedIdx}`);
@@ -688,82 +749,124 @@
 
             const locIdx = container.querySelectorAll('.location-point').length;
 
+            // location wrapper
             const wrapper = document.createElement('div');
-            wrapper.className = 'location-point';
+            wrapper.className = 'location-point card mt-2 p-3 shadow-sm rounded';
+            wrapper.style.border = '1px solid #ddd';
 
-            // 타입
-            const typeDiv = document.createElement('div');
-            typeDiv.appendChild(createLabel('타입 '));
-            const typeinput = createInput('text', `schedules[${schedIdx}].locations[${locIdx}].locationType`, '', { readonly: true });
-            typeinput.value = type;
-            typeDiv.appendChild(typeinput);
-            wrapper.appendChild(typeDiv);
+            // location header
+            const header = document.createElement('div');
+            header.className = 'location-header d-flex justify-content-between align-items-center mb-2';
 
-            // 설명
-            const descDiv = document.createElement('div');
-            descDiv.appendChild(createLabel('설명 '));
-            descDiv.appendChild(createInput(
-                'text',
-                `schedules[${schedIdx}].locations[${locIdx}].description`,
-                '설명 입력'
-            ));
-            wrapper.appendChild(descDiv);
+            const typeBadge = document.createElement('span');
+            typeBadge.className = 'badge bg-primary';
+            typeBadge.textContent = type;
+            header.appendChild(typeBadge);
 
-            // 타입별 필드
-            const addDiv = document.createElement('div');
-            if (type === 'AIR') {
-                addDiv.appendChild(createLabel('출발지 '));
-                addDiv.appendChild(createInput(
-                    'text',
-                    `schedules[${schedIdx}].locations[${locIdx}].departAirport`,
-                    '출발지 선택',
-                    { list: 'cityList', onchange: 'stripAfterPipe(this)' }
-                ));
-
-                addDiv.appendChild(createLabel('도착지 '));
-                addDiv.appendChild(createInput(
-                    'text',
-                    `schedules[${schedIdx}].locations[${locIdx}].arriveAirport`,
-                    '도착지 선택',
-                    { list: 'cityList', onchange: 'stripAfterPipe(this)' }
-                ));
-
-                // addDiv.appendChild(createLabel('항공편 번호 '));
-                // addDiv.appendChild(createInput(
-                //     'text',
-                //     `schedules[${schedIdx}].locations[${locIdx}].seatClass`,
-                //     '항공편 ID 입력',
-                //     { onclick: 'searchAir(this)', readonly: true }
-                // ));
-            } else {
-                addDiv.appendChild(createLabel('도시 '));
-                addDiv.appendChild(createInput(
-                    'text',
-                    `schedules[${schedIdx}].locations[${locIdx}].city`,
-                    '예: KR | South Korea | 대한민국',
-                    { list: 'cityList', onchange: 'stripAfterPipe(this)' }
-                ));
-
-                if (type === 'HOTEL') {
-                    addDiv.appendChild(createLabel('호텔 번호 '));
-                    addDiv.appendChild(createInput(
-                        'text',
-                        `schedules[${schedIdx}].locations[${locIdx}].hotel`,
-                        '호텔 ID 입력',
-                        { onclick: 'searchHotel(this)' }
-                    ));
-                }
-            }
-            wrapper.appendChild(addDiv);
-
-            // 삭제 버튼 (location)
             const btnDel = document.createElement('button');
             btnDel.type = 'button';
-            btnDel.textContent = '삭제';
+            btnDel.className = 'btn btn-danger btn-sm';
+            btnDel.innerHTML = '<i class="fas fa-times"></i>';
             btnDel.addEventListener('click', () => removeLocation(btnDel));
-            wrapper.appendChild(btnDel);
+            header.appendChild(btnDel);
+            wrapper.appendChild(header);
 
+            // hidden locationType
+            const hiddenType = document.createElement('input');
+            hiddenType.type = 'hidden';
+            hiddenType.name = `schedules[${schedIdx}].locations[${locIdx}].locationType`;
+            hiddenType.value = type;
+            wrapper.appendChild(hiddenType);
+
+            // location content
+            const content = document.createElement('div');
+            content.className = 'location-content';
+
+            // 제목
+            const nameGroup = createFormGroup('이름', `schedules[${schedIdx}].locations[${locIdx}].name`, '이름 입력');
+            content.appendChild(nameGroup);
+
+            // 설명
+            const descGroup = createFormGroup('설명', `schedules[${schedIdx}].locations[${locIdx}].description`, '설명 입력');
+            content.appendChild(descGroup);
+
+            // 타입별 필드
+            if (type === 'AIR') {
+                const depGroup = createFormGroup('출발지', `schedules[${schedIdx}].locations[${locIdx}].departAirport`, '출발지 선택', {
+                    list: 'cityList',
+                    onchange: 'stripAfterPipe(this)',
+                });
+                content.appendChild(depGroup);
+
+                const arrGroup = createFormGroup('도착지', `schedules[${schedIdx}].locations[${locIdx}].arriveAirport`, '도착지 선택', {
+                    list: 'cityList',
+                    onchange: 'stripAfterPipe(this)',
+                });
+                content.appendChild(arrGroup);
+
+            } else {
+                const cityGroup = createFormGroup('도시', `schedules[${schedIdx}].locations[${locIdx}].city`, '예: KR | South Korea | 대한민국', {
+                    list: 'cityList',
+                    onchange: 'stripAfterPipe(this)',
+                });
+                content.appendChild(cityGroup);
+
+                if (type === 'HOTEL') {
+                    const hotelGroup = document.createElement('div');
+                    hotelGroup.className = 'form-group';
+                    const label = document.createElement('label');
+                    label.textContent = '호텔 선택';
+                    const inputGroup = document.createElement('div');
+                    inputGroup.className = 'input-group';
+
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.name = `schedules[${schedIdx}].locations[${locIdx}].hotel`;
+                    input.placeholder = '호텔을 검색하세요';
+                    input.className = 'form-control';
+                    input.readOnly = true;
+                    input.onclick = () => searchHotel(input);
+
+                    const btnSearch = document.createElement('button');
+                    btnSearch.type = 'button';
+                    btnSearch.className = 'btn btn-outline-primary';
+                    btnSearch.innerHTML = '<i class="fas fa-search"></i> 검색';
+                    btnSearch.onclick = () => searchHotel(input);
+
+                    inputGroup.appendChild(input);
+                    inputGroup.appendChild(btnSearch);
+                    hotelGroup.appendChild(label);
+                    hotelGroup.appendChild(inputGroup);
+
+                    content.appendChild(hotelGroup);
+                }
+            }
+
+            wrapper.appendChild(content);
             container.appendChild(wrapper);
+        }
+
+        // 공통 form-group 생성 함수
+        function createFormGroup(labelText, name, placeholder, attrs = {}) {
+            const div = document.createElement('div');
+            div.className = 'form-group mb-2';
+
+            const label = document.createElement('label');
+            label.textContent = labelText;
+            div.appendChild(label);
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.name = name;
+            input.placeholder = placeholder;
+            input.className = 'form-control';
+
+            for (const [k, v] of Object.entries(attrs)) {
+                input.setAttribute(k, v);
+            }
+
+            div.appendChild(input);
+            return div;
         }
 
         // location 삭제
@@ -808,12 +911,11 @@
                 Array.from(locDiv.querySelectorAll("input, select")).forEach(input => {
                     if (!input.name) return;
 
+                    // fieldName만 가져오기 (마지막 부분)
                     const parts = input.name.split(".");
-                    if (parts.length < 2) {
-                        return;
-                    }
-                    const suffix = parts.slice(1).join(".");
-                    input.name = `${prefix}.${suffix}`;
+                    const fieldName = parts[parts.length - 1]; // city, description, hotel 등
+
+                    input.name = `schedules[${schedIdx}].locations[${newIdx}].${fieldName}`;
                 });
             });
         }
@@ -919,5 +1021,5 @@
         <option th:each="type : ${types}" th:value="${type}"></option>
     </datalist>
 
-    
+
 </div>
