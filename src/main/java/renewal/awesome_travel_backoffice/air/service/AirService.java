@@ -13,19 +13,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.air.dto.AirFilterDTO;
-import renewal.common.entity.Air;
-import renewal.common.entity.CityCode;
-import renewal.common.entity.Air.AirStatus;
-import renewal.common.entity.Airline;
-import renewal.common.entity.Air.FlightSegment;
-import renewal.common.entity.SeatClass;
 import renewal.awesome_travel_backoffice.air.repository.AirRepository;
 import renewal.awesome_travel_backoffice.air.repository.AirSpecification;
 import renewal.awesome_travel_backoffice.air.repository.AirlineRepository;
 import renewal.awesome_travel_backoffice.air.repository.SeatClassRepository;
-
-import lombok.RequiredArgsConstructor;
+import renewal.common.entity.Air;
+import renewal.common.entity.Air.AirStatus;
+import renewal.common.entity.Air.FlightSegment;
+import renewal.common.entity.Airline;
+import renewal.common.entity.CityCode;
+import renewal.common.entity.SeatClass;
 
 @Service
 @RequiredArgsConstructor
@@ -101,7 +100,8 @@ public class AirService {
 
     public Page<SeatClass> searchAirs(AirFilterDTO filter, Pageable pageable) {
 
-        Specification<SeatClass> spec = Specification.where(null);
+        // Specification<SeatClass> spec = Specification.where(null);
+        Specification<SeatClass> spec = Specification.where(AirSpecification.fetchAir());
 
         // seatClassType LIKE %seatClassType%
         if (filter.getSeatClassType() != null) {

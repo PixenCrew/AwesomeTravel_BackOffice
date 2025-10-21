@@ -18,6 +18,17 @@ import renewal.common.entity.SeatClass;
 
 public class AirSpecification {
 
+    public static Specification<SeatClass> fetchAir() {
+        return (root, query, builder) -> {
+            // Page 조회 시 count query에는 fetch join 추가하면 안 되므로 조건 처리
+            if (SeatClass.class.equals(query.getResultType())) {
+                root.fetch("air", JoinType.LEFT);
+                query.distinct(true); // join 때문에 중복 제거
+            }
+            return null;
+        };
+    }
+
     // code LIKE %code%
     public static Specification<SeatClass> codeContains(String code) {
         return (root, query, builder) -> {
@@ -89,7 +100,7 @@ public class AirSpecification {
     public static Specification<SeatClass> departEquals(AirportCode depart) {
         return (root, query, builder) -> {
             Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT);
-            if (depart==null)
+            if (depart == null)
                 return null;
             return builder.equal(seatJoin.get("departAirport"), depart);
         };
@@ -99,7 +110,7 @@ public class AirSpecification {
     public static Specification<SeatClass> arriveEquals(AirportCode arrive) {
         return (root, query, builder) -> {
             Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT);
-            if (arrive==null)
+            if (arrive == null)
                 return null;
             return builder.equal(seatJoin.get("arriveAirport"), arrive);
         };
