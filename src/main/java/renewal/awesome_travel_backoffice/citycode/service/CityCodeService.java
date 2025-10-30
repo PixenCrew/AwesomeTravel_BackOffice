@@ -1,16 +1,16 @@
 package renewal.awesome_travel_backoffice.citycode.service;
 
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.RequiredArgsConstructor;
 import renewal.common.entity.CityCode;
 import renewal.common.repository.CityCodeRepository;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -80,9 +80,9 @@ public class CityCodeService {
         CityCode cityCode = cityCodeRepository.findById(code)
                 .orElseThrow(() -> new RuntimeException("도시 코드를 찾을 수 없습니다: " + code));
 
-        cityCode.setCountry(updatedCityCode.getCountry());
-        cityCode.setKor(updatedCityCode.getKor());
-        cityCode.setEng(updatedCityCode.getEng());
+        cityCode.setCountryCode(updatedCityCode.getCountryCode());
+        cityCode.setCityKor(updatedCityCode.getCityKor());
+        cityCode.setCityEng(updatedCityCode.getCityEng());
 
         return cityCodeRepository.save(cityCode);
     }
@@ -101,5 +101,3 @@ public class CityCodeService {
         return cityCodeRepository.existsById(code);
     }
 }
-
-

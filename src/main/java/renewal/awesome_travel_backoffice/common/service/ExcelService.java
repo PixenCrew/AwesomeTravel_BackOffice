@@ -1,10 +1,24 @@
 package renewal.awesome_travel_backoffice.common.service;
 
-import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.airline.service.AirlineService;
 import renewal.awesome_travel_backoffice.airport.service.AirportService;
 import renewal.awesome_travel_backoffice.citycode.service.CityCodeService;
@@ -13,12 +27,6 @@ import renewal.common.entity.Airline;
 import renewal.common.entity.AirportCode;
 import renewal.common.entity.CityCode;
 import renewal.common.entity.CountryCode;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +42,7 @@ public class ExcelService {
         List<CountryCode> countryCodes = new ArrayList<>();
 
         try (InputStream is = file.getInputStream();
-             Workbook workbook = new XSSFWorkbook(is)) {
+                Workbook workbook = new XSSFWorkbook(is)) {
 
             Sheet sheet = workbook.getSheetAt(0);
             int successCount = 0;
@@ -43,7 +51,8 @@ public class ExcelService {
             // 첫 번째 행(헤더)은 건너뛰기
             for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
-                if (row == null) continue;
+                if (row == null)
+                    continue;
 
                 try {
                     String code = getCellValue(row.getCell(0));
@@ -56,10 +65,9 @@ public class ExcelService {
                     }
 
                     CountryCode countryCode = new CountryCode(
-                        code.trim().toUpperCase(),
-                        nameKor != null ? nameKor.trim() : "",
-                        nameEng != null ? nameEng.trim() : ""
-                    );
+                            code.trim().toUpperCase(),
+                            nameKor != null ? nameKor.trim() : "",
+                            nameEng != null ? nameEng.trim() : "");
 
                     // 기존 코드가 있으면 업데이트, 없으면 생성
                     if (countryCodeService.existsByCode(countryCode.getCode())) {
@@ -81,7 +89,7 @@ public class ExcelService {
     // 도시 코드 Excel 업로드
     public int uploadCityCodes(MultipartFile file) throws IOException {
         try (InputStream is = file.getInputStream();
-             Workbook workbook = new XSSFWorkbook(is)) {
+                Workbook workbook = new XSSFWorkbook(is)) {
 
             Sheet sheet = workbook.getSheetAt(0);
             int successCount = 0;
@@ -90,7 +98,8 @@ public class ExcelService {
             // 첫 번째 행(헤더)은 건너뛰기
             for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
-                if (row == null) continue;
+                if (row == null)
+                    continue;
 
                 try {
                     String country = getCellValue(row.getCell(0));
@@ -106,12 +115,11 @@ public class ExcelService {
                     }
 
                     CityCode cityCode = new CityCode(
-                        code.trim().toUpperCase(),
-                        eng != null ? eng.trim() : "",
-                        kor != null ? kor.trim() : "",
-                        utcOffsetMins,
-                        countryCode
-                    );
+                            code.trim().toUpperCase(),
+                            eng != null ? eng.trim() : "",
+                            kor != null ? kor.trim() : "",
+                            utcOffsetMins,
+                            countryCode);
 
                     // 기존 코드가 있으면 업데이트, 없으면 생성
                     if (cityCodeService.existsByCode(cityCode.getCityCode())) {
@@ -136,7 +144,7 @@ public class ExcelService {
         List<CountryCode> countryCodes = countryCodeService.getAllCountryCodesList();
 
         try (Workbook workbook = new XSSFWorkbook();
-             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
             Sheet sheet = workbook.createSheet("국가 코드");
 
@@ -150,7 +158,7 @@ public class ExcelService {
 
             // 헤더 행 생성
             Row headerRow = sheet.createRow(0);
-            String[] headers = {"국가 코드", "국가명 (한글)", "국가명 (영문)"};
+            String[] headers = { "국가 코드", "국가명 (한글)", "국가명 (영문)" };
             for (int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(headers[i]);
@@ -182,7 +190,7 @@ public class ExcelService {
         List<CityCode> cityCodes = cityCodeService.getAllCityCodesList();
 
         try (Workbook workbook = new XSSFWorkbook();
-             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
             Sheet sheet = workbook.createSheet("도시 코드");
 
@@ -196,7 +204,7 @@ public class ExcelService {
 
             // 헤더 행 생성
             Row headerRow = sheet.createRow(0);
-            String[] headers = {"국가 코드", "도시 코드", "도시명 (한글)", "도시명 (영문)"};
+            String[] headers = { "국가 코드", "도시 코드", "도시명 (한글)", "도시명 (영문)" };
             for (int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(headers[i]);
@@ -207,10 +215,11 @@ public class ExcelService {
             int rowNum = 1;
             for (CityCode city : cityCodes) {
                 Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(city.getCountry() != null ? city.getCountry().getCountryCode() : "");
+                row.createCell(0)
+                        .setCellValue(city.getCountryCode() != null ? city.getCountryCode().getCountryCode() : "");
                 row.createCell(1).setCellValue(city.getCityCode());
-                row.createCell(2).setCellValue(city.getKor());
-                row.createCell(3).setCellValue(city.getEng());
+                row.createCell(2).setCellValue(city.getCityKor());
+                row.createCell(3).setCellValue(city.getCityEng());
             }
 
             // 열 너비 자동 조정
@@ -227,7 +236,7 @@ public class ExcelService {
     // Excel 템플릿 다운로드 (국가 코드)
     public byte[] downloadCountryCodeTemplate() throws IOException {
         try (Workbook workbook = new XSSFWorkbook();
-             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
             Sheet sheet = workbook.createSheet("국가 코드");
 
@@ -241,7 +250,7 @@ public class ExcelService {
 
             // 헤더 행
             Row headerRow = sheet.createRow(0);
-            String[] headers = {"국가 코드", "국가명 (한글)", "국가명 (영문)"};
+            String[] headers = { "국가 코드", "국가명 (한글)", "국가명 (영문)" };
             for (int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(headers[i]);
@@ -268,7 +277,7 @@ public class ExcelService {
     // Excel 템플릿 다운로드 (도시 코드)
     public byte[] downloadCityCodeTemplate() throws IOException {
         try (Workbook workbook = new XSSFWorkbook();
-             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
             Sheet sheet = workbook.createSheet("도시 코드");
 
@@ -282,7 +291,7 @@ public class ExcelService {
 
             // 헤더 행
             Row headerRow = sheet.createRow(0);
-            String[] headers = {"국가 코드", "도시 코드", "도시명 (한글)", "도시명 (영문)"};
+            String[] headers = { "국가 코드", "도시 코드", "도시명 (한글)", "도시명 (영문)" };
             for (int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(headers[i]);
@@ -310,7 +319,7 @@ public class ExcelService {
     // 항공사 Excel 업로드
     public int uploadAirlines(MultipartFile file) throws IOException {
         try (InputStream is = file.getInputStream();
-             Workbook workbook = new XSSFWorkbook(is)) {
+                Workbook workbook = new XSSFWorkbook(is)) {
 
             Sheet sheet = workbook.getSheetAt(0);
             int successCount = 0;
@@ -318,7 +327,8 @@ public class ExcelService {
             // 첫 번째 행(헤더)은 건너뛰기
             for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
-                if (row == null) continue;
+                if (row == null)
+                    continue;
 
                 try {
                     String code = getCellValue(row.getCell(0));
@@ -330,14 +340,14 @@ public class ExcelService {
                         continue;
                     }
 
-                    boolean infantSeatsRequired = "Y".equalsIgnoreCase(infantSeats) || "예".equals(infantSeats) || "true".equalsIgnoreCase(infantSeats);
+                    boolean infantSeatsRequired = "Y".equalsIgnoreCase(infantSeats) || "예".equals(infantSeats)
+                            || "true".equalsIgnoreCase(infantSeats);
 
                     Airline airline = new Airline(
-                        code.trim().toUpperCase(),
-                        nameKor != null ? nameKor.trim() : "",
-                        nameEng != null ? nameEng.trim() : "",
-                        infantSeatsRequired
-                    );
+                            code.trim().toUpperCase(),
+                            nameKor != null ? nameKor.trim() : "",
+                            nameEng != null ? nameEng.trim() : "",
+                            infantSeatsRequired);
 
                     // 기존 코드가 있으면 업데이트, 없으면 생성
                     if (airlineService.existsByCode(airline.getCode())) {
@@ -360,7 +370,7 @@ public class ExcelService {
         List<Airline> airlines = airlineService.getAllAirlinesList();
 
         try (Workbook workbook = new XSSFWorkbook();
-             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
             Sheet sheet = workbook.createSheet("항공사");
 
@@ -374,7 +384,7 @@ public class ExcelService {
 
             // 헤더 행 생성
             Row headerRow = sheet.createRow(0);
-            String[] headers = {"항공사 코드", "항공사명 (한글)", "항공사명 (영문)", "유아 좌석 필수"};
+            String[] headers = { "항공사 코드", "항공사명 (한글)", "항공사명 (영문)", "유아 좌석 필수" };
             for (int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(headers[i]);
@@ -405,7 +415,7 @@ public class ExcelService {
     // 항공사 Excel 템플릿 다운로드
     public byte[] downloadAirlineTemplate() throws IOException {
         try (Workbook workbook = new XSSFWorkbook();
-             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
             Sheet sheet = workbook.createSheet("항공사");
 
@@ -419,7 +429,7 @@ public class ExcelService {
 
             // 헤더 행
             Row headerRow = sheet.createRow(0);
-            String[] headers = {"항공사 코드", "항공사명 (한글)", "항공사명 (영문)", "유아 좌석 필수"};
+            String[] headers = { "항공사 코드", "항공사명 (한글)", "항공사명 (영문)", "유아 좌석 필수" };
             for (int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(headers[i]);
@@ -458,7 +468,8 @@ public class ExcelService {
 
             for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
-                if (row == null) continue;
+                if (row == null)
+                    continue;
 
                 try {
                     String code = getCellValue(row.getCell(0));
@@ -468,25 +479,25 @@ public class ExcelService {
                     String nameEng = getCellValue(row.getCell(4));
                     String typeStr = getCellValue(row.getCell(5));
 
-                    if (code == null || code.trim().isEmpty()) continue;
+                    if (code == null || code.trim().isEmpty())
+                        continue;
 
                     // AirportCode.AirportType type = AirportCode.AirportType.BOTH;
                     // if (typeStr != null) {
-                    //     try {
-                    //         type = AirportCode.AirportType.valueOf(typeStr.toUpperCase());
-                    //     } catch (Exception e) {
-                    //         if ("국제".equals(typeStr)) type = AirportCode.AirportType.INTERNATIONAL;
-                    //         else if ("국내".equals(typeStr)) type = AirportCode.AirportType.DOMESTIC;
-                    //         else if ("국제/국내".equals(typeStr)) type = AirportCode.AirportType.BOTH;
-                    //     }
+                    // try {
+                    // type = AirportCode.AirportType.valueOf(typeStr.toUpperCase());
+                    // } catch (Exception e) {
+                    // if ("국제".equals(typeStr)) type = AirportCode.AirportType.INTERNATIONAL;
+                    // else if ("국내".equals(typeStr)) type = AirportCode.AirportType.DOMESTIC;
+                    // else if ("국제/국내".equals(typeStr)) type = AirportCode.AirportType.BOTH;
+                    // }
                     // }
                     CityCode cityCode2 = cityCodeService.getCityCodeByCode(cityCode).get();
                     AirportCode airport = new AirportCode(
-                        code.trim().toUpperCase(),
-                        nameKor != null ? nameKor.trim() : "",
-                        nameEng != null ? nameEng.trim() : "",
-                        cityCode2
-                    );
+                            code.trim().toUpperCase(),
+                            nameKor != null ? nameKor.trim() : "",
+                            nameEng != null ? nameEng.trim() : "",
+                            cityCode2);
 
                     if (airportService.existsByCode(airport.getAirportCode())) {
                         airportService.updateAirport(airport.getAirportCode(), airport);
@@ -515,7 +526,7 @@ public class ExcelService {
             headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
             Row headerRow = sheet.createRow(0);
-            String[] headers = {"공항 코드", "국가 코드", "도시 코드", "공항명 (한글)", "공항명 (영문)", "공항 유형"};
+            String[] headers = { "공항 코드", "국가 코드", "도시 코드", "공항명 (한글)", "공항명 (영문)", "공항 유형" };
             for (int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(headers[i]);
@@ -553,7 +564,7 @@ public class ExcelService {
             headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
             Row headerRow = sheet.createRow(0);
-            String[] headers = {"공항 코드", "국가 코드", "도시 코드", "공항명 (한글)", "공항명 (영문)", "공항 유형"};
+            String[] headers = { "공항 코드", "국가 코드", "도시 코드", "공항명 (한글)", "공항명 (영문)", "공항 유형" };
             for (int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(headers[i]);

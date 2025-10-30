@@ -3,21 +3,25 @@
 
     <a th:href="@{/menu-code/new}">새 메뉴 코드 등록</a>
 
-    <table border="1" style="border-collapse: collapse; text-align: center;">
+    <table style="border-collapse: collapse; border: 1px solid black;">
         <thead>
             <tr>
-                <th>코드</th>
-                <th>대상</th>
-                <th>값</th>
+                <th style="border: 1px solid black;">코드</th>
+                <th style="border: 1px solid black;">대상</th>
+                <th style="border: 1px solid black;">값</th>
             </tr>
         </thead>
         <tbody>
             <th:block th:each="mc : ${menuCodes}">
                 <tr th:each="det, iter : ${mc.details}"
-                    th:onclick="'window.location.href=\'/menu-code/' + ${mc.code} + '\';'">
-                    <td th:if="${iter.index == 0}" th:text="${mc.code}" th:rowspan="${#lists.size(mc.details)}"></td>
-                    <td th:text="${det.targetColumn}"></td>
-                    <td th:text="${det.value}"></td>
+                    th:onclick="'window.location.href=\'/menu-code/' + ${mc.code2} + '\';'"
+                    style="cursor: pointer;">
+                    <td th:if="${iter.index == 0}"
+                        th:text="${mc.code}"
+                        th:rowspan="${#lists.size(mc.details)}"
+                        style="border: 1px solid black;"></td>
+                    <td style="border: 1px solid black;" th:text="${det.targetColumn}"></td>
+                    <td style="border: 1px solid black;" th:text="${det.value}"></td>
                 </tr>
             </th:block>
         </tbody>

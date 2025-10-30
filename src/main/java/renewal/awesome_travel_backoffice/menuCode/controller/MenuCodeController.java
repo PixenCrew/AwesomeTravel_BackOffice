@@ -33,25 +33,25 @@ public class MenuCodeController {
 
         model.addAttribute("title", "MenuCode List");
         model.addAttribute("menuCodes", menuCodes);
-        model.addAttribute("content", "components/menuCode");
+        model.addAttribute("content", "components/menuCode/menuCode");
         return "layout";
     }
 
     @GetMapping("/{id}")
     public String getMenuCodeDetail(@PathVariable Long id, Model model) {
 
-        MenuCode menuCode = menuCodeRepository.findById(id).get();
+        MenuCode menuCode = menuCodeRepository.findByCode2(id).get();
 
         model.addAttribute("title", "MenuCode Detail");
         model.addAttribute("menuCode", menuCode);
-        model.addAttribute("content", "components/menuCodeDetail");
+        model.addAttribute("content", "components/menuCode/menuCodeDetail");
         return "layout";
     }
 
     @GetMapping("/check/{id}")
     public ResponseEntity<Map<String, Object>> checkMenuCodeDupe(@PathVariable Long id) {
 
-        Optional<MenuCode> menuCode = menuCodeRepository.findById(id);
+        Optional<MenuCode> menuCode = menuCodeRepository.findByCode2(id);
 
         Map<String, Object> response = new HashMap<>();
         if (menuCode.isPresent()) {
@@ -72,11 +72,11 @@ public class MenuCodeController {
 
         model.addAttribute("title", "New MenuCode");
         model.addAttribute("menuCode", menuCode);
-        model.addAttribute("content", "components/menuCodeDetail");
+        model.addAttribute("content", "components/menuCode/menuCodeDetail");
 
         return "layout";
     }
-    
+
     @PostMapping("/new")
     public String submitNewMenuCode(@ModelAttribute MenuCode menuCode) {
         System.out.println(menuCode.getDetails());
@@ -84,19 +84,18 @@ public class MenuCodeController {
 
         return "redirect:/menu-code";
     }
-    
+
     @PostMapping("/{id}")
     public String modifyMenuCodeDetail(@ModelAttribute MenuCode menuCode, Model model) {
-        
+
         menuCodeRepository.save(menuCode);
 
         return "redirect:/menu-code";
     }
 
-    
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMenuCode(@PathVariable Long id) {
-        menuCodeRepository.deleteById(id);
+        menuCodeRepository.deleteByCode2(id);
         return ResponseEntity.ok().build();
     }
 

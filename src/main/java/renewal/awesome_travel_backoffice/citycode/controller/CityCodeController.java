@@ -113,7 +113,7 @@ public class CityCodeController {
 
         // 국가 정보 조회
         Optional<CountryCode> countryCode = countryCodeService.getCountryCodeByCode(
-            cityCode.get().getCountry() != null ? cityCode.get().getCountry().getCountryCode() : null);
+                cityCode.get().getCountryCode() != null ? cityCode.get().getCountryCode().getCountryCode() : null);
 
         model.addAttribute("cityCode", cityCode.get());
         model.addAttribute("countryCode", countryCode.orElse(null));
@@ -164,18 +164,18 @@ public class CityCodeController {
             // CityCode cityCode = new CityCode(country, code, kor, eng);
 
             // if (originalCode != null && !originalCode.isEmpty()) {
-            //     // 수정: 코드가 변경되었는지 확인
-            //     if (!originalCode.equals(code)) {
-            //         // 코드가 변경된 경우, 기존 코드 삭제 후 새 코드로 생성
-            //         cityCodeService.deleteCityCode(originalCode);
-            //         cityCodeService.createCityCode(cityCode);
-            //     } else {
-            //         // 코드가 변경되지 않은 경우, 업데이트
-            //         cityCodeService.updateCityCode(originalCode, cityCode);
-            //     }
+            // // 수정: 코드가 변경되었는지 확인
+            // if (!originalCode.equals(code)) {
+            // // 코드가 변경된 경우, 기존 코드 삭제 후 새 코드로 생성
+            // cityCodeService.deleteCityCode(originalCode);
+            // cityCodeService.createCityCode(cityCode);
             // } else {
-            //     // 생성
-            //     cityCodeService.createCityCode(cityCode);
+            // // 코드가 변경되지 않은 경우, 업데이트
+            // cityCodeService.updateCityCode(originalCode, cityCode);
+            // }
+            // } else {
+            // // 생성
+            // cityCodeService.createCityCode(cityCode);
             // }
 
             return "redirect:/city-code?message=success";
