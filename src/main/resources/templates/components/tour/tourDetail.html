@@ -535,7 +535,7 @@
                                     <div class="form-group">
                                         <label>도시</label>
                                         <input type="text"
-                                            th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].city}"
+                                            th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].city.cityCode}"
                                             placeholder="예: KR | South Korea | 대한민국" list="cityList"
                                             class="form-control" />
                                     </div>
