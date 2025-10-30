@@ -45,7 +45,7 @@ public class RandomGenerator {
             List<Airline> airlines = airlineRepo.findAll();
             List<AirportCode> cities = airportRepo.findByCityCodeCountryCodeCountryCode("KR");
 
-            for (int i = 100; i < 10000; i++) {
+            for (int i = 100; i < 100000; i++) {
                 Airline airline = airlines.get(random.nextInt(airlines.size()));
 
                 // 출/도착 공항은 다르게 선택
@@ -57,7 +57,7 @@ public class RandomGenerator {
 
                 // 출발시간
                 LocalDateTime departDateTime = LocalDateTime.now()
-                        .plusDays(random.nextInt(2))
+                        .plusDays(random.nextInt(100))
                         .withHour(random.nextInt(24))
                         .withMinute(random.nextInt(60));
 
