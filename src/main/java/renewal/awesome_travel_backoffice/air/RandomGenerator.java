@@ -43,7 +43,9 @@ public class RandomGenerator {
             System.out.println(">>> RandomGenerator CommandLineRunner 실행됨!");
             Random random = new Random();
             List<Airline> airlines = airlineRepo.findAll();
-            List<AirportCode> cities = airportRepo.findByCityCodeCountryCodeCountryCode("KR");
+            // List<AirportCode> cities =
+            // airportRepo.findByCityCodeCountryCodeCountryCode("KR");
+            List<AirportCode> cities = airportRepo.findAllByMenuCodeCities();
 
             for (int i = 100; i < 100000; i++) {
                 Airline airline = airlines.get(random.nextInt(airlines.size()));
@@ -61,8 +63,10 @@ public class RandomGenerator {
                         .withHour(random.nextInt(24))
                         .withMinute(random.nextInt(60));
 
-                ZoneOffset departOffset = ZoneOffset.ofTotalSeconds((int) (depart.getCityCode().getUtcOffsetMins() * 60));
-                ZoneOffset arriveOffset = ZoneOffset.ofTotalSeconds((int) (arrive.getCityCode().getUtcOffsetMins() * 60));
+                ZoneOffset departOffset = ZoneOffset
+                        .ofTotalSeconds((int) (depart.getCityCode().getUtcOffsetMins() * 60));
+                ZoneOffset arriveOffset = ZoneOffset
+                        .ofTotalSeconds((int) (arrive.getCityCode().getUtcOffsetMins() * 60));
 
                 // 목표 비행 시간 (분)
                 int flightMinutes = 120 + random.nextInt(600); // 2~12시간
@@ -98,7 +102,8 @@ public class RandomGenerator {
                     segment.setArriveAirport(arrive);
                     segment.setArriveTerminal("T3");
                     segment.setArriveDateTime(arriveDateTime);
-                    segment.setFlightDuration(airService.calcDuration(departDateTime, depart.getCityCode(), arriveDateTime, arrive.getCityCode()));
+                    segment.setFlightDuration(airService.calcDuration(departDateTime, depart.getCityCode(),
+                            arriveDateTime, arrive.getCityCode()));
                     segments.add(segment);
                 } else {
 
@@ -130,11 +135,13 @@ public class RandomGenerator {
                         segment.setArriveTerminal("T3");
                         segment.setArriveDateTime(segArriveTime);
                         segment.setFlightDuration(
-                            airService.calcDuration(departDateTime, depart.getCityCode(), arriveDateTime, arrive.getCityCode()));
+                                airService.calcDuration(departDateTime, depart.getCityCode(), arriveDateTime,
+                                        arrive.getCityCode()));
 
                         if (s != 0) {
                             Air.FlightSegment lastSegment = segments.get(segments.size() - 1); // getLast() 대신
-                            lastSegment.setWaitDuration(airService.calcDuration(departDateTime, depart.getCityCode(), arriveDateTime, arrive.getCityCode()));
+                            lastSegment.setWaitDuration(airService.calcDuration(departDateTime, depart.getCityCode(),
+                                    arriveDateTime, arrive.getCityCode()));
                         }
 
                         segments.add(segment);
