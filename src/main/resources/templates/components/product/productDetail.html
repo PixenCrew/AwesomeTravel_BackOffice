@@ -517,6 +517,14 @@
                         <span class="unit">일</span>
                     </div>
                 </div>
+
+                <div class="form-group">
+                    <label class="form-label">출발 구분</label>
+                    <select th:field="*{departTimeType}" class="form-input">
+                        <option th:each="type : ${T(renewal.common.entity.Product.DepartTimeType).values()}"
+                            th:value="${type}" th:text="${type}">TYPE</option>
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -707,24 +715,27 @@
             </div>
         </div>
 
-        <!-- 이미지 섹션 -->
-        <div class="form-section">
-            <div class="dynamic-section">
-                <div class="dynamic-header">
-                    <h3 class="dynamic-title">상품 이미지</h3>
-                    <button type="button" class="btn-add" onclick="addImageField()">
-                        <i class="fas fa-plus mr-1"></i>이미지 추가
-                    </button>
-                </div>
-
-                <div id="images-container">
-                    <div class="dynamic-item" th:each="img, iterStat : *{images}">
-                        <input type="text" th:field="*{images[__${iterStat.index}__]}" placeholder="이미지 URL을 입력하세요" />
-                        <button type="button" class="btn-remove" onclick="removeImageField(this)">
-                            <i class="fas fa-trash"></i>
-                        </button>
+        <!-- 이미지 관리 -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-base font-semibold leading-6 text-gray-900 mb-4">이미지 관리</h3>
+                <fieldset id="images-fieldset" class="space-y-4">
+                    <div class="image-item" th:each="img, iterStat : *{images}">
+                        <div class="flex space-x-2">
+                            <input type="text" th:field="*{images[__${iterStat.index}__]}" placeholder="이미지 URL을 입력하세요"
+                                class="flex-1 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                            <button type="button" onclick="removeImage(this)"
+                                class="inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500">
+                                <i class="fas fa-trash h-4 w-4"></i>
+                            </button>
+                        </div>
                     </div>
-                </div>
+                    <button type="button" onclick="addImage()"
+                        class="inline-flex items-center rounded-md bg-gray-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500">
+                        <i class="fas fa-plus -ml-0.5 mr-1.5 h-4 w-4"></i>
+                        이미지 추가
+                    </button>
+                </fieldset>
             </div>
         </div>
 
@@ -784,14 +795,20 @@
             );
         }
 
-        function setPrice(id, tourPrice, airPrice, hotelPrice) {
-            console.log(`id, tourPrice, airPrice, hotelPrice: ${id}, ${tourPrice}, ${airPrice}, ${hotelPrice}`);
-            document.querySelector('input[name="tour.id"]').value = id;
-            document.querySelector('input[name="tour.priceAdult"]').value = tourPrice;
-            // document.querySelector('input[name="tour.airPriceSum"]').value = airPrice;
-            document.querySelector('input[name="tour.hotelPriceSum"]').value = hotelPrice;
-            calculateTotalPrice();
+        function setData(data) {
+            console.log("팝업에서 받은 데이터:", data);
+
+            document.querySelector('[name="tour.id"]').value = data.id;
+            document.querySelector('[name="tour.country"]').value = data.country;
+            document.querySelector('[name="tour.startDate"]').value = data.startDate;
+            document.querySelector('[name="tour.endDate"]').value = data.endDate;
+            document.querySelector('[name="tour.priceAdult"]').value = data.priceAdult.toLocaleString();
+            document.querySelector('[name="tour.hotelPriceSum"]').value = data.hotelPriceSum.toLocaleString();
+
+            const total = data.priceAdult + data.hotelPriceSum;
+            document.getElementById("totalPrice").textContent = `${total.toLocaleString()}원`;
         }
+
 
         function deactivateProduct(id) {
             if (confirm('정말로 이 상품을 비활성화하시겠습니까?')) {
@@ -836,10 +853,6 @@
             reindexInfos();
         }
 
-        function removeImageField(btn) {
-            removeField(btn);
-        }
-
         function reindexImages() {
             const inputs = document.querySelectorAll("#images-container input");
             inputs.forEach((input, idx) => {
@@ -857,28 +870,24 @@
             });
         }
 
-        // 이미지 필드 추가
-        function addImageField() {
-            const container = document.getElementById("images-container");
-            const index = container.querySelectorAll(".dynamic-item").length;
+        // 
 
-            const div = document.createElement("div");
-            div.className = "dynamic-item";
+        function addImage() {
+            const fieldset = document.getElementById("images-fieldset");
 
-            const input = document.createElement("input");
-            input.type = "text";
-            input.name = `images[${index}]`;
-            input.placeholder = "이미지 URL을 입력하세요";
+            // .image-item 개수 → 다음 인덱스
+            const index = fieldset.querySelectorAll(".image-item").length;
 
-            const button = document.createElement("button");
-            button.type = "button";
-            button.className = "btn-remove";
-            button.innerHTML = '<i class="fas fa-trash"></i>';
-            button.addEventListener("click", () => removeImageField(button));
+            const item = document.createElement("div");
+            item.classList.add("image-item");
 
-            div.appendChild(input);
-            div.appendChild(button);
-            container.appendChild(div);
+            item.innerHTML = `
+                <input type="text" name="images[${index}]" placeholder="이미지 URL" readonly />
+                <input type="file" onchange="uploadImage(this)" />
+                <button type="button" onclick="removeImage(this)">삭제</button>
+            `;
+
+            fieldset.insertBefore(item, fieldset.lastElementChild);
         }
 
         // Info 필드 추가
