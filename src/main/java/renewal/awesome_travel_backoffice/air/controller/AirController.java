@@ -40,7 +40,7 @@ public class AirController {
     private final AirRepository airRepo;
 
     private final CommonCodeService commonCodeService;
-    
+
     // 항공 목록
     @GetMapping
     // @PreAuthorize("hasRole('ADMIN')")
@@ -151,26 +151,29 @@ public class AirController {
             air.setFlightType(FlightType.STOP_OVER);
         }
 
-        airService.createAir(air);
+        airService.saveAir(air);
 
         return "redirect:/air";
     }
 
     // @GetMapping("/search")
-    // public ResponseEntity<Page<AirResponseDto>> searchAirList(@ModelAttribute AirSearchRequestDto req) {
-    //     Page<AirResponseDto> result = airService.getAirList(req);
-    //     return ResponseEntity.ok(result);
+    // public ResponseEntity<Page<AirResponseDto>> searchAirList(@ModelAttribute
+    // AirSearchRequestDto req) {
+    // Page<AirResponseDto> result = airService.getAirList(req);
+    // return ResponseEntity.ok(result);
     // }
 
     // @PutMapping("/{id}")
-    // public ResponseEntity<AirResponseDto> updateAir(@PathVariable Long id, @RequestBody AirRequestDto dto) {
-    //     return ResponseEntity.ok(airService.updateAir(id, dto));
+    // public ResponseEntity<AirResponseDto> updateAir(@PathVariable Long id,
+    // @RequestBody AirRequestDto dto) {
+    // return ResponseEntity.ok(airService.updateAir(id, dto));
     // }
 
     // @PatchMapping("/{id}/update-details")
-    // public ResponseEntity<Void> updateDetails(@PathVariable Long id, @RequestBody AirRequestDto dto) {
-    //     airService.updateDetails(id, dto);
-    //     return ResponseEntity.ok().build();
+    // public ResponseEntity<Void> updateDetails(@PathVariable Long id, @RequestBody
+    // AirRequestDto dto) {
+    // airService.updateDetails(id, dto);
+    // return ResponseEntity.ok().build();
     // }
 
     @PatchMapping("/{id}/status")
@@ -206,7 +209,7 @@ public class AirController {
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("title", "Air Select");
         model.addAttribute("airportCode", commonCodeService.getAllAirports());
-        
+
         // 항공선택 플래그
         model.addAttribute("isSelectionPage", true);
         model.addAttribute("content", "components/air/air");
@@ -216,9 +219,18 @@ public class AirController {
     // @GetMapping("/seat/{id}")
     // public String showReservation(@PathVariable Long id, Model model) {
 
-    //     List<AirReservation> reservations = airReservationRepo.findAllBySeatClassId(id);
-    //     model.addAttribute("reservations", reservations);
-        
-    //     return "components/air/airReservation";
+    // List<AirReservation> reservations =
+    // airReservationRepo.findAllBySeatClassId(id);
+    // model.addAttribute("reservations", reservations);
+
+    // return "components/air/airReservation";
     // }
+
+    // !!!!!!!!!!!!!!!!!![TEST] 항공권 100일치 복제 !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    @GetMapping("/replicate/{id}")
+    public String replicateAir100(@PathVariable Long id) {
+        Air originAir = airRepo.findById(id).get();
+        airService.generateAirVariantsWithRandomPrice(originAir);
+        return "redirect:/air";
+    }
 }

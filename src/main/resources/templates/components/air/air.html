@@ -119,7 +119,7 @@
       const seenNames = new Set();
       let count = 0;
       const elements = Array.from(form.elements);
-      const skip = new Set(['page','size','sort','sortField','sortDir','_csrf']);
+      const skip = new Set(['page', 'size', 'sort', 'sortField', 'sortDir', '_csrf']);
       elements.forEach(el => {
         if (!el.name || skip.has(el.name)) return;
         if (el.type === 'hidden') return;
@@ -151,7 +151,7 @@
       if (n > 0) { badge.textContent = n; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); }
     }
 
-    (function(){
+    (function () {
       const form = document.getElementById('filterForm');
       if (form) {
         form.addEventListener('input', updateFilterCount, true);
@@ -166,191 +166,191 @@
     <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex-shrink-0">
       <h3 class="text-lg font-semibold text-gray-800">항공편 목록 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 ml-2" th:text="'총 ' + ${airPage.totalElements} + '개'"></span></h3>
     </div>
-    
+
     <div class="flex-1 overflow-auto table-responsive" style="max-height: calc(100vh - 500px); min-height: 200px;">
       <table class="min-w-full divide-y divide-gray-200" style="table-layout: fixed; width: 100%;">
-            <thead class="bg-gray-50">
-              <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 20%;">
-                  항공편 정보</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 12%;">
-                  <a href="#" data-sortfield="air.departDate"
-                    th:data-sortdir="${sortField=='air.departDate' and sortDir=='asc' ? 'asc' : 'desc'}"
-                    onclick="toggleSort(this, event)" class="group inline-flex">
-                    출발일시
-                    <span th:if="${sortField=='air.departDate'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"
-                      class="ml-2 flex-none rounded text-gray-400 group-hover:text-gray-500"></span>
-                  </a>
-                </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 12%;">
-                  <a href="#" data-sortfield="air.arriveDate"
-                    th:data-sortdir="${sortField=='air.arriveDate' and sortDir=='asc' ? 'asc' : 'desc'}"
-                    onclick="toggleSort(this, event)" class="group inline-flex">
-                    도착일시
-                    <span th:if="${sortField=='air.arriveDate'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"
-                      class="ml-2 flex-none rounded text-gray-400 group-hover:text-gray-500"></span>
-                  </a>
-                </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 18%;">
-                  항공사</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 15%;">
-                  좌석 정보</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 12%;">
-                  <a href="#" data-sortfield="price"
-                    th:data-sortdir="${sortField=='price' and sortDir=='asc' ? 'asc' : 'desc'}"
-                    onclick="toggleSort(this, event)" class="group inline-flex">
-                    가격
-                    <span th:if="${sortField=='price'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"
-                      class="ml-2 flex-none rounded text-gray-400 group-hover:text-gray-500"></span>
-                  </a>
-                </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 10%;">
-                  상태</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <th:block th:each="seatClass : ${airPage.content}">
-                <tr
-                  th:onclick="${isSelectionPage} ? |returnNumber(${seatClass.id})| : |window.location.href='@{/air/{id}(id=${seatClass.air.id})}'|"
-                  class="hover:bg-gray-50 cursor-pointer">
-                  <!-- 항공편 정보 -->
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center">
-                      <div class="flex-shrink-0 h-10 w-10">
-                        <div
-                          class="relative h-10 w-10 rounded-full bg-blue-100 overflow-hidden flex items-center justify-center">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 20%;">
+              항공편 정보</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 12%;">
+              <a href="#" data-sortfield="air.departDate"
+                th:data-sortdir="${sortField=='air.departDate' and sortDir=='asc' ? 'asc' : 'desc'}"
+                onclick="toggleSort(this, event)" class="group inline-flex">
+                출발일시
+                <span th:if="${sortField=='air.departDate'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"
+                  class="ml-2 flex-none rounded text-gray-400 group-hover:text-gray-500"></span>
+              </a>
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 12%;">
+              <a href="#" data-sortfield="air.arriveDate"
+                th:data-sortdir="${sortField=='air.arriveDate' and sortDir=='asc' ? 'asc' : 'desc'}"
+                onclick="toggleSort(this, event)" class="group inline-flex">
+                도착일시
+                <span th:if="${sortField=='air.arriveDate'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"
+                  class="ml-2 flex-none rounded text-gray-400 group-hover:text-gray-500"></span>
+              </a>
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 18%;">
+              항공사</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 15%;">
+              좌석 정보</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 12%;">
+              <a href="#" data-sortfield="price"
+                th:data-sortdir="${sortField=='price' and sortDir=='asc' ? 'asc' : 'desc'}"
+                onclick="toggleSort(this, event)" class="group inline-flex">
+                가격
+                <span th:if="${sortField=='price'}" th:text="${sortDir=='asc' ? '▲' : '▼'}"
+                  class="ml-2 flex-none rounded text-gray-400 group-hover:text-gray-500"></span>
+              </a>
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 10%;">
+              상태</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <th:block th:each="seatClass : ${airPage.content}">
+            <tr
+              th:onclick="${isSelectionPage} ? |returnNumber(${seatClass.id})| : |window.location.href='@{/air/{id}(id=${seatClass.air.id})}'|"
+              class="hover:bg-gray-50 cursor-pointer">
+              <!-- 항공편 정보 -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 h-10 w-10">
+                    <div
+                      class="relative h-10 w-10 rounded-full bg-blue-100 overflow-hidden flex items-center justify-center">
 
-                          <img th:src="${seatClass.air.airline.iconUrl}" alt="airline logo"
-                            class="absolute inset-0 w-full h-full object-cover opacity-80" />
+                      <img th:src="${seatClass.air.airline.iconUrl}" alt="airline logo"
+                        class="absolute inset-0 w-full h-full object-cover opacity-80" />
 
-                          <i class="fas fa-plane text-blue-600 text-sm relative z-10"></i>
-                        </div>
-                      </div>
-                      <div class="ml-4">
-                        <div class="text-sm font-medium text-gray-900" th:text="${seatClass.air.flightNumber}">AB123
-                        </div>
-                        <div class="text-sm text-gray-500">
-                          <span th:text="${seatClass.air.departAirport.airportCode}">ICN</span>→
-                          <span th:text="${seatClass.air.arriveAirport.airportCode}">NRT</span>
-                        </div>
-                      </div>
+                      <i class="fas fa-plane text-blue-600 text-sm relative z-10"></i>
                     </div>
-                  </td>
-
-                  <!-- 출발일시 -->
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900"
-                      th:text="${#temporals.format(seatClass.air.departTime, 'yyyy-MM-dd HH:mm')}">
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900" th:text="${seatClass.air.flightNumber}">AB123
                     </div>
-                  </td>
-
-                  <!-- 도착일시 -->
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900"
-                      th:text="${#temporals.format(seatClass.air.arriveTime, 'yyyy-MM-dd HH:mm')}">
-                    </div>
-                  </td>
-
-                  <!-- 항공사 -->
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm font-medium text-gray-900" th:text="${seatClass.air.airline.nameKor}">좋은항공</div>
-                    <div class="text-sm text-gray-500" th:text="${seatClass.air.airline.nameEng}">GreatAir</div>
-                    <div class="text-xs text-gray-400" th:text="${seatClass.air.airline.code}">AAA</div>
-                  </td>
-
-                  <!-- 좌석 정보 -->
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm font-medium text-gray-900" th:text="${seatClass.classType}">FIRST</div>
                     <div class="text-sm text-gray-500">
-                      <span th:text="${seatClass.availableSeats}">10</span> / <span
-                        th:text="${seatClass.maxSeats}">100</span>
+                      <span th:text="${seatClass.air.departAirport.airportCode}">ICN</span>→
+                      <span th:text="${seatClass.air.arriveAirport.airportCode}">NRT</span>
                     </div>
-                    <div class="text-xs text-gray-400">
-                      경유: <span th:text="${seatClass.air.stopovers}">0</span>회
-                    </div>
-                  </td>
+                  </div>
+                </div>
+              </td>
 
-                  <!-- 가격 -->
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm font-medium text-gray-900">
-                      <span th:text="${#numbers.formatDecimal(seatClass.price, 0, 'COMMA', 0, 'POINT')}">50,000</span>원
-                    </div>
-                  </td>
+              <!-- 출발일시 -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900"
+                  th:text="${#temporals.format(seatClass.air.departDateTime, 'yyyy-MM-dd HH:mm')}">
+                </div>
+              </td>
 
-                  <!-- 상태 -->
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <span th:if="${seatClass.air.status.name() == 'ACTIVE'}"
-                      class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                      활성
-                    </span>
-                    <span th:if="${seatClass.air.status.name() == 'INACTIVE'}"
-                      class="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20">
-                      비활성
-                    </span>
-                    <span th:if="${seatClass.air.status.name() == 'CANCELLED'}"
-                      class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-700 ring-1 ring-inset ring-gray-600/20">
-                      취소
-                    </span>
-                  </td>
+              <!-- 도착일시 -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900"
+                  th:text="${#temporals.format(seatClass.air.arriveDateTime, 'yyyy-MM-dd HH:mm')}">
+                </div>
+              </td>
 
-                </tr>
-              </th:block>
-            </tbody>
-          </table>
+              <!-- 항공사 -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-gray-900" th:text="${seatClass.air.airline.nameKor}">좋은항공</div>
+                <div class="text-sm text-gray-500" th:text="${seatClass.air.airline.nameEng}">GreatAir</div>
+                <div class="text-xs text-gray-400" th:text="${seatClass.air.airline.code}">AAA</div>
+              </td>
+
+              <!-- 좌석 정보 -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-gray-900" th:text="${seatClass.classType}">FIRST</div>
+                <div class="text-sm text-gray-500">
+                  <span th:text="${seatClass.availableSeats}">10</span> / <span
+                    th:text="${seatClass.maxSeats}">100</span>
+                </div>
+                <div class="text-xs text-gray-400">
+                  경유: <span th:text="${seatClass.air.stopovers}">0</span>회
+                </div>
+              </td>
+
+              <!-- 가격 -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-gray-900">
+                  <span th:text="${#numbers.formatDecimal(seatClass.price, 0, 'COMMA', 0, 'POINT')}">50,000</span>원
+                </div>
+              </td>
+
+              <!-- 상태 -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span th:if="${seatClass.air.status.name() == 'ACTIVE'}"
+                  class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                  활성
+                </span>
+                <span th:if="${seatClass.air.status.name() == 'INACTIVE'}"
+                  class="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20">
+                  비활성
+                </span>
+                <span th:if="${seatClass.air.status.name() == 'CANCELLED'}"
+                  class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-700 ring-1 ring-inset ring-gray-600/20">
+                  취소
+                </span>
+              </td>
+
+            </tr>
+          </th:block>
+        </tbody>
+      </table>
     </div>
   </div>
 
-        <!-- 페이징 -->
-        <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 flex-shrink-0">
-            <div class="flex-1 flex justify-between sm:hidden">
-                <a th:if="${airPage.hasPrevious()}" href="#" th:onclick="|performSearch(${airPage.number - 1}, event)|" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                    이전
-                </a>
-                <a th:if="${airPage.hasNext()}" href="#" th:onclick="|performSearch(${airPage.number + 1}, event)|" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                    다음
-                </a>
-            </div>
-            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
-                    <p class="text-sm text-gray-700">
-                        총 <span class="font-medium" th:text="${airPage.totalElements}">0</span>개 중 
-                        <span class="font-medium" th:text="${airPage.number * airPage.size + 1}">1</span>-<span class="font-medium" th:text="${(airPage.number + 1) * airPage.size > airPage.totalElements ? airPage.totalElements : (airPage.number + 1) * airPage.size}">10</span>개 표시
-                    </p>
-                </div>
-                <div>
-                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        <!-- 이전 페이지 버튼 -->
-                        <a th:if="${airPage.hasPrevious()}" th:href="@{/air(page=${airPage.number - 1}, sortField=${sortField}, sortDir=${sortDir})}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                            <i class="fas fa-chevron-left"></i>
-                        </a>
-                        
-                        <!-- 페이지 번호들 (최대 10개만 표시) -->
-                        <th:block th:with="startPage=${airPage.number > 5 ? airPage.number - 5 : 0}, endPage=${airPage.number + 5 < airPage.totalPages ? airPage.number + 5 : airPage.totalPages - 1}">
-                            <a th:each="i : ${#numbers.sequence(startPage, endPage)}" 
-                              th:href="@{/air(page=${i}, sortField=${sortField}, sortDir=${sortDir})}" 
-                              th:class="${i == airPage.number} ? 'z-10 bg-blue-50 border-blue-500 text-blue-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium'" 
-                              th:text="${i + 1}">1</a>
-                        </th:block>
-                        
-                        <!-- 다음 페이지 버튼 -->
-                        <a th:if="${airPage.hasNext()}" th:href="@{/air(page=${airPage.number + 1}, sortField=${sortField}, sortDir=${sortDir})}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                            <i class="fas fa-chevron-right"></i>
-                        </a>
-                    </nav>
-                </div>
-            </div>
-        </div>
+  <!-- 페이징 -->
+  <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 flex-shrink-0">
+    <div class="flex-1 flex justify-between sm:hidden">
+      <a th:if="${airPage.hasPrevious()}" href="#" th:onclick="|performSearch(${airPage.number - 1}, event)|" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+        이전
+      </a>
+      <a th:if="${airPage.hasNext()}" href="#" th:onclick="|performSearch(${airPage.number + 1}, event)|" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+        다음
+      </a>
     </div>
+    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+      <div>
+        <p class="text-sm text-gray-700">
+          총 <span class="font-medium" th:text="${airPage.totalElements}">0</span>개 중
+          <span class="font-medium" th:text="${airPage.number * airPage.size + 1}">1</span>-<span class="font-medium" th:text="${(airPage.number + 1) * airPage.size > airPage.totalElements ? airPage.totalElements : (airPage.number + 1) * airPage.size}">10</span>개 표시
+        </p>
+      </div>
+      <div>
+        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+          <!-- 이전 페이지 버튼 -->
+          <a th:if="${airPage.hasPrevious()}" th:href="@{/air(page=${airPage.number - 1}, sortField=${sortField}, sortDir=${sortDir})}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+            <i class="fas fa-chevron-left"></i>
+          </a>
 
-  <script src="/js/util.js"></script>
+          <!-- 페이지 번호들 (최대 10개만 표시) -->
+          <th:block th:with="startPage=${airPage.number > 5 ? airPage.number - 5 : 0}, endPage=${airPage.number + 5 < airPage.totalPages ? airPage.number + 5 : airPage.totalPages - 1}">
+            <a th:each="i : ${#numbers.sequence(startPage, endPage)}"
+              th:href="@{/air(page=${i}, sortField=${sortField}, sortDir=${sortDir})}"
+              th:class="${i == airPage.number} ? 'z-10 bg-blue-50 border-blue-500 text-blue-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium'"
+              th:text="${i + 1}">1</a>
+          </th:block>
 
-  <div th:replace="components/datalist/airportList :: airportDatalistFragment"></div>
+          <!-- 다음 페이지 버튼 -->
+          <a th:if="${airPage.hasNext()}" th:href="@{/air(page=${airPage.number + 1}, sortField=${sortField}, sortDir=${sortDir})}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
 
-  <datalist id="seatClassList">
-    <option value="ECONOMY">ECONOMY</option>
-    <option value="PREMIUMECONOMY">PREMIUMECONOMY</option>
-    <option value="BUSINESS">BUSINESS</option>
-    <option value="FIRST">FIRST</option>
-  </datalist>
+<script src="/js/util.js"></script>
+
+<div th:replace="components/datalist/airportList :: airportDatalistFragment"></div>
+
+<datalist id="seatClassList">
+  <option value="ECONOMY">ECONOMY</option>
+  <option value="PREMIUMECONOMY">PREMIUMECONOMY</option>
+  <option value="BUSINESS">BUSINESS</option>
+  <option value="FIRST">FIRST</option>
+</datalist>
 
 </div>
