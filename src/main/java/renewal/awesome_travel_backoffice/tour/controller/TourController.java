@@ -22,10 +22,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.common.service.CommonCodeService;
+import renewal.awesome_travel_backoffice.hotel.repository.HotelRepository;
 import renewal.awesome_travel_backoffice.product.repository.ProductRepository;
 import renewal.awesome_travel_backoffice.tour.TourService;
 import renewal.awesome_travel_backoffice.tour.dto.TourFilterDTO;
 import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
+import renewal.common.entity.Hotel;
 import renewal.common.entity.Location;
 import renewal.common.entity.Location.LocationType;
 import renewal.common.entity.Product;
@@ -40,6 +42,7 @@ public class TourController {
     private final TourRepository tourRepo;
     private final TourService tourService;
     private final ProductRepository productRepo;
+    private final HotelRepository hotelRepo;
 
     private final CommonCodeService commonCodeService;
 
@@ -141,7 +144,7 @@ public class TourController {
         model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
         model.addAttribute("airportCode", commonCodeService.getAllAirports());
         model.addAttribute("tour", tour);
-        model.addAttribute("connectedProduct", connectedProduct==null ? 0 : connectedProduct.getId());
+        model.addAttribute("connectedProduct", connectedProduct == null ? 0 : connectedProduct.getId());
         model.addAttribute("isSelectionPage", false);
         model.addAttribute("title", "Tour " + tour.getName());
         model.addAttribute("content", "components/tour/tourDetail");
@@ -152,7 +155,7 @@ public class TourController {
     // 특정 투어 수정
     @PostMapping("/{id}")
     public String submitSelectedTravel(@ModelAttribute Tour tour) throws Exception {
-        
+
         // 모든 Schedule 객체에 tour 참조를 세팅
         for (Schedule schedule : tour.getSchedules()) {
             schedule.setTour(tour);
@@ -172,7 +175,7 @@ public class TourController {
     public ResponseEntity<String> deleteTour(@PathVariable Long id) {
 
         // 연결된 Product 있는지 확인
-        if (productRepo.findByTourId(id)!=null) {
+        if (productRepo.findByTourId(id) != null) {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
                     .body("연결된 패키지를 먼저 삭제해주세요.");
@@ -217,7 +220,7 @@ public class TourController {
 
         // 투어선택 플래그
         model.addAttribute("isSelectionPage", true);
-        model.addAttribute("content", "components/hotel/hotel"); // layout 안에서 이 fragment를 렌더
+        model.addAttribute("content", "components/tour/tour"); // layout 안에서 이 fragment를 렌더
 
         return "popup";
     }
@@ -240,7 +243,10 @@ public class TourController {
                     // AIR 처리
                 } else if (location.getLocationType() == LocationType.HOTEL) {
                     // 호텔 가격 합산
-                    hotelPriceSum += location.getHotel().getPrice();
+                    Hotel hotel = hotelRepo.findById(location.getHotel().getId()).get();
+                    if (hotel != null) {
+                        hotelPriceSum += hotel.getPrice();
+                    }
                 } else {
                     // POINT 처리
                 }

@@ -535,8 +535,8 @@
                                     <div class="form-group">
                                         <label>도시</label>
                                         <input type="text"
-                                            th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].city.cityCode}"
-                                            placeholder="예: KR | South Korea | 대한민국" list="cityList"
+                                            th:field="*{schedules[__${schedStat.index}__].locations[__${locStat.index}__].cityCode.cityCode}"
+                                            placeholder="예: KR | South Korea | 대한민국" list="cityList" onchange="stripAfterPipe(this)"
                                             class="form-control" />
                                     </div>
 
@@ -799,13 +799,13 @@
                 content.appendChild(depGroup);
 
                 const arrGroup = createFormGroup('도착지', `schedules[${schedIdx}].locations[${locIdx}].arriveAirport`, '도착지 선택', {
-                    list: 'cityList',
+                    list: 'airportList',
                     onchange: 'stripAfterPipe(this)',
                 });
                 content.appendChild(arrGroup);
 
             } else {
-                const cityGroup = createFormGroup('도시', `schedules[${schedIdx}].locations[${locIdx}].city`, '예: KR | South Korea | 대한민국', {
+                const cityGroup = createFormGroup('도시', `schedules[${schedIdx}].locations[${locIdx}].cityCode`, '예: KR | South Korea | 대한민국', {
                     list: 'cityList',
                     onchange: 'stripAfterPipe(this)',
                 });
@@ -926,7 +926,7 @@
             console.log('Search Hotel for : ' + input?.value);
 
             const locationDiv = input?.closest(".location-point");
-            const cityInput = locationDiv?.querySelector("input[name$='.city'], input[name='city'], input[id$='city']");
+            const cityInput = locationDiv?.querySelector("input[name$='.cityCode'], input[name='cityCode'], input[id$='cityCode']");
             const cityValue = cityInput?.value?.trim() || null;
 
             // // 클릭한 schedule의 data-sched-idx를 dayOffset으로 사용

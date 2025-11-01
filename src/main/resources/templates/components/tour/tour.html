@@ -189,8 +189,17 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     <th:block th:each="tour : ${tourPage.content}">
-                        <tr th:onclick="${isSelectionPage != null and isSelectionPage} ? |returnPrice(${tour.id},${tour.priceAdult},${tour.hotelPriceSum})| : |window.location.href='@{/tour/{id}(id=${tour.id})}'|"
-                            class="hover:bg-gray-50 cursor-pointer">
+                        <tr th:onclick="${isSelectionPage != null and isSelectionPage} ?
+            'returnData(this)' :
+            'window.location.href=\'/tour/' + ${tour.id} + '\''"
+                            class="hover:bg-gray-50 cursor-pointer"
+                            th:attr="data-id=${tour.id},
+                 data-price-adult=${tour.priceAdult},
+                 data-hotel-price=${tour.hotelPriceSum},
+                 data-country=${tour.country.countryCode},
+                 data-start=${#temporals.format(tour.startDate, 'yyyy-MM-dd')},
+                 data-end=${#temporals.format(tour.endDate, 'yyyy-MM-dd')}">
+
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
                                 th:text="${tour.id}">1</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
@@ -198,32 +207,30 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
                                 th:text="${#temporals.format(tour.endDate, 'yyyy-MM-dd')}">2000-12-31</td>
                             <td class="px-6 py-4 text-sm text-gray-900">
-                                <div class="font-semibold text-gray-900 truncate" th:text="${tour.name}"
-                                    title="${tour.name}">투어명</div>
+                                <div class="font-semibold text-gray-900 truncate"
+                                    th:text="${tour.name}"
+                                    th:title="${tour.name}">투어명</div>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-900">
-                                <span
-                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 truncate"
-                                    th:text="${tour.company}" th:title="${tour.company}">회사명</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 truncate"
+                                    th:text="${tour.company}"
+                                    th:title="${tour.company}">회사명</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 <span class="font-semibold text-green-600"
                                     th:text="${#numbers.formatInteger(tour.priceAdult, 3, 'COMMA')} + '원'">100,000원</span>
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-900" style="max-width: 80px; overflow: hidden;">
-                                <span
-                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 truncate block"
-                                    th:text="${tour.country.countryCode}" th:title="${tour.country.countryCode}"
-                                    style="max-width: 100%;">KR</span>
+                            <td class="px-6 py-4 text-sm text-gray-900">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 truncate block"
+                                    th:text="${tour.country.countryCode}"
+                                    th:title="${tour.country.countryCode}">KR</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                <span
-                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800"
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800"
                                     th:text="${tour.count} + '명'">10명</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                <span
-                                    th:text="${#numbers.formatInteger(tour.hotelPriceSum, 3, 'COMMA')} + '원'">30,000원</span>
+                                <span th:text="${#numbers.formatInteger(tour.hotelPriceSum, 3, 'COMMA')} + '원'">30,000원</span>
                             </td>
                         </tr>
                     </th:block>
