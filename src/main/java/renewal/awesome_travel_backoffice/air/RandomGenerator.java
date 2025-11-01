@@ -10,7 +10,6 @@ import java.util.Random;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,7 +26,7 @@ import renewal.common.entity.AirportCode;
 import renewal.common.entity.SeatClass;
 import renewal.common.repository.CountryCodeRepository;
 
-@Configuration
+// @Configuration
 public class RandomGenerator {
 
     @Bean
@@ -102,8 +101,8 @@ public class RandomGenerator {
                     segment.setArriveAirport(arrive);
                     segment.setArriveTerminal("T3");
                     segment.setArriveDateTime(arriveDateTime);
-                    segment.setFlightDuration(airService.calcDuration(departDateTime, depart.getCityCode(),
-                            arriveDateTime, arrive.getCityCode()));
+                    segment.setFlightDuration(airService.calcDuration(departDateTime, depart,
+                            arriveDateTime, arrive));
                     segments.add(segment);
                 } else {
 
@@ -135,13 +134,13 @@ public class RandomGenerator {
                         segment.setArriveTerminal("T3");
                         segment.setArriveDateTime(segArriveTime);
                         segment.setFlightDuration(
-                                airService.calcDuration(departDateTime, depart.getCityCode(), arriveDateTime,
-                                        arrive.getCityCode()));
+                                airService.calcDuration(departDateTime, depart, arriveDateTime,
+                                        arrive));
 
                         if (s != 0) {
                             Air.FlightSegment lastSegment = segments.get(segments.size() - 1); // getLast() 대신
-                            lastSegment.setWaitDuration(airService.calcDuration(departDateTime, depart.getCityCode(),
-                                    arriveDateTime, arrive.getCityCode()));
+                            lastSegment.setWaitDuration(airService.calcDuration(departDateTime, depart,
+                                    arriveDateTime, arrive));
                         }
 
                         segments.add(segment);
