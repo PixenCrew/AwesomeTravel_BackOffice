@@ -525,6 +525,20 @@
                             th:value="${type}" th:text="${type}">TYPE</option>
                     </select>
                 </div>
+
+                <div class="form-group">
+                    <label class="form-label">노 쇼핑</label>
+                    <div class="input-group">
+                        <input type="checkbox" th:field="*{noShopping}" class="form-input" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">노 옵션</label>
+                    <div class="input-group">
+                        <input type="checkbox" th:field="*{noOption}" class="form-input" />
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -715,14 +729,14 @@
             </div>
         </div>
 
-        <!-- 이미지 관리 -->
+        <!-- 사진 관리 -->
         <div class="bg-white shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
-                <h3 class="text-base font-semibold leading-6 text-gray-900 mb-4">이미지 관리</h3>
+                <h3 class="text-base font-semibold leading-6 text-gray-900 mb-4">사진 관리</h3>
                 <fieldset id="images-fieldset" class="space-y-4">
-                    <div class="image-item" th:each="img, iterStat : *{images}">
+                    <div class="image-item" th:each="img, iterStat : *{photos}">
                         <div class="flex space-x-2">
-                            <input type="text" th:field="*{images[__${iterStat.index}__]}" placeholder="이미지 URL을 입력하세요"
+                            <input type="text" th:field="*{photos[__${iterStat.index}__]}" placeholder="사진 URL을 입력하세요"
                                 class="flex-1 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
                             <button type="button" onclick="removeImage(this)"
                                 class="inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500">
@@ -739,23 +753,59 @@
             </div>
         </div>
 
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-base font-semibold leading-6 text-gray-900 mb-4">상세이미지 관리</h3>
+                <fieldset id="images-fieldset" class="space-y-4">
+                    <div class="image-item">
+                        <div class="flex space-x-2">
+                            <input type="text" th:field="*{image}" placeholder="이미지 URL" readonly />
+                            <input type="file" onchange="uploadImage(this)" />
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+
         <!-- 상품 정보 섹션 -->
         <div class="form-section">
             <div class="dynamic-section">
                 <div class="dynamic-header">
-                    <h3 class="dynamic-title">상품 정보</h3>
-                    <button type="button" class="btn-add" onclick="addInfoField()">
+                    <h3 class="dynamic-title">포함 정보</h3>
+                    <button type="button" class="btn-add" onclick="addInfoField('include')">
                         <i class="fas fa-plus mr-1"></i>정보 추가
                     </button>
                 </div>
 
-                <div id="info-container">
-                    <div class="dynamic-item" th:each="entry, iterStat : *{info}">
-                        <input type="text" th:name="|info[${iterStat.index}].title|" th:value="${entry.title}"
+                <div id="include-container">
+                    <div class="dynamic-item" th:each="entry, iterStat : *{include}">
+                        <input type="text" th:name="|include[${iterStat.index}].title|" th:value="${entry.title}"
                             placeholder="제목" />
-                        <input type="text" th:name="|info[${iterStat.index}].content|" th:value="${entry.content}"
+                        <input type="text" th:name="|include[${iterStat.index}].content|" th:value="${entry.content}"
                             placeholder="내용" />
-                        <input type="text" th:name="|info[${iterStat.index}].appendix|" th:value="${entry.appendix}"
+                        <input type="text" th:name="|include[${iterStat.index}].appendix|" th:value="${entry.appendix}"
+                            placeholder="추가 정보" />
+                        <button type="button" class="btn-remove" onclick="removeField(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="dynamic-section">
+                <div class="dynamic-header">
+                    <h3 class="dynamic-title">불포함 정보</h3>
+                    <button type="button" class="btn-add" onclick="addInfoField('exclude')">
+                        <i class="fas fa-plus mr-1"></i>정보 추가
+                    </button>
+                </div>
+
+                <div id="exclude-container">
+                    <div class="dynamic-item" th:each="entry, iterStat : *{exclude}">
+                        <input type="text" th:name="|exclude[${iterStat.index}].title|" th:value="${entry.title}"
+                            placeholder="제목" />
+                        <input type="text" th:name="|exclude[${iterStat.index}].content|" th:value="${entry.content}"
+                            placeholder="내용" />
+                        <input type="text" th:name="|exclude[${iterStat.index}].appendix|" th:value="${entry.appendix}"
                             placeholder="추가 정보" />
                         <button type="button" class="btn-remove" onclick="removeField(this)">
                             <i class="fas fa-trash"></i>
@@ -864,9 +914,9 @@
             const divs = document.querySelectorAll("#info-container .dynamic-item");
             divs.forEach((div, idx) => {
                 const inputs = div.querySelectorAll("input");
-                inputs[0].name = `info[${idx}].title`;
-                inputs[1].name = `info[${idx}].content`;
-                inputs[2].name = `info[${idx}].appendix`;
+                inputs[0].name = `${target}[${idx}].title`;
+                inputs[1].name = `${target}[${idx}].content`;
+                inputs[2].name = `${target}[${idx}].appendix`;
             });
         }
 
@@ -882,7 +932,7 @@
             item.classList.add("image-item");
 
             item.innerHTML = `
-                <input type="text" name="images[${index}]" placeholder="이미지 URL" readonly />
+                <input type="text" name="photos[${index}]" placeholder="이미지 URL" readonly />
                 <input type="file" onchange="uploadImage(this)" />
                 <button type="button" onclick="removeImage(this)">삭제</button>
             `;
@@ -891,8 +941,8 @@
         }
 
         // Info 필드 추가
-        function addInfoField() {
-            const container = document.getElementById("info-container");
+        function addInfoField(target) {
+            const container = document.getElementById(target + '-container');
             const index = container.querySelectorAll(".dynamic-item").length;
 
             const div = document.createElement("div");
@@ -900,17 +950,17 @@
 
             const titleInput = document.createElement("input");
             titleInput.type = "text";
-            titleInput.name = `info[${index}].title`;
+            titleInput.name = `${target}[${index}].title`;
             titleInput.placeholder = "제목";
 
             const contentInput = document.createElement("input");
             contentInput.type = "text";
-            contentInput.name = `info[${index}].content`;
+            contentInput.name = `${target}[${index}].content`;
             contentInput.placeholder = "내용";
 
             const appendixInput = document.createElement("input");
             appendixInput.type = "text";
-            appendixInput.name = `info[${index}].appendix`;
+            appendixInput.name = `${target}[${index}].appendix`;
             appendixInput.placeholder = "추가 정보";
 
             const button = document.createElement("button");

@@ -85,8 +85,9 @@ public class ProductController {
         Product blankProduct = new Product();
         Tour blankTour = new Tour();
         blankProduct.setTour(blankTour);
-        blankProduct.setImages(new ArrayList<String>());
-        blankProduct.setInfo(new ArrayList<Info>());
+        blankProduct.setPhotos(new ArrayList<String>());
+        blankProduct.setInclude(new ArrayList<Info>());
+        blankProduct.setExclude(new ArrayList<Info>());
 
         model.addAttribute("countryCode", commonCodeService.getAllCountryCodes());
         model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
@@ -114,6 +115,11 @@ public class ProductController {
         // Tour tour = tourRepo.findById(product.getTour().getId()).get();
         product.setTour(tour);
         productRepo.save(product);
+
+        // 첫 사진 섬네일로 등록
+        if (!product.getPhotos().isEmpty()) {
+            product.setThumbnail(product.getPhotos().get(0));
+        }
 
         return "redirect:/product";
     }
@@ -155,6 +161,11 @@ public class ProductController {
         product.setStar3(existingProduct.getStar3());
         product.setStar4(existingProduct.getStar4());
         product.setStar5(existingProduct.getStar5());
+
+        // 첫 사진 섬네일로 등록
+        if (!product.getPhotos().isEmpty()) {
+            product.setThumbnail(product.getPhotos().get(0));
+        }
 
         // Product 저장
         productRepo.save(product);
