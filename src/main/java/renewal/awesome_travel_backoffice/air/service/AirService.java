@@ -287,6 +287,9 @@ public class AirService {
                 sc.setMaxSeats(oldSeat.getMaxSeats());
                 sc.setAvailableSeats(oldSeat.getAvailableSeats());
 
+                // 좌석 랜덤 변동 ±20% 범위
+                sc.setAvailableSeats(applyRandomSeats(oldSeat.getAvailableSeats()));
+
                 // 가격 랜덤 변화 (±10~30% 변동)
                 sc.setPriceAdult(applyRandomPrice(oldSeat.getPriceAdult()));
                 sc.setPriceYouth(applyRandomPrice(oldSeat.getPriceYouth()));
@@ -295,6 +298,22 @@ public class AirService {
                 newSeatClasses.add(sc);
             }
             newAir.setSeatClasses(newSeatClasses);
+
+            // === FlightSegment 그대로 복제 (변동 없이) ===
+            List<Air.FlightSegment> newSegments = new ArrayList<>();
+            for (Air.FlightSegment oldSeg : sourceAir.getFlightSegments()) {
+                Air.FlightSegment seg = new Air.FlightSegment();
+                seg.setDepartAirport(oldSeg.getDepartAirport());
+                seg.setDepartTerminal(oldSeg.getDepartTerminal());
+                seg.setDepartDateTime(oldSeg.getDepartDateTime());
+                seg.setArriveAirport(oldSeg.getArriveAirport());
+                seg.setArriveTerminal(oldSeg.getArriveTerminal());
+                seg.setArriveDateTime(oldSeg.getArriveDateTime());
+                seg.setFlightDuration(oldSeg.getFlightDuration());
+                seg.setWaitDuration(oldSeg.getWaitDuration());
+                newSegments.add(seg);
+            }
+            newAir.setFlightSegments(newSegments);
 
             airRepo.save(newAir);
             generated.add(newAir);
@@ -316,4 +335,16 @@ public class AirService {
                 : original * (1 - variation);
         return Math.round(newValue);
     }
+
+    /**
+     * 기존 좌석에서 ±20% 변동 (랜덤)
+     */
+    private Long applyRandomSeats(Long original) {
+        if (original == null || original <= 0)
+            return original;
+        double variation = (random.nextDouble() * 0.4 - 0.2); // -20% ~ +20%
+        long newSeats = Math.round(original * (1 + variation));
+        return Math.max(newSeats, 1L); // 최소 1석은 보장
+    }
+
 }
