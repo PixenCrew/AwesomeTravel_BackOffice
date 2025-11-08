@@ -17,17 +17,16 @@ public interface PurchaseAirRepository extends JpaRepository<PurchaseAir, Long>,
     Page<PurchaseAir> findByPurchaseStatusAndPaymentDueDateBefore(
             PurchaseStatus status,
             LocalDateTime time,
-            Pageable pageable
-    );
+            Pageable pageable);
 
     // 기존 코드 호환성을 위한 메서드 (실제로는 findById와 동일)
-    default Optional<PurchaseAir> findByProductPurchaseId(Long productPurchaseId) {
+    default Optional<PurchaseAir> findByPurchaseProductId(Long productPurchaseId) {
         return findById(productPurchaseId);
     }
 
     @Query("SELECT ap FROM PurchaseAir ap " +
-           "LEFT JOIN FETCH ap.passengers passengers " +
-           "WHERE ap.id = :id")
+            "LEFT JOIN FETCH ap.passengers passengers " +
+            "WHERE ap.id = :id")
     Optional<PurchaseAir> findByIdWithPassengers(@Param("id") Long id);
 
 }

@@ -20,18 +20,18 @@ public class AdminService implements UserDetailsService {
 
     private final PasswordEncoder passwordEncoder;
     private final JdbcTemplate adminJdbcTemplate;
-    
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         System.out.println("admin 테이블 조회");
 
         try {
             Map<String, Object> adminMap = adminJdbcTemplate.queryForMap("SELECT * FROM admin WHERE id = ?", username);
-        return User.builder()
-                .username(adminMap.get("id").toString())
-                .password(adminMap.get("password").toString()) // 인코딩된 비밀번호 사용
-                .roles(adminMap.get("role").toString())
-                .build();
+            return User.builder()
+                    .username(adminMap.get("id").toString())
+                    .password(adminMap.get("password").toString()) // 인코딩된 비밀번호 사용
+                    .roles(adminMap.get("role").toString())
+                    .build();
 
         } catch (EmptyResultDataAccessException e) {
             // 유저가 존재하지 않으면
@@ -43,11 +43,37 @@ public class AdminService implements UserDetailsService {
     }
 
     public void createUser(Admin admin) {
+        String hashedPassword = passwordEncoder.encode(admin.getPassword());
 
-        String hashedPassword = passwordEncoder.encode(admin.getPassword()); // 인코딩된 비밀번호 사용
-        String sql = "INSERT INTO admin (id, password, role) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO admin " +
+                "(id, password, name, position, email, number, fax, role) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-        adminJdbcTemplate.update(sql, admin.getId(), hashedPassword, admin.getRole().name());
+        adminJdbcTemplate.update(
+                sql,
+                admin.getId(),
+                hashedPassword,
+                admin.getName(),
+                admin.getPosition(),
+                admin.getEmail(),
+                admin.getNumber(),
+                admin.getFax(),
+                admin.getRole().name());
+    }
 
+    public Admin getAdminByUsername(String username) {
+        String sql = "SELECT * FROM admin WHERE id = ?";
+        Map<String, Object> adminMap = adminJdbcTemplate.queryForMap(sql, username);
+
+        return new Admin(
+                null,
+                adminMap.get("id").toString(),
+                null,
+                (String) adminMap.get("name"),
+                (String) adminMap.get("position"),
+                (String) adminMap.get("email"),
+                (String) adminMap.get("number"),
+                (String) adminMap.get("fax"),
+                null);
     }
 }

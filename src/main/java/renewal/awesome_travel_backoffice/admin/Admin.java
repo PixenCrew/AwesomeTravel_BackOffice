@@ -1,15 +1,14 @@
 package renewal.awesome_travel_backoffice.admin;
 
-import jakarta.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.EnumType;
-
+import jakarta.persistence.Id;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -24,6 +23,12 @@ public class Admin {
   private final String id;
 
   private final String password;
+
+  private final String name; // 이름
+  private final String position; // 직급
+  private final String email;
+  private final String number;
+  private final String fax;
 
   @Enumerated(EnumType.STRING)
   private final Role role;

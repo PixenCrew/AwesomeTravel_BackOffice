@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <!-- Google Tag Manager -->
     <script>(function (w, d, s, l, i) {
@@ -35,7 +36,7 @@
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N2JRTZZQ" height="0" width="0"
             style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
-    
+
     <div class="w-full max-w-md">
         <!-- 로고 및 제목 -->
         <div class="text-center mb-8">
@@ -53,22 +54,22 @@
             <form method="post" action="/login" class="space-y-6">
                 <div>
                     <label for="username" class="block text-sm font-medium text-gray-700 mb-2">사용자명</label>
-                    <input type="text" 
-                           id="username" 
-                           name="username" 
-                           required 
-                           value="admin"
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 outline-none">
+                    <input type="text"
+                        id="username"
+                        name="username"
+                        required
+                        value="admin"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 outline-none">
                 </div>
-                
+
                 <div>
                     <label for="password" class="block text-sm font-medium text-gray-700 mb-2">비밀번호</label>
-                    <input type="password" 
-                           id="password" 
-                           name="password" 
-                           required 
-                           value="admin"
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 outline-none">
+                    <input type="password"
+                        id="password"
+                        name="password"
+                        required
+                        value="admin"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 outline-none">
                 </div>
 
                 <!-- 로그인 실패 시 메시지 -->
@@ -81,8 +82,8 @@
                     </div>
                 </div>
 
-                <button type="submit" 
-                        class="w-full bg-primary hover:bg-secondary text-white font-semibold py-3 px-4 rounded-lg transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                <button type="submit"
+                    class="w-full bg-primary hover:bg-secondary text-white font-semibold py-3 px-4 rounded-lg transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
                     로그인
                 </button>
             </form>
@@ -94,49 +95,89 @@
             <form method="post" action="/admin" class="space-y-6">
                 <div>
                     <label for="test-username" class="block text-sm font-medium text-gray-700 mb-2">사용자명</label>
-                    <input type="text" 
-                           id="test-username" 
-                           name="id" 
-                           required 
-                           value="admin"
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 outline-none">
+                    <input type="text"
+                        id="test-username"
+                        name="id"
+                        required
+                        value="admin"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 outline-none">
                 </div>
-                
+
                 <div>
                     <label for="test-password" class="block text-sm font-medium text-gray-700 mb-2">비밀번호</label>
-                    <input type="password" 
-                           id="test-password" 
-                           name="password" 
-                           required 
-                           value="admin"
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 outline-none">
+                    <input type="password"
+                        id="test-password"
+                        name="password"
+                        required
+                        value="admin"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 outline-none">
                 </div>
-                
+                <div>
+                    <label for="test-position" class="block text-sm font-medium text-gray-700 mb-2">직급</label>
+                    <input type="text"
+                        id="test-position"
+                        name="position"
+                        required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 outline-none">
+                </div>
+                <div>
+                    <label for="test-name" class="block text-sm font-medium text-gray-700 mb-2">이름</label>
+                    <input type="text"
+                        id="test-name"
+                        name="name"
+                        required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 outline-none">
+                </div>
+                <div>
+                    <label for="test-email" class="block text-sm font-medium text-gray-700 mb-2">이메일</label>
+                    <input type="email"
+                        id="test-email"
+                        name="email"
+                        required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 outline-none">
+                </div>
+                <div>
+                    <label for="test-number" class="block text-sm font-medium text-gray-700 mb-2">전화</label>
+                    <input type="tel"
+                        id="test-number"
+                        name="number"
+                        required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 outline-none">
+                </div>
+                <div>
+                    <label for="test-fax" class="block text-sm font-medium text-gray-700 mb-2">팩스</label>
+                    <input type="tel"
+                        id="test-fax"
+                        name="fax"
+                        required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 outline-none">
+                </div>
+
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-3">역할</label>
                     <div class="flex space-x-6">
                         <label class="flex items-center">
-                            <input type="radio" 
-                                   value="ADMIN" 
-                                   id="role2" 
-                                   name="role" 
-                                   checked="checked"
-                                   class="w-4 h-4 text-primary bg-gray-100 border-gray-300 focus:ring-primary focus:ring-2">
+                            <input type="radio"
+                                value="ADMIN"
+                                id="role2"
+                                name="role"
+                                checked="checked"
+                                class="w-4 h-4 text-primary bg-gray-100 border-gray-300 focus:ring-primary focus:ring-2">
                             <span class="ml-2 text-sm text-gray-700">관리자</span>
                         </label>
                         <label class="flex items-center">
-                            <input type="radio" 
-                                   value="SERVICE" 
-                                   id="role1" 
-                                   name="role"
-                                   class="w-4 h-4 text-primary bg-gray-100 border-gray-300 focus:ring-primary focus:ring-2">
+                            <input type="radio"
+                                value="SERVICE"
+                                id="role1"
+                                name="role"
+                                class="w-4 h-4 text-primary bg-gray-100 border-gray-300 focus:ring-primary focus:ring-2">
                             <span class="ml-2 text-sm text-gray-700">서비스</span>
                         </label>
                     </div>
                 </div>
 
-                <button type="submit" 
-                        class="w-full bg-accent hover:bg-yellow-600 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2">
+                <button type="submit"
+                    class="w-full bg-accent hover:bg-yellow-600 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2">
                     테스트 계정 생성
                 </button>
             </form>
@@ -148,4 +189,5 @@
         </div>
     </div>
 </body>
+
 </html>

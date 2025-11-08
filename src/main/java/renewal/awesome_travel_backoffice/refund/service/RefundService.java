@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.airPurchase.repository.PurchaseAirRepository;
-import renewal.awesome_travel_backoffice.productPurchase.repository.ProductPurchaseRepository;
+import renewal.awesome_travel_backoffice.purchaseProduct.repository.PurchaseProductRepository;
 import renewal.awesome_travel_backoffice.refund.repository.RefundRepository;
 import renewal.common.entity.PurchaseAir;
 import renewal.common.entity.PurchaseBase.PurchaseStatus;
@@ -21,7 +21,7 @@ public class RefundService {
 
     private final RefundRepository refundRepository;
     private final PurchaseAirRepository purchaseAirRepository;
-    private final ProductPurchaseRepository productPurchaseRepository;
+    private final PurchaseProductRepository productPurchaseRepository;
 
     // 환불 요청 (통합)
     @Transactional
@@ -32,7 +32,7 @@ public class RefundService {
         }
 
         // PurchaseAir에서 먼저 찾기
-        PurchaseAir purchaseAir = purchaseAirRepository.findByProductPurchaseId(purchaseId).orElse(null);
+        PurchaseAir purchaseAir = purchaseAirRepository.findByPurchaseProductId(purchaseId).orElse(null);
         if (purchaseAir != null) {
             // 환불 가능 여부 확인
             if (purchaseAir.getPurchaseStatus() != PurchaseStatus.PAID) {
@@ -90,8 +90,8 @@ public class RefundService {
 
             // 좌석 수 복구
             SeatClass seatClass = airPurchase.getSeatClass();
-            seatClass.setAvailableSeats(seatClass.getAvailableSeats() + 
-                airPurchase.getPassengers().size());
+            seatClass.setAvailableSeats(seatClass.getAvailableSeats() +
+                    airPurchase.getPassengers().size());
 
             System.out.printf("[환불 처리 완료 - 항공권] 환불ID=%d, 주문ID=%d, 금액=%d, 처리자=%s\n",
                     refundId, refund.getPurchaseId(), refund.getAmount(), processedBy);
@@ -143,7 +143,7 @@ public class RefundService {
         System.out.println("=== RefundService.getRefunds 디버깅 ===");
         System.out.println("status: " + status);
         System.out.println("refundType: " + refundType);
-        
+
         Page<Refund> result;
         if (status != null && refundType != null) {
             System.out.println("상태 + 주문유형 필터 적용");
@@ -158,13 +158,14 @@ public class RefundService {
             System.out.println("필터 없음 - 전체 조회");
             result = refundRepository.findAll(pageable);
         }
-        
+
         System.out.println("조회된 결과 수: " + result.getTotalElements());
         result.getContent().forEach(refund -> {
-            System.out.println("  - 환불ID: " + refund.getId() + ", 상태: " + refund.getStatus() + ", 주문유형: " + refund.getRefundType());
+            System.out.println("  - 환불ID: " + refund.getId() + ", 상태: " + refund.getStatus() + ", 주문유형: "
+                    + refund.getRefundType());
         });
         System.out.println("=====================================");
-        
+
         return result;
     }
 
@@ -187,13 +188,36 @@ public class RefundService {
         private long rejectedCount;
 
         // Getters and Setters
-        public long getRequestedCount() { return requestedCount; }
-        public void setRequestedCount(long requestedCount) { this.requestedCount = requestedCount; }
-        public long getApprovedCount() { return approvedCount; }
-        public void setApprovedCount(long approvedCount) { this.approvedCount = approvedCount; }
-        public long getProcessedCount() { return processedCount; }
-        public void setProcessedCount(long processedCount) { this.processedCount = processedCount; }
-        public long getRejectedCount() { return rejectedCount; }
-        public void setRejectedCount(long rejectedCount) { this.rejectedCount = rejectedCount; }
+        public long getRequestedCount() {
+            return requestedCount;
+        }
+
+        public void setRequestedCount(long requestedCount) {
+            this.requestedCount = requestedCount;
+        }
+
+        public long getApprovedCount() {
+            return approvedCount;
+        }
+
+        public void setApprovedCount(long approvedCount) {
+            this.approvedCount = approvedCount;
+        }
+
+        public long getProcessedCount() {
+            return processedCount;
+        }
+
+        public void setProcessedCount(long processedCount) {
+            this.processedCount = processedCount;
+        }
+
+        public long getRejectedCount() {
+            return rejectedCount;
+        }
+
+        public void setRejectedCount(long rejectedCount) {
+            this.rejectedCount = rejectedCount;
+        }
     }
 }

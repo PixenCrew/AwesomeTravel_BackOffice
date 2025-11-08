@@ -1,4 +1,4 @@
-package renewal.awesome_travel_backoffice.productPurchase.repository;
+package renewal.awesome_travel_backoffice.purchaseProduct.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,13 +13,13 @@ import org.springframework.data.repository.query.Param;
 import renewal.common.entity.PurchaseBase.PurchaseStatus;
 import renewal.common.entity.PurchaseProduct;
 
-public interface ProductPurchaseRepository extends JpaRepository<PurchaseProduct, Long>, ProductPurchaseRepositoryCustom {
+public interface PurchaseProductRepository
+        extends JpaRepository<PurchaseProduct, Long>, PurchaseProductRepositoryCustom {
 
     Page<PurchaseProduct> findByPurchaseStatusAndPaymentDueDateBefore(
             PurchaseStatus status,
             LocalDateTime time,
-            Pageable pageable
-    );
+            Pageable pageable);
 
     // 기존 코드 호환성을 위한 메서드 (실제로는 findById와 동일)
     default Optional<PurchaseProduct> findByPurchaseProductId(Long productPurchaseId) {
@@ -27,8 +27,8 @@ public interface ProductPurchaseRepository extends JpaRepository<PurchaseProduct
     }
 
     @Query("SELECT pp FROM PurchaseProduct pp " +
-           "LEFT JOIN FETCH pp.passengers passengers " +
-           "WHERE pp.id = :id")
+            "LEFT JOIN FETCH pp.passengers passengers " +
+            "WHERE pp.id = :id")
     Optional<PurchaseProduct> findByIdWithPassengers(@Param("id") Long id);
 
     // 상품별 구매 내역 조회
@@ -42,7 +42,7 @@ public interface ProductPurchaseRepository extends JpaRepository<PurchaseProduct
     // 상품별 모든 구매 내역 조회 (List)
     @Query("SELECT pp FROM PurchaseProduct pp WHERE pp.product.id = :productId")
     List<PurchaseProduct> findByProductId(@Param("productId") Long productId);
-    
+
     // 상품별 구매 내역 삭제
     @Query("DELETE FROM PurchaseProduct pp WHERE pp.product.id = :productId")
     void deleteByProductId(@Param("productId") Long productId);
