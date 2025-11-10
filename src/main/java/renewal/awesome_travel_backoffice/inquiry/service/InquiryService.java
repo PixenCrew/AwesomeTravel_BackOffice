@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.inquiry.dto.request.InquiryAnswerRequestDto;
 import renewal.awesome_travel_backoffice.inquiry.dto.response.InquiryResponseDto;
 import renewal.awesome_travel_backoffice.inquiry.repository.InquiryAnswerRepository;
@@ -12,7 +13,6 @@ import renewal.awesome_travel_backoffice.notification.repository.NotificationRep
 import renewal.common.entity.Inquiry;
 import renewal.common.entity.InquiryAnswer;
 import renewal.common.entity.Notification;
-import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +26,8 @@ public class InquiryService {
         return inquiryRepository.findAll(pageable).map(this::toDto);
     }
 
-    public Page<InquiryResponseDto> searchInquiriesAdmin(String keyword, String searchType, Boolean isAnswered, String category, String status, String startDate, String endDate, Pageable pageable) {
+    public Page<InquiryResponseDto> searchInquiriesAdmin(String keyword, String searchType, Boolean isAnswered,
+            String category, String status, String startDate, String endDate, Pageable pageable) {
         // String을 enum으로 변환
         Inquiry.InquiryCategory categoryEnum = null;
         if (category != null && !category.trim().isEmpty()) {
@@ -36,7 +37,7 @@ public class InquiryService {
                 // 잘못된 카테고리 값은 무시
             }
         }
-        
+
         Inquiry.InquiryStatus statusEnum = null;
         if (status != null && !status.trim().isEmpty()) {
             try {
@@ -45,7 +46,7 @@ public class InquiryService {
                 // 잘못된 상태 값은 무시
             }
         }
-        
+
         // 날짜 변환
         java.time.LocalDateTime startDateTime = null;
         if (startDate != null && !startDate.trim().isEmpty()) {
@@ -55,7 +56,7 @@ public class InquiryService {
                 // 잘못된 날짜 형식은 무시
             }
         }
-        
+
         java.time.LocalDateTime endDateTime = null;
         if (endDate != null && !endDate.trim().isEmpty()) {
             try {
@@ -64,8 +65,9 @@ public class InquiryService {
                 // 잘못된 날짜 형식은 무시
             }
         }
-        
-        return inquiryRepository.searchAdmin(keyword, searchType, isAnswered, categoryEnum, statusEnum, startDateTime, endDateTime, pageable).map(this::toDto);
+
+        return inquiryRepository.searchAdmin(keyword, searchType, isAnswered, categoryEnum, statusEnum, startDateTime,
+                endDateTime, pageable).map(this::toDto);
     }
 
     public Long createAnswer(Long inquiryId, Long adminId, InquiryAnswerRequestDto dto) {
@@ -74,15 +76,15 @@ public class InquiryService {
         inquiryAnswerRepository.save(answer);
         inquiry.markAnswered();
         notificationRepository.save(Notification.create(
-                inquiry.getUser().getId(),  // 연관관계 기반
-                "작성하신 문의에 답변이 등록되었습니다."
-        ));
+                inquiry.getUser().getId(), // 연관관계 기반
+                "작성하신 문의에 답변이 등록되었습니다."));
         return answer.getId();
     }
 
     public void updateAnswer(Long answerId, InquiryAnswerRequestDto dto) {
         InquiryAnswer answer = inquiryAnswerRepository.findById(answerId).orElseThrow();
-        if (dto.getContent() != null) answer.updateContent(dto.getContent());
+        if (dto.getContent() != null)
+            answer.updateContent(dto.getContent());
     }
 
     public void deleteAnswer(Long answerId) {
@@ -103,9 +105,6 @@ public class InquiryService {
                 .status(inquiry.getStatus())
                 .isAnswered(inquiry.isAnswered())
                 .createdAt(inquiry.getCreatedAt())
-                .answeredAt(inquiry.getAnsweredAt())
                 .build();
     }
 }
-
-
