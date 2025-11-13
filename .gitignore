@@ -1,5 +1,5 @@
 HELP.md
-.gradle
+.gradle/
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
@@ -18,7 +18,7 @@ bin/
 !**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
-.idea
+.idea/
 *.iws
 *.iml
 *.ipr
@@ -35,16 +35,17 @@ out/
 
 ### VS Code ###
 .vscode/
-.gitattributes
-gradlew
-gradlew.bat
-gradle
-gradle/wrapper/gradle-wrapper.jar
-gradle/wrapper/gradle-wrapper.properties
+
+# wrapper가 무시되지 않도록 수정한 부분 (여기만 변경)
+!gradlew
+!gradlew.bat
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
 certicificate.p12
+certificate.p12
 src/main/generated/
 
 images/
 src/main/resources/META-INF/additional-spring-configuration-metadata.json
-certificate.p12
 src/main/resources/templates/components/.old/
