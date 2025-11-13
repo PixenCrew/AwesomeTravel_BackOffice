@@ -2,6 +2,7 @@ package renewal.awesome_travel_backoffice.citycode.controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +29,6 @@ import renewal.awesome_travel_backoffice.common.service.ExcelService;
 import renewal.awesome_travel_backoffice.countrycode.service.CountryCodeService;
 import renewal.common.entity.CityCode;
 import renewal.common.entity.CountryCode;
-import renewal.common.repository.CityCodeRepository;
 
 @Controller
 @RequestMapping("/city-code")
@@ -37,7 +36,6 @@ import renewal.common.repository.CityCodeRepository;
 public class CityCodeController {
 
     private final CityCodeService cityCodeService;
-    private final CityCodeRepository cityCodeRepo;
     private final CountryCodeService countryCodeService;
     private final ExcelService excelService;
 
@@ -53,10 +51,13 @@ public class CityCodeController {
             @RequestParam(required = false) String searchKeyword,
             Model model) {
 
-        // 정렬 설정
-        Sort sort = sortDir.equalsIgnoreCase("asc")
-                ? Sort.by(sortField).ascending()
-                : Sort.by(sortField).descending();
+        // 정렬 설정 (요청 필드명을 엔티티 속성으로 매핑)
+        String resolvedSortField = Objects.requireNonNull(resolveSortField(sortField));
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortDir)
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+        Sort.Order sortOrder = Sort.Order.by(resolvedSortField).with(direction);
+        Sort sort = Sort.by(sortOrder);
 
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<CityCode> cityCodePage;
@@ -103,6 +104,23 @@ public class CityCodeController {
         return "layout";
     }
 
+    /**
+     * UI에서 사용하는 정렬 필드를 엔티티 속성명으로 매핑합니다.
+     */
+    private String resolveSortField(String sortField) {
+        if (sortField == null || sortField.isBlank()) {
+            return "cityCode";
+        }
+
+        return switch (sortField) {
+            case "code" -> "cityCode";
+            case "kor" -> "cityKor";
+            case "eng" -> "cityEng";
+            case "country" -> "countryCode.countryCode";
+            default -> "cityCode";
+        };
+    }
+
     // 도시 코드 상세 페이지
     @GetMapping("/{code}")
     public String cityCodeDetail(@PathVariable String code, Model model) {
@@ -111,11 +129,13 @@ public class CityCodeController {
             return "redirect:/city-code?error=도시 코드를 찾을 수 없습니다.";
         }
 
+        CityCode cityCodeEntity = Objects.requireNonNull(cityCode.get());
+
         // 국가 정보 조회
         Optional<CountryCode> countryCode = countryCodeService.getCountryCodeByCode(
-                cityCode.get().getCountryCode() != null ? cityCode.get().getCountryCode().getCountryCode() : null);
+                cityCodeEntity.getCountryCode() != null ? cityCodeEntity.getCountryCode().getCountryCode() : null);
 
-        model.addAttribute("cityCode", cityCode.get());
+        model.addAttribute("cityCode", Objects.requireNonNull(cityCodeEntity));
         model.addAttribute("countryCode", countryCode.orElse(null));
         model.addAttribute("title", "도시 코드 상세");
         model.addAttribute("content", "components/citycode/citycodeDetail");
@@ -157,34 +177,46 @@ public class CityCodeController {
     // 도시 코드 저장 (생성/수정)
     @PostMapping
     public String saveCityCode(
-            @ModelAttribute CityCode cityCode,
+            @RequestParam(required = false) String originalCode,
+            @RequestParam String cityCode,
+            @RequestParam String cityKor,
+            @RequestParam String cityEng,
+            @RequestParam String countryCode,
             Model model) {
         try {
-            cityCodeRepo.save(cityCode);
-            // CityCode cityCode = new CityCode(country, code, kor, eng);
+            CountryCode country = countryCodeService.getCountryCodeByCode(countryCode)
+                    .orElseThrow(() -> new IllegalArgumentException("국가 코드를 찾을 수 없습니다: " + countryCode));
 
-            // if (originalCode != null && !originalCode.isEmpty()) {
-            // // 수정: 코드가 변경되었는지 확인
-            // if (!originalCode.equals(code)) {
-            // // 코드가 변경된 경우, 기존 코드 삭제 후 새 코드로 생성
-            // cityCodeService.deleteCityCode(originalCode);
-            // cityCodeService.createCityCode(cityCode);
-            // } else {
-            // // 코드가 변경되지 않은 경우, 업데이트
-            // cityCodeService.updateCityCode(originalCode, cityCode);
-            // }
-            // } else {
-            // // 생성
-            // cityCodeService.createCityCode(cityCode);
-            // }
+            CityCode newCityCode = new CityCode();
+            newCityCode.setCityCode(cityCode);
+            newCityCode.setCityKor(cityKor);
+            newCityCode.setCityEng(cityEng);
+            newCityCode.setCountryCode(country);
+
+            if (originalCode != null && !originalCode.isBlank()) {
+                if (!originalCode.equals(cityCode)) {
+                    cityCodeService.deleteCityCode(originalCode);
+                    cityCodeService.createCityCode(newCityCode);
+                } else {
+                    cityCodeService.updateCityCode(originalCode, newCityCode);
+                }
+            } else {
+                cityCodeService.createCityCode(newCityCode);
+            }
 
             return "redirect:/city-code?message=success";
         } catch (Exception e) {
+            CityCode formCityCode = new CityCode();
+            formCityCode.setCityCode(cityCode);
+            formCityCode.setCityKor(cityKor);
+            	formCityCode.setCityEng(cityEng);
+            countryCodeService.getCountryCodeByCode(countryCode).ifPresent(formCityCode::setCountryCode);
+
             List<CountryCode> countryList = countryCodeService.getAllCountryCodesList();
             model.addAttribute("error", "도시 코드 저장 중 오류가 발생했습니다: " + e.getMessage());
-            model.addAttribute("cityCode", cityCode);
+            model.addAttribute("cityCode", formCityCode);
             model.addAttribute("countryList", countryList);
-            model.addAttribute("title", cityCode.getCityCode() != null ? "도시 코드 수정" : "새 도시 코드 등록");
+            model.addAttribute("title", originalCode != null && !originalCode.isBlank() ? "도시 코드 수정" : "새 도시 코드 등록");
             model.addAttribute("content", "components/citycode/citycodeForm");
             return "layout";
         }
