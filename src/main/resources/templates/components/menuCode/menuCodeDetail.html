@@ -1,50 +1,160 @@
-<div th:fragment="content" th:inline="text">
-    <h1 th:text="${menuCode.code} == null ? '메뉴코드 등록' : '메뉴코드 상세'"></h1>
-
-    <form th:object="${menuCode}"
-        th:action="${menuCode.code} == null ? @{/menu-code/new} : @{/menu-code/{code}(code=${menuCode.code})}"
-        method="post">
-
-        <div>
-            <label>코드:</label>
-            <input type="text" id="codeInput" th:field="*{code}" oninput="clearHidden()" />
-            <button type="button" id="checkBtn" onclick="checkDupe()">중복검사</button>
-            <span id="checkResult" style="margin-left:10px;color:red;"></span>
-            <input type="hidden" id="codeValidInput" name="codeValid" required />
-        </div>
-
-        <div>
-            <label>항목:</label>
-            <div id="details-container">
-                <div th:each="det, iterStat : *{details}">
-                    <select th:field="*{details[__${iterStat.index}__].targetColumn}">
-                        <option
-                            th:each="col : ${T(renewal.common.entity.MenuCode$MenuCodeDetail.TargetColumn).values()}"
-                            th:value="${col}" th:text="${col}"></option>
-                    </select>
-                    <input type="text" th:field="*{details[__${iterStat.index}__].value}" placeholder="값" />
-                    <button type="button" onclick="removeDetailField(this)">삭제</button>
-                </div>
+<div th:fragment="content">
+    <div class="space-y-6">
+        <!-- 페이지 헤더 -->
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900"
+                    th:text="${menuCode.code} == null ? '메뉴 코드 등록' : '메뉴 코드 상세'">메뉴 코드 등록</h2>
+                <p class="text-sm text-gray-600 mt-1">메뉴 코드 정보를 입력하고 항목을 구성하세요.</p>
             </div>
-            <button type="button" onclick="addDetailField()">항목 추가</button>
+            <a href="/menu-code"
+               class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>목록으로
+            </a>
         </div>
 
-        <button type="submit" th:text="${menuCode.code} == null ? '등록' : '수정'"></button>
-    </form>
+        <!-- 메시지 영역 -->
+        <div th:if="${error}" class="p-4 bg-red-100 text-red-800 rounded-lg">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 10-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <span th:text="${error}">오류 메시지</span>
+            </div>
+        </div>
 
-    <!-- 삭제 버튼 -->
-    <button th:if="${menuCode.code != null}" th:onclick="deleteMenuCode([[${menuCode.code}]])">삭제</button>
+        <!-- 폼 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <form th:object="${menuCode}"
+                  th:action="${menuCode.code} == null ? @{/menu-code/new} : @{/menu-code/{id}(id=${menuCode.code2})}"
+                  method="post"
+                  class="space-y-6">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 코드 -->
+                    <div>
+                        <label for="codeInput" class="block text-sm font-medium text-gray-700 mb-2">코드 *</label>
+                        <div class="flex space-x-3">
+                            <input type="text"
+                                   id="codeInput"
+                                   th:field="*{code}"
+                                   placeholder="예: 101001"
+                                   oninput="clearHidden()"
+                                   required
+                                   class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent uppercase"/>
+                            <button type="button"
+                                    id="checkBtn"
+                                    onclick="checkDupe()"
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                중복검사
+                            </button>
+                        </div>
+                        <input type="hidden" id="codeValidInput" name="codeValid"
+                               th:value="${menuCode.code != null ? menuCode.code : ''}" required />
+                        <p id="checkResult" class="mt-1 text-sm"></p>
+                    </div>
+
+                    <!-- 표시 이름 -->
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-2">표시 이름</label>
+                        <input type="text"
+                               id="name"
+                               th:field="*{name}"
+                               placeholder="사용자에게 노출될 이름"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+                    </div>
+                </div>
+
+                <!-- 상세 항목 -->
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <label class="block text-sm font-medium text-gray-700">상세 항목 *</label>
+                        <button type="button"
+                                onclick="addDetailField()"
+                                class="inline-flex items-center px-3 py-1.5 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700">
+                            <i class="fas fa-plus mr-2"></i>항목 추가
+                        </button>
+                    </div>
+
+                    <div id="details-container" class="space-y-3">
+                        <div th:if="${menuCode.details == null || menuCode.details.isEmpty()}" class="detail-row flex items-center space-x-3">
+                            <select name="details[0].targetColumn"
+                                    class="w-40 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option th:each="col : ${targetColumns}"
+                                        th:value="${col}"
+                                        th:text="${col}">
+                                </option>
+                            </select>
+                            <input type="text"
+                                   name="details[0].value"
+                                   placeholder="값"
+                                   required
+                                   class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+                            <button type="button"
+                                    class="px-3 py-1.5 bg-red-100 text-red-700 rounded hover:bg-red-200 transition"
+                                    onclick="removeDetailField(this)">
+                                삭제
+                            </button>
+                        </div>
+
+                        <div th:each="det, iterStat : *{details}"
+                             class="detail-row flex items-center space-x-3">
+                            <select th:field="*{details[__${iterStat.index}__].targetColumn}"
+                                    class="w-40 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option th:each="col : ${targetColumns}"
+                                        th:value="${col}"
+                                        th:text="${col}">
+                                </option>
+                            </select>
+                            <input type="text"
+                                   th:field="*{details[__${iterStat.index}__].value}"
+                                   placeholder="값"
+                                   required
+                                   class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+                            <button type="button"
+                                    class="px-3 py-1.5 bg-red-100 text-red-700 rounded hover:bg-red-200 transition"
+                                    onclick="removeDetailField(this)">
+                                삭제
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 버튼 -->
+                <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                    <a href="/menu-code"
+                       class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                        취소
+                    </a>
+                    <button type="submit"
+                            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        <i class="fas fa-save mr-2"></i>
+                        <span th:text="${menuCode.code} == null ? '등록' : '수정'">등록</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 삭제 버튼 -->
+        <div th:if="${menuCode.code != null}" class="flex justify-end">
+            <button type="button"
+                    th:onclick="deleteMenuCode([[${menuCode.code2}]])"
+                    class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                <i class="fas fa-trash mr-2"></i>삭제
+            </button>
+        </div>
+    </div>
 
     <script>
-
         function checkDupe() {
-            const code = document.getElementById('codeInput').value.trim();
+            const codeInput = document.getElementById('codeInput');
+            const code = codeInput.value.trim();
             const resultSpan = document.getElementById("checkResult");
             const hiddenInput = document.getElementById('codeValidInput');
 
             if (!code) {
                 resultSpan.textContent = '코드를 입력해주세요.';
-                resultSpan.style.color = 'red';
+                resultSpan.className = 'mt-1 text-sm text-red-600';
                 hiddenInput.value = '';
                 return;
             }
@@ -52,35 +162,41 @@
             fetch(`/menu-code/check/${code}`, { method: "GET" })
                 .then(response => response.json())
                 .then(data => {
-
                     if (data.duplicate) {
                         resultSpan.textContent = "이미 사용 중인 코드입니다.";
-                        resultSpan.style.color = "red";
+                        resultSpan.className = 'mt-1 text-sm text-red-600';
                         hiddenInput.value = '';
                     } else {
                         resultSpan.textContent = "사용 가능한 코드입니다.";
-                        resultSpan.style.color = "green";
+                        resultSpan.className = 'mt-1 text-sm text-green-600';
                         hiddenInput.value = code;
                     }
                 })
+                .catch(() => {
+                    resultSpan.textContent = "중복 확인 중 오류가 발생했습니다.";
+                    resultSpan.className = 'mt-1 text-sm text-red-600';
+                    hiddenInput.value = '';
+                });
         }
 
         function clearHidden() {
             const hiddenInput = document.getElementById('codeValidInput');
-            hiddenInput.value = ''; // hidden 초기화
-            document.getElementById('checkResult').textContent = ''; // 메시지 초기화
+            hiddenInput.value = '';
+            const resultSpan = document.getElementById('checkResult');
+            resultSpan.textContent = '';
+            resultSpan.className = 'mt-1 text-sm';
         }
 
         function addDetailField() {
             const container = document.getElementById('details-container');
-            const index = container.children.length;
+            const index = container.querySelectorAll('.detail-row').length;
 
-            // div 생성
             const div = document.createElement('div');
+            div.className = 'detail-row flex items-center space-x-3';
 
-            // select 생성
             const select = document.createElement('select');
             select.name = `details[${index}].targetColumn`;
+            select.className = 'w-40 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent';
 
             const options = ['ID', 'COUNTRY', 'CITY'];
             options.forEach(optValue => {
@@ -90,64 +206,57 @@
                 select.appendChild(option);
             });
 
-            // input 생성
             const input = document.createElement('input');
             input.type = 'text';
             input.name = `details[${index}].value`;
             input.placeholder = '값';
+            input.required = true;
+            input.className = 'flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent';
 
-            // 삭제 버튼 생성
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.textContent = '삭제';
-            btn.onclick = function () { removeDetailField(this); };
+            btn.className = 'px-3 py-1.5 bg-red-100 text-red-700 rounded hover:bg-red-200 transition';
+            btn.onclick = function () { removeDetailField(btn); };
 
-            // div에 append
             div.appendChild(select);
             div.appendChild(input);
             div.appendChild(btn);
 
-            // container에 append
             container.appendChild(div);
         }
 
         function removeDetailField(btn) {
             const container = document.getElementById('details-container');
-            btn.parentNode.remove(); // 해당 div 삭제
+            btn.parentNode.remove();
 
-            // 재인덱싱
-            const detailDivs = container.querySelectorAll('div');
+            const detailDivs = container.querySelectorAll('.detail-row');
             detailDivs.forEach((div, index) => {
                 const select = div.querySelector('select');
                 const input = div.querySelector('input');
 
-                // name 속성 재설정
                 select.name = `details[${index}].targetColumn`;
-                select.id = `details${index}.targetColumn`;
-
                 input.name = `details[${index}].value`;
-                input.id = `details${index}.value`;
             });
+
+            if (detailDivs.length === 0) {
+                addDetailField();
+            }
         }
 
-        // function deleteMenuCode(code) {
-        //     if (confirm('정말 삭제하시겠습니까?')) {
-        //         window.location.href = `/menu-code/delete/${code}`;
-        //     }
-        // }
         function deleteMenuCode(id) {
             if (confirm('정말로 삭제하시겠습니까?')) {
                 fetch('/menu-code/' + id, { method: 'DELETE' })
                     .then(res => {
                         if (res.ok) {
-                            alert('삭제 성공');
+                            alert('삭제되었습니다.');
                             window.location.href = '/menu-code';
                         } else {
-                            alert('삭제 실패');
+                            alert('삭제에 실패했습니다.');
                         }
-                    });
+                    })
+                    .catch(() => alert('삭제 중 오류가 발생했습니다.'));
             }
         }
-
     </script>
 </div>
