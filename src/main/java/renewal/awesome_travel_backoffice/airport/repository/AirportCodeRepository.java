@@ -29,24 +29,24 @@ public interface AirportCodeRepository extends JpaRepository<AirportCode, String
     Page<AirportCode> findByCodeContaining(@Param("airportCode") String airportCode, Pageable pageable);
 
     // 국가별 공항 조회
-    @Query("SELECT a FROM AirportCode a WHERE a.cityCode.countryCode = :countryCode ORDER BY a.airportCode ASC")
+    @Query("SELECT a FROM AirportCode a WHERE a.cityCode.countryCode.countryCode = :countryCode ORDER BY a.airportCode ASC")
     Page<AirportCode> findByCountryCode(@Param("countryCode") String countryCode, Pageable pageable);
 
     // 도시별 공항 조회
-    @Query("SELECT a FROM AirportCode a WHERE a.cityCode = :cityCode ORDER BY a.airportCode ASC")
+    @Query("SELECT a FROM AirportCode a WHERE a.cityCode.cityCode = :cityCode ORDER BY a.airportCode ASC")
     Page<AirportCode> findByCityCode(@Param("cityCode") String cityCode, Pageable pageable);
 
     // 국가 + 도시별 공항 조회
-    @Query("SELECT a FROM AirportCode a WHERE a.cityCode.countryCode = :countryCode AND a.cityCode = :cityCode ORDER BY a.airportCode ASC")
+    @Query("SELECT a FROM AirportCode a WHERE a.cityCode.countryCode.countryCode = :countryCode AND a.cityCode.cityCode = :cityCode ORDER BY a.airportCode ASC")
     Page<AirportCode> findByCountryCodeAndCityCode(@Param("countryCode") String countryCode,
             @Param("cityCode") String cityCode, Pageable pageable);
 
     // 모든 공항 조회 (정렬)
-    @Query("SELECT a FROM AirportCode a ORDER BY a.cityCode.countryCode ASC, a.cityCode ASC, a.airportCode ASC")
+    @Query("SELECT a FROM AirportCode a ORDER BY a.cityCode.countryCode.countryCode ASC, a.cityCode.cityCode ASC, a.airportCode ASC")
     Page<AirportCode> findAllAirportCodes(Pageable pageable);
 
     // 모든 공항 조회 (리스트)
-    @Query("SELECT a FROM AirportCode a ORDER BY a.cityCode.countryCode ASC, a.cityCode ASC, a.airportCode ASC")
+    @Query("SELECT a FROM AirportCode a ORDER BY a.cityCode.countryCode.countryCode ASC, a.cityCode.cityCode ASC, a.airportCode ASC")
     List<AirportCode> findAllAirportCodesList();
 
     // 공항 코드로 조회 (단일)

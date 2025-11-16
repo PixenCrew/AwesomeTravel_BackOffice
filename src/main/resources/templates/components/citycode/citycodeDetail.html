@@ -10,7 +10,7 @@
                 <a href="/city-code" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
                     <i class="fas fa-arrow-left mr-2"></i>목록으로
                 </a>
-                <a th:href="@{/city-code/edit/{code}(code=${cityCode.code})}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <a th:href="@{/city-code/edit/{code}(code=${cityCode.cityCode})}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                     <i class="fas fa-edit mr-2"></i>수정
                 </a>
             </div>
@@ -26,7 +26,7 @@
                     <div>
                         <dt class="text-sm font-medium text-gray-500">국가 코드</dt>
                         <dd class="mt-1 text-lg font-semibold text-gray-900">
-                            <span th:text="${cityCode.country}">KR</span>
+                            <span th:text="${cityCode.countryCode != null ? cityCode.countryCode.countryCode : ''}">KR</span>
                             <span th:if="${countryCode != null}" class="text-base font-normal text-gray-600">
                                 - <span th:text="${countryCode.nameKor}">대한민국</span>
                             </span>
@@ -34,15 +34,15 @@
                     </div>
                     <div>
                         <dt class="text-sm font-medium text-gray-500">도시 코드</dt>
-                        <dd class="mt-1 text-lg font-semibold text-gray-900" th:text="${cityCode.code}">SEL</dd>
+       				        <dd class="mt-1 text-lg font-semibold text-gray-900" th:text="${cityCode.cityCode}">SEL</dd>
                     </div>
                     <div>
                         <dt class="text-sm font-medium text-gray-500">도시명 (한글)</dt>
-                        <dd class="mt-1 text-lg text-gray-900" th:text="${cityCode.kor}">서울</dd>
+                        <dd class="mt-1 text-lg text-gray-900" th:text="${cityCode.cityKor}">서울</dd>
                     </div>
                     <div>
                         <dt class="text-sm font-medium text-gray-500">도시명 (영문)</dt>
-                        <dd class="mt-1 text-lg text-gray-900" th:text="${cityCode.eng}">Seoul</dd>
+                        <dd class="mt-1 text-lg text-gray-900" th:text="${cityCode.cityEng}">Seoul</dd>
                     </div>
                 </dl>
             </div>
@@ -50,7 +50,7 @@
 
         <!-- 액션 버튼 -->
         <div class="flex justify-center space-x-4">
-            <button th:data-code="${cityCode.code}"
+            <button th:data-code="${cityCode.cityCode}"
                     onclick="deleteCityCode(this.dataset.code)" 
                     class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
                 <i class="fas fa-trash mr-2"></i>삭제

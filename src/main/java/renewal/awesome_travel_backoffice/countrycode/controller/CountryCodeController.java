@@ -17,6 +17,7 @@ import renewal.awesome_travel_backoffice.countrycode.service.CountryCodeService;
 import renewal.common.entity.CountryCode;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 
 @Controller
@@ -38,10 +39,13 @@ public class CountryCodeController {
             @RequestParam(required = false) String searchKeyword,
             Model model) {
 
-        // 정렬 설정
-        Sort sort = sortDir.equalsIgnoreCase("asc")
-                ? Sort.by(sortField).ascending()
-                : Sort.by(sortField).descending();
+        // 정렬 설정 (요청 필드명을 엔티티 속성으로 매핑)
+        String resolvedSortField = Objects.requireNonNull(resolveSortField(sortField));
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortDir)
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+        Sort.Order sortOrder = Sort.Order.by(resolvedSortField).with(direction);
+        Sort sort = Sort.by(sortOrder);
 
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<CountryCode> countryCodePage;
@@ -73,6 +77,22 @@ public class CountryCodeController {
         model.addAttribute("content", "components/countrycode/countrycode");
 
         return "layout";
+    }
+
+    /**
+     * UI에서 사용하는 정렬 필드를 엔티티 속성명으로 매핑합니다.
+     */
+    private String resolveSortField(String sortField) {
+        if (sortField == null || sortField.isBlank()) {
+            return "countryCode";
+        }
+
+        return switch (sortField) {
+            case "code" -> "countryCode";
+            case "nameKor" -> "countryKor";
+            case "nameEng" -> "countryEng";
+            default -> "countryCode";
+        };
     }
 
     // 국가 코드 상세 페이지

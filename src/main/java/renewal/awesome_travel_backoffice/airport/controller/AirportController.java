@@ -10,7 +10,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import renewal.awesome_travel_backoffice.airport.service.AirportService;
 import renewal.awesome_travel_backoffice.citycode.service.CityCodeService;
@@ -22,6 +28,7 @@ import renewal.common.entity.CountryCode;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Controller
@@ -46,9 +53,15 @@ public class AirportController {
             @RequestParam(required = false) String searchKeyword,
             Model model) {
 
-        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();
+        String resolvedSortField = Objects.requireNonNull(resolveSortField(sortField));
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortDir)
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+        Sort sort = Sort.by(Sort.Order.by(resolvedSortField).with(direction));
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<AirportCode> airportPage;
+
+        String normalizedSearchType = (searchType == null || searchType.isBlank()) ? "code" : searchType;
 
         if (countryCode != null && !countryCode.isEmpty() && cityCode != null && !cityCode.isEmpty()) {
             airportPage = airportService.getAirportsByCountryAndCity(countryCode, cityCode, pageable);
@@ -57,10 +70,15 @@ public class AirportController {
         } else if (cityCode != null && !cityCode.isEmpty()) {
             airportPage = airportService.getAirportsByCity(cityCode, pageable);
         } else if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-            switch (searchType != null ? searchType : "code") {
-                case "nameKor": airportPage = airportService.searchByNameKor(searchKeyword, pageable); break;
-                case "nameEng": airportPage = airportService.searchByNameEng(searchKeyword, pageable); break;
-                default: airportPage = airportService.searchByCode(searchKeyword, pageable);
+            switch (normalizedSearchType) {
+                case "nameKor":
+                    airportPage = airportService.searchByNameKor(searchKeyword, pageable);
+                    break;
+                case "nameEng":
+                    airportPage = airportService.searchByNameEng(searchKeyword, pageable);
+                    break;
+                default:
+                    airportPage = airportService.searchByCode(searchKeyword, pageable);
             }
         } else {
             airportPage = airportService.getAllAirports(pageable);
@@ -77,7 +95,7 @@ public class AirportController {
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("countryCode", countryCode);
         model.addAttribute("cityCode", cityCode);
-        model.addAttribute("searchType", searchType);
+        model.addAttribute("searchType", normalizedSearchType);
         model.addAttribute("searchKeyword", searchKeyword);
         model.addAttribute("title", "공항 관리");
         model.addAttribute("content", "components/airport/airport");
@@ -87,6 +105,7 @@ public class AirportController {
 
     @GetMapping("/{code}")
     public String airportDetail(@PathVariable String code, Model model) {
+        Objects.requireNonNull(code, "공항 코드는 필수입니다.");
         Optional<AirportCode> airport = airportService.getAirportByCode(code);
         if (airport.isEmpty()) {
             return "redirect:/airport?error=공항을 찾을 수 없습니다.";
@@ -110,6 +129,7 @@ public class AirportController {
 
     @GetMapping("/edit/{code}")
     public String editAirportForm(@PathVariable String code, Model model) {
+        Objects.requireNonNull(code, "공항 코드는 필수입니다.");
         Optional<AirportCode> airport = airportService.getAirportByCode(code);
         if (airport.isEmpty()) {
             return "redirect:/airport?error=공항을 찾을 수 없습니다.";
@@ -126,19 +146,34 @@ public class AirportController {
     @PostMapping
     public String saveAirport(
             @RequestParam(required = false) String originalCode,
-            @RequestParam String code,
-            @RequestParam String countryCode,
-            @RequestParam CityCode cityCode,
-            @RequestParam String nameKor,
-            @RequestParam String nameEng,
-            @RequestParam String airportType,
+            @RequestParam String airportCode,
+            @RequestParam String cityCode,
+            @RequestParam(required = false) String countryCode,
+            @RequestParam String airportKor,
+            @RequestParam String airportEng,
             Model model) {
 
         try {
-            AirportCode airport = new AirportCode(code, nameKor, nameEng, cityCode);
+            CityCode city = cityCodeService.getCityCodeByCode(cityCode)
+                    .orElseThrow(() -> new IllegalArgumentException("도시 코드를 찾을 수 없습니다: " + cityCode));
+
+            if (countryCode != null && !countryCode.isBlank()) {
+                CountryCode expectedCountry = countryCodeService.getCountryCodeByCode(countryCode)
+                        .orElseThrow(() -> new IllegalArgumentException("국가 코드를 찾을 수 없습니다: " + countryCode));
+                if (city.getCountryCode() == null || !Objects.equals(city.getCountryCode().getCountryCode(),
+                        expectedCountry.getCountryCode())) {
+                    throw new IllegalArgumentException("선택한 도시가 해당 국가에 속하지 않습니다.");
+                }
+            }
+
+            AirportCode airport = new AirportCode();
+            airport.setAirportCode(airportCode);
+            airport.setAirportKor(airportKor);
+            airport.setAirportEng(airportEng);
+            airport.setCityCode(city);
 
             if (originalCode != null && !originalCode.isEmpty()) {
-                if (!originalCode.equals(code)) {
+                if (!originalCode.equals(airportCode)) {
                     airportService.deleteAirport(originalCode);
                     airportService.createAirport(airport);
                 } else {
@@ -150,20 +185,47 @@ public class AirportController {
 
             return "redirect:/airport?message=success";
         } catch (Exception e) {
+            AirportCode formAirport = new AirportCode();
+            formAirport.setAirportCode(airportCode);
+            formAirport.setAirportKor(airportKor);
+            formAirport.setAirportEng(airportEng);
+            cityCodeService.getCityCodeByCode(cityCode).ifPresent(formAirport::setCityCode);
+
             model.addAttribute("error", "공항 저장 중 오류가 발생했습니다: " + e.getMessage());
-            model.addAttribute("airport", new AirportCode(code, nameKor, nameEng, cityCode));
+            model.addAttribute("airport", formAirport);
             model.addAttribute("countryList", countryCodeService.getAllCountryCodesList());
             model.addAttribute("cityList", cityCodeService.getAllCityCodesList());
-            model.addAttribute("title", originalCode != null ? "공항 수정" : "새 공항 등록");
+            model.addAttribute("selectedCountryCode", countryCode);
+            model.addAttribute("selectedCityCode", cityCode);
+            model.addAttribute("title", originalCode != null && !originalCode.isBlank() ? "공항 수정" : "새 공항 등록");
             model.addAttribute("content", "components/airport/airportForm");
             return "layout";
         }
+    }
+
+    /**
+     * UI 정렬 필드를 엔티티 속성명으로 매핑.
+     */
+    private String resolveSortField(String sortField) {
+        if (sortField == null || sortField.isBlank()) {
+            return "airportCode";
+        }
+
+        return switch (sortField) {
+            case "code" -> "airportCode";
+            case "nameKor" -> "airportKor";
+            case "nameEng" -> "airportEng";
+            case "countryCode" -> "cityCode.countryCode.countryCode";
+            case "cityCode" -> "cityCode.cityCode";
+            default -> "airportCode";
+        };
     }
 
     @DeleteMapping("/{code}")
     @ResponseBody
     public ResponseEntity<String> deleteAirport(@PathVariable String code) {
         try {
+            Objects.requireNonNull(code, "공항 코드는 필수입니다.");
             airportService.deleteAirport(code);
             return ResponseEntity.ok("공항이 삭제되었습니다.");
         } catch (Exception e) {
