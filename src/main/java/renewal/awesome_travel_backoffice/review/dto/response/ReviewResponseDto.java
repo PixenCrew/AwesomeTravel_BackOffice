@@ -11,6 +11,7 @@ import lombok.Setter;
 @Setter
 public class ReviewResponseDto {
     private Long id;
+    private Long writerId;
     private String writerName;
     private String content;
     private int rating;

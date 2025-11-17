@@ -5,14 +5,15 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import renewal.awesome_travel_backoffice.notice.dto.request.NoticeRequestDto;
 import renewal.awesome_travel_backoffice.notice.dto.request.NoticeSearchRequest;
 import renewal.awesome_travel_backoffice.notice.dto.response.NoticeResponseDto;
-import renewal.awesome_travel_backoffice.notice.repository.NoticeQueryRepository;
 import renewal.awesome_travel_backoffice.notice.repository.NoticeRepository;
+import renewal.awesome_travel_backoffice.notice.repository.NoticeSpecification;
 import renewal.common.entity.Notice;
 import lombok.RequiredArgsConstructor;
 
@@ -21,8 +22,6 @@ import lombok.RequiredArgsConstructor;
 public class NoticeService {
 
     private final NoticeRepository noticeRepository;
-
-    private final NoticeQueryRepository noticeQueryRepository;
 
     @Transactional
     public Long create(NoticeRequestDto dto) {
@@ -37,11 +36,7 @@ public class NoticeService {
                 dto.getEndAt());
         
         // visible 필드 설정 (null이면 true로 기본 설정)
-        if (dto.getVisible() != null) {
-            notice.setVisible(dto.getVisible());
-        } else {
-            notice.setVisible(true); // 기본값 true
-        }
+        notice.setVisible(dto.getVisible() != null ? dto.getVisible() : true);
         
         return noticeRepository.save(notice).getId();
     }
@@ -60,8 +55,35 @@ public class NoticeService {
         return toDto(notice);
     }
 
+    @Transactional(readOnly = true)
     public Page<NoticeResponseDto> search(NoticeSearchRequest noticeSearchRequest, Pageable pageable) {
-        return noticeQueryRepository.search(noticeSearchRequest, pageable);
+        // Specification 조합
+        Specification<Notice> spec = Specification.where(null);
+        
+        // 키워드 검색
+        if (noticeSearchRequest.getKeyword() != null && !noticeSearchRequest.getKeyword().isEmpty()) {
+            spec = spec.and(NoticeSpecification.keywordContains(
+                noticeSearchRequest.getKeyword(), 
+                noticeSearchRequest.getSearchType()
+            ));
+        }
+        
+        // 카테고리 필터
+        if (noticeSearchRequest.getCategory() != null) {
+            spec = spec.and(NoticeSpecification.categoryEquals(noticeSearchRequest.getCategory()));
+        }
+        
+        // 고정 여부 필터
+        if (noticeSearchRequest.getFix() != null) {
+            spec = spec.and(NoticeSpecification.fixEquals(noticeSearchRequest.getFix()));
+        }
+        
+        // 숨김 공지사항 포함 여부
+        spec = spec.and(NoticeSpecification.includeHidden(noticeSearchRequest.getIncludeHidden()));
+        
+        // 검색 실행 및 DTO 변환
+        return noticeRepository.findAll(spec, pageable)
+                .map(this::toDto);
     }
 
     @Transactional

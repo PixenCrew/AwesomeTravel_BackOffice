@@ -12,16 +12,16 @@
             <div class="px-6 py-4 border-b border-gray-200">
                 <div class="flex justify-between items-center">
                     <h3 class="text-lg font-medium text-gray-900">검색 필터</h3>
-                    <button type="button" id="filterToggle" onclick="toggleFilter()"
+                    <button type="button" id="toggleFilterBtn" onclick="toggleFilter()"
                         class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         <i class="fas fa-filter mr-2"></i>
-                        <span id="filterToggleText">필터 숨기기</span>
+                        <span id="filterToggleText">필터</span>
                     </button>
                 </div>
             </div>
 
             <!-- 필터 폼 -->
-            <div id="filterForm" class="p-6">
+            <div id="filterForm" class="hidden p-6">
                 <form th:action="@{/product-purchase}" method="get" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
@@ -215,22 +215,6 @@
     </div>
 
     <script>
-        // 필터 토글 기능
-        function toggleFilter() {
-            const filterForm = document.getElementById('filterForm');
-            const toggleText = document.getElementById('filterToggleText');
-            const toggleIcon = document.querySelector('#filterToggle i');
-
-            if (filterForm.style.display === 'none') {
-                filterForm.style.display = 'block';
-                toggleText.textContent = '필터 숨기기';
-                toggleIcon.className = 'fas fa-filter mr-2';
-            } else {
-                filterForm.style.display = 'none';
-                toggleText.textContent = '필터 보기';
-                toggleIcon.className = 'fas fa-filter mr-2';
-            }
-        }
 
         // 필터 초기화
         function resetFilter() {
@@ -254,4 +238,6 @@
             }
         });
     </script>
+    
+    <script src="/js/filter.js"></script>
 </div>

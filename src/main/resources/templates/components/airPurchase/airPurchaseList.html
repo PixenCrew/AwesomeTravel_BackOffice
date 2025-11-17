@@ -54,10 +54,17 @@
         }
 
         .filter-form {
-            display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
             margin-bottom: 1rem;
+        }
+        
+        .filter-form.hidden {
+            display: none !important;
+        }
+        
+        .filter-form:not(.hidden) {
+            display: grid;
         }
 
         .filter-group {
@@ -310,12 +317,12 @@
     <div class="filter-section">
         <div class="filter-header">
             <h3 class="filter-title">검색 필터</h3>
-            <button class="toggle-filter-btn" onclick="toggleFilter()">
-                <i class="fas fa-filter"></i> 필터 토글
+            <button type="button" id="toggleFilterBtn" class="toggle-filter-btn" onclick="toggleFilter()">
+                <i class="fas fa-filter"></i> 필터
             </button>
         </div>
         
-        <form id="filterForm" class="filter-form" method="get">
+        <form id="filterForm" class="filter-form hidden" method="get">
             <div class="filter-group">
                 <label class="filter-label">주문 상태</label>
                 <select name="status" class="filter-input">
@@ -489,10 +496,6 @@
     </div>
 
     <script>
-        function toggleFilter() {
-            const form = document.getElementById('filterForm');
-            form.style.display = form.style.display === 'none' ? 'grid' : 'none';
-        }
 
         function resetFilter() {
             document.getElementById('filterForm').reset();
@@ -556,6 +559,7 @@
             }
         }
 
-
     </script>
+    
+    <script src="/js/filter.js"></script>
 </div>

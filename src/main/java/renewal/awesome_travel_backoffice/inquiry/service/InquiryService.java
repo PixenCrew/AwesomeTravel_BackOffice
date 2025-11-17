@@ -103,6 +103,9 @@ public class InquiryService {
                 .content(inquiry.getContent())
                 .category(inquiry.getCategory())
                 .status(inquiry.getStatus())
+                .stage(inquiry.getStage())
+                .productId(inquiry.getProductId())
+                .purchaseId(inquiry.getPurchaseId())
                 .isAnswered(inquiry.isAnswered())
                 .createdAt(inquiry.getCreatedAt())
                 .build();

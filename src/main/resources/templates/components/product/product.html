@@ -321,4 +321,6 @@
     <datalist id="countryList">
         <option th:each="cc : ${countryCode}" th:value="${cc.code + ' | ' + cc.nameEng + ' | ' + cc.nameKor}"></option>
     </datalist>
+    
+    <script src="/js/filter.js"></script>
 </div>

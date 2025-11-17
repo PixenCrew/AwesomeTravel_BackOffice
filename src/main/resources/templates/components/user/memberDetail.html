@@ -179,20 +179,20 @@
                     <p class="text-gray-500">작성한 댓글이 없습니다.</p>
                 </div>
                 <div th:unless="${#lists.isEmpty(recentComments)}" class="space-y-4">
-                    <div th:each="comment : ${recentComments}" class="border border-gray-200 rounded-lg p-4">
+                    <div th:each="review : ${recentComments}" class="border border-gray-200 rounded-lg p-4">
                         <div class="flex justify-between items-start mb-2">
                             <div class="flex items-center space-x-2">
-                                <span class="text-sm font-medium text-gray-900" th:text="${comment.productTitle}">상품명</span>
+                                <span class="text-sm font-medium text-gray-900" th:text="${review.productTitle}">상품명</span>
                                 <span class="text-sm text-gray-500">•</span>
-                                <span class="text-sm text-gray-500" th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 10:00</span>
+                                <span class="text-sm text-gray-500" th:text="${#temporals.format(review.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 10:00</span>
                             </div>
                             <div class="flex items-center space-x-1">
                                 <span th:each="i : ${#numbers.sequence(1, 5)}" 
-                                      th:class="${i <= comment.rating ? 'text-yellow-400' : 'text-gray-300'}"
+                                      th:class="${i <= review.rating ? 'text-yellow-400' : 'text-gray-300'}"
                                       class="text-sm">★</span>
                             </div>
                         </div>
-                        <p class="text-sm text-gray-700" th:text="${comment.content}">댓글 내용입니다.</p>
+                        <p class="text-sm text-gray-700" th:text="${review.content}">댓글 내용입니다.</p>
                     </div>
                 </div>
             </div>

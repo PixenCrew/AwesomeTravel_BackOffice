@@ -11,7 +11,7 @@ import renewal.awesome_travel_backoffice.review.service.ReviewService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin/comments")
+@RequestMapping("/api/admin/reviews")
 public class ReviewAdminController {
 
     private final ReviewService reviewService;
@@ -20,9 +20,22 @@ public class ReviewAdminController {
     @GetMapping
     public ResponseEntity<Page<ReviewResponseDto>> searchReviews(
             @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Integer rating,
+            @RequestParam(required = false) Long productId,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
             Pageable pageable
     ) {
-        return ResponseEntity.ok(reviewService.searchAllReviews(keyword, pageable));
+        java.time.LocalDateTime startDateTime = null;
+        java.time.LocalDateTime endDateTime = null;
+        if (startDate != null && !startDate.isEmpty()) {
+            startDateTime = java.time.LocalDate.parse(startDate).atStartOfDay();
+        }
+        if (endDate != null && !endDate.isEmpty()) {
+            endDateTime = java.time.LocalDate.parse(endDate).atTime(23, 59, 59);
+        }
+        return ResponseEntity.ok(reviewService.searchAllReviews(
+            keyword, rating, productId, startDateTime, endDateTime, pageable));
     }
 
     // 댓글 삭제 (신고 연관도 함께 삭제됨)

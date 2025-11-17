@@ -95,12 +95,12 @@
                                     </h3>
                                     <span th:if="${notice.fix}" class="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">고정</span>
                                     <span th:if="${notice.visible == false}" class="px-2 py-1 text-xs bg-gray-200 text-gray-600 rounded-full">숨김</span>
-                                    <span th:switch="${notice.category?.name()}" class="px-2 py-1 text-xs rounded-full">
+                                    <span th:if="${notice.category != null}" th:switch="${notice.category.name()}" class="px-2 py-1 text-xs rounded-full">
                                         <span th:case="EVENT" class="bg-purple-100 text-purple-800">이벤트</span>
                                         <span th:case="UPDATE" class="bg-blue-100 text-blue-800">업데이트</span>
                                         <span th:case="SYSTEM" class="bg-orange-100 text-orange-800">점검</span>
                                         <span th:case="GUIDE" class="bg-green-100 text-green-800">안내</span>
-                                        <span th:case="*" class="bg-gray-100 text-gray-800" th:text="${notice.category?.displayName}">카테고리</span>
+                                        <span th:case="*" class="bg-gray-100 text-gray-800" th:text="${notice.category.displayName}">카테고리</span>
                                     </span>
                                 </div>
                                 <p class="text-gray-600 text-sm mb-3 line-clamp-2" th:text="${notice.content}">공지사항 내용 미리보기...</p>
@@ -111,7 +111,7 @@
                                     </div>
                                     <div class="flex items-center">
                                         <i class="fas fa-user mr-1"></i>
-                                        <span th:text="${notice.createdBy}">작성자</span>
+                                        <span th:text="${notice.createdBy != null ? notice.createdBy : '시스템'}">작성자</span>
                                     </div>
                                     <div class="flex items-center">
                                         <i class="fas fa-eye mr-1"></i>

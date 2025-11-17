@@ -21,8 +21,9 @@ public class ReviewReportService {
      * 어드민 - 댓글 신고 전체 조회 (필터/페이징)
      */
     @Transactional(readOnly = true)
-    public Page<ReviewReportResponseDto> getAllReports(ReportReason reason, Pageable pageable) {
-        return reviewReportRepository.searchReports(reason, pageable)
+    public Page<ReviewReportResponseDto> getAllReports(ReportReason reason, String keyword,
+            java.time.LocalDateTime startDate, java.time.LocalDateTime endDate, Pageable pageable) {
+        return reviewReportRepository.searchReports(reason, keyword, startDate, endDate, pageable)
                 .map(this::toResponseDto);
     }
 
