@@ -14,8 +14,8 @@ import renewal.awesome_travel_backoffice.user.service.UserService;
 import renewal.common.entity.User.UserProvider;
 import renewal.common.entity.User.UserRole;
 import renewal.common.entity.User.UserStatus;
-import renewal.awesome_travel_backoffice.comment.service.CommentService;
-import renewal.awesome_travel_backoffice.comment.dto.response.CommentResponseDto;
+import renewal.awesome_travel_backoffice.review.service.ReviewService;
+import renewal.awesome_travel_backoffice.review.dto.response.ReviewResponseDto;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +27,7 @@ import java.util.Map;
 public class UserViewController {
     
     private final UserService userService;
-    private final CommentService commentService;
+    private final ReviewService reviewService;
     
     // 회원 목록
     @GetMapping
@@ -101,7 +101,7 @@ public class UserViewController {
         try {
             UserResponseDto user = userService.getUserById(id);
             // 최근 댓글 5개 조회
-            List<CommentResponseDto> recentComments = commentService.getRecentCommentsByUser(id);
+            List<ReviewResponseDto> recentComments = reviewService.getRecentCommentsByUser(id);
             model.addAttribute("title", "회원 상세 정보");
             model.addAttribute("content", "components/user/memberDetail");
             model.addAttribute("user", user);
