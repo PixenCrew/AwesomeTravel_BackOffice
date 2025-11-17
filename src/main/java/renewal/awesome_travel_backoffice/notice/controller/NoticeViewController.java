@@ -35,26 +35,50 @@ public class NoticeViewController {
             @RequestParam(required = false) String searchType,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) Boolean fix,
-            @RequestParam(required = false) Boolean includeHidden,
+            @RequestParam(required = false) String includeHidden,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             Model model) {
         
-        NoticeSearchRequest searchRequest = new NoticeSearchRequest();
-        searchRequest.setKeyword(keyword);
-        searchRequest.setSearchType(searchType != null && !searchType.isEmpty() ? SearchType.valueOf(searchType) : null);
-        searchRequest.setCategory(category != null && !category.isEmpty() ? NoticeCategory.valueOf(category) : null);
-        searchRequest.setFix(fix);
-        // 기본적으로는 공개 공지만 표시, 체크박스로 숨김 공지사항 포함 가능
-        searchRequest.setIncludeHidden(includeHidden != null ? includeHidden : false);
-        
-        Page<NoticeResponseDto> notices = noticeService.search(searchRequest, pageable);
-        
-        model.addAttribute("notices", notices);
-        model.addAttribute("searchRequest", searchRequest);
-        model.addAttribute("title", "공지사항 관리");
-        model.addAttribute("content", "notice/noticeList");
-        
-        return "layout";
+        try {
+            NoticeSearchRequest searchRequest = new NoticeSearchRequest();
+            searchRequest.setKeyword(keyword);
+            if (searchType != null && !searchType.isEmpty()) {
+                try {
+                    searchRequest.setSearchType(SearchType.valueOf(searchType));
+                } catch (IllegalArgumentException e) {
+                    // 잘못된 searchType은 무시
+                }
+            }
+            if (category != null && !category.isEmpty()) {
+                try {
+                    searchRequest.setCategory(NoticeCategory.valueOf(category));
+                } catch (IllegalArgumentException e) {
+                    // 잘못된 category는 무시
+                }
+            }
+            searchRequest.setFix(fix);
+            // 기본적으로는 공개 공지만 표시, 체크박스로 숨김 공지사항 포함 가능
+            // includeHidden이 "on" 문자열로 오는 경우 처리
+            boolean includeHiddenValue = includeHidden != null && 
+                    (includeHidden.equals("true") || includeHidden.equals("on") || includeHidden.equals("1"));
+            searchRequest.setIncludeHidden(includeHiddenValue);
+            
+            Page<NoticeResponseDto> notices = noticeService.search(searchRequest, pageable);
+            
+            model.addAttribute("notices", notices);
+            model.addAttribute("searchRequest", searchRequest);
+            model.addAttribute("title", "공지사항 관리");
+            model.addAttribute("content", "notice/noticeList");
+            
+            return "layout";
+        } catch (Exception e) {
+            e.printStackTrace(); // 스택 트레이스 출력
+            System.err.println("공지사항 리스트 조회 오류: " + e.getMessage());
+            model.addAttribute("error", "공지사항 목록을 불러오는 중 오류가 발생했습니다: " + e.getMessage());
+            model.addAttribute("title", "공지사항 관리");
+            model.addAttribute("content", "notice/noticeList");
+            return "layout";
+        }
     }
 
     @GetMapping("/create")
@@ -106,12 +130,22 @@ public class NoticeViewController {
             dto.setPriority(priority);
             dto.setVisible(visible != null ? visible : false);
             
-            // 날짜 변환
+            // 날짜 변환 (datetime-local 형식: "yyyy-MM-ddTHH:mm")
             if (startAt != null && !startAt.isEmpty()) {
-                dto.setStartAt(java.time.LocalDateTime.parse(startAt));
+                try {
+                    dto.setStartAt(java.time.LocalDateTime.parse(startAt));
+                } catch (Exception e) {
+                    // 파싱 실패 시 로그만 남기고 null로 설정
+                    System.err.println("날짜 파싱 실패 (startAt): " + startAt);
+                }
             }
             if (endAt != null && !endAt.isEmpty()) {
-                dto.setEndAt(java.time.LocalDateTime.parse(endAt));
+                try {
+                    dto.setEndAt(java.time.LocalDateTime.parse(endAt));
+                } catch (Exception e) {
+                    // 파싱 실패 시 로그만 남기고 null로 설정
+                    System.err.println("날짜 파싱 실패 (endAt): " + endAt);
+                }
             }
             
             // 공지사항 생성
@@ -119,6 +153,8 @@ public class NoticeViewController {
             
             return "redirect:/notice?message=success";
         } catch (Exception e) {
+            e.printStackTrace(); // 스택 트레이스 출력
+            System.err.println("공지사항 등록 오류: " + e.getMessage());
             model.addAttribute("error", "공지사항 등록 중 오류가 발생했습니다: " + e.getMessage());
             model.addAttribute("title", "공지사항 작성");
             model.addAttribute("content", "notice/noticeForm");
@@ -167,12 +203,22 @@ public class NoticeViewController {
             dto.setPriority(priority);
             dto.setVisible(visible != null ? visible : false);
             
-            // 날짜 변환
+            // 날짜 변환 (datetime-local 형식: "yyyy-MM-ddTHH:mm")
             if (startAt != null && !startAt.isEmpty()) {
-                dto.setStartAt(java.time.LocalDateTime.parse(startAt));
+                try {
+                    dto.setStartAt(java.time.LocalDateTime.parse(startAt));
+                } catch (Exception e) {
+                    // 파싱 실패 시 로그만 남기고 null로 설정
+                    System.err.println("날짜 파싱 실패 (startAt): " + startAt);
+                }
             }
             if (endAt != null && !endAt.isEmpty()) {
-                dto.setEndAt(java.time.LocalDateTime.parse(endAt));
+                try {
+                    dto.setEndAt(java.time.LocalDateTime.parse(endAt));
+                } catch (Exception e) {
+                    // 파싱 실패 시 로그만 남기고 null로 설정
+                    System.err.println("날짜 파싱 실패 (endAt): " + endAt);
+                }
             }
             
             // 공지사항 수정
