@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import renewal.common.entity.Inquiry.InquiryCategory;
+import renewal.common.entity.Inquiry.InquiryStage;
 import renewal.common.entity.Inquiry.InquiryStatus;
 
 @Getter
@@ -17,6 +18,9 @@ public class InquiryResponseDto {
     private String content;
     private InquiryCategory category;
     private InquiryStatus status;
+    private InquiryStage stage;
+    private Long productId;
+    private Long purchaseId;
     private boolean isAnswered;
     private LocalDateTime createdAt;
     private LocalDateTime answeredAt;

@@ -51,6 +51,38 @@
                             th:text="${!inquiry.isAnswered} ? '대기중' : '완료'">대기중</span>
                     </div>
                 </div>
+                <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-gray-500">카테고리</span>
+                        <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full"
+                              th:switch="${inquiry.category.name()}">
+                            <span th:case="'ORDER'" class="bg-blue-100 text-blue-800" th:text="${inquiry.category.displayName}">주문/결제</span>
+                            <span th:case="'REFUND'" class="bg-red-100 text-red-700" th:text="${inquiry.category.displayName}">환불/취소</span>
+                            <span th:case="'ACCOUNT'" class="bg-purple-100 text-purple-700" th:text="${inquiry.category.displayName}">계정/회원</span>
+                            <span th:case="'BENEFIT'" class="bg-emerald-100 text-emerald-700" th:text="${inquiry.category.displayName}">혜택/쿠폰</span>
+                            <span th:case="'SERVICE'" class="bg-orange-100 text-orange-700" th:text="${inquiry.category.displayName}">서비스 오류</span>
+                            <span th:case="'POLICY'" class="bg-slate-100 text-slate-700" th:text="${inquiry.category.displayName}">정책/약관</span>
+                            <span th:case="*" class="bg-gray-100 text-gray-700" th:text="${inquiry.category.displayName}">기타</span>
+                        </span>
+                    </div>
+                    <div class="flex flex-col text-sm text-gray-600">
+                        <span class="font-medium text-gray-500 mb-1">문의 유형</span>
+                        <span class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full"
+                              th:classappend="${inquiry.stage.name() == 'GENERAL'} ? ' bg-gray-100 text-gray-800' : (${inquiry.stage.name() == 'BEFORE_PURCHASE'} ? ' bg-blue-100 text-blue-800' : (${inquiry.stage.name() == 'AFTER_BOOKING'} ? ' bg-yellow-100 text-yellow-800' : ' bg-green-100 text-green-800'))"
+                              th:text="${inquiry.stage.displayName}">일반 문의</span>
+                        <div class="mt-2 space-y-1">
+                            <span th:if="${inquiry.productId != null}" class="flex items-center gap-1">
+                                <i class="fas fa-tag text-gray-400"></i>
+                                상품 ID: <strong th:text="${inquiry.productId}">0</strong>
+                            </span>
+                            <span th:if="${inquiry.purchaseId != null}" class="flex items-center gap-1">
+                                <i class="fas fa-receipt text-gray-400"></i>
+                                구매 ID: <strong th:text="${inquiry.purchaseId}">0</strong>
+                            </span>
+                            <span th:if="${inquiry.productId == null and inquiry.purchaseId == null}" class="text-gray-400">연결된 상품/구매 정보 없음</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- 문의 내용 -->

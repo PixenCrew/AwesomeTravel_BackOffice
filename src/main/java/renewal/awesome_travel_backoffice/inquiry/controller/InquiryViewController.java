@@ -49,9 +49,9 @@ public class InquiryViewController {
 
         // 답변 상태 필터링
         Boolean isAnswered = null;
-        if ("PENDING".equals(status)) {
+        if ("PENDING".equalsIgnoreCase(status)) {
             isAnswered = false;
-        } else if ("COMPLETED".equals(status)) {
+        } else if ("ANSWERED".equalsIgnoreCase(status)) {
             isAnswered = true;
         }
 
@@ -97,8 +97,14 @@ public class InquiryViewController {
                 : InquiryResponseDto.builder()
                         .id(inquiryEntity.getId())
                         .userId(inquiryEntity.getUser().getId())
+                        .userName(inquiryEntity.getUser().getName())
                         .title(inquiryEntity.getTitle())
                         .content(inquiryEntity.getContent())
+                        .category(inquiryEntity.getCategory())
+                        .status(inquiryEntity.getStatus())
+                        .stage(inquiryEntity.getStage())
+                        .productId(inquiryEntity.getProductId())
+                        .purchaseId(inquiryEntity.getPurchaseId())
                         .isAnswered(inquiryEntity.isAnswered())
                         .createdAt(inquiryEntity.getCreatedAt())
                         .build();
