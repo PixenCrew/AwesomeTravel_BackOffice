@@ -106,6 +106,21 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
         
+        .form-select {
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: white;
+        }
+        
+        .form-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
         .btn-search {
             background: #10b981;
             color: white;
@@ -185,12 +200,12 @@
             font-size: 0.75rem;
         }
         
-        .comment-id {
+        .review-id {
             font-weight: 600;
             color: #1f2937;
         }
         
-        .comment-content {
+        .review-content {
             max-width: 300px;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -232,11 +247,6 @@
         .writer-name {
             font-weight: 600;
             color: #1f2937;
-        }
-        
-        .product-title {
-            color: #6b7280;
-            font-size: 0.875rem;
         }
         
         .rating {
@@ -354,14 +364,145 @@
             margin-bottom: 1rem;
             color: #d1d5db;
         }
+        
+        /* 상품별 그룹화 스타일 */
+        .product-group {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+        
+        .product-group:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-header {
+            background: #f9fafb;
+            padding: 1.25rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e5e7eb;
+            transition: background-color 0.2s;
+        }
+        
+        .product-header:hover {
+            background: #f3f4f6;
+        }
+        
+        .product-header-info {
+            flex: 1;
+        }
+        
+        .product-header-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+        
+        .product-header-meta {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .product-header-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .product-header-toggle {
+            color: #6b7280;
+            font-size: 1.25rem;
+            transition: transform 0.2s;
+        }
+        
+        .product-group.expanded .product-header-toggle {
+            transform: rotate(180deg);
+        }
+        
+        .product-reviews {
+            display: none;
+            padding: 0;
+        }
+        
+        .product-group.expanded .product-reviews {
+            display: block;
+        }
+        
+        .product-review-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            align-items: start;
+            gap: 1rem;
+        }
+        
+        .product-review-item:last-child {
+            border-bottom: none;
+        }
+        
+        .product-review-item:hover {
+            background: #f9fafb;
+        }
+        
+        .review-item-content {
+            flex: 1;
+        }
+        
+        .review-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .review-item-writer {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .review-item-date {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .review-item-text {
+            color: #374151;
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+        
+        .review-item-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .review-item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
     </style>
 
     <!-- 페이지 헤더 -->
     <div class="page-header">
         <h1 class="page-title">댓글 관리</h1>
         <div class="btn-group">
-            <a href="/comment-report" class="btn-secondary">
-                <i class="fas fa-flag mr-2"></i>신고 관리
+            <a th:href="@{/review(grouped=${grouped != null ? !grouped : true}, keyword=${keyword != null ? keyword : ''}, rating=${rating}, productId=${productId}, startDate=${startDate != null ? startDate : ''}, endDate=${endDate != null ? endDate : ''})}" 
+               class="btn-secondary">
+                <i th:class="${grouped != null and grouped} ? 'fas fa-list mr-1' : 'fas fa-layer-group mr-1'"></i>
+                <span th:text="${grouped != null and grouped} ? '목록 보기' : '상품별 보기'">상품별 보기</span>
+            </a>
+            <a href="/review-report" class="btn-secondary">
+                <i class="fas fa-flag mr-1"></i>댓글 신고 관리
             </a>
         </div>
     </div>
@@ -370,7 +511,7 @@
     <div class="filter-section">
         <div class="filter-toggle">
             <h3 class="filter-title">검색 필터</h3>
-            <button type="button" class="toggle-btn" onclick="toggleFilter()">
+            <button type="button" id="toggleFilterBtn" class="toggle-btn" onclick="toggleFilter()">
                 <i class="fas fa-filter mr-1"></i>필터
             </button>
         </div>
@@ -382,10 +523,37 @@
                     <input type="text" name="keyword" th:value="${keyword}" placeholder="작성자명, 댓글 내용, 상품명으로 검색" class="form-input" />
                 </div>
                 
+                <div class="form-group">
+                    <label class="form-label">평점</label>
+                    <select name="rating" class="form-select">
+                        <option value="">전체</option>
+                        <option value="5" th:selected="${rating != null && rating == 5}">5점</option>
+                        <option value="4" th:selected="${rating != null && rating == 4}">4점</option>
+                        <option value="3" th:selected="${rating != null && rating == 3}">3점</option>
+                        <option value="2" th:selected="${rating != null && rating == 2}">2점</option>
+                        <option value="1" th:selected="${rating != null && rating == 1}">1점</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">상품 ID</label>
+                    <input type="number" name="productId" th:value="${productId}" placeholder="상품 ID 입력" class="form-input" min="1" />
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">작성일 시작</label>
+                    <input type="date" name="startDate" th:value="${startDate}" class="form-input" />
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">작성일 종료</label>
+                    <input type="date" name="endDate" th:value="${endDate}" class="form-input" />
+                </div>
+                
                 <button type="button" class="btn-reset" onclick="resetFilter()">
                     <i class="fas fa-undo mr-1"></i>초기화
                 </button>
-                <button type="button" class="btn-search" onclick="searchComments()">
+                <button type="button" class="btn-search" onclick="searchReviews()">
                     <i class="fas fa-search mr-1"></i>검색
                 </button>
             </div>
@@ -396,8 +564,69 @@
         </form>
     </div>
 
-    <!-- 결과 테이블 -->
-    <div class="table-section">
+    <!-- 상품별 그룹화 뷰 -->
+    <div th:if="${grouped != null and grouped}" class="grouped-section">
+        <div th:if="${groupedReviews == null or groupedReviews.empty}" class="no-data">
+            <i class="fas fa-comment-slash"></i>
+            <div>등록된 댓글이 없습니다.</div>
+        </div>
+        
+        <div th:each="productGroup : ${groupedReviews}" class="product-group" th:attr="data-product-id=${productGroup.productId}">
+            <div class="product-header" th:onclick="|toggleProductGroup(${productGroup.productId})|">
+                <div class="product-header-info">
+                    <div class="product-header-title" th:text="${productGroup.productTitle}">상품명</div>
+                    <div class="product-header-meta">
+                        <span>
+                            <i class="fas fa-tag"></i>
+                            ID: <span th:text="${productGroup.productId}">1001</span>
+                        </span>
+                        <span th:if="${productGroup.productPrice != null}">
+                            <i class="fas fa-won-sign"></i>
+                            <span th:text="${#numbers.formatInteger(productGroup.productPrice, 3, 'COMMA')} + '원'">550,000원</span>
+                        </span>
+                        <span>
+                            <i class="fas fa-comments"></i>
+                            댓글 <span th:text="${productGroup.reviewCount}">5</span>개
+                        </span>
+                        <span>
+                            <i class="fas fa-star"></i>
+                            평균 <span th:text="${productGroup.averageRating}">4.5</span>점
+                        </span>
+                    </div>
+                </div>
+                <div class="product-header-toggle">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            
+            <div class="product-reviews">
+                <div th:each="review : ${productGroup.reviews}" class="product-review-item">
+                    <div class="review-item-content">
+                        <div class="review-item-header">
+                            <span class="review-item-writer" th:text="${review.writerName}">작성자</span>
+                            <span class="review-item-date" th:text="${#temporals.format(review.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 12:00</span>
+                        </div>
+                        <div class="review-item-text" th:text="${review.content}">댓글 내용</div>
+                        <div class="review-item-footer">
+                            <div class="rating">
+                                <span th:each="i : ${#numbers.sequence(1, 5)}" 
+                                      th:class="${i <= review.rating} ? 'star fas fa-star' : 'star far fa-star'"></span>
+                                <span class="rating-number" th:text="${review.rating}">5</span>
+                            </div>
+                            <div class="review-item-actions">
+                                <button th:onclick="|deleteReview(${review.id})|" class="btn-danger" style="padding: 0.5rem;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 기존 테이블 뷰 -->
+    <div th:unless="${grouped != null and grouped}" class="table-section">
         <table class="table">
             <thead>
                 <tr>
@@ -426,34 +655,34 @@
                 </tr>
             </thead>
             <tbody>
-                <tr th:if="${commentPage.content.isEmpty()}">
+                <tr th:if="${reviewPage != null and reviewPage.content.isEmpty()}">
                     <td colspan="7" class="no-data">
                         <i class="fas fa-comment-slash"></i>
                         <div>등록된 댓글이 없습니다.</div>
                     </td>
                 </tr>
-                <tr th:each="comment : ${commentPage.content}">
-                    <td class="comment-id" th:text="${comment.id}">1</td>
-                    <td class="writer-name" th:text="${comment.writerName}">작성자</td>
+                <tr th:if="${reviewPage != null}" th:each="review : ${reviewPage.content}">
+                    <td class="review-id" th:text="${review.id}">1</td>
+                    <td class="writer-name" th:text="${review.writerName}">작성자</td>
                     <td class="product-info">
-                        <div class="product-title" th:text="${comment.productTitle}">상품명</div>
+                        <div class="product-title" th:text="${review.productTitle}">상품명</div>
                         <div class="product-details">
-                            <span class="product-id">ID: <span th:text="${comment.productId}">1001</span></span>
-                            <span class="product-price" th:text="${#numbers.formatInteger(comment.productPrice, 3, 'COMMA')} + '원'">550,000원</span>
+                            <span class="product-id">ID: <span th:text="${review.productId}">1001</span></span>
+                            <span class="product-price" th:if="${review.productPrice != null}" th:text="${#numbers.formatInteger(review.productPrice, 3, 'COMMA')} + '원'">550,000원</span>
                         </div>
                     </td>
-                    <td class="comment-content" th:text="${comment.content}">댓글 내용</td>
+                    <td class="review-content" th:text="${review.content}">댓글 내용</td>
                     <td>
                         <div class="rating">
                             <span th:each="i : ${#numbers.sequence(1, 5)}" 
-                                  th:class="${i <= comment.rating} ? 'star fas fa-star' : 'star far fa-star'"></span>
-                            <span class="rating-number" th:text="${comment.rating}">5</span>
+                                  th:class="${i <= review.rating} ? 'star fas fa-star' : 'star far fa-star'"></span>
+                            <span class="rating-number" th:text="${review.rating}">5</span>
                         </div>
                     </td>
-                    <td class="date" th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 12:00</td>
+                    <td class="date" th:text="${#temporals.format(review.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 12:00</td>
                     <td>
                         <div class="action-buttons">
-                            <button th:onclick="|deleteComment(${comment.id})|" class="btn-danger">
+                            <button th:onclick="|deleteReview(${review.id})|" class="btn-danger">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -463,24 +692,24 @@
         </table>
     </div>
 
-    <!-- 페이징 -->
-    <div class="pagination-section">
+    <!-- 페이징 (목록 보기일 때만 표시) -->
+    <div th:if="${reviewPage != null}" class="pagination-section">
         <div class="pagination-info">
-            총 <span th:text="${commentPage.totalElements}">0</span>개 중 
-            <span th:text="${commentPage.number * commentPage.size + 1}">1</span>-<span th:text="${(commentPage.number + 1) * commentPage.size > commentPage.totalElements ? commentPage.totalElements : (commentPage.number + 1) * commentPage.size}">10</span>개 표시
+            총 <span th:text="${reviewPage.totalElements}">0</span>개 중 
+            <span th:text="${reviewPage.number * reviewPage.size + 1}">1</span>-<span th:text="${(reviewPage.number + 1) * reviewPage.size > reviewPage.totalElements ? reviewPage.totalElements : (reviewPage.number + 1) * reviewPage.size}">10</span>개 표시
         </div>
         
         <div class="pagination">
-            <a th:if="${commentPage.hasPrevious()}" th:onclick="|searchComments(${commentPage.number - 1})|">
+            <a th:if="${reviewPage.hasPrevious()}" th:onclick="|searchReviews(${reviewPage.number - 1})|">
                 <i class="fas fa-chevron-left"></i> 이전
             </a>
             
-            <a th:each="i : ${#numbers.sequence(0, commentPage.totalPages - 1)}" 
-               th:onclick="|searchComments(${i})|" 
-               th:class="${i == commentPage.number} ? 'active' : ''" 
+            <a th:each="i : ${#numbers.sequence(0, reviewPage.totalPages - 1)}" 
+               th:onclick="|searchReviews(${i})|" 
+               th:class="${i == reviewPage.number} ? 'active' : ''" 
                th:text="${i + 1}">1</a>
             
-            <a th:if="${commentPage.hasNext()}" th:onclick="|searchComments(${commentPage.number + 1})|">
+            <a th:if="${reviewPage.hasNext()}" th:onclick="|searchReviews(${reviewPage.number + 1})|">
                 다음 <i class="fas fa-chevron-right"></i>
             </a>
         </div>
@@ -490,35 +719,48 @@
     <script src="/js/util.js"></script>
     
     <script>
-        function toggleFilter() {
-            const filterForm = document.getElementById('filterForm');
-            const toggleBtn = document.querySelector('.toggle-btn');
-            
-            if (filterForm.classList.contains('hidden')) {
-                filterForm.classList.remove('hidden');
-                toggleBtn.innerHTML = '<i class="fas fa-chevron-up mr-1"></i>접기';
-            } else {
-                filterForm.classList.add('hidden');
-                toggleBtn.innerHTML = '<i class="fas fa-filter mr-1"></i>필터';
+        function toggleProductGroup(productId) {
+            const group = document.querySelector(`[data-product-id="${productId}"]`);
+            if (group) {
+                group.classList.toggle('expanded');
             }
         }
         
-        function searchComments(page = 0) {
+        // 페이지 로드 시 첫 번째 그룹 자동 펼치기
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstGroup = document.querySelector('.product-group');
+            if (firstGroup) {
+                firstGroup.classList.add('expanded');
+            }
+        });
+        
+        function searchReviews(page = 0) {
             const form = document.getElementById('filterForm');
             const formData = new FormData(form);
             formData.set('page', page);
+            
+            // 그룹화 모드 유지
+            const urlParams = new URLSearchParams(window.location.search);
+            const isGrouped = urlParams.get('grouped') === 'true';
+            if (isGrouped) {
+                formData.set('grouped', 'true');
+            }
             
             const params = new URLSearchParams();
             for (let [key, value] of formData.entries()) {
                 if (value) params.append(key, value);
             }
             
-            window.location.href = '/comment?' + params.toString();
+            window.location.href = '/review?' + params.toString();
         }
         
         function resetFilter() {
             document.querySelector('input[name="keyword"]').value = '';
-            searchComments(0);
+            document.querySelector('select[name="rating"]').value = '';
+            document.querySelector('input[name="productId"]').value = '';
+            document.querySelector('input[name="startDate"]').value = '';
+            document.querySelector('input[name="endDate"]').value = '';
+            searchReviews(0);
         }
         
         function toggleSort(element, event) {
@@ -535,12 +777,12 @@
             document.querySelector('input[name="sortField"]').value = sortField;
             document.querySelector('input[name="sortDir"]').value = newSortDir;
             
-            searchComments(0);
+            searchReviews(0);
         }
         
-        function deleteComment(id) {
+        function deleteReview(id) {
             if (confirm('정말로 이 댓글을 삭제하시겠습니까?\n삭제된 댓글은 복구할 수 없습니다.')) {
-                fetch('/api/admin/comments/' + id, { 
+                fetch('/api/admin/reviews/' + id, { 
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json'
@@ -562,3 +804,4 @@
         }
     </script>
 </div>
+

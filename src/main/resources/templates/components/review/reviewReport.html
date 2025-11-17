@@ -92,6 +92,20 @@
             font-size: 0.875rem;
         }
         
+        .form-input {
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
         .form-select {
             padding: 0.75rem;
             border: 1px solid #d1d5db;
@@ -191,7 +205,7 @@
             color: #1f2937;
         }
         
-        .comment-content {
+        .review-content {
             max-width: 200px;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -356,7 +370,7 @@
     <div class="page-header">
         <h1 class="page-title">댓글 신고 관리</h1>
         <div class="btn-group">
-            <a href="/comment" class="btn-secondary">
+            <a href="/review" class="btn-secondary">
                 <i class="fas fa-comments mr-2"></i>댓글 관리
             </a>
         </div>
@@ -366,7 +380,7 @@
     <div class="filter-section">
         <div class="filter-toggle">
             <h3 class="filter-title">검색 필터</h3>
-            <button type="button" class="toggle-btn" onclick="toggleFilter()">
+            <button type="button" id="toggleFilterBtn" class="toggle-btn" onclick="toggleFilter()">
                 <i class="fas fa-filter mr-1"></i>필터
             </button>
         </div>
@@ -377,11 +391,26 @@
                     <label class="form-label">신고 사유</label>
                     <select name="reason" class="form-select">
                         <option value="">전체</option>
-                        <option th:each="reason : ${reportReasons}" 
-                                th:value="${reason}" 
-                                th:text="${reason}" 
-                                th:selected="${reason == reason}">SPAM</option>
+                        <option th:each="r : ${reportReasons}" 
+                                th:value="${r}" 
+                                th:text="${r.getDisplayName()}" 
+                                th:selected="${r == reason}"></option>
                     </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">검색어</label>
+                    <input type="text" name="keyword" th:value="${keyword}" placeholder="작성자명, 신고자명, 댓글 내용으로 검색" class="form-input" />
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">신고일 시작</label>
+                    <input type="date" name="startDate" th:value="${startDate}" class="form-input" />
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">신고일 종료</label>
+                    <input type="date" name="endDate" th:value="${endDate}" class="form-input" />
                 </div>
                 
                 <button type="button" class="btn-reset" onclick="resetFilter()">
@@ -427,12 +456,12 @@
                 </tr>
                 <tr th:each="report : ${reportPage.content}">
                     <td class="report-id" th:text="${report.reportId}">1</td>
-                    <td class="comment-content" th:text="${report.commentContent}">댓글 내용</td>
+                    <td class="review-content" th:text="${report.reviewContent}">댓글 내용</td>
                     <td class="reporter-name" th:text="${report.reporterName}">신고자</td>
                     <td class="reported-user-name" th:text="${report.reportedUserName}">피신고자</td>
                     <td>
                         <span th:class="|reason-badge reason-${report.reason.name().toLowerCase()}|" 
-                              th:text="${report.reason}">SPAM</span>
+                              th:text="${report.reason.getDisplayName()}">광고/도배</span>
                     </td>
                     <td>
                         <div class="rating">
@@ -481,19 +510,6 @@
     <script src="/js/util.js"></script>
     
     <script>
-        function toggleFilter() {
-            const filterForm = document.getElementById('filterForm');
-            const toggleBtn = document.querySelector('.toggle-btn');
-            
-            if (filterForm.classList.contains('hidden')) {
-                filterForm.classList.remove('hidden');
-                toggleBtn.innerHTML = '<i class="fas fa-chevron-up mr-1"></i>접기';
-            } else {
-                filterForm.classList.add('hidden');
-                toggleBtn.innerHTML = '<i class="fas fa-filter mr-1"></i>필터';
-            }
-        }
-        
         function searchReports(page = 0) {
             const form = document.getElementById('filterForm');
             const formData = new FormData(form);
@@ -504,11 +520,14 @@
                 if (value) params.append(key, value);
             }
             
-            window.location.href = '/comment-report?' + params.toString();
+            window.location.href = '/review-report?' + params.toString();
         }
         
         function resetFilter() {
             document.querySelector('select[name="reason"]').value = '';
+            document.querySelector('input[name="keyword"]').value = '';
+            document.querySelector('input[name="startDate"]').value = '';
+            document.querySelector('input[name="endDate"]').value = '';
             searchReports(0);
         }
         
@@ -531,7 +550,7 @@
         
         function deleteReport(id) {
             if (confirm('정말로 이 신고를 삭제하시겠습니까?\n삭제된 신고는 복구할 수 없습니다.')) {
-                fetch('/api/admin/comment-reports/' + id, { 
+                fetch('/api/admin/review-reports/' + id, { 
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json'
@@ -553,6 +572,4 @@
         }
     </script>
 </div>
-
-
 

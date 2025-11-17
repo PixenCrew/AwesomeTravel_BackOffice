@@ -15,12 +15,22 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("""
     SELECT c FROM Review c
-    WHERE (:keyword IS NULL OR
+    WHERE (:keyword IS NULL OR :keyword = '' OR
            LOWER(c.content) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
            LOWER(c.writer.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
            LOWER(c.product.title) LIKE LOWER(CONCAT('%', :keyword, '%')))
+    AND (:rating IS NULL OR c.rating = :rating)
+    AND (:productId IS NULL OR c.product.id = :productId)
+    AND (:startDate IS NULL OR c.createdAt >= :startDate)
+    AND (:endDate IS NULL OR c.createdAt <= :endDate)
     """)
-    Page<Review> searchAll(@Param("keyword") String keyword, Pageable pageable);
+    Page<Review> searchAll(
+        @Param("keyword") String keyword,
+        @Param("rating") Integer rating,
+        @Param("productId") Long productId,
+        @Param("startDate") java.time.LocalDateTime startDate,
+        @Param("endDate") java.time.LocalDateTime endDate,
+        Pageable pageable);
 
     /**
      * 특정 사용자의 최근 댓글 5개 조회
