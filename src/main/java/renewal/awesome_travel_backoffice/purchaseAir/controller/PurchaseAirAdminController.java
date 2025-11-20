@@ -1,4 +1,4 @@
-package renewal.awesome_travel_backoffice.airPurchase.controller;
+package renewal.awesome_travel_backoffice.purchaseAir.controller;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,11 +15,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import renewal.awesome_travel_backoffice.airPurchase.dto.request.AirPassengerUpdateRequestDto;
-import renewal.awesome_travel_backoffice.airPurchase.dto.request.PurchaseAirSearchCondition;
-import renewal.awesome_travel_backoffice.airPurchase.service.PurchaseAirService;
 import renewal.common.entity.PurchaseAir;
 import renewal.common.entity.PurchaseBase.PurchaseStatus;
+import renewal.awesome_travel_backoffice.purchaseAir.dto.request.PurchaseAirSearchCondition;
+import renewal.awesome_travel_backoffice.purchaseAir.dto.response.PurchaseAirResponseDto;
+import renewal.awesome_travel_backoffice.purchaseAir.service.PurchaseAirService;
+import renewal.common.dto.PassengerUpdateRequestDto;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,14 +40,13 @@ public class PurchaseAirAdminController {
         return ResponseEntity.ok(result);
     }
 
-
-    // 2. 단건 상세 조회
     @GetMapping("/{id}")
-    public ResponseEntity<PurchaseAir> getPurchase(@PathVariable Long id) {
-        return ResponseEntity.ok(airPurchaseService.getPurchase(id));
+    public ResponseEntity<PurchaseAirResponseDto> getPurchase(@PathVariable Long id) {
+        return ResponseEntity.ok(airPurchaseService.getPurchaseDetail(id).getPurchase());
     }
 
-    // 3. 상태 변경 (관리자용)
+
+    // 3. 구매 상태 변경 (관리자용)
     @PatchMapping("/{id}/status")
     public ResponseEntity<Void> changeStatus(
             @PathVariable Long id,
@@ -56,66 +56,80 @@ public class PurchaseAirAdminController {
         return ResponseEntity.ok().build();
     }
 
-    // 4. 주문 취소 (관리자용)
-    @PatchMapping("/{id}/cancel")
-    public ResponseEntity<Void> cancelPurchase(@PathVariable Long id) {
-        airPurchaseService.changePurchaseStatus(id, PurchaseStatus.CANCELLED);
-        return ResponseEntity.ok().build();
-    }
-
-    // 5. 승객 정보 수정 (관리자용)
+    // 4. 탑승객 정보 수정 (관리자용)
     @PatchMapping("/{purchaseId}/passengers/{passengerId}")
     public ResponseEntity<Void> updatePassenger(
             @PathVariable Long purchaseId,
             @PathVariable Long passengerId,
-            @RequestBody AirPassengerUpdateRequestDto updateRequest
+            @RequestBody PassengerUpdateRequestDto updateRequest
     ) {
         airPurchaseService.updatePassenger(purchaseId, passengerId, updateRequest);
         return ResponseEntity.ok().build();
     }
 
-    // 6. 승객 정보 추가 (관리자용)
+    // 4-1. 탑승객 정보 추가 (관리자용)
     @PatchMapping("/{purchaseId}/passengers")
     public ResponseEntity<Void> addPassenger(
             @PathVariable Long purchaseId,
-            @RequestBody AirPassengerUpdateRequestDto passengerDto
+            @RequestBody PassengerUpdateRequestDto passengerDto
     ) {
         airPurchaseService.addPassengerInfo(purchaseId, passengerDto);
         return ResponseEntity.ok().build();
     }
 
-    // 7. 결제 완료 처리 (관리자용)
-    @PatchMapping("/{purchaseId}/complete-payment")
-    public ResponseEntity<Void> completePayment(@PathVariable Long purchaseId) {
-        airPurchaseService.completePayment(purchaseId);
+    // 5. 주문 취소 (공통 로직 호출)
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<Void> cancelPurchase(@PathVariable Long id) {
+        airPurchaseService.cancelPurchase(id);
         return ResponseEntity.ok().build();
     }
 
+    // 6. 승객 수 수정 (관리자용)
+    @PatchMapping("/{id}/passenger-count")
+    public ResponseEntity<Void> updatePassengerCount(
+            @PathVariable Long id,
+            @RequestBody PassengerCountUpdateRequest request
+    ) {
+        airPurchaseService.updatePassengerCount(id, request.getAdultCount(), request.getYouthCount(), request.getInfantCount());
+        return ResponseEntity.ok().build();
+    }
 
-    // 9. 국적 코드 목록 조회 (검색 기능 포함)
+    // 7. 국적 코드 목록 조회 (검색 기능 포함)
     @GetMapping("/countries")
-    public ResponseEntity<java.util.List<CountryCodeDto>> getCountries(@RequestParam(required = false) String search) {
-        java.util.List<CountryCodeDto> countries = airPurchaseService.getCountries(search);
+    public ResponseEntity<java.util.List<PurchaseAirService.CountryCodeDto>> getCountries(@RequestParam(required = false) String search) {
+        java.util.List<PurchaseAirService.CountryCodeDto> countries = airPurchaseService.getCountries(search);
         return ResponseEntity.ok(countries);
     }
 
-    // 국적 코드 DTO
-    public static class CountryCodeDto {
-        private String code;
-        private String nameKor;
-        private String nameEng;
+    // 승객 수 수정 요청 DTO
+    public static class PassengerCountUpdateRequest {
+        private Long adultCount;
+        private Long youthCount;
+        private Long infantCount;
 
-        public CountryCodeDto(String code, String nameKor, String nameEng) {
-            this.code = code;
-            this.nameKor = nameKor;
-            this.nameEng = nameEng;
+        public Long getAdultCount() {
+            return adultCount;
         }
 
-        // Getters
-        public String getCode() { return code; }
-        public String getNameKor() { return nameKor; }
-        public String getNameEng() { return nameEng; }
-        public String getDisplayName() { return nameKor + " (" + code + ")"; }
+        public void setAdultCount(Long adultCount) {
+            this.adultCount = adultCount;
+        }
+
+        public Long getYouthCount() {
+            return youthCount;
+        }
+
+        public void setYouthCount(Long youthCount) {
+            this.youthCount = youthCount;
+        }
+
+        public Long getInfantCount() {
+            return infantCount;
+        }
+
+        public void setInfantCount(Long infantCount) {
+            this.infantCount = infantCount;
+        }
     }
 
 }

@@ -1,4 +1,6 @@
-package renewal.awesome_travel_backoffice.airPurchase.controller;
+package renewal.awesome_travel_backoffice.purchaseAir.controller;
+
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,15 +14,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.RequiredArgsConstructor;
-import renewal.awesome_travel_backoffice.airPurchase.dto.request.PurchaseAirSearchCondition;
-import renewal.awesome_travel_backoffice.airPurchase.dto.response.PurchaseAirResponseDto;
-import renewal.awesome_travel_backoffice.airPurchase.service.PurchaseAirService;
+import renewal.awesome_travel_backoffice.purchaseAir.dto.request.PurchaseAirSearchCondition;
+import renewal.awesome_travel_backoffice.purchaseAir.dto.response.PurchaseAirResponseDto;
+import renewal.awesome_travel_backoffice.purchaseAir.service.PurchaseAirService;
+import renewal.awesome_travel_backoffice.purchaseAir.service.PurchaseAirService.PurchaseAirDetailView;
+import renewal.common.dto.PassengerResponseDto;
 import renewal.common.entity.PurchaseBase.PurchaseStatus;
 
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/air-purchase")
-public class AirPurchaseViewController {
+public class PurchaseAirViewController {
 
     private final PurchaseAirService purchaseAirService;
 
@@ -75,12 +79,28 @@ public class AirPurchaseViewController {
 
     @GetMapping("/{id}")
     public String viewAirPurchase(@PathVariable Long id, Model model) {
-        PurchaseAirResponseDto airPurchase = purchaseAirService.getPurchaseDto(id);
-        
-        model.addAttribute("airPurchase", airPurchase);
+        PurchaseAirDetailView detail = purchaseAirService.getPurchaseDetail(id);
+
+        model.addAttribute("purchase", detail.getPurchase());
+        model.addAttribute("seatClasses", detail.getSeatClasses());
+        model.addAttribute("countries", purchaseAirService.getCountries(null));
         model.addAttribute("purchaseStatuses", PurchaseStatus.values());
         model.addAttribute("title", "항공 주문 상세");
         model.addAttribute("content", "components/airPurchase/airPurchaseDetail");
+
+        return "layout";
+    }
+
+    @GetMapping("/{id}/passengers")
+    public String viewPassengers(@PathVariable Long id, Model model) {
+        PurchaseAirDetailView detail = purchaseAirService.getPurchaseDetail(id);
+        List<PassengerResponseDto> passengerDtos = purchaseAirService.getPassengers(id);
+
+        model.addAttribute("purchase", detail.getPurchase());
+        model.addAttribute("passengers", passengerDtos);
+        model.addAttribute("countries", purchaseAirService.getCountries(null));
+        model.addAttribute("title", "항공 주문 탑승객 목록");
+        model.addAttribute("content", "components/airPurchase/airPurchasePassengers");
 
         return "layout";
     }

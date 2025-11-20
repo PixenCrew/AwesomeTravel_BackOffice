@@ -16,24 +16,42 @@
             margin: 0;
         }
 
-        .back-btn {
-            background: #6b7280;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            text-decoration: none;
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .action-btn {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            padding: 0.55rem 1.25rem;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .back-btn {
+            background: #1f2937;
+            color: white;
         }
 
         .back-btn:hover {
-            background: #4b5563;
+            background: #111827;
             color: white;
+        }
+
+        .passenger-btn {
+            border: 1px solid #e5e7eb;
+            color: #1f2937;
+            background: #fff;
+        }
+
+        .passenger-btn:hover {
+            background: #f3f4f6;
         }
 
         .detail-container {
@@ -270,10 +288,16 @@
     <!-- 페이지 헤더 -->
     <div class="page-header">
         <h1 class="page-title">항공 주문 상세</h1>
-        <a href="/air-purchase" class="back-btn">
-            <i class="fas fa-arrow-left"></i>
-            목록으로 돌아가기
-        </a>
+        <div class="header-actions">
+            <a th:href="@{'/air-purchase/' + ${purchase.id} + '/passengers'}" class="action-btn passenger-btn">
+                <i class="fas fa-users"></i>
+                탑승객 보기
+            </a>
+            <a href="/air-purchase" class="action-btn back-btn">
+                <i class="fas fa-arrow-left"></i>
+                목록으로 돌아가기
+            </a>
+        </div>
     </div>
 
     <!-- 주문 정보 -->
@@ -284,31 +308,47 @@
             <div class="info-grid">
                 <div class="info-item">
                     <span class="info-label">주문번호</span>
-                    <span class="info-value" th:text="${airPurchase.id}">#12345</span>
+                    <span class="info-value" th:text="${purchase.id}">#12345</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">주문일시</span>
-                    <span class="info-value" th:text="${#temporals.format(airPurchase.purchaseDate, 'yyyy-MM-dd HH:mm')}">2024-01-01 12:00</span>
+                    <span class="info-value" th:text="${#temporals.format(purchase.purchaseDate, 'yyyy-MM-dd HH:mm')}">2024-01-01 12:00</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">결제기한</span>
-                    <span class="info-value" th:text="${airPurchase.paymentDueDate != null ? #temporals.format(airPurchase.paymentDueDate, 'yyyy-MM-dd HH:mm') : 'N/A'}">2024-01-02 12:00</span>
+                    <span class="info-value" th:text="${purchase.paymentDueDate != null ? #temporals.format(purchase.paymentDueDate, 'yyyy-MM-dd HH:mm') : 'N/A'}">2024-01-02 12:00</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">주문상태</span>
                     <span class="status-badge" 
-                          th:classappend="'status-' + ${airPurchase.status.name().toLowerCase()}"
-                          th:text="${airPurchase.status}">HOLDING</span>
+                          th:classappend="'status-' + ${purchase.status.name().toLowerCase()}"
+                          th:text="${purchase.status}">HOLDING</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">거래완료</span>
                     <span class="status-badge" 
-                          th:classappend="${airPurchase.transactionComplete} ? 'status-completed' : 'status-pending'"
-                          th:text="${airPurchase.transactionComplete} ? '완료' : '미완료'">미완료</span>
+                          th:classappend="${purchase.transactionComplete} ? 'status-completed' : 'status-pending'"
+                          th:text="${purchase.transactionComplete} ? '완료' : '미완료'">미완료</span>
                 </div>
                 <div class="info-item full-width">
                     <span class="info-label">결제금액</span>
-                    <span class="info-value price-highlight" th:text="${#numbers.formatInteger(airPurchase.price, 3, 'COMMA')} + '원'">550,000원</span>
+                    <span class="info-value price-highlight" th:text="${#numbers.formatInteger(purchase.price, 3, 'COMMA')} + '원'">550,000원</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">성인</span>
+                    <span class="info-value" th:text="${purchase.adultCount != null ? purchase.adultCount : 0} + '명'">2명</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">청소년</span>
+                    <span class="info-value" th:text="${purchase.youthCount != null ? purchase.youthCount : 0} + '명'">0명</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">영유아</span>
+                    <span class="info-value" th:text="${purchase.infantCount != null ? purchase.infantCount : 0} + '명'">0명</span>
+                </div>
+                <div class="info-item full-width">
+                    <span class="info-label">총 승객 수</span>
+                    <span class="info-value" th:text="${(purchase.adultCount != null ? purchase.adultCount : 0) + (purchase.youthCount != null ? purchase.youthCount : 0) + (purchase.infantCount != null ? purchase.infantCount : 0)} + '명'">2명</span>
                 </div>
             </div>
         </div>
@@ -319,19 +359,19 @@
             <div class="info-grid">
                 <div class="info-item">
                     <span class="info-label">예약자명</span>
-                    <span class="info-value" th:text="${airPurchase.name}">홍길동</span>
+                    <span class="info-value" th:text="${purchase.name}">홍길동</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">연락처</span>
-                    <span class="info-value" th:text="${airPurchase.number}">010-1234-5678</span>
+                    <span class="info-value" th:text="${purchase.number}">010-1234-5678</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">이메일</span>
-                    <span class="info-value" th:text="${airPurchase.email}">hong@example.com</span>
+                    <span class="info-value" th:text="${purchase.email}">hong@example.com</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">회원ID</span>
-                    <span class="info-value" th:text="${airPurchase.member_id}">12345</span>
+                    <span class="info-value" th:text="${purchase.member_id}">12345</span>
                 </div>
             </div>
         </div>
@@ -340,49 +380,73 @@
     <!-- 항공편 정보 -->
     <div class="detail-section full-width">
         <h3 class="section-title">항공편 정보</h3>
-        <div class="flight-info">
-            <div class="flight-route">
-                <div>
-                    <div class="airport-code" th:text="${airPurchase.airDto.depart}">ICN</div>
-                    <div class="flight-time" th:text="${#temporals.format(airPurchase.airDto.departTime, 'HH:mm')}">14:30</div>
+        <div th:if="${seatClasses == null || seatClasses.isEmpty()}" class="text-gray-500">
+            항공편 정보를 불러올 수 없습니다.
+        </div>
+        <div th:if="${seatClasses != null && !seatClasses.isEmpty()}">
+            <div th:each="seatClass, iterStat : ${seatClasses}" 
+                 class="flight-card" 
+                 style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h4 style="font-size: 1rem; font-weight: 600; color: #374151; margin: 0;">
+                        <span th:if="${seatClasses.size() > 1}">
+                            <span th:if="${iterStat.index == 0}">가는 편</span>
+                            <span th:if="${iterStat.index == 1}">오는 편</span>
+                            <span th:if="${iterStat.index > 1}">구간 <span th:text="${iterStat.index + 1}">3</span></span>
+                        </span>
+                        <span th:if="${seatClasses.size() == 1}">항공편</span>
+                    </h4>
+                    <span class="seat-class-badge" 
+                          style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; background: #dbeafe; color: #1e40af;"
+                          th:text="${seatClass.classType != null ? seatClass.classType : 'N/A'}">ECONOMY</span>
                 </div>
-                <div class="flight-arrow">✈️</div>
-                <div>
-                    <div class="airport-code" th:text="${airPurchase.airDto.arrive}">LAX</div>
-                    <div class="flight-time" th:text="${#temporals.format(airPurchase.airDto.arriveTime, 'HH:mm')}">10:45</div>
+                <div class="flight-route" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                    <div style="text-align: center;">
+                        <div class="airport-code" style="font-size: 1.5rem; font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;"
+                             th:text="${seatClass.departAirport != null ? seatClass.departAirport : 'N/A'}">ICN</div>
+                        <div class="flight-time" style="font-size: 0.875rem; color: #6b7280;"
+                             th:text="${seatClass.departDateTime != null ? #temporals.format(seatClass.departDateTime, 'yyyy-MM-dd HH:mm') : 'N/A'}">2025-02-01 14:30</div>
+                        <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem;"
+                             th:text="${seatClass.departTerminal != null ? ('터미널 ' + seatClass.departTerminal) : ''}">터미널 T1</div>
+                    </div>
+                    <div class="flight-arrow" style="font-size: 1.5rem; color: #3b82f6;">✈️</div>
+                    <div style="text-align: center;">
+                        <div class="airport-code" style="font-size: 1.5rem; font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;"
+                             th:text="${seatClass.arriveAirport != null ? seatClass.arriveAirport : 'N/A'}">LAX</div>
+                        <div class="flight-time" style="font-size: 0.875rem; color: #6b7280;"
+                             th:text="${seatClass.arriveDateTime != null ? #temporals.format(seatClass.arriveDateTime, 'yyyy-MM-dd HH:mm') : 'N/A'}">2025-02-01 10:45</div>
+                        <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem;"
+                             th:text="${seatClass.arriveTerminal != null ? ('터미널 ' + seatClass.arriveTerminal) : ''}">터미널 T1</div>
+                    </div>
                 </div>
-            </div>
-            <div class="info-grid">
-                <div class="info-item">
-                    <span class="info-label">항공편번호</span>
-                    <span class="info-value" th:text="${airPurchase.airDto.code}">AA123</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">항공사</span>
-                    <span class="info-value" th:text="${airPurchase.airDto.airlineNameKor}">아메리칸 항공</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">좌석등급</span>
-                    <span class="seat-class-badge" th:text="${airPurchase.airDto.seatClassType}">ECONOMY</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">좌석가격</span>
-                    <span class="info-value" th:text="${#numbers.formatInteger(airPurchase.airDto.price, 3, 'COMMA')} + '원'">275,000원</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">잔여좌석</span>
-                    <span class="info-value" th:text="${airPurchase.airDto.availableSeats}">15</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">경유지</span>
-                    <span class="info-value" th:text="${airPurchase.airDto.stopovers}">0</span>
+                <div class="info-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+                    <div class="info-item">
+                        <span class="info-label" style="font-size: 0.875rem; color: #6b7280; display: block; margin-bottom: 0.25rem;">항공사</span>
+                        <span class="info-value" style="font-size: 0.875rem; font-weight: 600; color: #1f2937;"
+                              th:text="${purchase.airlineNameKor != null ? purchase.airlineNameKor : 'N/A'}">대한항공</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label" style="font-size: 0.875rem; color: #6b7280; display: block; margin-bottom: 0.25rem;">항공편번호</span>
+                        <span class="info-value" style="font-size: 0.875rem; font-weight: 600; color: #1f2937;"
+                              th:text="${seatClass.flightNumber != null ? seatClass.flightNumber : 'N/A'}">AA123</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label" style="font-size: 0.875rem; color: #6b7280; display: block; margin-bottom: 0.25rem;">비행시간</span>
+                        <span class="info-value" style="font-size: 0.875rem; font-weight: 600; color: #1f2937;"
+                              th:text="${seatClass.flightDuration != null ? (seatClass.flightDuration + '분') : 'N/A'}">210분</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label" style="font-size: 0.875rem; color: #6b7280; display: block; margin-bottom: 0.25rem;">성인 가격</span>
+                        <span class="info-value" style="font-size: 0.875rem; font-weight: 600; color: #1f2937;"
+                              th:text="${seatClass.priceAdult != null ? (#numbers.formatInteger(seatClass.priceAdult, 3, 'COMMA') + '원') : 'N/A'}">275,000원</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- 항공권은 승객 정보가 완전해야만 결제가 가능하므로 추가 입력 폼 없음 -->
-    <div class="passenger-status-section" th:if="${!airPurchase.isPassengerInfoComplete}">
+    <div class="passenger-status-section" th:if="${!purchase.isPassengerInfoComplete}">
         <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
             <div class="flex items-center">
                 <i class="fas fa-exclamation-triangle text-yellow-600 mr-2"></i>
@@ -393,106 +457,13 @@
                         현재 승객 정보가 불완전한 상태입니다.
                     </p>
                     <p class="text-yellow-600 text-xs mt-1">
-                        예상 승객 수: <span th:text="${airPurchase.expectedPassengerCount}">4</span>명 | 
-                        현재 입력된 승객: <span th:text="${airPurchase.airPassengers != null ? airPurchase.airPassengers.size() : 0}">0</span>명
+                        현재 입력된 승객: <span th:text="${purchase.completedPassengerCount != null ? purchase.completedPassengerCount : 0}">0</span>명
                     </p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 승객 정보 -->
-    <div class="bg-white shadow-md rounded-lg p-6 mb-6">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-semibold text-gray-900">승객 정보</h2>
-            <span class="text-sm text-gray-500" th:text="'총 ' + ${airPurchase.airPassengers != null ? airPurchase.airPassengers.size() : 0} + '명'">총 2명</span>
-        </div>
-        
-        <div th:if="${airPurchase.airPassengers != null && !airPurchase.airPassengers.isEmpty()}" class="space-y-4">
-            <div th:each="passenger, iterStat : ${airPurchase.airPassengers}" 
-                 class="border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-3">
-                    <h3 class="text-lg font-medium text-gray-900" th:text="'승객 ' + ${iterStat.count}">승객 1</h3>
-                    <button type="button"
-                            class="text-blue-600 hover:text-blue-900 text-sm edit-passenger-btn"
-                            th:data-passenger-id="${passenger.id}"
-                            th:data-passenger-name="${passenger.name != null ? passenger.name : ''}"
-                            th:data-passenger-number="${passenger.number != null ? passenger.number : ''}"
-                            th:data-passenger-email="${passenger.email != null ? passenger.email : ''}"
-                            th:data-passenger-birth="${passenger.birth != null ? #temporals.format(passenger.birth, 'yyyy-MM-dd') : ''}"
-                            th:data-passenger-sex="${passenger.sex != null ? passenger.sex : ''}"
-                            th:data-passenger-passport="${passenger.passportNum != null ? passenger.passportNum : ''}"
-                            th:data-passenger-lastname="${passenger.lastName != null ? passenger.lastName : ''}"
-                            th:data-passenger-firstname="${passenger.firstName != null ? passenger.firstName : ''}"
-                            th:data-passenger-expire="${passenger.expire != null ? #temporals.format(passenger.expire, 'yyyy-MM-dd') : ''}"
-                            th:data-passenger-nationality="${passenger.nationality != null ? passenger.nationality : ''}"
-                            onclick="editPassengerFromButton(this)">
-                        <i class="fas fa-edit"></i> 수정
-                    </button>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">이름</label>
-                        <p class="mt-1 text-sm text-gray-900" th:text="${passenger.name != null ? passenger.name : '미입력'}">홍길동</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">연락처</label>
-                        <p class="mt-1 text-sm text-gray-900" th:text="${passenger.number != null ? passenger.number : '미입력'}">010-1234-5678</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">이메일</label>
-                        <p class="mt-1 text-sm text-gray-900" th:text="${passenger.email != null ? passenger.email : '미입력'}">hong@example.com</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">생년월일</label>
-                        <p class="mt-1 text-sm text-gray-900" th:text="${passenger.birth != null ? #temporals.format(passenger.birth, 'yyyy-MM-dd') : '미입력'}">1990-01-01</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">성별</label>
-                        <p class="mt-1 text-sm text-gray-900" th:text="${passenger.sex != null ? (passenger.sex == 'MALE' ? '남성' : '여성') : '미입력'}">남성</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">국적</label>
-                        <p class="mt-1 text-sm text-gray-900" th:text="${passenger.nationality != null ? passenger.nationality : '미입력'}">KOR</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">여권번호</label>
-                        <p class="mt-1 text-sm text-gray-900" th:text="${passenger.passportNum != null ? passenger.passportNum : '미입력'}">M12345678</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">영문 성</label>
-                        <p class="mt-1 text-sm text-gray-900" th:text="${passenger.lastName != null ? passenger.lastName : '미입력'}">HONG</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">영문 이름</label>
-                        <p class="mt-1 text-sm text-gray-900" th:text="${passenger.firstName != null ? passenger.firstName : '미입력'}">GILDONG</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">여권 만료일</label>
-                        <p class="mt-1 text-sm text-gray-900" th:text="${passenger.expire != null ? #temporals.format(passenger.expire, 'yyyy-MM-dd') : '미입력'}">2030-01-01</p>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700">특별 요청사항</label>
-                        <div class="mt-1">
-                            <div th:if="${passenger.specialRequests != null && !passenger.specialRequests.isEmpty()}">
-                                <span th:each="request, iterStat : ${passenger.specialRequests}" 
-                                      class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mr-2 mb-1"
-                                      th:text="${request}">요청사항</span>
-                            </div>
-                            <span th:if="${passenger.specialRequests == null || passenger.specialRequests.isEmpty()}"
-                                  class="text-sm text-gray-500">없음</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div th:if="${airPurchase.airPassengers == null || airPurchase.airPassengers.isEmpty()}" 
-             class="text-center py-8 text-gray-500">
-            <i class="fas fa-users text-4xl mb-2"></i>
-            <p>등록된 승객 정보가 없습니다.</p>
-        </div>
-    </div>
 
     <!-- 관리자 작업 -->
     <div class="action-section">
@@ -517,89 +488,12 @@
         </div>
     </div>
 
-    <!-- 승객 정보 수정 모달 -->
-    <div id="editModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-        <div class="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">승객 정보 수정</h3>
-                <div id="editForm" class="space-y-4">
-                    <input type="hidden" id="editPassengerId">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="editName" class="block text-sm font-medium text-gray-700">이름</label>
-                            <input type="text" id="editName"
-                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                        </div>
-                        <div>
-                            <label for="editNumber" class="block text-sm font-medium text-gray-700">연락처</label>
-                            <input type="text" id="editNumber"
-                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                        </div>
-                        <div>
-                            <label for="editEmail" class="block text-sm font-medium text-gray-700">이메일</label>
-                            <input type="text" id="editEmail"
-                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                        </div>
-                        <div>
-                            <label for="editBirth" class="block text-sm font-medium text-gray-700">생년월일</label>
-                            <input type="text" id="editBirth" placeholder="YYYY-MM-DD"
-                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                        </div>
-                        <div>
-                            <label for="editSex" class="block text-sm font-medium text-gray-700">성별</label>
-                            <select id="editSex"
-                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                                <option value="">선택하세요</option>
-                                <option value="MALE">남성</option>
-                                <option value="FEMALE">여성</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="editPassportNum" class="block text-sm font-medium text-gray-700">여권번호</label>
-                            <input type="text" id="editPassportNum"
-                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                        </div>
-                        <div class="relative">
-                            <label for="editNationality" class="block text-sm font-medium text-gray-700">국적</label>
-                            <input type="text" id="editNationality" placeholder="국적을 검색하세요 (예: K, Korea, 한국)" 
-                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
-                                   autocomplete="off">
-                            <div id="nationalityDropdown" class="absolute z-50 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto hidden">
-                                <!-- 검색 결과가 여기에 표시됩니다 -->
-                            </div>
-                        </div>
-                        <div>
-                            <label for="editLastName" class="block text-sm font-medium text-gray-700">영문 성</label>
-                            <input type="text" id="editLastName"
-                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                        </div>
-                        <div>
-                            <label for="editFirstName" class="block text-sm font-medium text-gray-700">영문 이름</label>
-                            <input type="text" id="editFirstName"
-                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                        </div>
-                        <div>
-                            <label for="editExpire" class="block text-sm font-medium text-gray-700">여권 만료일</label>
-                            <input type="text" id="editExpire" placeholder="YYYY-MM-DD"
-                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                        </div>
-                    </div>
-                    <div class="flex justify-end space-x-3 pt-4">
-                        <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
-                            취소
-                        </button>
-                        <button type="button" onclick="confirmPassengerUpdate(event);" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                            수정
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <script>
+    <script th:inline="javascript">
+        const purchaseId = /*[[${purchase.id}]]*/ 0;
+
         function changeStatus() {
-            const currentStatus = '[[${airPurchase.status}]]';
+            const currentStatus = '[[${purchase.status}]]';
             
             // 상태 선택 모달 생성
             const modal = document.createElement('div');
@@ -639,7 +533,7 @@
                 }
                 
                 // AJAX로 상태 변경 API 호출
-                fetch(`/api/admin/air-purchases/${[[${airPurchase.id}]]}/status?status=${selectedStatus}`, {
+                fetch(`/api/admin/air-purchases/${purchaseId}/status?status=${selectedStatus}`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json'
@@ -663,7 +557,7 @@
         function cancelPurchase() {
             if (confirm('정말로 이 주문을 취소하시겠습니까?')) {
                 // AJAX로 주문 취소 API 호출
-                fetch(`/api/admin/air-purchases/${[[${airPurchase.id}]]}/cancel`, {
+                fetch(`/api/admin/air-purchases/${purchaseId}/cancel`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json'
@@ -691,7 +585,7 @@
         function requestRefund() {
             const reason = prompt('환불 사유를 입력하세요:');
             if (reason && reason.trim()) {
-                fetch(`/api/refunds/request/${[[${airPurchase.id}]]}?reason=${encodeURIComponent(reason.trim())}`, {
+                fetch(`/api/refunds/request/${purchaseId}?reason=${encodeURIComponent(reason.trim())}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -712,381 +606,7 @@
             }
         }
 
-        function editPassengerFromButton(button) {
-            const passengerId = button.getAttribute('data-passenger-id');
-            const name = button.getAttribute('data-passenger-name') || '';
-            const number = button.getAttribute('data-passenger-number') || '';
-            const email = button.getAttribute('data-passenger-email') || '';
-            const birth = button.getAttribute('data-passenger-birth') || '';
-            const sex = button.getAttribute('data-passenger-sex') || '';
-            const passportNum = button.getAttribute('data-passenger-passport') || '';
-            const lastName = button.getAttribute('data-passenger-lastname') || '';
-            const firstName = button.getAttribute('data-passenger-firstname') || '';
-            const expire = button.getAttribute('data-passenger-expire') || '';
-            const nationality = button.getAttribute('data-passenger-nationality') || '';
-            
-            // 새 모달에 기존 값들 설정
-            document.getElementById('editPassengerId').value = passengerId;
-            document.getElementById('editName').value = name;
-            document.getElementById('editNumber').value = number;
-            document.getElementById('editEmail').value = email;
-            document.getElementById('editBirth').value = birth;
-            document.getElementById('editSex').value = sex;
-            document.getElementById('editPassportNum').value = passportNum;
-            document.getElementById('editLastName').value = lastName;
-            document.getElementById('editFirstName').value = firstName;
-            document.getElementById('editExpire').value = expire;
-            document.getElementById('editNationality').value = nationality;
-            
-            // 선택된 국적 코드 설정
-            selectedNationalityCode = nationality;
-            
-            // 모달 열기
-            document.getElementById('editModal').classList.remove('hidden');
-        }
-
-        function editPassenger(passengerId, name, number, email, birth, sex, passportNum, lastName, firstName, expire, nationality) {
-            // 승객 정보 수정 모달 생성
-            const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-            modal.innerHTML = `
-                <div class="bg-white p-6 rounded-lg shadow-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-                    <h3 class="text-lg font-semibold mb-4">승객 정보 수정</h3>
-                    <form id="passengerEditForm" class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">이름 *</label>
-                                <input type="text" id="editName" value="${name}" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">연락처 *</label>
-                                <input type="text" id="editNumber" value="${number}" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">이메일 *</label>
-                                <input type="email" id="editEmail" value="${email}" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">생년월일 *</label>
-                                <input type="date" id="editBirth" value="${birth}" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">성별 *</label>
-                                <select id="editSex" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                                    <option value="MALE" ${sex === 'MALE' ? 'selected' : ''}>MALE</option>
-                                    <option value="FEMALE" ${sex === 'FEMALE' ? 'selected' : ''}>FEMALE</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">여권번호 *</label>
-                                <input type="text" id="editPassportNum" value="${passportNum}" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                            </div>
-                            <div class="relative">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">국적 *</label>
-                                <input type="text" id="editNationality" placeholder="국적을 검색하세요 (예: K, Korea, 한국)" 
-                                       class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                                       autocomplete="off" required>
-                                <div id="nationalityDropdown" class="absolute z-50 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto hidden">
-                                    <!-- 검색 결과가 여기에 표시됩니다 -->
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">영문 성 *</label>
-                                <input type="text" id="editLastName" value="${lastName}" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">영문 이름 *</label>
-                                <input type="text" id="editFirstName" value="${firstName}" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">여권만료일 *</label>
-                                <input type="date" id="editExpire" value="${expire}" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                            </div>
-                        </div>
-                        <div class="flex justify-end space-x-2 pt-4">
-                            <button type="button" onclick="closePassengerModal()" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50">취소</button>
-                            <button type="button" onclick="confirmPassengerEdit(${passengerId})" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">수정</button>
-                        </div>
-                    </form>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            
-            // 전역 함수로 등록
-            window.closePassengerModal = function() {
-                document.body.removeChild(modal);
-            };
-            
-            window.confirmPassengerEdit = function(passengerId) {
-                const form = document.getElementById('passengerEditForm');
-                const formData = new FormData(form);
-                
-                const updateData = {
-                    name: document.getElementById('editName').value.trim(),
-                    number: document.getElementById('editNumber').value.trim(),
-                    email: document.getElementById('editEmail').value.trim(),
-                    birth: document.getElementById('editBirth').value,
-                    sex: document.getElementById('editSex').value.toUpperCase(), // 대문자로 변환
-                    passportNum: document.getElementById('editPassportNum').value.trim(),
-                    nationality: document.getElementById('editNationality').value.trim(),
-                    lastName: document.getElementById('editLastName').value.trim(),
-                    firstName: document.getElementById('editFirstName').value.trim(),
-                    expire: document.getElementById('editExpire').value
-                };
-
-                // 입력값 검증 제거 - 모든 필드 부분 수정 허용
-
-                // AJAX로 승객 정보 수정 API 호출
-                fetch(`/api/admin/air-purchases/${[[${airPurchase.id}]]}/passengers/${passengerId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(updateData)
-                })
-                .then(response => {
-                    if (response.ok) {
-                        alert('승객 정보가 성공적으로 수정되었습니다.');
-                        location.reload();
-                    } else {
-                        response.text().then(text => alert('승객 정보 수정 실패: ' + text));
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('승객 정보 수정 중 오류가 발생했습니다.');
-                });
-            };
-        }
-
-        // 2단계 승객 정보 추가 함수
-        function addPassenger() {
-            const form = document.getElementById('passengerForm');
-            const formData = new FormData(form);
-            
-            const passengerData = {
-                name: formData.get('name').trim(),
-                number: formData.get('number').trim(),
-                email: formData.get('email').trim(),
-                birth: formData.get('birth'),
-                sex: formData.get('sex').toUpperCase(),
-                nationality: formData.get('nationality'),
-                passportNum: formData.get('passportNum').trim(),
-                lastName: formData.get('lastName').trim(),
-                firstName: formData.get('firstName').trim(),
-                expire: formData.get('expire')
-            };
-
-            // 필수 필드 검증
-            if (!passengerData.name || !passengerData.number || !passengerData.email || 
-                !passengerData.birth || !passengerData.sex || !passengerData.nationality) {
-                alert('필수 필드를 모두 입력해주세요.');
-                return;
-            }
-
-            // AJAX로 승객 정보 추가 API 호출
-            fetch(`/api/admin/air-purchases/${[[${airPurchase.id}]]}/passengers`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(passengerData)
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert('승객 정보가 성공적으로 추가되었습니다.');
-                    location.reload();
-                } else {
-                    response.text().then(text => alert('승객 정보 추가 실패: ' + text));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('승객 정보 추가 중 오류가 발생했습니다.');
-            });
-        }
-
-        // 모달 닫기 함수
-        function closeEditModal() {
-            document.getElementById('editModal').classList.add('hidden');
-            document.getElementById('nationalityDropdown').classList.add('hidden'); // 드롭다운도 숨김
-            selectedNationalityCode = null; // 선택된 국적 초기화
-        }
-
-        // 국적 검색 기능
-        let nationalitySearchTimeout;
-        let selectedNationalityCode = null;
-
-        document.addEventListener('DOMContentLoaded', function() {
-            // Form validation 완전히 비활성화
-            const editForm = document.getElementById('editForm');
-            if (editForm) {
-                editForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    return false;
-                });
-                
-                // 모든 input 필드의 validation 제거
-                const inputs = editForm.querySelectorAll('input, select');
-                inputs.forEach(input => {
-                    input.removeAttribute('required');
-                    input.setAttribute('novalidate', 'true');
-                });
-            }
-
-            const nationalityInput = document.getElementById('editNationality');
-            const dropdown = document.getElementById('nationalityDropdown');
-
-            if (nationalityInput && dropdown) {
-                // 입력 시 검색
-                nationalityInput.addEventListener('input', function() {
-                    clearTimeout(nationalitySearchTimeout);
-                    const query = this.value.trim();
-
-                    if (query.length < 1) {
-                        dropdown.classList.add('hidden');
-                        return;
-                    }
-
-                    nationalitySearchTimeout = setTimeout(() => {
-                        searchNationalities(query);
-                    }, 300); // 300ms 지연
-                });
-
-                // 포커스 시 기본 목록 표시
-                nationalityInput.addEventListener('focus', function() {
-                    console.log('국적 필드 포커스됨');
-                    searchNationalities('KOR'); // 테스트용으로 한국부터 표시
-                });
-
-                // 외부 클릭 시 드롭다운 숨김
-                document.addEventListener('click', function(e) {
-                    if (!nationalityInput.contains(e.target) && !dropdown.contains(e.target)) {
-                        dropdown.classList.add('hidden');
-                    }
-                });
-            }
-        });
-
-        function searchNationalities(query) {
-            const dropdown = document.getElementById('nationalityDropdown');
-            
-            console.log('=== 국적 검색 시작 ===');
-            console.log('검색어:', query);
-            console.log('드롭다운 요소:', dropdown);
-            
-            fetch(`/api/admin/air-purchases/countries?search=${encodeURIComponent(query)}`)
-                .then(response => {
-                    console.log('API 응답 상태:', response.status);
-                    return response.json();
-                })
-                .then(countries => {
-                    console.log('검색 결과:', countries);
-                    dropdown.innerHTML = '';
-                    
-                    if (countries.length === 0) {
-                        dropdown.innerHTML = '<div class="px-3 py-2 text-gray-500">검색 결과가 없습니다</div>';
-                    } else {
-                        countries.forEach(country => {
-                            const item = document.createElement('div');
-                            item.className = 'px-3 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100';
-                            item.innerHTML = `
-                                <div class="font-medium">${country.nameKor} (${country.code})</div>
-                                <div class="text-sm text-gray-500">${country.nameEng}</div>
-                            `;
-                            item.addEventListener('click', function() {
-                                selectNationality(country.code, country.nameKor);
-                            });
-                            dropdown.appendChild(item);
-                        });
-                    }
-                    
-                    console.log('드롭다운 표시');
-                    dropdown.classList.remove('hidden');
-                })
-                .catch(error => {
-                    console.error('국적 검색 오류:', error);
-                    dropdown.innerHTML = '<div class="px-3 py-2 text-red-500">검색 중 오류가 발생했습니다</div>';
-                    dropdown.classList.remove('hidden');
-                });
-        }
-
-        function selectNationality(code, name) {
-            const nationalityInput = document.getElementById('editNationality');
-            const dropdown = document.getElementById('nationalityDropdown');
-            
-            nationalityInput.value = `${name} (${code})`;
-            selectedNationalityCode = code;
-            dropdown.classList.add('hidden');
-        }
-
-        // 승객 정보 수정 확인
-        function confirmPassengerUpdate(event) {
-            console.log('=== 승객 정보 수정 시작 ===');
-            
-            // form validation 방지
-            if (event) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-            
-            // 일단 테스트용으로 alert만 띄워보기
-            alert('수정 버튼이 클릭되었습니다! (테스트)');
-            
-            const passengerId = document.getElementById('editPassengerId').value;
-            console.log('승객 ID:', passengerId);
-            
-            if (!passengerId) {
-                alert('승객 ID가 없습니다.');
-                return;
-            }
-            
-            // 모든 필드를 전송하되, 빈 값은 null로 명시적으로 설정
-            const updateData = {
-                name: document.getElementById('editName').value || null,
-                number: document.getElementById('editNumber').value || null,
-                email: document.getElementById('editEmail').value || null,
-                birth: document.getElementById('editBirth').value || null,
-                sex: document.getElementById('editSex').value || null,
-                passportNum: document.getElementById('editPassportNum').value || null,
-                lastName: document.getElementById('editLastName').value || null,
-                firstName: document.getElementById('editFirstName').value || null,
-                expire: document.getElementById('editExpire').value || null,
-                nationality: selectedNationalityCode || null
-            };
-
-            console.log('수정 데이터:', updateData);
-
-            fetch(`/api/admin/air-purchases/${[[${airPurchase.id}]]}/passengers/${passengerId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(updateData)
-            })
-            .then(response => {
-                console.log('API 응답 상태:', response.status);
-                if (!response.ok) {
-                    return response.text().then(text => { 
-                        console.error('API 오류 응답:', text);
-                        throw new Error(text || '승객 정보 수정 실패'); 
-                    });
-                }
-                return response.text();
-            })
-            .then(data => {
-                console.log('수정 성공:', data);
-                alert('승객 정보가 성공적으로 수정되었습니다.');
-                document.getElementById('editModal').classList.add('hidden');
-                location.reload();
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('승객 정보 수정 중 오류가 발생했습니다: ' + error.message);
-            });
-        }
 
     </script>
 </div>
+
