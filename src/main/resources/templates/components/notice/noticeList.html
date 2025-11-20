@@ -95,7 +95,7 @@
                                     </h3>
                                     <span th:if="${notice.fix}" class="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">고정</span>
                                     <span th:if="${notice.visible == false}" class="px-2 py-1 text-xs bg-gray-200 text-gray-600 rounded-full">숨김</span>
-                                    <span th:if="${notice.category != null}" th:switch="${notice.category.name()}" class="px-2 py-1 text-xs rounded-full">
+                                    <span th:if="${notice.category != null}" th:switch="${notice.category}" class="px-2 py-1 text-xs rounded-full">
                                         <span th:case="EVENT" class="bg-purple-100 text-purple-800">이벤트</span>
                                         <span th:case="UPDATE" class="bg-blue-100 text-blue-800">업데이트</span>
                                         <span th:case="SYSTEM" class="bg-orange-100 text-orange-800">점검</span>
@@ -117,9 +117,9 @@
                                         <i class="fas fa-eye mr-1"></i>
                                         <span th:if="${notice.visible == false}" class="text-gray-400">숨김</span>
                                         <span th:if="${notice.visible}">
-                                            <span th:if="${notice.startAt != null and notice.startAt.isAfter(#temporals.createNow())}" class="text-orange-600">대기 중</span>
-                                            <span th:if="${notice.endAt != null and notice.endAt.isBefore(#temporals.createNow())}" class="text-red-600">종료됨</span>
-                                            <span th:if="${(notice.startAt == null or notice.startAt.isBefore(#temporals.createNow())) and (notice.endAt == null or notice.endAt.isAfter(#temporals.createNow()))}" class="text-green-600">노출 중</span>
+                                            <span th:if="${notice.startAt != null and notice.startAt.isAfter(now)}" class="text-orange-600">대기 중</span>
+                                            <span th:if="${notice.endAt != null and notice.endAt.isBefore(now)}" class="text-red-600">종료됨</span>
+                                            <span th:if="${(notice.startAt == null or notice.startAt.isBefore(now)) and (notice.endAt == null or notice.endAt.isAfter(now))}" class="text-green-600">노출 중</span>
                                         </span>
                                     </div>
                                 </div>
