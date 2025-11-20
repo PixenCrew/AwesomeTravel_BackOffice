@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -20,10 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.admin.Admin;
 import renewal.awesome_travel_backoffice.admin.AdminService;
-import renewal.awesome_travel_backoffice.purchaseProduct.dto.request.ProductPassengerUpdateRequestDto;
 import renewal.awesome_travel_backoffice.purchaseProduct.dto.request.PurchaseProductSearchCondition;
-import renewal.awesome_travel_backoffice.purchaseProduct.repository.PurchaseProductRepository;
+import renewal.awesome_travel_backoffice.purchaseProduct.repository.PurchaseProductAdminRepository;
 import renewal.awesome_travel_backoffice.purchaseProduct.service.PurchaseProductService;
+import renewal.common.dto.PassengerUpdateRequestDto;
 import renewal.common.entity.Handler;
 import renewal.common.entity.PurchaseBase.PurchaseStatus;
 import renewal.common.entity.PurchaseProduct;
@@ -35,7 +36,7 @@ import renewal.common.repository.HandlerRepository;
 public class PurchaseProductAdminController {
 
     private final PurchaseProductService productPurchaseService;
-    private final PurchaseProductRepository productPurchaseRepo;
+    private final PurchaseProductAdminRepository productPurchaseAdminRepo;
     private final AdminService adminService;
     private final HandlerRepository handlerRepo;
 
@@ -66,7 +67,7 @@ public class PurchaseProductAdminController {
     // 4. 주문 취소 (관리자용)
     @PatchMapping("/{id}/cancel")
     public ResponseEntity<Void> cancelPurchase(@PathVariable Long id) {
-        productPurchaseService.changePurchaseStatus(id, PurchaseStatus.CANCELLED);
+        productPurchaseService.cancelPurchase(id);
         return ResponseEntity.ok().build();
     }
 
@@ -75,7 +76,7 @@ public class PurchaseProductAdminController {
     public ResponseEntity<Void> updatePassenger(
             @PathVariable Long purchaseId,
             @PathVariable Long passengerId,
-            @RequestBody ProductPassengerUpdateRequestDto updateRequest) {
+            @RequestBody PassengerUpdateRequestDto updateRequest) {
         productPurchaseService.updatePassenger(purchaseId, passengerId, updateRequest);
         return ResponseEntity.ok().build();
     }
@@ -84,8 +85,17 @@ public class PurchaseProductAdminController {
     @PatchMapping("/{purchaseId}/passengers")
     public ResponseEntity<Void> addPassenger(
             @PathVariable Long purchaseId,
-            @RequestBody ProductPassengerUpdateRequestDto passengerDto) {
+            @RequestBody PassengerUpdateRequestDto passengerDto) {
         productPurchaseService.addPassengerInfo(purchaseId, passengerDto);
+        return ResponseEntity.ok().build();
+    }
+
+    // 6-1. 승객 수 수정 (관리자용)
+    @PatchMapping("/{id}/passenger-count")
+    public ResponseEntity<Void> updatePassengerCount(
+            @PathVariable Long id,
+            @RequestBody PassengerCountUpdateRequest request) {
+        productPurchaseService.updatePassengerCount(id, request.getAdultCount(), request.getYouthCount(), request.getInfantCount());
         return ResponseEntity.ok().build();
     }
 
@@ -112,7 +122,7 @@ public class PurchaseProductAdminController {
 
     // 8. 담당자 할당 (관리자용)
     @PostMapping("/{purchaseId}/assign-handler")
-    public String assignHandler(@PathVariable Long purchaseId, Principal principal) {
+    public ResponseEntity<Void> assignHandler(@PathVariable Long purchaseId, Principal principal) {
         String username = principal.getName();
 
         Admin admin = adminService.getAdminByUsername(username);
@@ -127,9 +137,42 @@ public class PurchaseProductAdminController {
 
         PurchaseProduct purchaseProduct = productPurchaseService.getPurchase(purchaseId);
         purchaseProduct.setHandler(handler);
-        productPurchaseRepo.save(purchaseProduct);
+        productPurchaseAdminRepo.save(purchaseProduct);
 
-        return "redirect:/product-purchase/" + purchaseId;
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .header("Location", "/product-purchase/" + purchaseId)
+                .build();
+    }
+
+    // 승객 수 수정 요청 DTO
+    public static class PassengerCountUpdateRequest {
+        private Long adultCount;
+        private Long youthCount;
+        private Long infantCount;
+
+        public Long getAdultCount() {
+            return adultCount;
+        }
+
+        public void setAdultCount(Long adultCount) {
+            this.adultCount = adultCount;
+        }
+
+        public Long getYouthCount() {
+            return youthCount;
+        }
+
+        public void setYouthCount(Long youthCount) {
+            this.youthCount = youthCount;
+        }
+
+        public Long getInfantCount() {
+            return infantCount;
+        }
+
+        public void setInfantCount(Long infantCount) {
+            this.infantCount = infantCount;
+        }
     }
 
     // 국적 코드 DTO
