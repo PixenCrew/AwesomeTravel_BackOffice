@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.common.service.CommonCodeService;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelRepository;
-import renewal.awesome_travel_backoffice.product.repository.ProductRepository;
+import renewal.awesome_travel_backoffice.product.repository.ProductAdminRepository;
 import renewal.awesome_travel_backoffice.tour.TourService;
 import renewal.awesome_travel_backoffice.tour.dto.TourFilterDTO;
 import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
@@ -41,7 +41,7 @@ public class TourController {
 
     private final TourRepository tourRepo;
     private final TourService tourService;
-    private final ProductRepository productRepo;
+    private final ProductAdminRepository productAdminRepo;
     private final HotelRepository hotelRepo;
 
     private final CommonCodeService commonCodeService;
@@ -138,7 +138,7 @@ public class TourController {
     public String selectTravel(@PathVariable Long id, Model model) {
 
         Tour tour = tourRepo.findById(id).get();
-        Product connectedProduct = productRepo.findByTourId(id);
+        Product connectedProduct = productAdminRepo.findByTourId(id);
         model.addAttribute("types", LocationType.class);
         model.addAttribute("countryCode", commonCodeService.getAllCountryCodes());
         model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
@@ -175,7 +175,7 @@ public class TourController {
     public ResponseEntity<String> deleteTour(@PathVariable Long id) {
 
         // 연결된 Product 있는지 확인
-        if (productRepo.findByTourId(id) != null) {
+        if (productAdminRepo.findByTourId(id) != null) {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
                     .body("연결된 패키지를 먼저 삭제해주세요.");
