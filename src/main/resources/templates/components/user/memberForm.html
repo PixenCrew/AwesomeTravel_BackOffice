@@ -66,7 +66,9 @@
                         <label for="provider" class="block text-sm font-medium text-gray-700 mb-1">가입 경로</label>
                         <select id="provider" 
                                 th:field="*{provider}" 
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                th:disabled="${userId != null}"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                th:classappend="${userId != null ? 'bg-gray-100 cursor-not-allowed' : ''}">
                             <option value="">선택하세요</option>
                             <option th:each="provider : ${providers}" 
                                     th:value="${provider}" 
@@ -79,48 +81,13 @@
                         <input type="text" 
                                id="socialId" 
                                th:field="*{socialId}" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                               th:disabled="${userId != null}"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               th:classappend="${userId != null ? 'bg-gray-100 cursor-not-allowed' : ''}">
                     </div>
                 </div>
             </div>
 
-            <!-- 여권 정보 -->
-            <div class="border-t pt-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">여권 정보</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="passportNumber" class="block text-sm font-medium text-gray-700 mb-1">여권번호</label>
-                        <input type="text" 
-                               id="passportNumber" 
-                               th:field="*{passportNumber}" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    </div>
-                    
-                    <div>
-                        <label for="passportCountry" class="block text-sm font-medium text-gray-700 mb-1">발급국가</label>
-                        <input type="text" 
-                               id="passportCountry" 
-                               th:field="*{passportCountry}" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    </div>
-                    
-                    <div>
-                        <label for="passportIssuedDate" class="block text-sm font-medium text-gray-700 mb-1">발급일</label>
-                        <input type="date" 
-                               id="passportIssuedDate" 
-                               th:field="*{passportIssuedDate}" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    </div>
-                    
-                    <div>
-                        <label for="passportExpiryDate" class="block text-sm font-medium text-gray-700 mb-1">만료일</label>
-                        <input type="date" 
-                               id="passportExpiryDate" 
-                               th:field="*{passportExpiryDate}" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    </div>
-                </div>
-            </div>
 
             <!-- 영문 이름 -->
             <div class="border-t pt-6">
@@ -152,13 +119,16 @@
                         <label for="role" class="block text-sm font-medium text-gray-700 mb-1">역할 *</label>
                         <select id="role" 
                                 th:field="*{role}" 
+                                th:disabled="${userId != null}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                required>
+                                th:classappend="${userId != null ? 'bg-gray-100 cursor-not-allowed' : ''}"
+                                th:required="${userId == null}">
                             <option value="">선택하세요</option>
                             <option th:each="role : ${roles}" 
                                     th:value="${role}" 
                                     th:text="${role}">USER</option>
                         </select>
+                        <p th:if="${userId != null}" class="mt-1 text-xs text-gray-500">역할은 수정할 수 없습니다.</p>
                     </div>
                     
                     <div>
@@ -189,16 +159,6 @@
                             이메일 인증 완료
                         </label>
                     </div>
-                    
-                    <div class="flex items-center">
-                        <input type="checkbox" 
-                               id="marketingConsent" 
-                               th:field="*{marketingConsent}" 
-                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                        <label for="marketingConsent" class="ml-2 block text-sm text-gray-700">
-                            마케팅 정보 수신 동의
-                        </label>
-                    </div>
                 </div>
             </div>
 
@@ -219,15 +179,16 @@
     <script>
         // 폼 유효성 검사
         document.querySelector('form').addEventListener('submit', function(e) {
-            const requiredFields = ['name', 'email', 'phone', 'role', 'status'];
+            const userId = /*[[${userId}]]*/ null;
+            const requiredFields = userId ? ['name', 'email', 'phone', 'status'] : ['name', 'email', 'phone', 'role', 'status'];
             let isValid = true;
             
             requiredFields.forEach(fieldName => {
                 const field = document.getElementById(fieldName);
-                if (!field.value.trim()) {
+                if (field && !field.disabled && !field.value.trim()) {
                     field.classList.add('border-red-500');
                     isValid = false;
-                } else {
+                } else if (field) {
                     field.classList.remove('border-red-500');
                 }
             });

@@ -70,31 +70,6 @@ public class UserViewController {
         return "layout";
     }
     
-    // 회원 등록 폼
-    @GetMapping("/new")
-    public String newUserForm(Model model) {
-        model.addAttribute("title", "회원 등록");
-        model.addAttribute("content", "components/user/memberForm");
-        model.addAttribute("user", new UserRequestDto());
-        model.addAttribute("providers", UserProvider.values());
-        model.addAttribute("roles", UserRole.values());
-        model.addAttribute("statuses", UserStatus.values());
-        return "layout";
-    }
-    
-    // 회원 등록 처리
-    @PostMapping("/new")
-    public String createUser(UserRequestDto userRequestDto, RedirectAttributes redirectAttributes) {
-        try {
-            Long userId = userService.createUser(userRequestDto);
-            redirectAttributes.addFlashAttribute("message", "회원이 성공적으로 등록되었습니다.");
-            return "redirect:/member";
-        } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/member/new";
-        }
-    }
-    
     // 회원 상세보기
     @GetMapping("/{id}")
     public String userDetail(@PathVariable Long id, Model model) {
@@ -102,10 +77,19 @@ public class UserViewController {
             UserResponseDto user = userService.getUserById(id);
             // 최근 댓글 5개 조회
             List<ReviewResponseDto> recentComments = reviewService.getRecentCommentsByUser(id);
+            // 전체 댓글 조회
+            List<ReviewResponseDto> allComments = reviewService.getAllCommentsByUser(id);
+            // 구매 내역 조회
+            List<renewal.awesome_travel_backoffice.purchaseAir.dto.response.PurchaseAirResponseDto> airPurchases = userService.getUserAirPurchases(id);
+            List<renewal.awesome_travel_backoffice.purchaseProduct.dto.response.PurchaseProductResponseDto> productPurchases = userService.getUserProductPurchases(id);
+            
             model.addAttribute("title", "회원 상세 정보");
             model.addAttribute("content", "components/user/memberDetail");
             model.addAttribute("user", user);
             model.addAttribute("recentComments", recentComments);
+            model.addAttribute("allComments", allComments);
+            model.addAttribute("airPurchases", airPurchases);
+            model.addAttribute("productPurchases", productPurchases);
             return "layout";
         } catch (IllegalArgumentException e) {
             return "redirect:/member?error=notFound";
@@ -134,7 +118,6 @@ public class UserViewController {
             userRequestDto.setEnglishFirstName(user.getEnglishFirstName());
             userRequestDto.setEnglishLastName(user.getEnglishLastName());
             userRequestDto.setEmailVerified(user.getEmailVerified());
-            userRequestDto.setMarketingConsent(user.getMarketingConsent());
             
             model.addAttribute("title", "회원 수정");
             model.addAttribute("content", "components/user/memberForm");
