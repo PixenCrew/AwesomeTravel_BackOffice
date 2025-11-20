@@ -1,4 +1,4 @@
-package renewal.awesome_travel_backoffice.airPurchase.dto.request;
+package renewal.awesome_travel_backoffice.purchaseAir.dto.request;
 
 import java.time.LocalDate;
 

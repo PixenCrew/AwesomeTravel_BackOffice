@@ -58,10 +58,10 @@
                             required
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         <option value="">카테고리를 선택하세요</option>
-                        <option value="EVENT" th:selected="${notice?.category?.name() == 'EVENT'}">이벤트</option>
-                        <option value="UPDATE" th:selected="${notice?.category?.name() == 'UPDATE'}">업데이트</option>
-                        <option value="SYSTEM" th:selected="${notice?.category?.name() == 'SYSTEM'}">점검</option>
-                        <option value="GUIDE" th:selected="${notice?.category?.name() == 'GUIDE'}">안내</option>
+                        <option value="EVENT" th:selected="${notice?.category?.toString() == 'EVENT'}">이벤트</option>
+                        <option value="UPDATE" th:selected="${notice?.category?.toString() == 'UPDATE'}">업데이트</option>
+                        <option value="SYSTEM" th:selected="${notice?.category?.toString() == 'SYSTEM'}">점검</option>
+                        <option value="GUIDE" th:selected="${notice?.category?.toString() == 'GUIDE'}">안내</option>
                     </select>
                 </div>
 

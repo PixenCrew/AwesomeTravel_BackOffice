@@ -150,28 +150,28 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         <tr th:each="purchase : ${purchasePage.content}">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900" th:text="${purchase.id}">#3001</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900" th:text="${purchase.productPurchaseId}">#3001</td>
                             <td class="px-6 py-4 text-sm text-gray-900">
-                                <div class="font-medium" th:text="${purchase.product.title}">프랑스 8일 패키지</div>
-                                <div class="text-gray-500" th:text="'ID: ' + ${purchase.product.id}">ID: 1001</div>
+                                <div class="font-medium" th:text="${purchase.product != null ? purchase.product.title : 'N/A'}">프랑스 8일 패키지</div>
+                                <div class="text-gray-500" th:if="${purchase.product != null && purchase.product.productId != null}" th:text="'ID: ' + ${purchase.product.productId}">ID: 1001</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${purchase.name}">홍길동</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="${#numbers.formatInteger(purchase.price, 3, 'COMMA')} + '원'">2,500,000원</td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span th:if="${purchase.purchaseStatus == T(renewal.common.entity.PurchaseBase.PurchaseStatus).RESERVED}"
+                                <span th:if="${purchase.purchaseStatus == 'RESERVED'}"
                                     class="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
                                     th:text="'예약접수'">예약접수</span>
-                                <span th:if="${purchase.purchaseStatus == T(renewal.common.entity.PurchaseBase.PurchaseStatus).CONFIRMED}"
+                                <span th:if="${purchase.purchaseStatus == 'CONFIRMED'}"
                                     class="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
                                     th:text="'담당자 확인'">담당자확인</span>
-                                <span th:if="${purchase.purchaseStatus == T(renewal.common.entity.PurchaseBase.PurchaseStatus).HOLDING}"
+                                <span th:if="${purchase.purchaseStatus == 'HOLDING'}"
                                     class="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
                                     th:text="'결제대기'">결제대기</span>
-                                <span th:if="${purchase.purchaseStatus == T(renewal.common.entity.PurchaseBase.PurchaseStatus).PAID}"
-                                    class="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
+                                <span th:if="${purchase.purchaseStatus == 'PAID'}"
+                                    class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
                                     th:text="'결제완료'">결제완료</span>
-                                <span th:if="${purchase.purchaseStatus == T(renewal.common.entity.PurchaseBase.PurchaseStatus).CANCELLED}"
-                                    class="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
+                                <span th:if="${purchase.purchaseStatus == 'CANCELLED'}"
+                                    class="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
                                     th:text="'취소됨'">취소됨</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${#temporals.format(purchase.purchaseDate, 'yyyy-MM-dd HH:mm')}">2024-01-15 14:30</td>
@@ -179,7 +179,7 @@
                                 <div th:text="${purchase.passengers != null ? purchase.passengers.size() : 0}">2</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a th:href="@{/product-purchase/{id}(id=${purchase.id})}"
+                                <a th:href="@{/product-purchase/{id}(id=${purchase.productPurchaseId})}"
                                     class="text-blue-600 hover:text-blue-900 mr-3">
                                     <i class="fas fa-eye"></i> 상세
                                 </a>

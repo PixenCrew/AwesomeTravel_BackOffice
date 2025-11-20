@@ -67,8 +67,9 @@ public class NoticeViewController {
             
             model.addAttribute("notices", notices);
             model.addAttribute("searchRequest", searchRequest);
+            model.addAttribute("now", java.time.LocalDateTime.now()); // 현재 시간을 모델에 추가
             model.addAttribute("title", "공지사항 관리");
-            model.addAttribute("content", "notice/noticeList");
+            model.addAttribute("content", "components/notice/noticeList");
             
             return "layout";
         } catch (Exception e) {
@@ -76,7 +77,7 @@ public class NoticeViewController {
             System.err.println("공지사항 리스트 조회 오류: " + e.getMessage());
             model.addAttribute("error", "공지사항 목록을 불러오는 중 오류가 발생했습니다: " + e.getMessage());
             model.addAttribute("title", "공지사항 관리");
-            model.addAttribute("content", "notice/noticeList");
+            model.addAttribute("content", "components/notice/noticeList");
             return "layout";
         }
     }
@@ -84,7 +85,7 @@ public class NoticeViewController {
     @GetMapping("/create")
     public String noticeCreateForm(Model model) {
         model.addAttribute("title", "공지사항 작성");
-        model.addAttribute("content", "notice/noticeForm");
+        model.addAttribute("content", "components/notice/noticeForm");
         return "layout";
     }
 
@@ -92,8 +93,9 @@ public class NoticeViewController {
     public String noticeDetail(@PathVariable Long id, Model model) {
         NoticeResponseDto notice = noticeService.getById(id);
         model.addAttribute("notice", notice);
+        model.addAttribute("now", java.time.LocalDateTime.now()); // 현재 시간을 모델에 추가
         model.addAttribute("title", "공지사항 상세");
-        model.addAttribute("content", "notice/noticeDetail");
+        model.addAttribute("content", "components/notice/noticeDetail");
         return "layout";
     }
 
@@ -102,7 +104,7 @@ public class NoticeViewController {
         NoticeResponseDto notice = noticeService.getById(id);
         model.addAttribute("notice", notice);
         model.addAttribute("title", "공지사항 수정");
-        model.addAttribute("content", "notice/noticeForm");
+        model.addAttribute("content", "components/notice/noticeForm");
         return "layout";
     }
 
@@ -157,7 +159,7 @@ public class NoticeViewController {
             System.err.println("공지사항 등록 오류: " + e.getMessage());
             model.addAttribute("error", "공지사항 등록 중 오류가 발생했습니다: " + e.getMessage());
             model.addAttribute("title", "공지사항 작성");
-            model.addAttribute("content", "notice/noticeForm");
+            model.addAttribute("content", "components/notice/noticeForm");
             return "layout";
         }
     }
@@ -188,7 +190,7 @@ public class NoticeViewController {
             NoticeResponseDto notice = noticeService.getById(id);
             model.addAttribute("notice", notice);
             model.addAttribute("title", "공지사항 수정");
-            model.addAttribute("content", "notice/noticeForm");
+            model.addAttribute("content", "components/notice/noticeForm");
             return "layout";
         }
         
@@ -228,7 +230,7 @@ public class NoticeViewController {
         } catch (Exception e) {
             model.addAttribute("error", "공지사항 수정 중 오류가 발생했습니다: " + e.getMessage());
             model.addAttribute("title", "공지사항 수정");
-            model.addAttribute("content", "notice/noticeForm");
+            model.addAttribute("content", "components/notice/noticeForm");
             return "layout";
         }
     }

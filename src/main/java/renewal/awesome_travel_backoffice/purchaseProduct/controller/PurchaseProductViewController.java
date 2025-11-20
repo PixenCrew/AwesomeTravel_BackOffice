@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 import lombok.RequiredArgsConstructor;
-import renewal.awesome_travel_backoffice.admin.AdminService;
 import renewal.awesome_travel_backoffice.purchaseProduct.dto.request.PurchaseProductSearchCondition;
-import renewal.awesome_travel_backoffice.purchaseProduct.repository.PurchaseProductRepository;
 import renewal.awesome_travel_backoffice.purchaseProduct.service.PurchaseProductService;
-import renewal.common.entity.PurchaseProduct;
+import renewal.common.dto.PassengerResponseDto;
 
 @Controller
 @RequestMapping("/product-purchase")
@@ -24,8 +24,6 @@ import renewal.common.entity.PurchaseProduct;
 public class PurchaseProductViewController {
 
     private final PurchaseProductService productPurchaseService;
-    private final PurchaseProductRepository productPurchaseRepo;
-    private final AdminService adminService;
 
     @GetMapping
     public String listPurchaseProducts(
@@ -53,9 +51,8 @@ public class PurchaseProductViewController {
         condition.setCustomerEmail(customerEmail);
 
         // 패키지 상품 구매 목록 조회
-        // Page<PurchaseProductResponseDto> purchasePage =
-        // productPurchaseService.getAllPurchasesDto(condition, pageable);
-        Page<PurchaseProduct> purchasePage = productPurchaseRepo.findAll(pageable);
+        Page<renewal.awesome_travel_backoffice.purchaseProduct.dto.response.PurchaseProductResponseDto> purchasePage =
+                productPurchaseService.getAllPurchasesDto(condition, pageable);
 
         // 모델에 데이터 추가
         model.addAttribute("purchasePage", purchasePage);
@@ -72,13 +69,28 @@ public class PurchaseProductViewController {
     @GetMapping("/{id}")
     public String getPurchaseProductDetail(@PathVariable Long id, Model model) {
 
-        // PurchaseProductResponseDto purchase =
-        // productPurchaseService.getPurchaseDto(id);
-        PurchaseProduct purchase = productPurchaseRepo.findById(id).get();
+        renewal.awesome_travel_backoffice.purchaseProduct.dto.response.PurchaseProductResponseDto purchase =
+                productPurchaseService.getPurchaseDto(id);
 
         model.addAttribute("purchase", purchase);
         model.addAttribute("title", "패키지 상품 주문 상세");
         model.addAttribute("content", "components/purchaseProduct/productPurchaseDetail");
+        model.addAttribute("isSelectionPage", false);
+
+        return "layout";
+    }
+
+    @GetMapping("/{id}/passengers")
+    public String viewPassengers(@PathVariable Long id, Model model) {
+        renewal.awesome_travel_backoffice.purchaseProduct.dto.response.PurchaseProductResponseDto purchase =
+                productPurchaseService.getPurchaseDto(id);
+        List<PassengerResponseDto> passengerDtos = productPurchaseService.getPassengers(id);
+
+        model.addAttribute("purchase", purchase);
+        model.addAttribute("passengers", passengerDtos);
+        model.addAttribute("countries", productPurchaseService.getCountries(null));
+        model.addAttribute("title", "패키지 상품 주문 탑승객 목록");
+        model.addAttribute("content", "components/purchaseProduct/productPurchasePassengers");
         model.addAttribute("isSelectionPage", false);
 
         return "layout";

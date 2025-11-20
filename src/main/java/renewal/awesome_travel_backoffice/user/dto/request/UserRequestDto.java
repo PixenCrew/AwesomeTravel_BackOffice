@@ -30,7 +30,6 @@ public class UserRequestDto {
     private String englishFirstName;
     private String englishLastName;
     private Boolean emailVerified;
-    private Boolean marketingConsent;
 }
 
 

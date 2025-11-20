@@ -14,34 +14,40 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.purchaseProduct.controller.PurchaseProductAdminController.CountryCodeDto;
-import renewal.awesome_travel_backoffice.purchaseProduct.dto.request.ProductPassengerUpdateRequestDto;
 import renewal.awesome_travel_backoffice.purchaseProduct.dto.request.PurchaseProductSearchCondition;
-import renewal.awesome_travel_backoffice.purchaseProduct.dto.response.ProductPassengerResponseDto;
 import renewal.awesome_travel_backoffice.purchaseProduct.dto.response.ProductResponseDto;
 import renewal.awesome_travel_backoffice.purchaseProduct.dto.response.PurchaseProductResponseDto;
-import renewal.awesome_travel_backoffice.purchaseProduct.repository.PurchaseProductRepository;
-import renewal.awesome_travel_backoffice.user.repository.UserRepository;
+import renewal.common.repository.PurchaseProductRepository;
+import renewal.awesome_travel_backoffice.purchaseProduct.repository.PurchaseProductAdminRepository;
+import renewal.awesome_travel_backoffice.purchaseProduct.repository.PurchaseProductSpecification;
+import org.springframework.data.jpa.domain.Specification;
+import renewal.common.dto.PassengerResponseDto;
+import renewal.common.dto.PassengerUpdateRequestDto;
 import renewal.common.entity.CountryCode;
 import renewal.common.entity.Passenger;
-import renewal.common.entity.Product;
+import renewal.common.entity.PassengerProduct;
 import renewal.common.entity.PurchaseBase.PurchaseStatus;
 import renewal.common.entity.PurchaseProduct;
 import renewal.common.repository.CountryCodeRepository;
+import renewal.common.service.PassengerServiceCommon;
+import renewal.common.service.ProductServiceCommon;
 
 @Service
 @RequiredArgsConstructor
 public class PurchaseProductService {
 
     private final PurchaseProductRepository productPurchaseRepository;
+    private final PurchaseProductAdminRepository purchaseProductAdminRepository;
     private final CountryCodeRepository countryCodeRepository;
-    private final UserRepository userRepo;
-    private final PurchaseProductRepository purchaseProductRepo;
+    private final ProductServiceCommon productServiceCommon;
+    private final PassengerServiceCommon passengerServiceCommon;
 
     /**
      * 어드민 - 전체 패키지 상품 구매 목록 조회 (페이징 + 정렬)
      */
     public Page<PurchaseProduct> getAllPurchases(PurchaseProductSearchCondition condition, Pageable pageable) {
-        return productPurchaseRepository.searchByCondition(condition, pageable);
+        Specification<PurchaseProduct> spec = buildSpecification(condition);
+        return purchaseProductAdminRepository.findAll(spec, pageable);
     }
 
     /**
@@ -49,16 +55,63 @@ public class PurchaseProductService {
      */
     public Page<PurchaseProductResponseDto> getAllPurchasesDto(PurchaseProductSearchCondition condition,
             Pageable pageable) {
-        Page<PurchaseProduct> purchases = productPurchaseRepository.searchByCondition(condition, pageable);
+        Specification<PurchaseProduct> spec = buildSpecification(condition);
+        Page<PurchaseProduct> purchases = purchaseProductAdminRepository.findAll(spec, pageable);
         return purchases.map(this::toDto);
+    }
+
+    /**
+     * 검색 조건을 Specification으로 변환
+     */
+    private Specification<PurchaseProduct> buildSpecification(PurchaseProductSearchCondition condition) {
+        Specification<PurchaseProduct> spec = Specification.where(null);
+
+        if (condition.getProductPurchaseId() != null) {
+            spec = spec.and(PurchaseProductSpecification.productPurchaseIdEquals(condition.getProductPurchaseId()));
+        }
+        if (condition.getPurchaseStatus() != null) {
+            spec = spec.and(PurchaseProductSpecification.purchaseStatusEquals(condition.getPurchaseStatus()));
+        }
+        if (condition.getMemberId() != null) {
+            spec = spec.and(PurchaseProductSpecification.memberIdEquals(condition.getMemberId()));
+        }
+        if (condition.getProductId() != null) {
+            spec = spec.and(PurchaseProductSpecification.productIdEquals(condition.getProductId()));
+        }
+        if (condition.getPurchaseDateFrom() != null || condition.getPurchaseDateTo() != null) {
+            spec = spec.and(PurchaseProductSpecification.purchaseDateBetween(
+                    condition.getPurchaseDateFrom(), condition.getPurchaseDateTo()));
+        }
+        if (condition.getMinPrice() != null || condition.getMaxPrice() != null) {
+            spec = spec.and(PurchaseProductSpecification.priceBetween(
+                    condition.getMinPrice(), condition.getMaxPrice()));
+        }
+        if (condition.getCustomerName() != null) {
+            spec = spec.and(PurchaseProductSpecification.customerNameContains(condition.getCustomerName()));
+        }
+        if (condition.getCustomerEmail() != null) {
+            spec = spec.and(PurchaseProductSpecification.customerEmailContains(condition.getCustomerEmail()));
+        }
+        if (condition.getProductTitle() != null) {
+            spec = spec.and(PurchaseProductSpecification.productTitleContains(condition.getProductTitle()));
+        }
+
+        return spec;
     }
 
     /**
      * 어드민 - 단건 구매 상세 조회
      */
+    @Transactional(readOnly = true)
     public PurchaseProduct getPurchase(Long id) {
-        PurchaseProduct purchase = productPurchaseRepository.findByPurchaseProductId(id)
+        PurchaseProduct purchase = productPurchaseRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("구매 내역 없음"));
+        if (purchase.getPassengers() != null) {
+            purchase.getPassengers().size();
+        }
+        if (purchase.getFinalSeatClasses() != null) {
+            purchase.getFinalSeatClasses().size();
+        }
         return purchase;
     }
 
@@ -66,8 +119,14 @@ public class PurchaseProductService {
      * 어드민 - 단건 구매 상세 조회 (DTO 변환)
      */
     public PurchaseProductResponseDto getPurchaseDto(Long id) {
-        PurchaseProduct purchase = productPurchaseRepository.findByIdWithPassengers(id)
+        PurchaseProduct purchase = purchaseProductAdminRepository.findByIdWithPassengers(id)
                 .orElseThrow(() -> new IllegalArgumentException("구매 내역 없음"));
+
+        List<renewal.common.entity.PurchaseBase.ConfirmedSeatClass> seatSnapshots = purchaseProductAdminRepository.findByIdWithSeatClasses(id)
+                .map(PurchaseProduct::getFinalSeatClasses)
+                .map(ArrayList::new)
+                .orElseGet(ArrayList::new);
+        purchase.setFinalSeatClasses(seatSnapshots);
 
         // 디버깅 로그 추가
         System.out.println("=== PurchaseProduct 디버깅 정보 ===");
@@ -79,7 +138,8 @@ public class PurchaseProductService {
         System.out.println("Transaction Complete: " + purchase.getIsTransactionComplete());
         if (purchase.getPassengers() != null && !purchase.getPassengers().isEmpty()) {
             purchase.getPassengers().forEach(passenger -> {
-                System.out.println("  - 승객: " + (passenger.getName() != null ? passenger.getName() : "null") + " (ID: "
+                String displayName = passengerServiceCommon.buildKoreanName(passenger);
+                System.out.println("  - 승객: " + (displayName != null ? displayName : "null") + " (ID: "
                         + passenger.getId() + ")");
                 System.out.println("    특별요청: " + passenger.getSpecialRequests());
             });
@@ -91,10 +151,30 @@ public class PurchaseProductService {
         return toDto(purchase);
     }
 
+    /**
+     * 승객 목록 조회 (승객 페이지용)
+     */
+    @Transactional(readOnly = true)
+    public List<renewal.common.dto.PassengerResponseDto> getPassengers(Long purchaseId) {
+        PurchaseProduct purchase = purchaseProductAdminRepository.findByIdWithPassengers(purchaseId)
+                .orElseThrow(() -> new IllegalArgumentException("구매 내역 없음"));
+        return purchase.getPassengers().stream()
+                .map(passengerServiceCommon::toResponseDto)
+                .toList();
+    }
+
+    /**
+     * 주문 취소 (공통 로직 호출)
+     */
+    @Transactional
+    public void cancelPurchase(Long id) {
+        productServiceCommon.cancelPurchase(id);
+    }
+
     // 관리자용 - 상태 변경
     @Transactional
     public void changePurchaseStatus(Long id, PurchaseStatus newStatus) {
-        PurchaseProduct purchase = purchaseProductRepo.findById(id)
+        PurchaseProduct purchase = productPurchaseRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("구매 내역 없음"));
 
         PurchaseStatus currentStatus = purchase.getPurchaseStatus();
@@ -123,91 +203,11 @@ public class PurchaseProductService {
     }
 
     /**
-     * 1단계: 패키지 상품 구매 생성 (승객 정보 부분 입력 가능)
-     * 패키지 상품의 경우 결제 후에도 승객 정보를 추가할 수 있습니다.
-     */
-    @Transactional
-    public PurchaseProduct createPurchase(Product product, Long productPurchaseId, Long price,
-            Long member_id, String name, String number, String email,
-            int expectedPassengerCount, List<ProductPassengerUpdateRequestDto> passengerDtos) {
-
-        // 승객 정보 검증 - 0명부터 입력 가능
-        if (passengerDtos == null) {
-            passengerDtos = new ArrayList<>();
-        }
-
-        if (passengerDtos.size() > expectedPassengerCount) {
-            throw new IllegalArgumentException("입력된 승객 수가 예상 승객 수를 초과합니다.");
-        }
-
-        PurchaseProduct purchase = new PurchaseProduct();
-
-        purchase.setProduct(product);
-        purchase.setId(productPurchaseId);
-        purchase.setPrice(price);
-        purchase.setUser(userRepo.findById(member_id).get());
-        purchase.setName(name);
-        purchase.setNumber(number);
-        purchase.setEmail(email);
-        purchase.setDepartDateTime(LocalDateTime.now());
-        purchase.setReturnDateTime(LocalDateTime.now().plusDays(1));
-
-        // 승객 정보 입력 마감일 설정 (구매일로부터 30일 후 - 패키지는 더 여유있게)
-        purchase.setPassengerInfoDeadline(LocalDateTime.now().plusDays(30));
-
-        // 승객 정보 추가 (빈 필드가 있어도 객체 생성)
-        for (ProductPassengerUpdateRequestDto dto : passengerDtos) {
-            Passenger passenger = new Passenger();
-
-            // 입력된 정보만 설정, 빈 필드는 null로 유지
-            passenger.setName(dto.getName());
-            passenger.setNumber(dto.getNumber());
-            passenger.setEmail(dto.getEmail());
-            passenger.setBirth(dto.getBirth());
-            passenger.setSex(Passenger.Sex.valueOf(dto.getSex().toLowerCase()));
-            passenger.setPassportNum(dto.getPassportNum());
-            passenger.setLastName(dto.getLastName());
-            passenger.setFirstName(dto.getFirstName());
-            passenger.setExpire(dto.getExpire());
-
-            // 국적은 유효한 경우에만 설정
-            if (dto.getNationality() != null && !dto.getNationality().trim().isEmpty()) {
-                CountryCode nationality = countryCodeRepository.findByCode(dto.getNationality())
-                        .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 국적 코드입니다."));
-                passenger.setNationality(nationality);
-            }
-
-            purchase.getPassengers().add(passenger);
-        }
-
-        // 예상 승객 수만큼 빈 승객 객체 생성 (부족한 경우)
-        while (purchase.getPassengers().size() < expectedPassengerCount) {
-            Passenger emptyPassenger = new Passenger();
-            // 모든 필드를 null로 유지 (빈 객체)
-            purchase.getPassengers().add(emptyPassenger);
-        }
-
-        System.out.println("=== 패키지 빈 객체 생성 완료 ===");
-        System.out.println("예상 승객 수: " + expectedPassengerCount);
-        System.out.println("생성된 승객 수: " + purchase.getPassengers().size());
-        System.out.println("입력된 승객 수: " + passengerDtos.size());
-        System.out.println("빈 객체 수: " + (purchase.getPassengers().size() - passengerDtos.size()));
-
-        // 승객 정보 완료 상태 확인 및 설정
-        checkPassengerInfoComplete(purchase);
-
-        // 초기에는 항상 HOLDING 상태 (패키지도 승객 정보 입력 대기)
-        purchase.setPurchaseStatus(PurchaseStatus.HOLDING);
-
-        return productPurchaseRepository.save(purchase);
-    }
-
-    /**
      * 2단계: 승객 정보 추가
      */
     @Transactional
-    public void addPassengerInfo(Long purchaseId, ProductPassengerUpdateRequestDto passengerDto) {
-        PurchaseProduct purchase = productPurchaseRepository.findByPurchaseProductId(purchaseId)
+    public void addPassengerInfo(Long purchaseId, PassengerUpdateRequestDto passengerDto) {
+        PurchaseProduct purchase = productPurchaseRepository.findById(purchaseId)
                 .orElseThrow(() -> new IllegalArgumentException("구매 내역을 찾을 수 없습니다."));
 
         // 마감일 확인
@@ -217,44 +217,24 @@ public class PurchaseProductService {
         }
 
         // 승객 정보 검증
-        if (passengerDto.getName() == null || passengerDto.getName().trim().isEmpty() ||
-                passengerDto.getNumber() == null || passengerDto.getNumber().trim().isEmpty() ||
-                passengerDto.getEmail() == null || passengerDto.getEmail().trim().isEmpty() ||
-                passengerDto.getBirth() == null ||
-                passengerDto.getSex() == null ||
-                passengerDto.getNationality() == null || passengerDto.getNationality().trim().isEmpty()) {
-            throw new IllegalArgumentException("모든 필수 정보를 입력해주세요.");
-        }
+        passengerServiceCommon.validateRequiredFields(passengerDto);
 
         // 빈 승객 객체 찾기 (이름이 null이거나 비어있는 경우)
         Passenger emptyPassenger = purchase.getPassengers().stream()
-                .filter(p -> p.getName() == null || p.getName().trim().isEmpty())
+                .filter(passengerServiceCommon::isPassengerSlotEmpty)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("더 이상 승객 정보를 추가할 수 없습니다."));
 
         // 승객 정보 설정
-        emptyPassenger.setName(passengerDto.getName());
-        emptyPassenger.setNumber(passengerDto.getNumber());
-        emptyPassenger.setEmail(passengerDto.getEmail());
-        emptyPassenger.setBirth(passengerDto.getBirth());
-        emptyPassenger.setSex(Passenger.Sex.valueOf(passengerDto.getSex().toLowerCase()));
-        emptyPassenger.setPassportNum(passengerDto.getPassportNum());
-        emptyPassenger.setLastName(passengerDto.getLastName());
-        emptyPassenger.setFirstName(passengerDto.getFirstName());
-        emptyPassenger.setExpire(passengerDto.getExpire());
-
-        // 국적 설정
-        CountryCode nationality = countryCodeRepository.findByCode(passengerDto.getNationality())
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 국적 코드입니다."));
-        emptyPassenger.setNationality(nationality);
+        passengerServiceCommon.applyPassengerInfo(emptyPassenger, passengerDto);
 
         // 승객 정보 완료 상태 확인
-        checkPassengerInfoComplete(purchase);
+        refreshPassengerInfoComplete(purchase);
 
         productPurchaseRepository.save(purchase);
 
         System.out.printf("[2단계] 패키지 상품 승객 정보 추가: 구매ID=%d, 승객명=%s | 시간=%s\n",
-                purchaseId, emptyPassenger.getName(), LocalDateTime.now());
+                purchaseId, passengerServiceCommon.buildKoreanName(emptyPassenger), LocalDateTime.now());
     }
 
     /**
@@ -264,7 +244,7 @@ public class PurchaseProductService {
      */
     @Transactional
     public void completePayment(Long purchaseId) {
-        PurchaseProduct purchase = productPurchaseRepository.findByPurchaseProductId(purchaseId)
+        PurchaseProduct purchase = productPurchaseRepository.findById(purchaseId)
                 .orElseThrow(() -> new IllegalArgumentException("구매 내역을 찾을 수 없습니다."));
 
         // 결제 완료 상태로 변경 (승객 정보 완료 여부와 관계없이)
@@ -310,26 +290,63 @@ public class PurchaseProductService {
     /**
      * 승객 정보 완료 상태 확인
      */
-    private void checkPassengerInfoComplete(PurchaseProduct purchase) {
-        // 모든 승객의 필수 정보가 입력되었는지 확인
-        boolean allComplete = purchase.getPassengers().stream()
-                .allMatch(passenger -> passenger.getName() != null && !passenger.getName().trim().isEmpty() &&
-                        passenger.getNumber() != null && !passenger.getNumber().trim().isEmpty() &&
-                        passenger.getEmail() != null && !passenger.getEmail().trim().isEmpty() &&
-                        passenger.getBirth() != null &&
-                        passenger.getSex() != null &&
-                        passenger.getNationality() != null);
-        purchase.setIsPassengerInfoComplete(allComplete);
+    private void refreshPassengerInfoComplete(PurchaseProduct purchase) {
+        purchase.setIsPassengerInfoComplete(
+                passengerServiceCommon.isPassengerInfoComplete(purchase.getPassengers()));
+    }
 
+    /**
+     * 승객 수 수정 (관리자용)
+     */
+    @Transactional
+    public void updatePassengerCount(Long purchaseId, Long adultCount, Long youthCount, Long infantCount) {
+        PurchaseProduct purchase = productPurchaseRepository.findById(purchaseId)
+                .orElseThrow(() -> new IllegalArgumentException("구매 내역을 찾을 수 없습니다."));
+
+        if (adultCount == null || adultCount < 0) {
+            throw new IllegalArgumentException("성인 수는 0 이상이어야 합니다.");
+        }
+        if (youthCount == null || youthCount < 0) {
+            throw new IllegalArgumentException("청소년 수는 0 이상이어야 합니다.");
+        }
+        if (infantCount == null || infantCount < 0) {
+            throw new IllegalArgumentException("영유아 수는 0 이상이어야 합니다.");
+        }
+
+        Long totalCount = adultCount + youthCount + infantCount;
+        Long currentPassengerCount = purchase.getPassengers() != null ? (long) purchase.getPassengers().size() : 0L;
+
+        // 승객 수가 줄어드는 경우, 기존 승객 정보를 삭제할 수 없으므로 경고
+        if (totalCount < currentPassengerCount) {
+            throw new IllegalStateException(
+                    String.format("현재 등록된 승객 수(%d명)보다 적은 수(%d명)로 변경할 수 없습니다. 먼저 승객 정보를 삭제해주세요.",
+                            currentPassengerCount, totalCount));
+        }
+
+        // 승객 수 업데이트
+        purchase.setAdultCount(adultCount);
+        purchase.setYouthCount(youthCount);
+        purchase.setInfantCount(infantCount);
+
+        // 승객 슬롯이 부족한 경우 빈 승객 객체 추가
+        if (totalCount > currentPassengerCount) {
+            int additionalSlots = (int) (totalCount - currentPassengerCount);
+            for (int i = 0; i < additionalSlots; i++) {
+                PassengerProduct newPassenger = new PassengerProduct();
+                purchase.getPassengers().add(newPassenger);
+            }
+        }
+        refreshPassengerInfoComplete(purchase);
+        productPurchaseRepository.save(purchase);
     }
 
     /**
      * 승객 정보 수정 (관리자용)
      */
     @Transactional
-    public void updatePassenger(Long purchaseId, Long passengerId, ProductPassengerUpdateRequestDto updateRequest) {
+    public void updatePassenger(Long purchaseId, Long passengerId, PassengerUpdateRequestDto updateRequest) {
         // 구매 정보 조회
-        PurchaseProduct purchase = productPurchaseRepository.findByPurchaseProductId(purchaseId)
+        PurchaseProduct purchase = productPurchaseRepository.findById(purchaseId)
                 .orElseThrow(() -> new IllegalArgumentException("구매 내역을 찾을 수 없습니다."));
 
         // 승객 정보 조회
@@ -339,98 +356,134 @@ public class PurchaseProductService {
                 .orElseThrow(() -> new IllegalArgumentException("승객 정보를 찾을 수 없습니다."));
 
         // 디버깅 로그
-        System.out.println("=== 승객 정보 수정 디버깅 ===");
-        System.out.println("입력된 데이터: " + updateRequest);
-        System.out.println(
-                "수정 전 승객 정보: " + passenger.getName() + ", " + passenger.getNumber() + ", " + passenger.getEmail());
-
-        // 국적 처리
-        CountryCode newCountry = null;
-        if (updateRequest.getNationality() != null && !updateRequest.getNationality().trim().isEmpty()) {
-            newCountry = countryCodeRepository.findByCode(updateRequest.getNationality())
-                    .orElse(null);
-            System.out.println("국적 코드: " + updateRequest.getNationality() + " -> "
-                    + (newCountry != null ? newCountry.getCode() : "null"));
-        }
-
-        // 승객 정보 업데이트
-        // passenger.updateInfo(updateRequest, newCountry, null);
-
-        System.out.println(
-                "수정 후 승객 정보: " + passenger.getName() + ", " + passenger.getNumber() + ", " + passenger.getEmail());
-        System.out.println("===============================");
+        passengerServiceCommon.validateRequiredFields(updateRequest);
+        passengerServiceCommon.applyPassengerInfo(passenger, updateRequest);
 
         // 승객 정보 완료 상태 재확인
-        checkPassengerInfoComplete(purchase);
+        refreshPassengerInfoComplete(purchase);
 
         // 로그
         System.out.printf("[관리자] 패키지 상품 승객 정보 수정: 구매ID=%d, 승객ID=%d, 승객명=%s | 시간=%s\n",
-                purchaseId, passengerId, passenger.getName(), LocalDateTime.now());
+                purchaseId, passengerId, passengerServiceCommon.buildKoreanName(passenger), LocalDateTime.now());
     }
 
     /**
      * 내부 변환 메서드 (응답용 DTO로 변환)
      */
-    private PurchaseProductResponseDto toDto(PurchaseProduct purchase) {
-        // 상품 정보 DTO 생성
-        ProductResponseDto productDto = new ProductResponseDto();
-        productDto.setProductId(purchase.getProduct().getId());
-        productDto.setTitle(purchase.getProduct().getTitle());
-        productDto.setPrice(purchase.getProduct().getPrice());
-        productDto.setCountry(purchase.getProduct().getTour().getCountry() != null
-                ? purchase.getProduct().getTour().getCountry().getCountryKor()
-                : "");
-        productDto.setCity(purchase.getProduct().getTour().getName()); // city 대신 name 사용
-        productDto.setStartDate(purchase.getProduct().getTour().getStartDate().toString());
-        productDto.setEndDate(purchase.getProduct().getTour().getEndDate().toString());
-        productDto.setDuration(calculateDuration(purchase.getProduct().getTour().getStartDate(),
-                purchase.getProduct().getTour().getEndDate()));
-        productDto.setAverageRating(purchase.getProduct().getAverageRating());
-        productDto.setTotalReviews(purchase.getProduct().getTotalReviews());
-
-        // 정원 정보 설정
-        Long totalCapacity = purchase.getProduct().getTour().getCount();
-        productDto.setTotalCapacity(totalCapacity);
-
-        // 남은 정원 계산 (총 정원 - 해당 패키지의 모든 구매에서 사용된 총 승객 수)
-        Long totalUsedCapacity = calculateTotalUsedCapacity(purchase.getProduct().getId());
-        productDto.setRemainingCapacity(totalCapacity - totalUsedCapacity);
-
-        // 승객 정보 DTO 생성
-        List<ProductPassengerResponseDto> passengerDtos = new ArrayList<>();
-        if (purchase.getPassengers() != null && !purchase.getPassengers().isEmpty()) {
-            passengerDtos = purchase.getPassengers().stream()
-                    .map(passenger -> {
-                        return new ProductPassengerResponseDto(
-                                passenger.getId(),
-                                passenger.getName(),
-                                passenger.getNumber(),
-                                passenger.getEmail(),
-                                passenger.getBirth(),
-                                passenger.getSex() != null ? passenger.getSex().name() : "UNKNOWN",
-                                passenger.getNationality() != null ? passenger.getNationality().getCode() : "UNKNOWN",
-                                passenger.getPassportNum(),
-                                passenger.getLastName(),
-                                passenger.getFirstName(),
-                                passenger.getExpire(),
-                                passenger.getSpecialRequests());
-                    }).toList();
+    public PurchaseProductResponseDto toDto(PurchaseProduct purchase) {
+        // 상품 정보 DTO 생성 (Product가 없을 수 있음 - 임시 데이터 생성 중일 때)
+        ProductResponseDto productDto = null;
+        if (purchase.getProduct() != null) {
+            renewal.common.entity.Product product = purchase.getProduct();
+            renewal.common.entity.Tour tour = product.getTour();
+            
+            productDto = ProductResponseDto.builder()
+                    .productId(product.getId())
+                    .title(product.getTitle())
+                    .price(product.getPrice())
+                    .country(tour != null && tour.getCountry() != null
+                            ? tour.getCountry().getCountryKor()
+                            : "")
+                    .city(tour != null ? tour.getName() : "") // city 대신 name 사용
+                    .startDate(tour != null && tour.getStartDate() != null 
+                            ? tour.getStartDate().toString() 
+                            : null)
+                    .endDate(tour != null && tour.getEndDate() != null 
+                            ? tour.getEndDate().toString() 
+                            : null)
+                    .duration(calculateDuration(
+                            tour != null ? tour.getStartDate() : null,
+                            tour != null ? tour.getEndDate() : null))
+                    .averageRating(product.getAverageRating())
+                    .totalReviews(product.getTotalReviews())
+                    .totalCapacity(tour != null ? tour.getCount() : null)
+                    .remainingCapacity(calculateRemainingCapacity(product))
+                    .build();
+        } else {
+            // Product가 없는 경우 기본값으로 DTO 생성
+            productDto = ProductResponseDto.builder()
+                    .productId(null)
+                    .title(purchase.getTitle() != null ? purchase.getTitle() : "상품 정보 없음")
+                    .price(purchase.getPrice())
+                    .country("")
+                    .city("")
+                    .startDate(null)
+                    .endDate(null)
+                    .duration(null)
+                    .averageRating(0.0)
+                    .totalReviews(0L)
+                    .totalCapacity(null)
+                    .remainingCapacity(0L)
+                    .build();
         }
 
-        return new PurchaseProductResponseDto(
-                purchase.getId(),
-                productDto,
-                purchase.getPurchaseStatus().name(),
-                purchase.getPrice(),
-                purchase.getUser().getId(),
-                purchase.getName(),
-                purchase.getNumber(),
-                purchase.getEmail(),
-                purchase.getPurchaseDate(),
-                purchase.getPaymentDueDate(),
-                passengerDtos,
-                purchase.getPassengers().size(),
-                purchase.getIsPassengerInfoComplete());
+        // 승객 정보 DTO 생성
+        List<PassengerResponseDto> passengerDtos = purchase.getPassengers() != null
+                ? purchase.getPassengers().stream()
+                        .map(passengerServiceCommon::toResponseDto)
+                        .toList()
+                : java.util.Collections.emptyList();
+
+        long actualPassengerCount = passengerDtos.size();
+        long expectedPassengerCount = getSafeCount(purchase.getAdultCount())
+                + getSafeCount(purchase.getYouthCount())
+                + getSafeCount(purchase.getInfantCount());
+        long passengerEmptyCount = expectedPassengerCount > actualPassengerCount
+                ? expectedPassengerCount - actualPassengerCount
+                : 0;
+        long passengerDisplayCount = expectedPassengerCount > 0 ? expectedPassengerCount : actualPassengerCount;
+        
+        // 완료된 승객 수 계산
+        long completedCount = purchase.getPassengers() != null
+                ? purchase.getPassengers().stream()
+                        .filter(p -> p.isCompleted())
+                        .count()
+                : 0L;
+
+        return PurchaseProductResponseDto.builder()
+                .productPurchaseId(purchase.getId())
+                .product(productDto)
+                .purchaseStatus(purchase.getPurchaseStatus().name())
+                .price(purchase.getPrice())
+                .memberId(purchase.getUser() != null ? purchase.getUser().getId() : null)
+                .name(purchase.getName())
+                .number(purchase.getNumber())
+                .email(purchase.getEmail())
+                .purchaseDate(purchase.getPurchaseDate())
+                .paymentDueDate(purchase.getPaymentDueDate())
+                .passengers(passengerDtos)
+                // PurchaseBase 필드들
+                .title(purchase.getTitle())
+                .finalPriceAdult(purchase.getFinalPriceAdult())
+                .finalPriceYouth(purchase.getFinalPriceYouth())
+                .finalPriceInfant(purchase.getFinalPriceInfant())
+                .adultCount(purchase.getAdultCount())
+                .youthCount(purchase.getYouthCount())
+                .infantCount(purchase.getInfantCount())
+                .isPassengerInfoComplete(purchase.getIsPassengerInfoComplete())
+                .passengerInfoDeadline(purchase.getPassengerInfoDeadline())
+                .transactionComplete(purchase.getIsTransactionComplete() != null ? purchase.getIsTransactionComplete() : false)
+                .completedPassengerCount(completedCount)
+                .passengerActualCount(actualPassengerCount)
+                .passengerExpectedCount(expectedPassengerCount)
+                .passengerEmptyCount(passengerEmptyCount)
+                .passengerDisplayCount(passengerDisplayCount)
+                // PurchaseProduct 전용 필드들
+                .airlineCode(purchase.getAirline() != null ? purchase.getAirline().getCode() : null)
+                .airlineNameKor(purchase.getAirline() != null ? purchase.getAirline().getNameKor() : null)
+                .airlineNameEng(purchase.getAirline() != null ? purchase.getAirline().getNameEng() : null)
+                .departDateTime(purchase.getDepartDateTime())
+                .returnDateTime(purchase.getReturnDateTime())
+                .bak(purchase.getBak())
+                .il(purchase.getIl())
+                .handlerId(purchase.getHandler() != null ? purchase.getHandler().getId() : null)
+                .handlerName(purchase.getHandler() != null ? purchase.getHandler().getName() : null)
+                .handlerPosition(purchase.getHandler() != null ? purchase.getHandler().getPosition() : null)
+                .handlerEmail(purchase.getHandler() != null ? purchase.getHandler().getEmail() : null)
+                .handlerNumber(purchase.getHandler() != null ? purchase.getHandler().getNumber() : null)
+                .handlerFax(purchase.getHandler() != null ? purchase.getHandler().getFax() : null)
+                .waiting(purchase.isWaiting())
+                .build();
     }
 
     /**
@@ -444,11 +497,23 @@ public class PurchaseProductService {
     }
 
     /**
+     * 남은 정원 계산
+     */
+    private Long calculateRemainingCapacity(renewal.common.entity.Product product) {
+        if (product.getTour() == null || product.getTour().getCount() == null) {
+            return 0L;
+        }
+        Long totalCapacity = product.getTour().getCount();
+        Long totalUsedCapacity = calculateTotalUsedCapacity(product.getId());
+        return totalCapacity - totalUsedCapacity;
+    }
+
+    /**
      * 해당 패키지의 모든 구매에서 사용된 총 승객 수 계산 (취소된 주문 제외)
      */
     private Long calculateTotalUsedCapacity(Long productId) {
         // 해당 상품의 모든 구매 조회
-        List<PurchaseProduct> allPurchases = productPurchaseRepository.findByProductId(productId);
+        List<PurchaseProduct> allPurchases = purchaseProductAdminRepository.findByProductId(productId);
 
         // 취소되지 않은 구매의 승객 수만 합계 (HOLDING, PAID 상태만)
         return allPurchases.stream()
@@ -456,6 +521,10 @@ public class PurchaseProductService {
                         purchase.getPurchaseStatus() == PurchaseStatus.PAID)
                 .mapToLong(purchase -> purchase.getPassengers() != null ? (long) purchase.getPassengers().size() : 0L)
                 .sum();
+    }
+
+    private long getSafeCount(Long value) {
+        return value != null ? value : 0L;
     }
 
     /**
@@ -504,4 +573,5 @@ public class PurchaseProductService {
             return new ArrayList<>();
         }
     }
+
 }

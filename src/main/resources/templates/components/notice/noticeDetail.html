@@ -25,12 +25,12 @@
                         <div class="flex items-center space-x-3 mb-2">
                             <h3 class="text-xl font-semibold text-gray-900" th:text="${notice.title}">공지사항 제목</h3>
                             <span th:if="${notice.fix}" class="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">고정</span>
-                            <span th:switch="${notice.category?.name()}" class="px-2 py-1 text-xs rounded-full">
+                            <span th:if="${notice.category != null}" th:switch="${notice.category}" class="px-2 py-1 text-xs rounded-full">
                                 <span th:case="EVENT" class="bg-purple-100 text-purple-800">이벤트</span>
                                 <span th:case="UPDATE" class="bg-blue-100 text-blue-800">업데이트</span>
                                 <span th:case="SYSTEM" class="bg-orange-100 text-orange-800">점검</span>
                                 <span th:case="GUIDE" class="bg-green-100 text-green-800">안내</span>
-                                <span th:case="*" class="bg-gray-100 text-gray-800" th:text="${notice.category?.displayName}">카테고리</span>
+                                <span th:case="*" class="bg-gray-100 text-gray-800" th:text="${notice.category.displayName}">카테고리</span>
                             </span>
                         </div>
                         <div class="flex items-center space-x-6 text-sm text-gray-600">
@@ -51,9 +51,9 @@
                     <div class="flex items-center space-x-2">
                         <span th:if="${notice.visible == false}" class="px-3 py-1 text-sm bg-gray-100 text-gray-800 rounded-full">숨김</span>
                         <span th:if="${notice.visible}">
-                            <span th:if="${notice.startAt != null and notice.startAt.isAfter(#temporals.createNow())}" class="px-3 py-1 text-sm bg-orange-100 text-orange-800 rounded-full">대기 중</span>
-                            <span th:if="${notice.endAt != null and notice.endAt.isBefore(#temporals.createNow())}" class="px-3 py-1 text-sm bg-red-100 text-red-800 rounded-full">종료됨</span>
-                            <span th:if="${(notice.startAt == null or notice.startAt.isBefore(#temporals.createNow())) and (notice.endAt == null or notice.endAt.isAfter(#temporals.createNow()))}" class="px-3 py-1 text-sm bg-green-100 text-green-800 rounded-full">노출 중</span>
+                            <span th:if="${notice.startAt != null and notice.startAt.isAfter(now)}" class="px-3 py-1 text-sm bg-orange-100 text-orange-800 rounded-full">대기 중</span>
+                            <span th:if="${notice.endAt != null and notice.endAt.isBefore(now)}" class="px-3 py-1 text-sm bg-red-100 text-red-800 rounded-full">종료됨</span>
+                            <span th:if="${(notice.startAt == null or notice.startAt.isBefore(now)) and (notice.endAt == null or notice.endAt.isAfter(now))}" class="px-3 py-1 text-sm bg-green-100 text-green-800 rounded-full">노출 중</span>
                         </span>
                     </div>
                 </div>

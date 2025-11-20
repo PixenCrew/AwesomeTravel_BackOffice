@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import renewal.common.entity.Product;
 
-public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product>{
+public interface ProductAdminRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
     
     Product findByTourId(Long id);
     
@@ -17,3 +17,4 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     List<Long> findUsedTourIds();
 
 }
+

@@ -20,7 +20,7 @@ import renewal.awesome_travel_backoffice.air.dto.AirFilterDTO;
 import renewal.awesome_travel_backoffice.air.repository.AirRepository;
 import renewal.awesome_travel_backoffice.air.repository.AirSpecification;
 import renewal.awesome_travel_backoffice.air.repository.AirlineRepository;
-import renewal.awesome_travel_backoffice.air.repository.SeatClassRepository;
+import renewal.awesome_travel_backoffice.air.repository.SeatClassAdminRepository;
 import renewal.awesome_travel_backoffice.airport.repository.AirportCodeRepository;
 import renewal.common.entity.Air;
 import renewal.common.entity.Air.AirStatus;
@@ -34,7 +34,7 @@ import renewal.common.repository.CityCodeRepository;
 @RequiredArgsConstructor
 public class AirService {
 
-    private final SeatClassRepository seatClassRepo;
+    private final SeatClassAdminRepository seatClassAdminRepo;
     private final AirRepository airRepo;
     private final AirlineRepository airlineRepo;
     private final CityCodeRepository cityCodeRepo;
@@ -123,27 +123,38 @@ public class AirService {
                 calcDuration(air.getDepartDateTime(), air.getDepartAirport(), air.getArriveDateTime(),
                         air.getArriveAirport()));
 
-        // 2. 각 segment별 소요시간 계산
-        for (FlightSegment segment : air.getFlightSegments()) {
-            segment.setFlightDuration(
-                    calcDuration(segment.getDepartDateTime(), segment.getDepartAirport(),
-                            segment.getArriveDateTime(), segment.getArriveAirport()));
+        // 2. flightSegments null 체크 및 초기화
+        List<FlightSegment> segments = air.getFlightSegments();
+        if (segments == null) {
+            segments = new ArrayList<>();
+            air.setFlightSegments(segments);
         }
 
-        // 3. segment 사이 대기시간 계산
-        List<FlightSegment> segments = air.getFlightSegments();
+        // 3. 각 segment별 소요시간 계산
+        for (FlightSegment segment : segments) {
+            if (segment != null && segment.getDepartDateTime() != null && segment.getArriveDateTime() != null) {
+                segment.setFlightDuration(
+                        calcDuration(segment.getDepartDateTime(), segment.getDepartAirport(),
+                                segment.getArriveDateTime(), segment.getArriveAirport()));
+            }
+        }
 
+        // 4. segment 사이 대기시간 계산
         for (int i = 0; i < segments.size() - 1; i++) {
             FlightSegment currentSegment = segments.get(i);
-            LocalDateTime currentArriveTime = currentSegment.getArriveDateTime();
-            AirportCode currentArriveAirport = currentSegment.getArriveAirport();
-
             FlightSegment nextSegment = segments.get(i + 1);
-            LocalDateTime nextDepartTime = nextSegment.getDepartDateTime();
-            AirportCode nextDepartAirport = nextSegment.getDepartAirport();
+            
+            if (currentSegment != null && nextSegment != null 
+                    && currentSegment.getArriveDateTime() != null 
+                    && nextSegment.getDepartDateTime() != null) {
+                LocalDateTime currentArriveTime = currentSegment.getArriveDateTime();
+                AirportCode currentArriveAirport = currentSegment.getArriveAirport();
+                LocalDateTime nextDepartTime = nextSegment.getDepartDateTime();
+                AirportCode nextDepartAirport = nextSegment.getDepartAirport();
 
-            currentSegment.setWaitDuration(
-                    calcDuration(currentArriveTime, currentArriveAirport, nextDepartTime, nextDepartAirport));
+                currentSegment.setWaitDuration(
+                        calcDuration(currentArriveTime, currentArriveAirport, nextDepartTime, nextDepartAirport));
+            }
         }
 
         airRepo.save(air);
@@ -228,7 +239,7 @@ public class AirService {
             spec = spec.and(AirSpecification.availableSeatsMore(filter.getAvailableSeats()));
         }
 
-        return seatClassRepo.findAll(spec, pageable);
+        return seatClassAdminRepo.findAll(spec, pageable);
     }
 
     // (시간+도시코드)로 소요시간[분] 계산

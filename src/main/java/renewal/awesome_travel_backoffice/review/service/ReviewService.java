@@ -103,6 +103,17 @@ public class ReviewService {
     }
 
     /**
+     * 특정 사용자의 전체 댓글 조회
+     */
+    @Transactional(readOnly = true)
+    public List<ReviewResponseDto> getAllCommentsByUser(Long userId) {
+        return reviewRepository.findByWriterIdOrderByCreatedAtDesc(userId)
+                .stream()
+                .map(this::toResponseDtoWithProduct)
+                .toList();
+    }
+
+    /**
      * 댓글 생성 (금지어 필터링 적용)
      */
     @Transactional
