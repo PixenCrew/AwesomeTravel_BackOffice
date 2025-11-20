@@ -16,7 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import renewal.awesome_travel_backoffice.air.repository.AirRepository;
 import renewal.awesome_travel_backoffice.air.repository.AirlineRepository;
-import renewal.awesome_travel_backoffice.air.repository.SeatClassRepository;
+import renewal.awesome_travel_backoffice.air.repository.SeatClassAdminRepository;
 import renewal.awesome_travel_backoffice.air.service.AirService;
 import renewal.awesome_travel_backoffice.airport.repository.AirportCodeRepository;
 import renewal.common.entity.Air;
@@ -35,7 +35,7 @@ public class RandomGenerator {
             AirlineRepository airlineRepo,
             AirportCodeRepository airportRepo,
             CountryCodeRepository countryRepo,
-            SeatClassRepository seatRepo,
+            SeatClassAdminRepository seatAdminRepo,
             AirService airService) {
         return args -> {
             setDummyAuthentication();
