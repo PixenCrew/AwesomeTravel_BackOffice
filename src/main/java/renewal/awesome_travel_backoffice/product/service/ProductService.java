@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import renewal.awesome_travel_backoffice.product.dto.ProductFilterDTO;
-import renewal.awesome_travel_backoffice.product.repository.ProductRepository;
+import renewal.awesome_travel_backoffice.product.repository.ProductAdminRepository;
 import renewal.awesome_travel_backoffice.product.repository.ProductSpecification;
 import renewal.common.entity.Product;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProductService {
 
-    private final ProductRepository productRepo;
+    private final ProductAdminRepository productAdminRepo;
 
     public Page<Product> searchProducts(ProductFilterDTO filter, Pageable pageable) {
         Specification<Product> spec = Specification.where(null);
@@ -58,7 +58,7 @@ public class ProductService {
             spec = spec.and(ProductSpecification.tourEndDateBetween(filter.getEndDateFrom(), filter.getEndDateTo()));
         }
 
-        return productRepo.findAll(spec, pageable);
+        return productAdminRepo.findAll(spec, pageable);
     }
 
     /**
@@ -66,7 +66,7 @@ public class ProductService {
      */
     @Transactional(readOnly = true)
     public Optional<Product> findById(Long id) {
-        return productRepo.findById(id);
+        return productAdminRepo.findById(id);
     }
 
     /**
@@ -74,7 +74,7 @@ public class ProductService {
      */
     @Transactional
     public Product save(Product product) {
-        return productRepo.save(product);
+        return productAdminRepo.save(product);
     }
 
     /**
@@ -82,7 +82,7 @@ public class ProductService {
      */
     @Transactional
     public void deleteById(Long id) {
-        productRepo.deleteById(id);
+        productAdminRepo.deleteById(id);
     }
 
     /**
@@ -90,7 +90,7 @@ public class ProductService {
      */
     @Transactional
     public void updateRating(Long productId, int rating, boolean isAdd) {
-        Product product = productRepo.findById(productId)
+        Product product = productAdminRepo.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
         
         if (isAdd) {
@@ -106,7 +106,7 @@ public class ProductService {
             }
         }
         
-        productRepo.save(product);
+        productAdminRepo.save(product);
     }
 
     /**
@@ -114,7 +114,7 @@ public class ProductService {
      */
     @Transactional(readOnly = true)
     public ProductRatingStats getRatingStats(Long productId) {
-        Product product = productRepo.findById(productId)
+        Product product = productAdminRepo.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
         
         return ProductRatingStats.builder()

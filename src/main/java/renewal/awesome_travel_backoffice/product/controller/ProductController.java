@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.common.service.CommonCodeService;
 import renewal.awesome_travel_backoffice.product.dto.ProductFilterDTO;
-import renewal.awesome_travel_backoffice.product.repository.ProductRepository;
+import renewal.awesome_travel_backoffice.product.repository.ProductAdminRepository;
 import renewal.awesome_travel_backoffice.product.service.ProductService;
 import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
 import renewal.common.entity.Product;
@@ -33,7 +33,7 @@ import renewal.common.entity.Tour;
 @Controller
 public class ProductController {
 
-    private final ProductRepository productRepo;
+    private final ProductAdminRepository productAdminRepo;
     private final TourRepository tourRepo;
     private final ProductService productService;
 
@@ -104,7 +104,7 @@ public class ProductController {
     public String submitProduct(@ModelAttribute Product product) throws Exception {
 
         // product 등록 (먼저 저장하여 ID 생성)
-        Product savedProduct = productRepo.save(product);
+        Product savedProduct = productAdminRepo.save(product);
 
         // 투어 productId 업데이트
         Tour tour = tourRepo.findById(product.getTour().getId()).get();
@@ -114,7 +114,7 @@ public class ProductController {
         // 투어 productId 업데이트
         // Tour tour = tourRepo.findById(product.getTour().getId()).get();
         product.setTour(tour);
-        productRepo.save(product);
+        productAdminRepo.save(product);
 
         // 첫 사진 섬네일로 등록
         if (!product.getPhotos().isEmpty()) {
@@ -128,7 +128,7 @@ public class ProductController {
     @GetMapping("/{id}")
     public String selectProduct(@PathVariable Long id, Model model) {
 
-        Product product = productRepo.getReferenceById(id);
+        Product product = productAdminRepo.getReferenceById(id);
         model.addAttribute("product", product);
         model.addAttribute("productTypes", ProductType.values());
         model.addAttribute("title", "Product " + product.getTitle());
@@ -142,7 +142,7 @@ public class ProductController {
     public String submitSelectedProduct(@ModelAttribute Product product) {
 
         // 기존 Product 조회하여 리뷰 데이터 보존
-        Product existingProduct = productRepo.findById(product.getId()).get();
+        Product existingProduct = productAdminRepo.findById(product.getId()).get();
 
         // 기존 Tour productId 삭제
         Long lastTourId = existingProduct.getTour().getId();
@@ -168,7 +168,7 @@ public class ProductController {
         }
 
         // Product 저장
-        productRepo.save(product);
+        productAdminRepo.save(product);
 
         return "redirect:/product";
     }
@@ -177,14 +177,14 @@ public class ProductController {
     @PostMapping("/{id}/deactivate")
     public ResponseEntity<String> deactivateProduct(@PathVariable Long id) {
         try {
-            Product product = productRepo.findById(id).orElse(null);
+            Product product = productAdminRepo.findById(id).orElse(null);
             if (product == null) {
                 return ResponseEntity.status(404).body("상품을 찾을 수 없습니다.");
             }
 
             // 상품을 비활성화
             product.setIsActive(false);
-            productRepo.save(product);
+            productAdminRepo.save(product);
 
             // 연결된 Tour의 productId를 NULL로 설정
             if (product.getTour() != null) {
@@ -203,14 +203,14 @@ public class ProductController {
     @PostMapping("/{id}/activate")
     public ResponseEntity<String> activateProduct(@PathVariable Long id) {
         try {
-            Product product = productRepo.findById(id).orElse(null);
+            Product product = productAdminRepo.findById(id).orElse(null);
             if (product == null) {
                 return ResponseEntity.status(404).body("상품을 찾을 수 없습니다.");
             }
 
             // 상품을 활성화
             product.setIsActive(true);
-            productRepo.save(product);
+            productAdminRepo.save(product);
 
             // 연결된 Tour의 productId를 다시 설정
             if (product.getTour() != null) {
@@ -230,14 +230,14 @@ public class ProductController {
     public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
 
         // Product와 연결된 Tour가 있으면 연결 해제
-        Product product = productRepo.findById(id).get();
+        Product product = productAdminRepo.findById(id).get();
         Tour tour = product.getTour();
         if (tour != null) {
             // tour.setProduct(null); // FK를 null로 만들어서 참조 끊기
             tourRepo.save(tour); // 업데이트 필요
         }
 
-        productRepo.deleteById(id);
+        productAdminRepo.deleteById(id);
 
         return ResponseEntity.ok("삭제 완료");
     }
