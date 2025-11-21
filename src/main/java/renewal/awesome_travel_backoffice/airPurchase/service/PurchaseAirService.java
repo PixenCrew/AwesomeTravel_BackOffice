@@ -23,9 +23,11 @@ import renewal.common.entity.CountryCode;
 import renewal.common.entity.Passenger;
 import renewal.common.entity.Passenger.Sex;
 import renewal.common.entity.PurchaseAir;
+import renewal.common.entity.PurchaseBase.ConfirmedSeatClass;
 import renewal.common.entity.PurchaseBase.PurchaseStatus;
 import renewal.common.entity.SeatClass;
 import renewal.common.repository.CountryCodeRepository;
+import renewal.common.repository.SeatClassRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +37,7 @@ public class PurchaseAirService {
 
     private final PurchaseAirRepository airPurchaseRepository;
     private final CountryCodeRepository countryCodeRepository;
+    private final SeatClassRepository seatClassRepository;
 
     /**
      * 어드민 - 전체 항공 예약 목록 조회 (페이징 + 정렬)
@@ -78,7 +81,11 @@ public class PurchaseAirService {
         System.out.println("Transaction Complete: " + purchase.getIsTransactionComplete());
         if (purchase.getPassengers() != null && !purchase.getPassengers().isEmpty()) {
             purchase.getPassengers().forEach(passenger -> {
-                System.out.println("  - 승객: " + (passenger.getName() != null ? passenger.getName() : "null") + " (ID: "
+                System.out.println("  - 승객: "
+                        + (passenger.getLastNameKor() != null && passenger.getFirstNameKor() != null
+                                ? passenger.getLastNameKor() + passenger.getFirstNameKor()
+                                : "null")
+                        + " (ID: "
                         + passenger.getId() + ")");
                 System.out.println("    특별요청: " + passenger.getSpecialRequests());
             });
@@ -116,8 +123,17 @@ public class PurchaseAirService {
         // 좌석 수 복구: HOLDING or PAID → CANCELLED
         if ((currentStatus == PurchaseStatus.HOLDING || currentStatus == PurchaseStatus.PAID)
                 && newStatus == PurchaseStatus.CANCELLED) {
-            SeatClass seatClass = purchase.getSeatClass();
-            seatClass.setAvailableSeats(Long.valueOf(purchase.getPassengers().size()));
+            List<ConfirmedSeatClass> restoreTarget = purchase.getFinalSeatClasses();
+            for (ConfirmedSeatClass confirmedSeatClass : restoreTarget) {
+                SeatClass seatClass = seatClassRepository
+                        .findByAirIdAndClassType(confirmedSeatClass.getAirId(), confirmedSeatClass.getClassType())
+                        .orElse(null);
+                if (seatClass != null) {
+                    seatClass.setAvailableSeats(seatClass.getAvailableSeats()
+                            + confirmedSeatClass.getSeatCountAdult()
+                            + confirmedSeatClass.getSeatCountYouth());
+                }
+            }
         }
 
         // 상태 변경 적용
