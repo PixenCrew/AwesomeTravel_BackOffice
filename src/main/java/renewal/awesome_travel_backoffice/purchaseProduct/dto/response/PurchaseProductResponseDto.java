@@ -4,12 +4,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import renewal.common.dto.PassengerResponseDto;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class PurchaseProductResponseDto {
@@ -24,9 +27,39 @@ public class PurchaseProductResponseDto {
     private String email; // 이메일
     private LocalDateTime purchaseDate; // 구매일
     private LocalDateTime paymentDueDate; // 결제 기한
-    private List<ProductPassengerResponseDto> productPassengers; // 승객 목록
+    private List<PassengerResponseDto> passengers; // 승객 목록
 
-    private int expectedPassengerCount;
+    // PurchaseBase 필드들
+    private String title; // 구매 제목
+    private Long finalPriceAdult; // 확정 성인 가격
+    private Long finalPriceYouth; // 확정 청소년 가격
+    private Long finalPriceInfant; // 확정 영유아 가격
+    private Long adultCount; // 성인 수
+    private Long youthCount; // 청소년 수
+    private Long infantCount; // 영유아 수
+    private boolean isPassengerInfoComplete; // 승객 정보 입력 완료 여부
+    private LocalDateTime passengerInfoDeadline; // 승객 정보 입력 기한
+    private boolean transactionComplete; // 결제 완료 여부
+    private Long completedPassengerCount; // 완료된 승객 수
 
-    private boolean isPassengerInfoComplete;
+    // PurchaseProduct 전용 필드들
+    private String airlineCode; // 항공사 코드 (ID)
+    private String airlineNameKor; // 항공사 한글명
+    private String airlineNameEng; // 항공사 영문명
+    private LocalDateTime departDateTime; // 출발 일시
+    private LocalDateTime returnDateTime; // 귀국 일시
+    private Long bak; // 백
+    private Long il; // 일
+    private Long handlerId; // 담당자 ID
+    private String handlerName; // 담당자 이름
+    private String handlerPosition; // 담당자 직책
+    private String handlerEmail; // 담당자 이메일
+    private String handlerNumber; // 담당자 연락처
+    private String handlerFax; // 담당자 팩스
+    private boolean waiting; // 예약 대기 여부
+
+    private Long passengerActualCount;
+    private Long passengerExpectedCount;
+    private Long passengerEmptyCount;
+    private Long passengerDisplayCount;
 }

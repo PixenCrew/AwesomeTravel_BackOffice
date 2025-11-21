@@ -6,10 +6,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import renewal.awesome_travel_backoffice.airPurchase.repository.PurchaseAirRepository;
-import renewal.awesome_travel_backoffice.purchaseProduct.repository.PurchaseProductRepository;
+import renewal.awesome_travel_backoffice.air.repository.AirRepository;
+import renewal.awesome_travel_backoffice.air.repository.SeatClassAdminRepository;
+import renewal.common.repository.PurchaseAirRepository;
+import renewal.common.repository.PurchaseProductRepository;
 import renewal.awesome_travel_backoffice.refund.repository.RefundRepository;
+import renewal.common.entity.Air;
 import renewal.common.entity.PurchaseAir;
+import renewal.common.entity.PurchaseBase;
 import renewal.common.entity.PurchaseBase.PurchaseStatus;
 import renewal.common.entity.PurchaseProduct;
 import renewal.common.entity.Refund;
@@ -22,6 +26,8 @@ public class RefundService {
     private final RefundRepository refundRepository;
     private final PurchaseAirRepository purchaseAirRepository;
     private final PurchaseProductRepository productPurchaseRepository;
+    private final AirRepository airRepository;
+    private final SeatClassAdminRepository seatClassAdminRepository;
 
     // 환불 요청 (통합)
     @Transactional
@@ -32,7 +38,7 @@ public class RefundService {
         }
 
         // PurchaseAir에서 먼저 찾기
-        PurchaseAir purchaseAir = purchaseAirRepository.findByPurchaseProductId(purchaseId).orElse(null);
+        PurchaseAir purchaseAir = purchaseAirRepository.findById(purchaseId).orElse(null);
         if (purchaseAir != null) {
             // 환불 가능 여부 확인
             if (purchaseAir.getPurchaseStatus() != PurchaseStatus.PAID) {
@@ -88,10 +94,20 @@ public class RefundService {
                     .orElseThrow(() -> new IllegalArgumentException("PurchaseAir not found"));
             airPurchase.setPurchaseStatus(PurchaseStatus.CANCELLED); // 환불 완료는 취소로 처리
 
-            // 좌석 수 복구
-            SeatClass seatClass = airPurchase.getSeatClass();
-            seatClass.setAvailableSeats(seatClass.getAvailableSeats() +
-                    airPurchase.getPassengers().size());
+            // 좌석 수 복구 - finalSeatClasses에서 정보를 가져와서 실제 SeatClass를 찾아 복구
+            if (airPurchase.getFinalSeatClasses() != null && !airPurchase.getFinalSeatClasses().isEmpty()) {
+                PurchaseBase.ConfirmedSeatClass confirmedSeatClass = airPurchase.getFinalSeatClasses().get(0);
+                Air air = airRepository.findById(confirmedSeatClass.getAirId())
+                        .orElseThrow(() -> new IllegalArgumentException("Air not found"));
+                SeatClass seatClass = seatClassAdminRepository.findByAirAndClassType(air, confirmedSeatClass.getClassType())
+                        .orElseThrow(() -> new IllegalArgumentException("SeatClass not found"));
+                
+                // 좌석 수 복구 (성인, 청소년, 영유아 모두 합산)
+                long totalSeats = (confirmedSeatClass.getSeatCountAdult() != null ? confirmedSeatClass.getSeatCountAdult() : 0) +
+                                 (confirmedSeatClass.getSeatCountYouth() != null ? confirmedSeatClass.getSeatCountYouth() : 0) +
+                                 (confirmedSeatClass.getSeatCountInfant() != null ? confirmedSeatClass.getSeatCountInfant() : 0);
+                seatClass.setAvailableSeats(seatClass.getAvailableSeats() + totalSeats);
+            }
 
             System.out.printf("[환불 처리 완료 - 항공권] 환불ID=%d, 주문ID=%d, 금액=%d, 처리자=%s\n",
                     refundId, refund.getPurchaseId(), refund.getAmount(), processedBy);

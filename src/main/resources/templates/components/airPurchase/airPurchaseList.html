@@ -417,19 +417,14 @@
                         </td>
                         <td th:text="${purchase.number}">010-1234-5678</td>
                         <td>
-                            <div class="font-medium" th:text="${purchase.airDto.code}">AA123</div>
-                            <div class="text-sm text-gray-500">
-                                <span th:text="${purchase.airDto.depart}">ICN</span> → 
-                                <span th:text="${purchase.airDto.arrive}">LAX</span>
-                            </div>
+                            <div class="font-medium" th:text="${purchase.title != null ? purchase.title : 'N/A'}">항공편</div>
+                            <div class="text-sm text-gray-500">-</div>
                         </td>
                         <td>
-                            <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs" 
-                                  th:text="${purchase.airDto.seatClassType}">ECONOMY</span>
+                            <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">N/A</span>
                         </td>
                         <td class="text-center">
-                            <div th:text="${purchase.airPassengers != null ? purchase.airPassengers.size() : 0}">2</div>
-                            <div class="text-xs text-gray-500" th:text="'/' + ${purchase.expectedPassengerCount}">/4</div>
+                            <div th:text="${(purchase.adultCount != null ? purchase.adultCount : 0) + (purchase.youthCount != null ? purchase.youthCount : 0) + (purchase.infantCount != null ? purchase.infantCount : 0)}">0</div>
                         </td>
                         <td class="font-medium" th:text="${#numbers.formatInteger(purchase.price, 3, 'COMMA')} + '원'">550,000원</td>
                         <td>

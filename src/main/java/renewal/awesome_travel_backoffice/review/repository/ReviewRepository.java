@@ -38,6 +38,11 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findTop5ByWriterIdOrderByCreatedAtDesc(Long writerId);
     
     /**
+     * 특정 사용자의 전체 댓글 조회 (최신순)
+     */
+    List<Review> findByWriterIdOrderByCreatedAtDesc(Long writerId);
+    
+    /**
      * 내용으로 검색
      */
     Page<Review> findByContentContaining(String keyword, Pageable pageable);

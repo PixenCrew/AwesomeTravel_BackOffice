@@ -1,0 +1,641 @@
+<div th:fragment="content" class="content-wrapper">
+    <style>
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.5rem 1.25rem;
+            border-radius: 999px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-back {
+            background: #1f2937;
+            color: #fff;
+        }
+
+        .btn-back:hover {
+            background: #111827;
+        }
+
+        .btn-list {
+            border: 1px solid #e5e7eb;
+            color: #111827;
+        }
+
+        .btn-list:hover {
+            background: #f9fafb;
+        }
+
+        .summary-card {
+            background: #fff;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .summary-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .summary-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .passenger-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .passenger-card {
+            background: #fff;
+            border-radius: 1rem;
+            border: 1px solid #e5e7eb;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .passenger-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .passenger-name {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-complete {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-pending {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+
+        .info-label {
+            color: #6b7280;
+        }
+
+        .info-value {
+            color: #111827;
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            background: #fff;
+            border: 1px dashed #d1d5db;
+            border-radius: 1rem;
+            color: #6b7280;
+            font-size: 1rem;
+        }
+    </style>
+
+    <div class="page-header">
+        <h1 class="page-title">탑승객 전체 목록</h1>
+        <div class="header-actions">
+            <a class="btn-nav btn-back" th:href="@{'/air-purchase/' + ${purchase.id}}">
+                <i class="fas fa-user-edit"></i> 상세로 돌아가기
+            </a>
+            <a class="btn-nav btn-list" href="/air-purchase">
+                <i class="fas fa-list"></i> 목록으로
+            </a>
+        </div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-grid">
+            <div class="summary-item">
+                <span class="summary-label">주문번호</span>
+                <span class="summary-value" th:text="${purchase.id}">#0</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">예약자명</span>
+                <span class="summary-value" th:text="${purchase.name != null ? purchase.name : '미입력'}">홍길동</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">연락처</span>
+                <span class="summary-value" th:text="${purchase.number != null ? purchase.number : '미입력'}">010-0000-0000</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">승객 수</span>
+                <span class="summary-value"
+                      th:text="${(purchase.adultCount != null ? purchase.adultCount : 0) + (purchase.youthCount != null ? purchase.youthCount : 0) + (purchase.infantCount != null ? purchase.infantCount : 0)} + '명'">
+                    0명
+                </span>
+            </div>
+        </div>
+        <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+            <button onclick="openPassengerCountModal()" class="btn-action" style="background: #3b82f6; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600;">
+                <i class="fas fa-users"></i> 승객 수 수정
+            </button>
+            <button onclick="openAddPassengerModal()" class="btn-action" style="background: #10b981; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600;">
+                <i class="fas fa-user-plus"></i> 승객 정보 추가
+            </button>
+        </div>
+    </div>
+
+    <div th:if="${passengers != null and !passengers.isEmpty()}" class="passenger-grid">
+        <div class="passenger-card" th:each="passenger, iter : ${passengers}" 
+             th:data-passenger-id="${passenger.id}"
+             th:data-last-name-kor="${passenger.lastNameKor}"
+             th:data-first-name-kor="${passenger.firstNameKor}"
+             th:data-last-name="${passenger.lastName}"
+             th:data-first-name="${passenger.firstName}"
+             th:data-birth="${passenger.birth != null ? #temporals.format(passenger.birth, 'yyyy-MM-dd') : ''}"
+             th:data-sex="${passenger.sex}"
+             th:data-nationality="${passenger.nationality}"
+             th:data-passport-num="${passenger.passportNum}"
+             th:data-issue="${passenger.issue != null ? #temporals.format(passenger.issue, 'yyyy-MM-dd') : ''}"
+             th:data-expire="${passenger.expire != null ? #temporals.format(passenger.expire, 'yyyy-MM-dd') : ''}"
+             th:data-authority="${passenger.authority}"
+             th:data-special-requests="${passenger.specialRequests != null ? passenger.specialRequests : ''}">
+            <div class="passenger-header">
+                <div>
+                    <div class="passenger-name"
+                         th:text="${passenger.koreanName != null ? passenger.koreanName : '(미입력)'}">홍길동</div>
+                    <div class="text-sm text-gray-500"
+                         th:text="'#' + (${iter.index} + 1)">#1</div>
+                </div>
+                <span class="badge"
+                      th:classappend="${passenger.completed} ? ' badge-complete' : ' badge-pending'"
+                      th:text="${passenger.completed} ? '완료' : '미완료'">미완료</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">생년월일</span>
+                <span class="info-value"
+                      th:text="${passenger.birth != null ? #temporals.format(passenger.birth, 'yyyy-MM-dd') : '미입력'}">
+                    1990-01-01
+                </span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">성별</span>
+                <span class="info-value" th:text="${passenger.sex != null ? (passenger.sex == 'MALE' ? '남성' : (passenger.sex == 'FEMALE' ? '여성' : passenger.sex)) : '미입력'}">M</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">국적</span>
+                <span class="info-value" th:text="${passenger.nationality != null ? passenger.nationality : '미입력'}">
+                    KOR
+                </span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">여권번호</span>
+                <span class="info-value"
+                      th:text="${passenger.passportNum != null ? passenger.passportNum : '미입력'}">M1234567</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">유효기간</span>
+                <span class="info-value"
+                      th:text="${passenger.expire != null ? #temporals.format(passenger.expire, 'yyyy-MM-dd') : '미입력'}">
+                    2030-01-01
+                </span>
+            </div>
+            <div th:if="${passenger.specialRequests != null && !#strings.isEmpty(passenger.specialRequests)}" 
+                 style="margin-top: 0.75rem; padding: 0.75rem; background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 0.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <i class="fas fa-star" style="color: #f59e0b;"></i>
+                    <span style="font-weight: 600; color: #92400e; font-size: 0.875rem;">특별 요청사항</span>
+                </div>
+                <p style="color: #78350f; font-size: 0.875rem; margin: 0; line-height: 1.5;" 
+                   th:text="${passenger.specialRequests}">특별 요청사항 내용</p>
+            </div>
+            <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #e5e7eb;">
+                <button th:onclick="'editPassenger(' + ${passenger.id} + ')'" 
+                        class="btn-edit" 
+                        style="width: 100%; padding: 0.5rem; background: #3b82f6; color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600;">
+                    <i class="fas fa-edit"></i> 수정
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="empty-state" th:if="${passengers == null or passengers.isEmpty()}">
+        입력된 탑승객 정보가 없습니다. 빈 슬롯도 승객 카드로 확인하려면 상세 페이지에서 승객 수를 조정해 주세요.
+    </div>
+
+    <!-- 승객 수 수정 모달 -->
+    <div id="passengerCountModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 50; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 2rem; border-radius: 0.75rem; max-width: 500px; width: 90%;">
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem;">승객 수 수정</h3>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">성인 수</label>
+                    <input type="number" id="adultCountInput" min="0" 
+                           th:value="${purchase.adultCount != null ? purchase.adultCount : 0}"
+                           style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">청소년 수</label>
+                    <input type="number" id="youthCountInput" min="0"
+                           th:value="${purchase.youthCount != null ? purchase.youthCount : 0}"
+                           style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">영유아 수</label>
+                    <input type="number" id="infantCountInput" min="0"
+                           th:value="${purchase.infantCount != null ? purchase.infantCount : 0}"
+                           style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                </div>
+            </div>
+            <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem; justify-content: flex-end;">
+                <button onclick="closePassengerCountModal()" 
+                        style="padding: 0.5rem 1rem; background: #e5e7eb; color: #374151; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600;">
+                    취소
+                </button>
+                <button onclick="confirmPassengerCountUpdate()" 
+                        style="padding: 0.5rem 1rem; background: #3b82f6; color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600;">
+                    수정
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 승객 정보 수정 모달 -->
+    <div id="passengerEditModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 50; align-items: center; justify-content: center; overflow-y: auto; padding: 1rem;">
+        <div style="background: white; padding: 2rem; border-radius: 0.75rem; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto;">
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem;">승객 정보 수정</h3>
+            <form id="passengerEditForm" style="display: flex; flex-direction: column; gap: 1rem;">
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">한국 이름 (성)</label>
+                    <input type="text" id="lastNameKor" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">한국 이름 (이름)</label>
+                    <input type="text" id="firstNameKor" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">영문 이름 (성)</label>
+                    <input type="text" id="lastName" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">영문 이름 (이름)</label>
+                    <input type="text" id="firstName" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">생년월일</label>
+                    <input type="date" id="birth" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">성별</label>
+                    <select id="sex" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                        <option value="">선택</option>
+                        <option value="MALE">남성</option>
+                        <option value="FEMALE">여성</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">국적</label>
+                    <input type="text" id="nationality" list="countriesList" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                    <datalist id="countriesList">
+                        <option th:each="country : ${countries}" th:value="${country.code}" th:text="${country.nameKor}"></option>
+                    </datalist>
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">여권번호</label>
+                    <input type="text" id="passportNum" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">발급일</label>
+                    <input type="date" id="issue" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">만료일</label>
+                    <input type="date" id="expire" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">발급관청</label>
+                    <input type="text" id="authority" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">특별 요청사항</label>
+                    <textarea id="specialRequests" rows="3" placeholder="특별 요청사항을 입력하세요 (예: 휠체어 지원, 특별식 등)" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem; resize: vertical;"></textarea>
+                </div>
+            </form>
+            <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem; justify-content: flex-end;">
+                <button onclick="closePassengerEditModal()" 
+                        style="padding: 0.5rem 1rem; background: #e5e7eb; color: #374151; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600;">
+                    취소
+                </button>
+                <button onclick="confirmPassengerUpdate()" 
+                        style="padding: 0.5rem 1rem; background: #3b82f6; color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600;">
+                    수정
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 승객 정보 추가 모달 -->
+    <div id="addPassengerModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 50; align-items: center; justify-content: center; overflow-y: auto; padding: 1rem;">
+        <div style="background: white; padding: 2rem; border-radius: 0.75rem; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto;">
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem;">승객 정보 추가</h3>
+            <form id="addPassengerForm" style="display: flex; flex-direction: column; gap: 1rem;">
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">한국 이름 (성)</label>
+                    <input type="text" id="addLastNameKor" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">한국 이름 (이름)</label>
+                    <input type="text" id="addFirstNameKor" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">영문 이름 (성)</label>
+                    <input type="text" id="addLastName" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">영문 이름 (이름)</label>
+                    <input type="text" id="addFirstName" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">생년월일</label>
+                    <input type="date" id="addBirth" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">성별</label>
+                    <select id="addSex" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                        <option value="">선택</option>
+                        <option value="MALE">남성</option>
+                        <option value="FEMALE">여성</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">국적</label>
+                    <input type="text" id="addNationality" list="addCountriesList" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                    <datalist id="addCountriesList">
+                        <option th:each="country : ${countries}" th:value="${country.code}" th:text="${country.nameKor}"></option>
+                    </datalist>
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">여권번호</label>
+                    <input type="text" id="addPassportNum" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">발급일</label>
+                    <input type="date" id="addIssue" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">만료일</label>
+                    <input type="date" id="addExpire" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">발급관청</label>
+                    <input type="text" id="addAuthority" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">특별 요청사항</label>
+                    <textarea id="addSpecialRequests" rows="3" placeholder="특별 요청사항을 입력하세요 (예: 휠체어 지원, 특별식 등)" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem; resize: vertical;"></textarea>
+                </div>
+            </form>
+            <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem; justify-content: flex-end;">
+                <button onclick="closeAddPassengerModal()" 
+                        style="padding: 0.5rem 1rem; background: #e5e7eb; color: #374151; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600;">
+                    취소
+                </button>
+                <button onclick="confirmAddPassenger()" 
+                        style="padding: 0.5rem 1rem; background: #10b981; color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600;">
+                    추가
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        const purchaseId = /*[[${purchase.id}]]*/ 0;
+        let currentEditingPassengerId = null;
+
+        function openPassengerCountModal() {
+            document.getElementById('passengerCountModal').style.display = 'flex';
+        }
+
+        function closePassengerCountModal() {
+            document.getElementById('passengerCountModal').style.display = 'none';
+        }
+
+        function confirmPassengerCountUpdate() {
+            const adultCount = parseInt(document.getElementById('adultCountInput').value) || 0;
+            const youthCount = parseInt(document.getElementById('youthCountInput').value) || 0;
+            const infantCount = parseInt(document.getElementById('infantCountInput').value) || 0;
+
+            fetch(`/api/admin/air-purchases/${purchaseId}/passenger-count`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    adultCount: adultCount,
+                    youthCount: youthCount,
+                    infantCount: infantCount
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('승객 수가 수정되었습니다.');
+                    location.reload();
+                } else {
+                    return response.text().then(text => {
+                        throw new Error(text || '승객 수 수정에 실패했습니다.');
+                    });
+                }
+            })
+            .catch(error => {
+                alert('오류: ' + error.message);
+            });
+        }
+
+        function editPassenger(passengerId) {
+            currentEditingPassengerId = passengerId;
+            
+            // 현재 승객 정보 가져오기 (데이터 속성에서)
+            const passengerCard = document.querySelector(`[data-passenger-id="${passengerId}"]`);
+            
+            if (passengerCard) {
+                document.getElementById('lastNameKor').value = passengerCard.dataset.lastNameKor || '';
+                document.getElementById('firstNameKor').value = passengerCard.dataset.firstNameKor || '';
+                document.getElementById('lastName').value = passengerCard.dataset.lastName || '';
+                document.getElementById('firstName').value = passengerCard.dataset.firstName || '';
+                document.getElementById('birth').value = passengerCard.dataset.birth || '';
+                document.getElementById('sex').value = passengerCard.dataset.sex || '';
+                document.getElementById('nationality').value = passengerCard.dataset.nationality || '';
+                document.getElementById('passportNum').value = passengerCard.dataset.passportNum || '';
+                document.getElementById('issue').value = passengerCard.dataset.issue || '';
+                document.getElementById('expire').value = passengerCard.dataset.expire || '';
+                document.getElementById('authority').value = passengerCard.dataset.authority || '';
+                document.getElementById('specialRequests').value = passengerCard.dataset.specialRequests || '';
+            }
+            
+            document.getElementById('passengerEditModal').style.display = 'flex';
+        }
+
+        function closePassengerEditModal() {
+            document.getElementById('passengerEditModal').style.display = 'none';
+            currentEditingPassengerId = null;
+        }
+
+        function confirmPassengerUpdate() {
+            const updateData = {
+                lastNameKor: document.getElementById('lastNameKor').value,
+                firstNameKor: document.getElementById('firstNameKor').value,
+                lastName: document.getElementById('lastName').value,
+                firstName: document.getElementById('firstName').value,
+                birth: document.getElementById('birth').value,
+                sex: document.getElementById('sex').value,
+                nationality: document.getElementById('nationality').value,
+                passportNum: document.getElementById('passportNum').value,
+                issue: document.getElementById('issue').value,
+                expire: document.getElementById('expire').value,
+                authority: document.getElementById('authority').value,
+                specialRequests: document.getElementById('specialRequests').value
+            };
+
+            fetch(`/api/admin/air-purchases/${purchaseId}/passengers/${currentEditingPassengerId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updateData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('승객 정보가 수정되었습니다.');
+                    location.reload();
+                } else {
+                    return response.text().then(text => {
+                        throw new Error(text || '승객 정보 수정에 실패했습니다.');
+                    });
+                }
+            })
+            .catch(error => {
+                alert('오류: ' + error.message);
+            });
+        }
+
+        function openAddPassengerModal() {
+            // 폼 초기화
+            document.getElementById('addPassengerForm').reset();
+            document.getElementById('addPassengerModal').style.display = 'flex';
+        }
+
+        function closeAddPassengerModal() {
+            document.getElementById('addPassengerModal').style.display = 'none';
+        }
+
+        function confirmAddPassenger() {
+            const addData = {
+                lastNameKor: document.getElementById('addLastNameKor').value,
+                firstNameKor: document.getElementById('addFirstNameKor').value,
+                lastName: document.getElementById('addLastName').value,
+                firstName: document.getElementById('addFirstName').value,
+                birth: document.getElementById('addBirth').value,
+                sex: document.getElementById('addSex').value,
+                nationality: document.getElementById('addNationality').value,
+                passportNum: document.getElementById('addPassportNum').value,
+                issue: document.getElementById('addIssue').value,
+                expire: document.getElementById('addExpire').value,
+                authority: document.getElementById('addAuthority').value,
+                specialRequests: document.getElementById('addSpecialRequests').value
+            };
+
+            fetch(`/api/admin/air-purchases/${purchaseId}/passengers`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(addData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('승객 정보가 추가되었습니다.');
+                    location.reload();
+                } else {
+                    return response.text().then(text => {
+                        throw new Error(text || '승객 정보 추가에 실패했습니다.');
+                    });
+                }
+            })
+            .catch(error => {
+                alert('오류: ' + error.message);
+            });
+        }
+
+        // 모달 외부 클릭 시 닫기
+        document.getElementById('passengerCountModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePassengerCountModal();
+            }
+        });
+
+        document.getElementById('passengerEditModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePassengerEditModal();
+            }
+        });
+
+        document.getElementById('addPassengerModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAddPassengerModal();
+            }
+        });
+    </script>
+</div>
+

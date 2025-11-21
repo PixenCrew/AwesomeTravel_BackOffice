@@ -11,6 +11,7 @@ import renewal.common.entity.User.UserStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -34,7 +35,7 @@ public class UserResponseDto {
     private String englishFirstName;
     private String englishLastName;
     private Boolean emailVerified;
-    private Boolean marketingConsent;
+    private Map<String, Boolean> terms;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
