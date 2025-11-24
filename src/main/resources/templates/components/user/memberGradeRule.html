@@ -1,0 +1,94 @@
+<div th:fragment="content">
+    <div class="space-y-6">
+
+        <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-gray-900">등급 기준 관리</h2>
+        </div>
+
+        <form th:action="@{/tierRule}" th:object="${memberGradeRuleList}" method="post">
+
+            <div class="bg-white rounded-lg shadow-sm">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3">등급</th>
+                                <th class="px-6 py-3">최근 1년 이용횟수</th>
+                                <th class="px-6 py-3">최근 5년 이용횟수</th>
+                                <th class="px-6 py-3">단일 최대 결제금액</th>
+                                <th class="px-6 py-3">최근 5년 누적결제</th>
+                                <th class="px-6 py-3">우선순위</th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr th:each="rule, iterStat : *{memberGradeRules}">
+
+                                <!-- ID -->
+                                <input type="hidden"
+                                    th:field="*{memberGradeRules[__${iterStat.index}__].id}" />
+
+                                <!-- Grade -->
+                                <td class="px-6 py-4">
+                                    <input type="hidden"
+                                        th:field="*{memberGradeRules[__${iterStat.index}__].grade}" />
+                                    <span th:text="${rule.grade}"></span>
+                                </td>
+
+                                <!-- 최근 1년 이용 -->
+                                <td class="px-6 py-4">
+                                    <input type="number"
+                                        th:field="*{memberGradeRules[__${iterStat.index}__].minUseCountLast1Year}"
+                                        class="w-32 border rounded px-2 py-1" />
+                                </td>
+
+                                <!-- 최근 5년 이용 -->
+                                <td class="px-6 py-4">
+                                    <input type="number"
+                                        th:field="*{memberGradeRules[__${iterStat.index}__].minUseCountLast5Years}"
+                                        class="w-32 border rounded px-2 py-1" />
+                                </td>
+
+                                <!-- 단일 최대 결제 -->
+                                <td class="px-6 py-4">
+                                    <input type="number"
+                                        th:field="*{memberGradeRules[__${iterStat.index}__].minMaxPrice}"
+                                        class="w-32 border rounded px-2 py-1" />
+                                </td>
+
+                                <!-- 최근 5년 누적 -->
+                                <td class="px-6 py-4">
+                                    <input type="number"
+                                        th:field="*{memberGradeRules[__${iterStat.index}__].minTotalPriceLast5Years}"
+                                        class="w-32 border rounded px-2 py-1" />
+                                </td>
+
+                                <!-- 우선순위 -->
+                                <td class="px-6 py-4">
+                                    <input type="number"
+                                        th:field="*{memberGradeRules[__${iterStat.index}__].priority}"
+                                        class="w-24 border rounded px-2 py-1" />
+                                </td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mt-4 text-right">
+                <button type="submit"
+                    class="px-5 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                    전체 저장
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+    <script th:if="${successMessage}" th:inline="javascript">
+        const message = /*[[${ successMessage }]]*/'';
+        alert(message);
+    </script>
+</div>
