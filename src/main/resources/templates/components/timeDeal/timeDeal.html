@@ -1,0 +1,100 @@
+<div th:fragment="content" class="flex flex-col h-full">
+
+    <!-- 헤더 -->
+    <div class="flex justify-between items-center mb-6 pb-4 border-b-2 border-gray-200 flex-shrink-0">
+        <h1 class="text-3xl font-bold text-gray-800">타임딜 관리</h1>
+        <a href="/timeDeal/new"
+            class="inline-flex items-center px-6 py-3 text-white font-semibold rounded-lg transition-all duration-300
+                  hover:-translate-y-0.5 hover:shadow-lg"
+            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <i class="fas fa-plus mr-2"></i>새 타임딜 등록
+        </a>
+    </div>
+
+    <!-- 리스트 -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex-1 flex flex-col">
+
+        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex-shrink-0">
+            <h3 class="text-lg font-semibold text-gray-800">
+                타임딜 목록
+                <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                             bg-blue-100 text-blue-800"
+                    th:text="'총 ' + ${list.size()} + '개'"></span>
+            </h3>
+        </div>
+
+        <div class="flex-1 overflow-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500">ID</th>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500">기간</th>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500">할인 타입</th>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500">값</th>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500">상태</th>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500">작업</th>
+                    </tr>
+                </thead>
+
+                <tbody class="bg-white divide-y divide-gray-200">
+
+                    <tr th:each="td : ${list}" class="hover:bg-gray-50">
+
+                        <!-- ID -->
+                        <td class="px-6 py-4 text-sm font-medium text-gray-800"
+                            th:text="${td.id}">1</td>
+
+                        <!-- 기간 -->
+                        <td class="px-6 py-4 text-sm text-gray-700">
+                            <div>
+                                <span th:text="${#temporals.format(td.startTime,'yyyy-MM-dd HH:mm')}"></span>
+                                ~
+                                <span th:text="${#temporals.format(td.endTime,'yyyy-MM-dd HH:mm')}"></span>
+                            </div>
+                        </td>
+
+                        <!-- 타입 -->
+                        <td class="px-6 py-4 text-sm">
+                            <span th:if="${td.discountType=='PERCENT'}"
+                                class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">
+                                퍼센트(%)
+                            </span>
+                            <span th:if="${td.discountType=='ABSOLUTE'}"
+                                class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded">
+                                절대값(원)
+                            </span>
+                        </td>
+
+                        <!-- 값 -->
+                        <td class="px-6 py-4 text-sm font-semibold text-gray-900"
+                            th:text="${td.value}">0</td>
+
+                        <!-- 상태 -->
+                        <td class="px-6 py-4 text-sm">
+                            <span th:if="${td.active}"
+                                class="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                                진행중
+                            </span>
+                            <span th:unless="${td.active}"
+                                class="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-200 text-gray-700">
+                                종료/예정
+                            </span>
+                        </td>
+
+                        <!-- 작업 -->
+                        <td class="px-6 py-4 text-sm font-medium">
+                            <a th:href="@{/timeDeal/{id}(id=${td.id})}"
+                                class="text-blue-600 hover:underline">
+                                상세
+                            </a>
+                        </td>
+
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>

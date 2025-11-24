@@ -1,0 +1,220 @@
+<div th:fragment="content" class="flex flex-col h-full">
+
+    <!-- 헤더 -->
+    <div class="flex justify-between items-center mb-6 pb-4 border-b-2 border-gray-200">
+        <h1 class="text-3xl font-bold text-gray-800"
+            th:text="${timeDeal.id == null} ? '타임딜 등록' : '타임딜 상세 / 수정'"></h1>
+    </div>
+
+    <!-- 저장 폼 (TimeDeal + ProductIds 전송 폼) -->
+    <form th:action="@{/timeDeal}" th:object="${timeDeal}" method="post"
+        class="bg-white rounded-lg shadow-sm p-6 border border-gray-200 w-full max-w-3xl mb-10">
+
+        <input type="hidden" th:field="*{id}" />
+
+        <!-- 기간 -->
+        <div class="mb-4">
+            <label class="block font-medium text-gray-700 mb-2">시작 시간</label>
+            <input type="datetime-local" th:field="*{startTime}"
+                class="p-3 border rounded w-full" />
+        </div>
+
+        <div class="mb-4">
+            <label class="block font-medium text-gray-700 mb-2">종료 시간</label>
+            <input type="datetime-local" th:field="*{endTime}"
+                class="p-3 border rounded w-full" />
+        </div>
+
+        <!-- 할인 타입 -->
+        <div class="mb-4">
+            <label class="block font-medium text-gray-700 mb-2">할인 타입</label>
+            <select th:field="*{discountType}" class="p-3 border rounded w-full">
+                <option value="PERCENT">퍼센트(%)</option>
+                <option value="ABSOLUTE">절대값(원)</option>
+            </select>
+        </div>
+
+        <!-- 할인 값 -->
+        <div class="mb-4">
+            <label class="block font-medium text-gray-700 mb-2">할인 값</label>
+            <input type="number" th:field="*{value}" class="p-3 border rounded w-full" />
+        </div>
+
+        <!-- 🔥 적용 상품 ID hidden input 컨테이너 -->
+        <div id="productIdsContainer">
+            <div th:each="product : ${products}">
+                <input type="hidden" name="productIds" th:value="${product.id}" />
+            </div>
+        </div>
+
+        <!-- 저장 버튼 -->
+        <div class="flex justify-between mt-6">
+            <a href="/timeDeal"
+                class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600">목록으로</a>
+
+            <button type="submit"
+                class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                저장
+            </button>
+        </div>
+    </form>
+
+    <!-- 삭제 버튼 -->
+    <form th:action="@{/timeDeal/{id}/delete(id=${timeDeal.id})}" method="post"
+        onsubmit="return confirm('정말 삭제하시겠습니까?');">
+        <button type="submit"
+            class="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700">
+            삭제
+        </button>
+    </form>
+
+    <!-- 적용 상품 목록 영역 -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold text-gray-800">적용 상품 목록</h2>
+
+            <!-- 추가 입력 UI -->
+            <div class="flex gap-2 items-center">
+                <input id="addProductIdInput"
+                    type="number"
+                    placeholder="상품 ID 입력"
+                    class="border rounded px-3 py-2 w-40 text-sm" />
+
+                <button type="button"
+                    onclick="addProductId()"
+                    class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    추가
+                </button>
+            </div>
+        </div>
+
+        <!-- 빈 목록 -->
+        <div th:if="${#lists.isEmpty(products)}" class="text-gray-500 text-sm">
+            이 타임딜이 적용된 상품이 없습니다.
+        </div>
+
+        <!-- 목록 표시 -->
+        <div class="overflow-auto">
+
+            <table class="min-w-full divide-y divide-gray-200">
+
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500">상품 ID</th>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500">상품명</th>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500">가격</th>
+                        <!-- <th class="px-6 py-3 text-xs font-medium text-gray-500">상태</th> -->
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500">삭제</th>
+                    </tr>
+                </thead>
+
+                <!-- ⭐ tbody는 반드시 항상 있어야 한다 -->
+                <tbody id="productTableBody" class="bg-white divide-y divide-gray-200">
+
+                    <!-- 기존 상품들 표시 -->
+                    <tr th:each="p : ${products}" th:attr="data-id=${p.id}" class="hover:bg-gray-50">
+
+                        <td class="px-6 py-4 text-sm font-semibold text-gray-900"
+                            th:text="${p.id}"></td>
+
+                        <td class="px-6 py-4 text-sm text-gray-700"
+                            th:text="${p.title}"></td>
+
+                        <td class="px-6 py-4 text-sm text-gray-900 font-semibold"
+                            th:text="${#numbers.formatInteger(p.price, 3, 'COMMA') + '원'}"></td>
+
+                        <!-- <td class="px-6 py-4 text-sm">
+                            <span th:if="${p.productStatus}"
+                                class="px-2 py-1 text-xs rounded bg-green-100 text-green-800">활성</span>
+                            <span th:unless="${p.productStatus}"
+                                class="px-2 py-1 text-xs rounded bg-red-100 text-red-800">비활성</span>
+                        </td> -->
+
+                        <td class="px-6 py-4 text-sm">
+                            <button type="button"
+                                th:onclick="|removeProductId(${p.id})|"
+                                class="text-red-600 hover:underline">
+                                삭제
+                            </button>
+                        </td>
+                    </tr>
+
+                    <!-- ⭐ products가 비어 있을 때 '없습니다' 문구 -->
+                    <tr th:if="${#lists.isEmpty(products)}">
+                        <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                            이 타임딜이 적용된 상품이 없습니다.
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function addProductId() {
+            const id = document.getElementById("addProductIdInput").value.trim();
+            if (!id) return alert("상품 ID를 입력하세요.");
+
+            if (document.querySelector(`input[name="productIds"][value="${id}"]`)) {
+                return alert("이미 추가된 상품입니다.");
+            }
+
+            // hidden input 생성
+            const container = document.getElementById("productIdsContainer");
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "productIds";
+            input.value = id;
+            container.appendChild(input);
+
+            // 테이블 row 동적 추가
+            const tableBody = document.getElementById("productTableBody");
+
+            // 제품명/가격/상태는 서버에서만 알 수 있으므로 임시 표기
+            const newRow = document.createElement("tr");
+            newRow.setAttribute("data-id", id);
+            newRow.className = "hover:bg-gray-50";
+
+            newRow.innerHTML = `
+            <td class="px-6 py-4 text-sm font-semibold text-gray-900">${id}</td>
+            <td class="px-6 py-4 text-sm text-gray-700 text-gray-400 italic">
+                저장 후 정보가 로드됩니다
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-400">-</td>
+            <td class="px-6 py-4 text-sm">
+                <span class="px-2 py-1 text-xs rounded bg-gray-200 text-gray-700">
+                    -
+                </span>
+            </td>
+            <td class="px-6 py-4 text-sm">
+                <button type="button"
+                        onclick="removeProductId(${id})"
+                        class="text-red-600 hover:underline">
+                    삭제
+                </button>
+            </td>
+        `;
+
+            tableBody.appendChild(newRow);
+
+            // 입력창 초기화
+            document.getElementById("addProductIdInput").value = "";
+
+            // 시각적 피드백
+            alert("상품이 추가되었습니다.");
+        }
+
+        function removeProductId(id) {
+            const input = document.querySelector(`input[name="productIds"][value="${id}"]`);
+            if (input) input.remove();
+
+            const row = document.querySelector(`tr[data-id="${id}"]`);
+            if (row) row.remove();
+
+            alert("상품이 제거되었습니다.");
+        }
+    </script>
+
+</div>

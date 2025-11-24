@@ -265,7 +265,7 @@
                             <span class="toggle-icon">+</span>
                         </div>
                         <ul class="submenu hidden">
-                            <li><a href="/timedeal" class="submenu-link">타임딜 관리</a></li>
+                            <li><a href="/timeDeal" class="submenu-link">타임딜 관리</a></li>
                             <li><a href="/coupon" class="submenu-link">쿠폰 관리</a></li>
                             <li><a href="/event" class="submenu-link">이벤트 관리</a></li>
                             <li><a href="/promotion" class="submenu-link">프로모션 관리</a></li>
@@ -373,6 +373,11 @@
             <div>&copy; 2024 딱좋은여행. All rights reserved.</div>
         </footer>
     </main>
+
+    <script th:if="${successMessage}" th:inline="javascript">
+        const message = /*[[${ successMessage }]]*/'';
+        alert(message);
+    </script>
 
     <!-- 메뉴 토글 스크립트 -->
     <script>
