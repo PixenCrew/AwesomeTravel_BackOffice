@@ -1,0 +1,81 @@
+<div th:fragment="content" class="flex flex-col h-full">
+
+    <!-- 헤더 -->
+    <div class="flex justify-between items-center mb-6 pb-4 border-b-2 border-gray-200 flex-shrink-0">
+        <h1 class="text-3xl font-bold text-gray-800">기획전 관리</h1>
+        <a href="/promotion/new"
+            class="inline-flex items-center px-6 py-3 text-white font-semibold rounded-lg transition-all duration-300
+                  hover:-translate-y-0.5 hover:shadow-lg"
+            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <i class="fas fa-plus mr-2"></i>새 기획전 등록
+        </a>
+    </div>
+
+    <!-- 리스트 -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex-1 flex flex-col">
+
+        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex-shrink-0">
+            <h3 class="text-lg font-semibold text-gray-800">
+                기획전 목록
+                <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                             bg-blue-100 text-blue-800"
+                    th:text="'총 ' + ${promotions.size()} + '개'"></span>
+            </h3>
+        </div>
+
+        <div class="flex-1 overflow-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500">ID</th>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500">기간</th>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500">상태</th>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500">코드</th>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500">작업</th>
+                    </tr>
+                </thead>
+
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <tr th:each="promotion : ${promotions}" class="hover:bg-gray-50">
+                        <!-- ID -->
+                        <td class="px-6 py-4 text-sm font-medium text-gray-800"
+                            th:text="${promotion.id}">1</td>
+
+                        <!-- 기간 -->
+                        <td class="px-6 py-4 text-sm text-gray-700">
+                            <div>
+                                <span th:text="${#temporals.format(promotion.startTime,'yyyy-MM-dd HH:mm')}"></span>
+                                ~
+                                <span th:text="${#temporals.format(promotion.endTime,'yyyy-MM-dd HH:mm')}"></span>
+                            </div>
+                        </td>
+
+                        <!-- 상태 -->
+                        <td class="px-6 py-4 text-sm">
+                            <span th:if="${promotion.isActive()}"
+                                class="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                                진행중
+                            </span>
+                            <span th:unless="${promotion.isActive()}"
+                                class="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-200 text-gray-700">
+                                종료/예정
+                            </span>
+                        </td>
+
+                        <!-- 코드 -->
+                        <td class="px-6 py-4 text-sm font-medium text-gray-800"
+                            th:text="${promotion.menuCode.code}">1</td>
+
+                        <!-- 작업 -->
+                        <td class="px-6 py-4 text-sm font-medium">
+                            <a th:href="@{/promotion/{id}(id=${promotion.id})}"
+                                class="text-blue-600 hover:underline">
+                                상세
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

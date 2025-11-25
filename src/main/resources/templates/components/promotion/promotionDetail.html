@@ -1,0 +1,107 @@
+<div th:fragment="content" class="flex flex-col h-full">
+
+    <!-- 헤더 -->
+    <div class="flex justify-between items-center mb-6 pb-4 border-b-2 border-gray-200">
+        <h1 class="text-3xl font-bold text-gray-800"
+            th:text="${promotion.id == null} ? '기획전 등록' : '기획전 상세 / 수정'"></h1>
+    </div>
+
+    <!-- 저장 폼 -->
+    <form id="promotionForm" th:action="@{/promotion}" th:object="${promotion}" method="post"
+        class="bg-white rounded-lg shadow-sm p-6 border border-gray-200 w-full max-w-3xl mb-10">
+
+        <input type="hidden" th:field="*{id}" />
+
+        <div class="mb-4">
+            <label class="block font-medium text-gray-700 mb-2">제목</label>
+            <input type="text" th:field="*{title}"
+                class="p-3 border rounded w-full" />
+        </div>
+
+        <div class="mb-4">
+            <label class="block font-medium text-gray-700 mb-2">메뉴코드</label>
+            <input list="menuCodes" type="text" th:field="*{menuCode}" class="p-3 border rounded w-full" />
+        </div>
+
+        <div class="mb-4">
+            <label class="block font-medium text-gray-700 mb-2">설명</label>
+            <input type="text" th:field="*{description}"
+                class="p-3 border rounded w-full" />
+        </div>
+
+        <div class="mb-4">
+            <label class="block font-medium text-gray-700 mb-2">섬네일 이미지</label>
+            <input type="text" th:field="*{thumnailImg}" placeholder="이미지 URL" readonly />
+            <input type="file" onchange="uploadImage(this)" />
+        </div>
+
+        <div class="mb-4">
+            <label class="block font-medium text-gray-700 mb-2">상세 이미지</label>
+            <input type="text" th:field="*{contentImg}" placeholder="이미지 URL" readonly />
+            <input type="file" onchange="uploadImage(this)" />
+        </div>
+        <!-- 
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-base font-semibold leading-6 text-gray-900 mb-4">상세이미지 관리</h3>
+                <fieldset id="images-fieldset" class="space-y-4">
+                    <div class="image-item">
+                        <div class="flex space-x-2">
+                            <input type="text" th:field="*{contentImg}" placeholder="이미지 URL" readonly />
+                            <input type="file" onchange="uploadImage(this)" />
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div> -->
+
+        <!-- 기간 -->
+        <div class="mb-4">
+            <label class="block font-medium text-gray-700 mb-2">시작 시간</label>
+            <input type="datetime-local" th:field="*{startTime}"
+                class="p-3 border rounded w-full" />
+        </div>
+
+        <div class="mb-4">
+            <label class="block font-medium text-gray-700 mb-2">종료 시간</label>
+            <input type="datetime-local" th:field="*{endTime}"
+                class="p-3 border rounded w-full" />
+        </div>
+
+    </form>
+
+    <div class="flex justify-between items-center mt-6">
+
+        <!-- 목록 -->
+        <a href="/promotion"
+            class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
+            목록으로
+        </a>
+
+        <div class="flex gap-3">
+
+            <!-- 삭제 폼 (독립적) -->
+            <form th:action="@{/promotion/{id}/delete(id=${promotion.id})}"
+                method="post"
+                onsubmit="return confirm('정말 삭제하시겠습니까?');">
+
+                <button type="submit"
+                    class="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                    삭제
+                </button>
+            </form>
+
+            <!-- 저장 버튼 : 저장 폼을 정확히 지정 -->
+            <button type="submit"
+                form="promotionForm"
+                class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                저장
+            </button>
+        </div>
+    </div>
+
+    <datalist id="menuCodes">
+        <option th:each="mc : ${menuCodes}" th:value="${mc.code}" th:text="${mc.name}"></option>
+    </datalist>
+
+</div>
