@@ -237,18 +237,20 @@ public class TourController {
             // Locations 순회
             for (Location location : schedule.getLocations()) {
                 // 키워드 목록에 이름 추가
-                keywords.add(location.getName());
+                // keywords.add(location.getName());
 
                 if (location.getLocationType() == LocationType.AIR) {
                     // AIR 처리
                 } else if (location.getLocationType() == LocationType.HOTEL) {
                     // 호텔 가격 합산
                     Hotel hotel = hotelRepo.findById(location.getHotel().getId()).get();
+                    keywords.add(location.getName());
                     if (hotel != null) {
                         hotelPriceSum += hotel.getPrice();
                     }
                 } else {
                     // POINT 처리
+                    keywords.add(location.getName());
                 }
             }
         }

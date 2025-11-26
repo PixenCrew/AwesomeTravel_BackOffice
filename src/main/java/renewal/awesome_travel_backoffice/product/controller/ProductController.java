@@ -1,6 +1,7 @@
 package renewal.awesome_travel_backoffice.product.controller;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -111,6 +112,12 @@ public class ProductController {
         tour.setProductId(savedProduct.getId());
         tourRepo.save(tour);
 
+        // 키워드 등록
+        Set<String> tourKeyword = tour.getKeywords();
+        product.getKeywords().clear();
+        product.getKeywords().addAll(tourKeyword);
+        product.getKeywords().add(product.getTitle());
+
         // 투어 productId 업데이트
         // Tour tour = tourRepo.findById(product.getTour().getId()).get();
         product.setTour(tour);
@@ -166,6 +173,12 @@ public class ProductController {
         if (!product.getPhotos().isEmpty()) {
             product.setThumbnail(product.getPhotos().get(0));
         }
+
+        // 키워드 등록
+        Set<String> tourKeyword = tour.getKeywords();
+        product.getKeywords().clear();
+        product.getKeywords().addAll(tourKeyword);
+        product.getKeywords().add(product.getTitle());
 
         // Product 저장
         productAdminRepo.save(product);
