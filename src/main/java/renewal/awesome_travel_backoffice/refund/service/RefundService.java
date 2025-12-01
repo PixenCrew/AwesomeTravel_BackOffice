@@ -10,7 +10,7 @@ import renewal.awesome_travel_backoffice.air.repository.AirRepository;
 import renewal.awesome_travel_backoffice.air.repository.SeatClassAdminRepository;
 import renewal.common.repository.PurchaseAirRepository;
 import renewal.common.repository.PurchaseProductRepository;
-import renewal.awesome_travel_backoffice.refund.repository.RefundRepository;
+import renewal.awesome_travel_backoffice.refund.repository.RefundBackOfficeRepository;
 import renewal.common.entity.Air;
 import renewal.common.entity.PurchaseAir;
 import renewal.common.entity.PurchaseBase;
@@ -23,7 +23,7 @@ import renewal.common.entity.SeatClass;
 @RequiredArgsConstructor
 public class RefundService {
 
-    private final RefundRepository refundRepository;
+    private final RefundBackOfficeRepository refundRepository;
     private final PurchaseAirRepository purchaseAirRepository;
     private final PurchaseProductRepository productPurchaseRepository;
     private final AirRepository airRepository;
