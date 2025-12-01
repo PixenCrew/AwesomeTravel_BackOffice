@@ -49,7 +49,7 @@ public class PopupViewController {
         model.addAttribute("popups", popups);
         model.addAttribute("searchRequest", searchRequest);
         model.addAttribute("title", "팝업 관리");
-        model.addAttribute("content", "popup/popupList");
+        model.addAttribute("content", "components/popup/popupList");
         
         return "layout";
     }
@@ -58,7 +58,7 @@ public class PopupViewController {
     @GetMapping("/create")
     public String popupCreateForm(Model model) {
         model.addAttribute("title", "팝업 등록");
-        model.addAttribute("content", "popup/popupForm");
+        model.addAttribute("content", "components/popup/popupForm");
         return "layout";
     }
     
@@ -68,7 +68,7 @@ public class PopupViewController {
         PopupResponseDto popup = popupService.getById(id);
         model.addAttribute("popup", popup);
         model.addAttribute("title", "팝업 상세");
-        model.addAttribute("content", "popup/popupDetail");
+        model.addAttribute("content", "components/popup/popupDetail");
         return "layout";
     }
     
@@ -78,7 +78,7 @@ public class PopupViewController {
         PopupResponseDto popup = popupService.getById(id);
         model.addAttribute("popup", popup);
         model.addAttribute("title", "팝업 수정");
-        model.addAttribute("content", "popup/popupForm");
+        model.addAttribute("content", "components/popup/popupForm");
         return "layout";
     }
     
@@ -110,7 +110,7 @@ public class PopupViewController {
         } catch (Exception e) {
             model.addAttribute("error", "팝업 등록 중 오류가 발생했습니다: " + e.getMessage());
             model.addAttribute("title", "팝업 등록");
-            model.addAttribute("content", "popup/popupForm");
+            model.addAttribute("content", "components/popup/popupForm");
             return "layout";
         }
     }
@@ -146,7 +146,7 @@ public class PopupViewController {
             PopupResponseDto popup = popupService.getById(id);
             model.addAttribute("popup", popup);
             model.addAttribute("title", "팝업 수정");
-            model.addAttribute("content", "popup/popupForm");
+            model.addAttribute("content", "components/popup/popupForm");
             return "layout";
         }
     }
