@@ -10,7 +10,7 @@ import renewal.common.entity.Refund;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-public interface RefundRepository extends JpaRepository<Refund, Long> {
+public interface RefundBackOfficeRepository extends JpaRepository<Refund, Long> {
 
     // 구매 ID로 환불 조회
     Optional<Refund> findByPurchaseId(Long purchaseId);
