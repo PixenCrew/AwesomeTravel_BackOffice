@@ -137,6 +137,13 @@ public class PurchaseProductAdminController {
 
         PurchaseProduct purchaseProduct = productPurchaseService.getPurchase(purchaseId);
         purchaseProduct.setHandler(handler);
+
+        // 담당자 배정 시 상태를 CONFIRMED로 변경 (단, 이미 PAID/CANCELLED는 그대로 유지)
+        PurchaseStatus currentStatus = purchaseProduct.getPurchaseStatus();
+        if (currentStatus != PurchaseStatus.PAID && currentStatus != PurchaseStatus.CANCELLED) {
+            purchaseProduct.setPurchaseStatus(PurchaseStatus.CONFIRMED);
+        }
+
         productPurchaseAdminRepo.save(purchaseProduct);
 
         return ResponseEntity.status(HttpStatus.FOUND)
