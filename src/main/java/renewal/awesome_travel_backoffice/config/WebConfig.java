@@ -1,5 +1,6 @@
 package renewal.awesome_travel_backoffice.config;
 
+import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -20,16 +21,22 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
-        String fullPath = "file:" + uploadDir + "/";
-        // System.out.println("fullPath : "+fullPath);
         registry.addResourceHandler("/images/**")
-                .addResourceLocations(fullPath)
+                .addResourceLocations(asResourceLocation(uploadDir))
                 .setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS).cachePublic());
 
         // 항공사 아이콘 (공용)
-        String iconPath = "file:" + iconDir + "/";
         registry.addResourceHandler("/icon/**")
-                .addResourceLocations(iconPath)
+                .addResourceLocations(asResourceLocation(iconDir))
                 .setCacheControl(CacheControl.maxAge(1, TimeUnit.DAYS).cachePublic());
+    }
+
+    private String asResourceLocation(String location) {
+        // classpath 접두라면 그대로 사용 (Spring이 내부 리소스를 처리함)
+        if (location.startsWith("classpath:")) {
+            return location.endsWith("/") ? location : location + "/";
+        }
+        // 그 외에는 절대경로 file URI로 변환
+        return Paths.get(location).toAbsolutePath().normalize().toUri().toString();
     }
 }
