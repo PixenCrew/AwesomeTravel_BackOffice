@@ -8,8 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import renewal.awesome_travel_backoffice.popup.dto.request.PopupRequestDto;
 import renewal.awesome_travel_backoffice.popup.dto.request.PopupSearchRequest;
 import renewal.awesome_travel_backoffice.popup.dto.response.PopupResponseDto;
-import renewal.awesome_travel_backoffice.popup.entity.Popup;
 import renewal.awesome_travel_backoffice.popup.repository.PopupRepository;
+import renewal.common.entity.Popup;
 
 import java.time.LocalDate;
 import java.util.List;

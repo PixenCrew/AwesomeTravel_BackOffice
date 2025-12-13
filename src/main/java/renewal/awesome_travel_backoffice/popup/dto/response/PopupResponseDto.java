@@ -3,7 +3,7 @@ package renewal.awesome_travel_backoffice.popup.dto.response;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import renewal.awesome_travel_backoffice.popup.entity.Popup;
+import renewal.common.entity.Popup;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

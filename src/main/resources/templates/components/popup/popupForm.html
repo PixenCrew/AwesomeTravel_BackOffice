@@ -97,8 +97,14 @@
                                id="file" 
                                name="file" 
                                th:value="${popup?.file}"
-                               placeholder="/images/popup/popup1.jpg"
+                               placeholder="이미지 URL (자동 입력)"
+                               readonly
                                required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg mb-2 bg-gray-50">
+                        <input type="file" 
+                               id="fileUpload" 
+                               onchange="uploadImage(this, 'popup')" 
+                               accept="image/*"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     </div>
                     
