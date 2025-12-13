@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +21,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 
-import renewal.awesome_travel_backoffice.image.LocalUploader;
+import renewal.awesome_travel_backoffice.image.service.FileUploadService;
+import renewal.awesome_travel_backoffice.image.entity.UploadedFile;
 import renewal.awesome_travel_backoffice.notice.dto.request.NoticeRequestDto;
 import renewal.awesome_travel_backoffice.notice.dto.request.NoticeSearchRequest;
 import renewal.awesome_travel_backoffice.notice.dto.response.NoticeResponseDto;
@@ -36,7 +38,7 @@ public class NoticeController {
 
     private final NoticeService noticeService;
 
-    private final LocalUploader localUploader;
+    private final FileUploadService fileUploadService;
 
     @PostMapping
     public ResponseEntity<Long> create(@RequestBody NoticeRequestDto dto) {
@@ -45,8 +47,14 @@ public class NoticeController {
 
     @PostMapping("/upload-image")
     public ResponseEntity<String> uploadImage(@RequestPart MultipartFile image) {
-        String imageUrl = localUploader.upload(image);
-        return ResponseEntity.ok(imageUrl);
+        try {
+            UploadedFile uploadedFile = fileUploadService.uploadFile(image, "notice");
+            String imageUrl = uploadedFile.getDriveImageUrl(); // Google Drive 이미지 직접 표시용 URL
+            return ResponseEntity.ok(imageUrl);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("이미지 업로드 실패: " + e.getMessage());
+        }
     }
 
     @GetMapping
