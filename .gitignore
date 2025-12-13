@@ -50,3 +50,10 @@ images/
 src/main/resources/META-INF/additional-spring-configuration-metadata.json
 src/main/resources/templates/components/.old/
 src/main/resources/application-smtp.properties
+
+# Google Drive credentials (보안상 중요)
+credentials.json
+src/main/resources/credentials.json
+
+# Google Drive & OAuth 설정 (보안상 중요 - client ID, secret, refresh token 포함)
+src/main/resources/application-google.properties
