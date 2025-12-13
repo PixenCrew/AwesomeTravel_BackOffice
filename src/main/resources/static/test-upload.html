@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이미지 업로드 테스트</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="file"], select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        .result.success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .result.error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .result pre {
+            margin: 10px 0 0 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .image-preview {
+            margin-top: 15px;
+            max-width: 100%;
+        }
+        .image-preview img {
+            max-width: 100%;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .info {
+            background-color: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .info h3 {
+            margin-top: 0;
+            color: #1976D2;
+        }
+        .info ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🖼️ 이미지 업로드 테스트</h1>
+        
+        <div class="info">
+            <h3>📋 사용 방법</h3>
+            <ul>
+                <li><strong>파일 선택:</strong> 업로드할 이미지 파일을 선택하세요</li>
+                <li><strong>폴더 타입:</strong> 이미지를 저장할 Google Drive 폴더를 선택하세요</li>
+                <li><strong>업로드:</strong> 버튼을 클릭하여 업로드합니다</li>
+            </ul>
+            <p><strong>⚠️ 주의:</strong> 관리자 권한이 필요합니다. 로그인 후 테스트하세요.</p>
+        </div>
+
+        <form id="uploadForm">
+            <div class="form-group">
+                <label for="file">이미지 파일 선택 *</label>
+                <input type="file" id="file" name="file" accept="image/*" required>
+            </div>
+
+            <div class="form-group">
+                <label for="folderType">폴더 타입 선택</label>
+                <select id="folderType" name="folderType">
+                    <option value="">기본 폴더</option>
+                    <option value="product">상품 이미지</option>
+                    <option value="notice">공지사항 이미지</option>
+                    <option value="banner">배너 이미지</option>
+                    <option value="popup">팝업 이미지</option>
+                    <option value="promotion">프로모션 이미지</option>
+                    <option value="hotel">호텔 이미지</option>
+                    <option value="excel">엑셀 파일</option>
+                </select>
+            </div>
+
+            <button type="submit" id="uploadBtn">업로드</button>
+        </form>
+
+        <div id="result" class="result"></div>
+        <div id="imagePreview" class="image-preview"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const resultDiv = document.getElementById('result');
+        const imagePreview = document.getElementById('imagePreview');
+        const uploadBtn = document.getElementById('uploadBtn');
+
+        // 파일 선택 시 미리보기
+        document.getElementById('file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.innerHTML = '<h3>미리보기:</h3><img src="' + e.target.result + '" alt="미리보기">';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.innerHTML = '';
+            }
+        });
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('file');
+            const folderType = document.getElementById('folderType').value;
+            
+            if (!fileInput.files[0]) {
+                showResult('error', '파일을 선택해주세요.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            if (folderType) {
+                formData.append('folderType', folderType);
+            }
+
+            // 버튼 비활성화
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = '업로드 중...';
+            resultDiv.style.display = 'none';
+            resultDiv.className = 'result';
+
+            try {
+                const response = await fetch('/api/files/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('success', 
+                        '✅ 업로드 성공!\n\n' +
+                        '파일 ID: ' + data.fileId + '\n' +
+                        '파일명: ' + data.filename + '\n' +
+                        '업로드 타입: ' + data.uploadType + '\n' +
+                        'Google Drive 링크: ' + (data.driveLink || 'N/A') + '\n\n' +
+                        '전체 응답:\n' + JSON.stringify(data, null, 2)
+                    );
+                    
+                    // 이미지 링크가 있으면 표시
+                    if (data.driveLink) {
+                        imagePreview.innerHTML = 
+                            '<h3>업로드된 이미지:</h3>' +
+                            '<a href="' + data.driveLink + '" target="_blank">' +
+                            '<img src="' + data.driveLink + '" alt="업로드된 이미지" style="max-width: 100%;">' +
+                            '</a>';
+                    }
+                } else {
+                    showResult('error', 
+                        '❌ 업로드 실패\n\n' +
+                        '메시지: ' + (data.message || '알 수 없는 오류') + '\n\n' +
+                        '전체 응답:\n' + JSON.stringify(data, null, 2)
+                    );
+                }
+            } catch (error) {
+                showResult('error', 
+                    '❌ 네트워크 오류\n\n' +
+                    '오류 메시지: ' + error.message + '\n\n' +
+                    '확인 사항:\n' +
+                    '1. 서버가 실행 중인지 확인\n' +
+                    '2. 관리자 권한으로 로그인했는지 확인\n' +
+                    '3. credentials.json 파일이 있는지 확인\n' +
+                    '4. Google Drive API가 활성화되어 있는지 확인'
+                );
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = '업로드';
+            }
+        });
+
+        function showResult(type, message) {
+            resultDiv.className = 'result ' + type;
+            resultDiv.innerHTML = '<pre>' + message + '</pre>';
+            resultDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
+

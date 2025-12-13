@@ -39,26 +39,65 @@ function returnData(trElement) {
 }
 
 
-function uploadImage(inputElement) {
+/**
+ * 이미지를 Google Drive에 업로드하는 함수
+ * @param {HTMLElement} inputElement - 파일 입력 요소
+ * @param {string} folderType - 업로드할 폴더 타입 (product, notice, banner, popup, promotion, hotel, excel)
+ */
+function uploadImage(inputElement, folderType) {
     const file = inputElement.files[0];
     if (!file) return;
 
+    // folderType이 지정되지 않으면 기본값 사용
+    // inputElement의 data-folder-type 속성 또는 부모 요소에서 찾기
+    if (!folderType) {
+        folderType = inputElement.getAttribute('data-folder-type') || 
+                     inputElement.closest('[data-folder-type]')?.getAttribute('data-folder-type') ||
+                     'product';  // 기본값: product
+    }
+
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("folderType", folderType);
 
-    fetch("/image", {  // 이미지 업로드 엔드포인트
+    // 업로드 중 표시
+    const originalValue = inputElement.value;
+    inputElement.disabled = true;
+    const imageInput = inputElement.previousElementSibling;  // input[type="text"]
+    if (imageInput) {
+        imageInput.value = "업로드 중...";
+        imageInput.disabled = true;
+    }
+
+    fetch("/api/files/upload", {  // Google Drive 업로드 엔드포인트
         method: "POST",
         body: formData
     })
-        .then(response => response.text())
-        .then(url => {
-            console.log("url : " + url)
-            // 서버에서 받은 URL을 해당 input 필드에 채우기
-            const imageInput = inputElement.previousElementSibling;  // input[type="text"]
-            imageInput.value = url;
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("업로드 실패: " + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("업로드 성공:", data);
+            // 이미지 직접 표시용 URL을 input 필드에 채우기 (클라이언트에서 <img> 태그로 사용)
+            if (imageInput) {
+                // imageUrl이 있으면 사용, 없으면 driveLink 사용
+                imageInput.value = data.imageUrl || data.driveLink || data.filename || "";
+                imageInput.disabled = false;
+            }
         })
         .catch(error => {
+            console.error("이미지 업로드 실패:", error);
             alert("이미지 업로드 실패: " + error.message);
+            if (imageInput) {
+                imageInput.value = "";
+                imageInput.disabled = false;
+            }
+        })
+        .finally(() => {
+            inputElement.disabled = false;
         });
 }
 
