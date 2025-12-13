@@ -8,11 +8,6 @@
                 th:text="${hotel.id == null} ? '새로운 호텔을 등록합니다.' : '호텔 정보를 확인하고 수정할 수 있습니다.'">호텔 정보를 확인하고 수정할 수 있습니다.</p>
         </div>
         <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none space-x-3" th:if="${hotel.id != null}">
-            <button th:onclick="|openReservationPopup(${hotel.id})|"
-                class="inline-flex items-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500">
-                <i class="fas fa-calendar -ml-0.5 mr-1.5 h-4 w-4"></i>
-                예약상세
-            </button>
             <button th:onclick="deleteHotel([[${hotel.id}]])"
                 class="inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500">
                 <i class="fas fa-trash -ml-0.5 mr-1.5 h-4 w-4"></i>
@@ -168,22 +163,22 @@
                 fetch('/hotel/' + id, { method: 'DELETE' })
                     .then(res => {
                         if (res.ok) {
-                            alert('삭제 성공');
-                            window.location.href = '/hotel';
+                            return res.text();
                         } else {
-                            alert('삭제 실패');
+                            return res.text().then(text => {
+                                throw new Error(text);
+                            });
                         }
+                    })
+                    .then(message => {
+                        alert(message || '삭제 완료');
+                        window.location.href = '/hotel';
+                    })
+                    .catch(err => {
+                        console.error('Error:', err);
+                        alert('삭제 실패: ' + err.message);
                     });
             }
-        }
-
-        function openReservationPopup(hotelId) {
-            const popup = window.open(
-                '/hotel/' + hotelId + '/hotelReservation',
-                'hotelReservation',
-                'width=1200,height=800,scrollbars=yes,resizable=yes,menubar=no,toolbar=no,location=no,status=no'
-            );
-            popup.focus();
         }
 
         // function addImage() {
@@ -210,7 +205,7 @@
 
             item.innerHTML = `
                 <input type="text" name="images[${index}]" placeholder="이미지 URL" readonly />
-                <input type="file" onchange="uploadImage(this)" />
+                <input type="file" onchange="uploadImage(this, 'hotel')" />
                 <button type="button" onclick="removeImage(this)">삭제</button>
             `;
 
