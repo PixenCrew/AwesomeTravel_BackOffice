@@ -189,16 +189,17 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     <th:block th:each="tour : ${tourPage.content}">
-                        <tr th:onclick="${isSelectionPage != null and isSelectionPage} ?
-            'returnData(this)' :
-            'window.location.href=\'/tour/' + ${tour.id} + '\''"
-                            class="hover:bg-gray-50 cursor-pointer"
+                        <tr th:class="${isSelectionPage != null and isSelectionPage} ? 
+                            'hover:bg-gray-50 cursor-pointer tour-selection-row' : 
+                            'hover:bg-gray-50 cursor-pointer'"
                             th:attr="data-id=${tour.id},
                  data-price-adult=${tour.priceAdult},
                  data-hotel-price=${tour.hotelPriceSum},
-                 data-country=${tour.country.countryCode},
+                 data-country=${tour.country != null ? tour.country.countryCode : ''},
                  data-start=${#temporals.format(tour.startDate, 'yyyy-MM-dd')},
-                 data-end=${#temporals.format(tour.endDate, 'yyyy-MM-dd')}">
+                 data-end=${#temporals.format(tour.endDate, 'yyyy-MM-dd')},
+                 data-selection-mode=${isSelectionPage != null and isSelectionPage},
+                 data-tour-id=${tour.id}">
 
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
                                 th:text="${tour.id}">1</td>
@@ -265,7 +266,9 @@
                 <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
                     <!-- 이전 페이지 버튼 -->
                     <a th:if="${tourPage.hasPrevious()}"
-                        th:href="@{/tour(page=${tourPage.number - 1}, sortField=${sortField}, sortDir=${sortDir})}"
+                        th:href="${isSelectionPage != null and isSelectionPage} ? 
+                            @{/tour/search(page=${tourPage.number - 1}, sortField=${sortField}, sortDir=${sortDir})} : 
+                            @{/tour(page=${tourPage.number - 1}, sortField=${sortField}, sortDir=${sortDir})}"
                         class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                         <i class="fas fa-chevron-left"></i>
                     </a>
@@ -274,14 +277,18 @@
                     <th:block
                         th:with="startPage=${tourPage.number > 5 ? tourPage.number - 5 : 0}, endPage=${tourPage.number + 5 < tourPage.totalPages ? tourPage.number + 5 : tourPage.totalPages - 1}">
                         <a th:each="i : ${#numbers.sequence(startPage, endPage)}"
-                            th:href="@{/tour(page=${i}, sortField=${sortField}, sortDir=${sortDir})}"
+                            th:href="${isSelectionPage != null and isSelectionPage} ? 
+                                @{/tour/search(page=${i}, sortField=${sortField}, sortDir=${sortDir})} : 
+                                @{/tour(page=${i}, sortField=${sortField}, sortDir=${sortDir})}"
                             th:class="${i == tourPage.number} ? 'z-10 bg-blue-50 border-blue-500 text-blue-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium'"
                             th:text="${i + 1}">1</a>
                     </th:block>
 
                     <!-- 다음 페이지 버튼 -->
                     <a th:if="${tourPage.hasNext()}"
-                        th:href="@{/tour(page=${tourPage.number + 1}, sortField=${sortField}, sortDir=${sortDir})}"
+                        th:href="${isSelectionPage != null and isSelectionPage} ? 
+                            @{/tour/search(page=${tourPage.number + 1}, sortField=${sortField}, sortDir=${sortDir})} : 
+                            @{/tour(page=${tourPage.number + 1}, sortField=${sortField}, sortDir=${sortDir})}"
                         class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                         <i class="fas fa-chevron-right"></i>
                     </a>
@@ -309,10 +316,19 @@
                 newSortDir = 'desc';
             }
 
+            // 현재 URL이 /tour/search인지 확인
+            const isSearchPage = window.location.pathname === '/tour/search';
+            
             // URL 파라미터로 정렬 정보 전달
             const url = new URL(window.location);
             url.searchParams.set('sortField', sortField);
             url.searchParams.set('sortDir', newSortDir);
+            
+            // 선택 페이지가 아니면 /tour로, 선택 페이지면 /tour/search로
+            if (!isSearchPage && window.location.pathname !== '/tour/search') {
+                url.pathname = '/tour';
+            }
+            
             window.location.href = url.toString();
         }
 
@@ -390,7 +406,7 @@
             }
         }
 
-        // 페이지 로드 시 필터 상태 확인
+        // 페이지 로드 시 필터 상태 확인 및 투어 선택 이벤트 등록
         document.addEventListener('DOMContentLoaded', function () {
             // URL에 필터 파라미터가 있으면 필터 폼을 열어둠
             const urlParams = new URLSearchParams(window.location.search);
@@ -402,8 +418,47 @@
             if (hasFilterParams) {
                 document.getElementById('filterForm').style.display = 'block';
             }
+            
+            // 투어 선택 모드일 때 클릭 이벤트 등록
+            const allRows = document.querySelectorAll('tr[data-selection-mode]');
+            console.log('총 행 개수:', allRows.length);
+            allRows.forEach(row => {
+                const isSelectionMode = row.getAttribute('data-selection-mode') === 'true';
+                console.log('행의 선택 모드:', isSelectionMode, row.getAttribute('data-selection-mode'));
+                
+                row.addEventListener('click', function(e) {
+                    if (!isSelectionMode) {
+                        // 일반 모드: 투어 상세 페이지로 이동
+                        const tourId = this.dataset.tourId;
+                        if (tourId) {
+                            window.location.href = '/tour/' + tourId;
+                        }
+                        return;
+                    }
+                    
+                    // 선택 모드: returnData 호출
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('투어 선택 행 클릭됨:', this);
+                    console.log('데이터 속성:', {
+                        id: this.dataset.id,
+                        priceAdult: this.dataset.priceAdult,
+                        hotelPrice: this.dataset.hotelPrice,
+                        country: this.dataset.country,
+                        start: this.dataset.start,
+                        end: this.dataset.end
+                    });
+                    if (typeof returnData === 'function') {
+                        returnData(this);
+                    } else {
+                        console.error('returnData 함수를 찾을 수 없습니다. util.js가 로드되었는지 확인하세요.');
+                        alert('오류: returnData 함수를 찾을 수 없습니다.');
+                    }
+                });
+            });
         });
     </script>
 
     <script src="/js/filter.js"></script>
+    <script src="/js/util.js"></script>
 </div>

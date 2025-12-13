@@ -821,7 +821,7 @@
 
                     const input = document.createElement('input');
                     input.type = 'text';
-                    input.name = `schedules[${schedIdx}].locations[${locIdx}].hotel`;
+                    input.name = `schedules[${schedIdx}].locations[${locIdx}].hotel.id`;
                     input.placeholder = '호텔을 검색하세요';
                     input.className = 'form-control';
                     input.readOnly = true;
@@ -913,9 +913,15 @@
 
                     // fieldName만 가져오기 (마지막 부분)
                     const parts = input.name.split(".");
-                    const fieldName = parts[parts.length - 1]; // city, description, hotel 등
-
-                    input.name = `schedules[${schedIdx}].locations[${newIdx}].${fieldName}`;
+                    // hotel.id 같은 중첩 필드도 처리
+                    if (parts.length >= 2 && parts[parts.length - 2] === 'hotel') {
+                        // hotel.id 또는 hotel.name 같은 경우
+                        const fieldName = parts[parts.length - 2] + '.' + parts[parts.length - 1];
+                        input.name = `schedules[${schedIdx}].locations[${newIdx}].${fieldName}`;
+                    } else {
+                        const fieldName = parts[parts.length - 1]; // city, description 등
+                        input.name = `schedules[${schedIdx}].locations[${newIdx}].${fieldName}`;
+                    }
                 });
             });
         }
@@ -966,9 +972,12 @@
         }
 
         function setId(id) {
+            console.log("setId 호출됨, id:", id, "searchTarget:", searchTarget);
             if (searchTarget) {
                 searchTarget.value = id;
-                console.log("searchTarget updated:", searchTarget.value);
+                console.log("searchTarget updated:", searchTarget.value, "name:", searchTarget.name);
+            } else {
+                console.error("searchTarget이 설정되지 않았습니다.");
             }
         }
 

@@ -30,11 +30,23 @@ function performSearch(page = 0, event = null, sortField = null, sortDir = null)
     }
     
     const formData = new FormData(form);
+    
+    // 현재 URL의 모든 쿼리 파라미터를 가져옴 (팝업 페이지의 isSelectionPage 등 유지)
+    const currentParams = new URLSearchParams(window.location.search);
     const params = new URLSearchParams();
 
+    // 먼저 현재 URL의 파라미터를 복사 (form 필드와 중복되지 않는 것들)
+    for (const [key, value] of currentParams.entries()) {
+        // form에 없는 필드들만 유지 (form 필드는 나중에 덮어씀)
+        if (!formData.has(key) || key.startsWith('_')) {
+            params.append(key, value);
+        }
+    }
+
+    // form 필드 값 추가/덮어쓰기
     for (const [key, value] of formData.entries()) {
         if (value != null && value !== '' && !key.startsWith('_')) {
-            params.append(key, value);
+            params.set(key, value); // set으로 덮어쓰기
         }
     }
 
