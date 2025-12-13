@@ -93,7 +93,8 @@ public class HotelController {
     // 호텔 상세 조회
     @GetMapping("/{id}")
     public String selectHotel(@PathVariable Long id, Model model) {
-        Hotel hotel = hotelRepo.getReferenceById(id);
+        Hotel hotel = hotelRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("호텔을 찾을 수 없습니다. ID: " + id));
 
         // 도시코드
         model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
@@ -116,19 +117,22 @@ public class HotelController {
     // 호텔 삭제 처리
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteHotel(@PathVariable Long id) {
+        try {
+            // 호텔 존재 여부 확인
+            if (!hotelRepo.existsById(id)) {
+                return ResponseEntity.status(404).body("호텔을 찾을 수 없습니다. ID: " + id);
+            }
 
-        // // 1. 호텔 ID에 연결된 모든 예약 가져오기
-        // List<HotelReservation> hotelReservations = hotelReservationRepo.findByHotelId(id);
-
-        // // 2. 예약 삭제
-        // for (HotelReservation hotelReservation : hotelReservations) {
-        //     hotelReservationRepo.deleteById(hotelReservation.getId());
-        // }
-        
-        // 3. 호텔 삭제
-        hotelRepo.deleteById(id);
-        
-        return ResponseEntity.ok("삭제 완료");
+            // 호텔 삭제
+            hotelRepo.deleteById(id);
+            
+            return ResponseEntity.ok("삭제 완료");
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            // 외래키 제약 조건 위반 시
+            return ResponseEntity.status(500).body("삭제할 수 없습니다. 이 호텔은 투어 스케줄(Location)에서 사용 중입니다. 먼저 해당 투어 스케줄에서 호텔 연결을 해제해주세요.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("삭제 실패: " + e.getMessage());
+        }
     }
 
     // // 특정 호텔 예약 조회

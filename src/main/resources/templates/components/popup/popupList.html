@@ -82,60 +82,72 @@
 
         <!-- 팝업 목록 -->
         <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">표시순서</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">제목</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">노출기간</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">상태</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">파일</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">등록일</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">작업</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr th:each="popup : ${popups.content}" th:classappend="${!popup.active} ? 'bg-gray-100 opacity-75' : ''">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="${popup.displayOrder}">1</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900" th:text="${popup.title}">팝업 제목</div>
-                                <div class="text-sm text-gray-500" th:text="${popup.url}">URL</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                <div th:text="${#temporals.format(popup.startDate, 'yyyy-MM-dd')}">2024-01-01</div>
-                                <div class="text-gray-500">~</div>
-                                <div th:text="${#temporals.format(popup.endDate, 'yyyy-MM-dd')}">2024-12-31</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span th:if="${popup.active}" class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">활성화</span>
-                                <span th:unless="${popup.active}" class="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">비활성화</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${popup.file}">popup.jpg</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${#temporals.format(popup.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 10:00</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                <a th:href="@{'/popup/' + ${popup.id}}" class="text-blue-600 hover:text-blue-900">상세</a>
-                                <a th:href="@{'/popup/edit/' + ${popup.id}}" class="text-indigo-600 hover:text-indigo-900">수정</a>
-                                <form th:action="@{'/popup/' + ${popup.id} + '/toggle'}" method="POST" class="inline">
-                                    <button type="submit" 
-                                            th:text="${popup.active ? '비활성화' : '활성화'}"
-                                            th:class="${popup.active ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}"
-                                            class="font-medium">
-                                        토글
-                                    </button>
-                                </form>
-                                <form th:action="@{'/popup/' + ${popup.id}}" method="POST" class="inline">
-                                    <input type="hidden" name="_method" value="DELETE" />
-                                    <button type="submit" 
-                                            class="text-red-600 hover:text-red-900 font-medium"
-                                            onclick="return confirm('정말로 이 팝업을 삭제하시겠습니까?')">
-                                        삭제
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="overflow-x-auto -mx-4 sm:mx-0">
+                <div class="inline-block min-w-full align-middle">
+                    <div class="overflow-hidden">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">순서</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[200px]">제목</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">노출기간</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">상태</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[150px] max-w-[200px]">파일</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">등록일</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">작업</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr th:each="popup : ${popups.content}" th:classappend="${!popup.active} ? 'bg-gray-100 opacity-75' : ''">
+                                    <td class="px-4 py-4 text-sm font-medium text-gray-900" th:text="${popup.displayOrder}">1</td>
+                                    <td class="px-4 py-4">
+                                        <div class="text-sm font-medium text-gray-900 truncate" th:text="${popup.title}" th:title="${popup.title}">팝업 제목</div>
+                                        <div class="text-sm text-gray-500 truncate" th:text="${popup.url}" th:title="${popup.url}">URL</div>
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-900">
+                                        <div th:text="${#temporals.format(popup.startDate, 'yyyy-MM-dd')}">2024-01-01</div>
+                                        <div class="text-gray-500 text-xs">~</div>
+                                        <div th:text="${#temporals.format(popup.endDate, 'yyyy-MM-dd')}">2024-12-31</div>
+                                    </td>
+                                    <td class="px-4 py-4">
+                                        <span th:if="${popup.active}" class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full whitespace-nowrap">활성화</span>
+                                        <span th:unless="${popup.active}" class="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full whitespace-nowrap">비활성화</span>
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-900">
+                                        <div class="truncate max-w-[200px]" th:text="${popup.file}" th:title="${popup.file}">popup.jpg</div>
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-500 whitespace-nowrap" th:text="${#temporals.format(popup.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 10:00</td>
+                                    <td class="px-4 py-4 text-sm font-medium">
+                                        <div class="flex items-center space-x-2">
+                                            <a th:href="@{'/popup/' + ${popup.id}}" 
+                                               class="inline-flex items-center justify-center px-3 py-1.5 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors" 
+                                               title="상세보기">
+                                                <i class="fas fa-eye text-sm"></i>
+                                            </a>
+                                            <a th:href="@{'/popup/edit/' + ${popup.id}}" 
+                                               class="inline-flex items-center justify-center px-3 py-1.5 bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200 transition-colors" 
+                                               title="수정">
+                                                <i class="fas fa-edit text-sm"></i>
+                                            </a>
+                                            <button th:onclick="|togglePopup(${popup.id})|" 
+                                                    th:class="${popup.active} ? 'inline-flex items-center justify-center px-3 py-1.5 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 transition-colors' : 'inline-flex items-center justify-center px-3 py-1.5 bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors'"
+                                                    th:title="${popup.active} ? '비활성화' : '활성화'"
+                                                    type="button">
+                                                <i th:class="${popup.active} ? 'fas fa-pause text-sm' : 'fas fa-play text-sm'"></i>
+                                            </button>
+                                            <button th:onclick="|deletePopup(${popup.id})|" 
+                                                    class="inline-flex items-center justify-center px-3 py-1.5 bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors" 
+                                                    title="삭제"
+                                                    type="button">
+                                                <i class="fas fa-trash text-sm"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
             
             <!-- 페이지네이션 -->
@@ -187,4 +199,54 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function togglePopup(id) {
+            if (confirm('팝업 상태를 변경하시겠습니까?')) {
+                fetch(`/popup/${id}/toggle`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        return response.text().then(text => {
+                            alert('상태 변경에 실패했습니다: ' + text);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('오류가 발생했습니다.');
+                });
+            }
+        }
+
+        function deletePopup(id) {
+            if (confirm('정말로 이 팝업을 삭제하시겠습니까?')) {
+                fetch(`/popup/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        return response.text().then(text => {
+                            alert('삭제에 실패했습니다: ' + text);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('오류가 발생했습니다.');
+                });
+            }
+        }
+    </script>
 </div>

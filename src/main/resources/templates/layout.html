@@ -308,6 +308,20 @@
                         </ul>
                     </li>
 
+                    <!-- 시스템관리 -->
+                    <li class="menu-item">
+                        <div class="menu-item-content cursor-pointer" onclick="toggleMenu(this)">
+                            <div class="menu-icon-container">
+                                <span class="menu-icon">⚙️</span>
+                            </div>
+                            <span class="sidebar-text">시스템관리</span>
+                            <span class="toggle-icon">+</span>
+                        </div>
+                        <ul class="submenu hidden">
+                            <li><a href="/file" class="submenu-link" th:classappend="${#strings.equals(content, 'components/file/fileList')} ? 'active' : ''">파일 관리</a></li>
+                        </ul>
+                    </li>
+
                     <!-- 주문관리 -->
                     <li class="menu-item">
                         <div class="menu-item-content cursor-pointer" onclick="toggleMenu(this)">

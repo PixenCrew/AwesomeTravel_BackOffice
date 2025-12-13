@@ -1,6 +1,7 @@
 package renewal.awesome_travel_backoffice.product.controller;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.common.service.CommonCodeService;
@@ -54,8 +56,11 @@ public class ProductController {
         }
 
         // 상태 필터가 설정되지 않은 경우 기본값 설정 (활성 상품만)
-        if (filter.getStatus() == null || filter.getStatus().isEmpty()) {
+        // 빈 문자열("")은 "all"로 간주하여 모든 상품 조회
+        if (filter.getStatus() == null) {
             filter.setStatus("active");
+        } else if (filter.getStatus().isEmpty()) {
+            filter.setStatus("all"); // "전체" 선택 시 모든 상품 조회
         }
         // 1) 정렬 객체 설정
         Sort sort = sortDir.equalsIgnoreCase("asc")
@@ -113,10 +118,25 @@ public class ProductController {
         tourRepo.save(tour);
 
         // 키워드 등록
-        Set<String> tourKeyword = tour.getKeywords();
-        product.getKeywords().clear();
-        product.getKeywords().addAll(tourKeyword);
-        product.getKeywords().add(product.getTitle());
+        // 폼에서 전송된 keywords와 Tour의 keywords를 병합
+        Set<String> finalKeywords = new HashSet<>();
+        
+        // 1. Tour의 keywords 추가
+        if (tour.getKeywords() != null) {
+            finalKeywords.addAll(tour.getKeywords());
+        }
+        
+        // 2. 폼에서 전송된 keywords 추가 (어드민이 직접 입력한 키워드)
+        if (product.getKeywords() != null) {
+            finalKeywords.addAll(product.getKeywords());
+        }
+        
+        // 3. Product title 추가
+        if (product.getTitle() != null && !product.getTitle().isEmpty()) {
+            finalKeywords.add(product.getTitle());
+        }
+        
+        product.setKeywords(finalKeywords);
 
         // 투어 productId 업데이트
         // Tour tour = tourRepo.findById(product.getTour().getId()).get();
@@ -135,7 +155,9 @@ public class ProductController {
     @GetMapping("/{id}")
     public String selectProduct(@PathVariable Long id, Model model) {
 
-        Product product = productAdminRepo.getReferenceById(id);
+        Product product = productAdminRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. ID: " + id));
+        
         model.addAttribute("product", product);
         model.addAttribute("productTypes", ProductType.values());
         model.addAttribute("title", "Product " + product.getTitle());
@@ -146,21 +168,28 @@ public class ProductController {
 
     // 특정 패키지 수정
     @PostMapping("/{id}")
+    @Transactional
     public String submitSelectedProduct(@ModelAttribute Product product) {
 
         // 기존 Product 조회하여 리뷰 데이터 보존
-        Product existingProduct = productAdminRepo.findById(product.getId()).get();
+        Product existingProduct = productAdminRepo.findById(product.getId())
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. ID: " + product.getId()));
 
-        // 기존 Tour productId 삭제
-        Long lastTourId = existingProduct.getTour().getId();
-        Tour lastTour = tourRepo.findById(lastTourId).get();
-        // lastTour.setProduct(null);
-        tourRepo.save(lastTour);
+        Long newTourId = product.getTour().getId();
+        Long existingTourId = existingProduct.getTour().getId();
 
-        // 투어 productId 업데이트
-        Tour tour = tourRepo.findById(product.getTour().getId()).get();
-        // tour.setProduct(product);
-        tourRepo.save(tour);
+        // Tour가 변경된 경우에만 Tour 업데이트
+        if (!newTourId.equals(existingTourId)) {
+            // 새로운 Tour의 productId 업데이트
+            Tour newTour = tourRepo.findById(newTourId)
+                    .orElseThrow(() -> new IllegalArgumentException("새 투어를 찾을 수 없습니다. ID: " + newTourId));
+            newTour.setProductId(product.getId());
+            tourRepo.save(newTour);
+            product.setTour(newTour);
+        } else {
+            // Tour가 변경되지 않은 경우, 기존 Tour 참조 유지
+            product.setTour(existingProduct.getTour());
+        }
 
         // 리뷰 데이터 보존하면서 Product 업데이트
         product.setStar1(existingProduct.getStar1());
@@ -175,10 +204,26 @@ public class ProductController {
         }
 
         // 키워드 등록
-        Set<String> tourKeyword = tour.getKeywords();
-        product.getKeywords().clear();
-        product.getKeywords().addAll(tourKeyword);
-        product.getKeywords().add(product.getTitle());
+        // 폼에서 전송된 keywords와 Tour의 keywords를 병합
+        Set<String> finalKeywords = new HashSet<>();
+        
+        // 1. Tour의 keywords 추가
+        Tour tour = product.getTour();
+        if (tour != null && tour.getKeywords() != null) {
+            finalKeywords.addAll(tour.getKeywords());
+        }
+        
+        // 2. 폼에서 전송된 keywords 추가 (어드민이 직접 입력한 키워드)
+        if (product.getKeywords() != null) {
+            finalKeywords.addAll(product.getKeywords());
+        }
+        
+        // 3. Product title 추가
+        if (product.getTitle() != null && !product.getTitle().isEmpty()) {
+            finalKeywords.add(product.getTitle());
+        }
+        
+        product.setKeywords(finalKeywords);
 
         // Product 저장
         productAdminRepo.save(product);

@@ -5,7 +5,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import renewal.awesome_travel_backoffice.popup.entity.Popup;
+
+import renewal.common.entity.Popup;
 
 import java.time.LocalDate;
 import java.util.List;

@@ -1,9 +1,5 @@
 package renewal.awesome_travel_backoffice.banner.controller;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -25,7 +21,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.banner.service.BannerService;
+import renewal.awesome_travel_backoffice.image.service.FileUploadService;
 import renewal.common.entity.Banner;
+import renewal.awesome_travel_backoffice.image.entity.UploadedFile;
 
 @Controller
 @RequestMapping("/banner")
@@ -33,7 +31,7 @@ import renewal.common.entity.Banner;
 public class BannerController {
 
     private final BannerService bannerService;
-    private static final String UPLOAD_DIR = "images/banners/";
+    private final FileUploadService fileUploadService;
 
     // 배너 목록 페이지
     @GetMapping
@@ -132,14 +130,18 @@ public class BannerController {
             @RequestParam String endDate,
             @RequestParam(required = false) Boolean active,
             @RequestParam String url,
-            @RequestParam("file") MultipartFile file,
+            @RequestParam(required = false) String fileUrl,
+            @RequestParam(required = false) MultipartFile file,
             Model model) {
 
         try {
-            // 파일 업로드 처리
-            String fileName = null;
-            if (!file.isEmpty()) {
-                fileName = uploadFile(file);
+            // 파일 업로드 처리 (Google Drive)
+            String fileName = fileUrl; // 기존 URL 또는 새로 업로드된 URL
+            
+            // 새 파일이 업로드된 경우
+            if (file != null && !file.isEmpty()) {
+                UploadedFile uploadedFile = fileUploadService.uploadFile(file, "banner");
+                fileName = uploadedFile.getDriveImageUrl(); // 이미지 직접 표시용 URL 사용
             }
 
             Banner banner;
@@ -162,12 +164,15 @@ public class BannerController {
                 bannerService.updateBanner(id, banner);
             } else {
                 // 생성
+                if (fileName == null || fileName.isEmpty()) {
+                    throw new RuntimeException("배너 이미지는 필수입니다.");
+                }
                 banner = new Banner(
                     displayOrder,
                     title,
                     LocalDate.parse(startDate),
                     LocalDate.parse(endDate),
-                    fileName != null ? fileName : "",
+                    fileName,
                     url
                 );
                 banner.setActive(active != null ? active : true);
@@ -220,23 +225,5 @@ public class BannerController {
         }
     }
 
-    // 파일 업로드 처리
-    private String uploadFile(MultipartFile file) throws IOException {
-        // 업로드 디렉토리 생성
-        Path uploadPath = Paths.get(UPLOAD_DIR);
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
-        }
-
-        // 파일명 생성 (타임스탬프 + 원본 파일명)
-        String originalFileName = file.getOriginalFilename();
-        String fileName = System.currentTimeMillis() + "_" + originalFileName;
-        
-        // 파일 저장
-        Path filePath = uploadPath.resolve(fileName);
-        Files.copy(file.getInputStream(), filePath);
-
-        return UPLOAD_DIR + fileName;
-    }
 }
 
