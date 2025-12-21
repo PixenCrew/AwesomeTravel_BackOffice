@@ -352,22 +352,26 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="company">회사 <span class="required">*</span></label>
-                    <input type="text" th:field="*{company}" required class="form-control" placeholder="회사명을 입력하세요" />
+                    <label for="company">랜드사명 <span class="required">*</span></label>
+                    <input type="text" th:field="*{company}" required class="form-control" placeholder="랜드사명을 입력하세요" />
                 </div>
 
                 <div class="form-group">
                     <label for="startDate">시작일 <span class="required">*</span></label>
-                    <input type="date" th:field="*{startDate}" min="2000-04-01" required class="form-control" />
+                    <input type="date" th:field="*{startDate}" id="startDate" min="2000-04-01" required 
+                        onchange="validateTourDates()" class="form-control" />
+                    <p id="startDateError" class="text-danger small mt-1" style="display: none;"></p>
                 </div>
 
                 <div class="form-group">
                     <label for="endDate">종료일 <span class="required">*</span></label>
-                    <input type="date" th:field="*{endDate}" min="2000-04-01" required class="form-control" />
+                    <input type="date" th:field="*{endDate}" id="endDate" min="2000-04-01" required 
+                        onchange="validateTourDates()" class="form-control" />
+                    <p id="endDateError" class="text-danger small mt-1" style="display: none;"></p>
                 </div>
 
                 <div class="form-group">
-                    <label for="price">가격 <span class="required">*</span></label>
+                    <label for="price">가격(성인) <span class="required">*</span></label>
                     <div class="input-group">
                         <input type="number" th:field="*{priceAdult}" min="1" required class="form-control"
                             placeholder="가격을 입력하세요" />
@@ -1020,6 +1024,61 @@
         //     const dd = String(dt.getDate()).padStart(2, '0');
         //     return `${yyyy}-${mm}-${dd}`;
         // }
+
+        // 투어 시작일/종료일 유효성 검사
+        function validateTourDates() {
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            const startDateError = document.getElementById('startDateError');
+            const endDateError = document.getElementById('endDateError');
+
+            // 에러 메시지 초기화
+            if (startDateError) {
+                startDateError.style.display = 'none';
+                startDateError.textContent = '';
+            }
+            if (endDateError) {
+                endDateError.style.display = 'none';
+                endDateError.textContent = '';
+            }
+            if (startDateInput) {
+                startDateInput.classList.remove('is-invalid');
+            }
+            if (endDateInput) {
+                endDateInput.classList.remove('is-invalid');
+            }
+
+            const startDate = startDateInput ? startDateInput.value : null;
+            const endDate = endDateInput ? endDateInput.value : null;
+
+            if (startDate && endDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+
+                if (end < start) {
+                    if (endDateError) {
+                        endDateError.textContent = '종료일은 시작일보다 이전일 수 없습니다.';
+                        endDateError.style.display = 'block';
+                    }
+                    if (endDateInput) {
+                        endDateInput.classList.add('is-invalid');
+                        endDateInput.focus();
+                    }
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // 폼 제출 시 최종 검증
+        document.querySelector('.tour-form').addEventListener('submit', function(e) {
+            if (!validateTourDates()) {
+                e.preventDefault();
+                alert('종료일은 시작일보다 이전일 수 없습니다. 날짜를 확인해주세요.');
+                return false;
+            }
+        });
 
     </script>
 

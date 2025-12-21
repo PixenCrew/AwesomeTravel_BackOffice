@@ -110,7 +110,7 @@ public class TourController {
         model.addAttribute("tour", blankTour);
         model.addAttribute("connectedProduct", new Product());
         model.addAttribute("isSelectionPage", false);
-        model.addAttribute("title", "New Tour");
+        model.addAttribute("title", "새 투어 등록");
         model.addAttribute("content", "components/tour/tourDetail");
 
         return "layout";
@@ -146,7 +146,7 @@ public class TourController {
         model.addAttribute("tour", tour);
         model.addAttribute("connectedProduct", connectedProduct == null ? 0 : connectedProduct.getId());
         model.addAttribute("isSelectionPage", false);
-        model.addAttribute("title", "Tour " + tour.getName());
+        model.addAttribute("title", "투어 상세");
         model.addAttribute("content", "components/tour/tourDetail");
 
         return "layout";
@@ -216,7 +216,7 @@ public class TourController {
         model.addAttribute("filter", filter); // 필터 객체 추가
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
-        model.addAttribute("title", "Tour Select");
+        model.addAttribute("title", "투어 선택");
 
         // 투어선택 플래그
         model.addAttribute("isSelectionPage", true);
