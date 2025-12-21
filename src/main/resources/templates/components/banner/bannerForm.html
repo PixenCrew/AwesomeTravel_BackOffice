@@ -112,6 +112,42 @@
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     </div>
 
+                    <!-- 배너 위치 타입 -->
+                    <div>
+                        <label for="locationType" class="block text-sm font-medium text-gray-700 mb-2">배너 위치 타입 *</label>
+                        <select id="locationType" 
+                                name="locationType" 
+                                required
+                                onchange="updateLocationIdentifierField()"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">선택하세요</option>
+                            <option value="HOME" th:selected="${banner.locationType != null && banner.locationType.name() == 'HOME'}">홈페이지 메인</option>
+                            <option value="SUB_MENU" th:selected="${banner.locationType != null && banner.locationType.name() == 'SUB_MENU'}">서브메뉴 페이지</option>
+                            <option value="AIR_SEARCH" th:selected="${banner.locationType != null && banner.locationType.name() == 'AIR_SEARCH'}">항공선택 페이지</option>
+                            <option value="PRODUCT_LIST" th:selected="${banner.locationType != null && banner.locationType.name() == 'PRODUCT_LIST'}">상품 목록 페이지</option>
+                            <option value="PRODUCT_DETAIL" th:selected="${banner.locationType != null && banner.locationType.name() == 'PRODUCT_DETAIL'}">상품 상세 페이지</option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">배너가 표시될 위치를 선택하세요.</p>
+                    </div>
+
+                    <!-- 위치 식별자 -->
+                    <div id="locationIdentifierGroup">
+                        <label for="locationIdentifier" class="block text-sm font-medium text-gray-700 mb-2">
+                            위치 식별자
+                            <span id="locationIdentifierLabel" class="text-xs text-gray-500">(선택사항)</span>
+                        </label>
+                        <input type="text" 
+                               id="locationIdentifier" 
+                               name="locationIdentifier" 
+                               th:value="${banner.locationIdentifier}"
+                               placeholder="예: 101, 201, air_search 등"
+                               maxlength="50"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <p id="locationIdentifierHelp" class="text-xs text-gray-500 mt-1">
+                            서브메뉴 페이지인 경우 메뉴 코드(예: 101, 201)를 입력하세요.
+                        </p>
+                    </div>
+
                     <!-- URL -->
                     <div class="md:col-span-2">
                         <label for="url" class="block text-sm font-medium text-gray-700 mb-2">연결 URL *</label>
@@ -206,6 +242,48 @@
                 alert('종료 날짜는 시작 날짜보다 늦어야 합니다.');
                 this.value = '';
             }
+        });
+
+        // 배너 위치 타입에 따라 위치 식별자 필드 업데이트
+        function updateLocationIdentifierField() {
+            const locationType = document.getElementById('locationType').value;
+            const locationIdentifierGroup = document.getElementById('locationIdentifierGroup');
+            const locationIdentifierInput = document.getElementById('locationIdentifier');
+            const locationIdentifierLabel = document.getElementById('locationIdentifierLabel');
+            const locationIdentifierHelp = document.getElementById('locationIdentifierHelp');
+
+            if (locationType === 'SUB_MENU') {
+                locationIdentifierGroup.style.display = 'block';
+                locationIdentifierInput.required = true;
+                locationIdentifierLabel.textContent = '(필수)';
+                locationIdentifierHelp.textContent = '서브메뉴 페이지인 경우 메뉴 코드를 입력해야 합니다. 예: 101, 201, 601 등';
+            } else if (locationType === 'AIR_SEARCH') {
+                locationIdentifierGroup.style.display = 'block';
+                locationIdentifierInput.required = true;
+                locationIdentifierLabel.textContent = '(필수)';
+                locationIdentifierInput.value = 'air_search';
+                locationIdentifierHelp.textContent = '항공배너의 경우 "air_search"를 입력해야 합니다.';
+            } else if (locationType === 'PRODUCT_LIST' || locationType === 'PRODUCT_DETAIL') {
+                locationIdentifierGroup.style.display = 'block';
+                locationIdentifierInput.required = false;
+                locationIdentifierLabel.textContent = '(선택사항)';
+                locationIdentifierHelp.textContent = '상품 목록/상세 페이지의 경우 특별한 식별자가 필요하지 않습니다.';
+            } else if (locationType === 'HOME') {
+                locationIdentifierGroup.style.display = 'block';
+                locationIdentifierInput.required = false;
+                locationIdentifierLabel.textContent = '(선택사항)';
+                locationIdentifierHelp.textContent = '홈페이지 메인 배너의 경우 특별한 식별자가 필요하지 않습니다. 입력하지 않아도 됩니다.';
+            } else {
+                locationIdentifierGroup.style.display = 'block';
+                locationIdentifierInput.required = false;
+                locationIdentifierLabel.textContent = '(선택사항)';
+                locationIdentifierHelp.textContent = '';
+            }
+        }
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            updateLocationIdentifierField();
         });
     </script>
 </div>

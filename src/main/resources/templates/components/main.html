@@ -1,3 +1,63 @@
 <div th:fragment="content">
-    <h1>Hello, Awesome Travel!</h1>
+    <div class="space-y-6">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">대시보드</h1>
+            <p class="text-gray-600 mt-2">딱좋은여행 관리자 대시보드에 오신 것을 환영합니다.</p>
+        </div>
+        
+        <!-- 대시보드 통계 카드 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- 모든 상품 -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                        <i class="fas fa-box text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">모든 상품</p>
+                        <p class="text-2xl font-semibold text-gray-900" th:text="${totalProducts}">0</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 모든 회원 -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100 text-green-600">
+                        <i class="fas fa-users text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">모든 회원</p>
+                        <p class="text-2xl font-semibold text-gray-900" th:text="${totalMembers}">0</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 항공 주문 -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                        <i class="fas fa-plane text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">항공 주문</p>
+                        <p class="text-2xl font-semibold text-gray-900" th:text="${totalAirOrders}">0</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 패키지 주문 -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">패키지 주문</p>
+                        <p class="text-2xl font-semibold text-gray-900" th:text="${totalPackageOrders}">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

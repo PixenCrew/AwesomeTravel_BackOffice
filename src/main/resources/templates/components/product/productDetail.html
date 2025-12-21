@@ -464,7 +464,9 @@
     </div>
 
     <form th:object="${product}"
-        th:action="${product.id} == null ? @{/product/new} : @{/product/{id}(id=${product.id})}" method="post">
+        th:action="${product.id} == null ? @{/product/new} : @{/product/{id}(id=${product.id})}" 
+        method="post"
+        onsubmit="reindexAllFields(); return validateNonNegativeNumbers();">
 
         <!-- 기본 정보 섹션 -->
         <div class="form-section">
@@ -504,16 +506,16 @@
                 <div class="form-group">
                     <label class="form-label">가격</label>
                     <div class="input-group">
-                        <input type="number" th:field="*{price}" required class="form-input" placeholder="가격을 입력하세요" />
+                        <input type="number" th:field="*{price}" required min="0" step="1" class="form-input" placeholder="가격을 입력하세요" />
                         <span class="unit">원</span>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">예약 여유일</label>
+                    <label class="form-label">예약 오픈일</label>
                     <div class="input-group">
-                        <input type="number" th:field="*{cutoffDays}" required class="form-input"
-                            placeholder="예약 여유일을 입력하세요" />
+                        <input type="number" th:field="*{cutoffDays}" required min="0" step="1" class="form-input"
+                            placeholder="예약 오픈일을 입력하세요" />
                         <span class="unit">일</span>
                     </div>
                 </div>
@@ -527,16 +529,46 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">노 쇼핑</label>
-                    <div class="input-group">
-                        <input type="checkbox" th:field="*{noShopping}" class="form-input" />
+                    <label class="form-label">쇼핑 포함여부</label>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center">
+                            <input type="radio" 
+                                   name="noShopping" 
+                                   th:value="false"
+                                   th:checked="${product.noShopping == false || product.noShopping == null}"
+                                   class="mr-2">
+                            <span class="text-sm text-gray-700">포함</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" 
+                                   name="noShopping" 
+                                   th:value="true"
+                                   th:checked="${product.noShopping == true}"
+                                   class="mr-2">
+                            <span class="text-sm text-gray-700">미포함</span>
+                        </label>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">노 옵션</label>
-                    <div class="input-group">
-                        <input type="checkbox" th:field="*{noOption}" class="form-input" />
+                    <label class="form-label">옵션 포함여부</label>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center">
+                            <input type="radio" 
+                                   name="noOption" 
+                                   th:value="false"
+                                   th:checked="${product.noOption == false || product.noOption == null}"
+                                   class="mr-2">
+                            <span class="text-sm text-gray-700">포함</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" 
+                                   name="noOption" 
+                                   th:value="true"
+                                   th:checked="${product.noOption == true}"
+                                   class="mr-2">
+                            <span class="text-sm text-gray-700">미포함</span>
+                        </label>
                     </div>
                 </div>
             </div>
@@ -565,9 +597,6 @@
             <h2 class="section-title">검색 키워드</h2>
             <div class="form-group">
                 <label class="form-label">키워드 추가</label>
-                <div class="form-hint" style="margin-bottom: 0.5rem; color: #6b7280; font-size: 0.875rem;">
-                    ※ 키워드를 쉼표(,)로 구분하여 입력하세요. 투어의 키워드는 자동으로 포함됩니다.
-                </div>
                 <div id="keywords-container" class="keywords-container" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem;">
                     <th:block th:each="keyword : ${product?.keywords}">
                         <span class="keyword-tag" style="display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; background: #e5e7eb; border-radius: 9999px; font-size: 0.875rem;">
@@ -769,7 +798,7 @@
                         <div class="flex space-x-2">
                             <input type="text" th:field="*{photos[__${iterStat.index}__]}" placeholder="사진 URL을 입력하세요"
                                 class="flex-1 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
-                            <button type="button" onclick="removeImage(this)"
+                            <button type="button" onclick="removeImageItem(this)"
                                 class="inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500">
                                 <i class="fas fa-trash h-4 w-4"></i>
                             </button>
@@ -976,27 +1005,91 @@
 
         // 공통 삭제 함수
         function removeField(btn) {
-            btn.parentElement.remove();
-            reindexImages();
-            reindexInfos();
+            const item = btn.closest('.dynamic-item');
+            const container = item.closest('[id$="-container"]');
+            const containerId = container.id;
+            
+            // include 또는 exclude 중 어떤 것인지 확인
+            const target = containerId.replace('-container', '');
+            
+            item.remove();
+            
+            // 해당 컨테이너의 인덱스 재정렬
+            reindexInfos(target);
         }
 
         function reindexImages() {
-            const inputs = document.querySelectorAll("#images-container input");
+            const inputs = document.querySelectorAll("#images-fieldset .image-item input[type='text']");
             inputs.forEach((input, idx) => {
-                input.name = `images[${idx}]`;
+                input.name = `photos[${idx}]`;
             });
         }
 
-        function reindexInfos() {
-            const divs = document.querySelectorAll("#info-container .dynamic-item");
+        function reindexInfos(target) {
+            const container = document.getElementById(target + '-container');
+            if (!container) return;
+            
+            const divs = container.querySelectorAll(".dynamic-item");
             divs.forEach((div, idx) => {
-                const inputs = div.querySelectorAll("input");
-                inputs[0].name = `${target}[${idx}].title`;
-                inputs[1].name = `${target}[${idx}].content`;
-                inputs[2].name = `${target}[${idx}].appendix`;
+                const inputs = div.querySelectorAll("input[type='text']");
+                if (inputs.length >= 3) {
+                    inputs[0].name = `${target}[${idx}].title`;
+                    inputs[1].name = `${target}[${idx}].content`;
+                    inputs[2].name = `${target}[${idx}].appendix`;
+                }
             });
         }
+
+        // 폼 제출 전 모든 필드 인덱스 재정렬
+        function reindexAllFields() {
+            reindexImages();
+            reindexInfos('include');
+            reindexInfos('exclude');
+        }
+
+        // 가격과 예약 오픈일 음수 검증
+        function validateNonNegativeNumbers() {
+            const priceInput = document.querySelector('input[name="price"]');
+            const cutoffDaysInput = document.querySelector('input[name="cutoffDays"]');
+            
+            if (priceInput && priceInput.value !== '' && parseFloat(priceInput.value) < 0) {
+                alert('가격은 0 이상이어야 합니다.');
+                priceInput.focus();
+                return false;
+            }
+            
+            if (cutoffDaysInput && cutoffDaysInput.value !== '' && parseInt(cutoffDaysInput.value) < 0) {
+                alert('예약 오픈일은 0 이상이어야 합니다.');
+                cutoffDaysInput.focus();
+                return false;
+            }
+            
+            return true;
+        }
+
+        // 입력 시 실시간 검증
+        document.addEventListener('DOMContentLoaded', function() {
+            const priceInput = document.querySelector('input[name="price"]');
+            const cutoffDaysInput = document.querySelector('input[name="cutoffDays"]');
+            
+            if (priceInput) {
+                priceInput.addEventListener('input', function() {
+                    if (this.value !== '' && parseFloat(this.value) < 0) {
+                        this.value = 0;
+                        alert('가격은 0 이상이어야 합니다.');
+                    }
+                });
+            }
+            
+            if (cutoffDaysInput) {
+                cutoffDaysInput.addEventListener('input', function() {
+                    if (this.value !== '' && parseInt(this.value) < 0) {
+                        this.value = 0;
+                        alert('예약 오픈일은 0 이상이어야 합니다.');
+                    }
+                });
+            }
+        });
 
         // 
 
@@ -1012,10 +1105,19 @@
             item.innerHTML = `
                 <input type="text" name="photos[${index}]" placeholder="이미지 URL" readonly />
                 <input type="file" onchange="uploadImage(this, 'product')" />
-                <button type="button" onclick="removeImage(this)">삭제</button>
+                <button type="button" onclick="removeImageItem(this)">삭제</button>
             `;
 
             fieldset.insertBefore(item, fieldset.lastElementChild);
+        }
+
+        // 이미지 아이템 삭제 (인덱스 재정렬 포함)
+        function removeImageItem(btn) {
+            const item = btn.closest(".image-item");
+            if (confirm('정말로 삭제하시겠습니까?')) {
+                item.remove();
+                reindexImages();
+            }
         }
 
         // Info 필드 추가

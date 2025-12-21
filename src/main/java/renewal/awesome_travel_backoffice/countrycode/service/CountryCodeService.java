@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import renewal.common.entity.CountryCode;
+import renewal.common.entity.CityCode;
 import renewal.common.repository.CountryCodeRepository;
+import renewal.common.repository.CityCodeRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +20,7 @@ import java.util.Optional;
 public class CountryCodeService {
 
     private final CountryCodeRepository countryCodeRepository;
+    private final CityCodeRepository cityCodeRepository;
 
     // 모든 국가 코드 조회 (페이징)
     public Page<CountryCode> getAllCountryCodes(Pageable pageable) {
@@ -77,6 +80,18 @@ public class CountryCodeService {
         if (!countryCodeRepository.existsById(code)) {
             throw new RuntimeException("국가 코드를 찾을 수 없습니다: " + code);
         }
+        
+        // 해당 국가 코드를 참조하는 도시 코드가 있는지 확인
+        List<CityCode> cityCodes = cityCodeRepository.findByCountryList(code);
+        if (!cityCodes.isEmpty()) {
+            int cityCount = cityCodes.size();
+            throw new RuntimeException(
+                "이 국가 코드를 참조하는 도시 코드가 " + cityCount + "개 있어 삭제할 수 없습니다.\n" +
+                "먼저 해당 도시 코드를 삭제한 후 국가 코드를 삭제해주세요.\n" +
+                "도시 코드 관리 페이지에서 국가 코드 '" + code + "'로 검색하여 관련 도시 코드를 확인하세요."
+            );
+        }
+        
         countryCodeRepository.deleteById(code);
     }
 

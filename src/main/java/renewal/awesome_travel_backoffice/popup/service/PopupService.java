@@ -3,12 +3,14 @@ package renewal.awesome_travel_backoffice.popup.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import renewal.awesome_travel_backoffice.popup.dto.request.PopupRequestDto;
 import renewal.awesome_travel_backoffice.popup.dto.request.PopupSearchRequest;
 import renewal.awesome_travel_backoffice.popup.dto.response.PopupResponseDto;
 import renewal.awesome_travel_backoffice.popup.repository.PopupRepository;
+import renewal.awesome_travel_backoffice.popup.repository.PopupSpecification;
 import renewal.common.entity.Popup;
 
 import java.time.LocalDate;
@@ -30,17 +32,32 @@ public class PopupService {
     
     // 검색 조건에 따른 팝업 조회
     public Page<PopupResponseDto> searchPopups(PopupSearchRequest searchRequest, Pageable pageable) {
-        // 간단한 구현 - 실제로는 Specification이나 QueryDSL을 사용하는 것이 좋습니다
-        Page<Popup> popups;
+        Specification<Popup> spec = Specification.where(null);
         
-        if (searchRequest.getActive() != null) {
-            popups = popupRepository.findByActive(searchRequest.getActive(), pageable);
-        } else if (searchRequest.getIncludeInactive() != null && searchRequest.getIncludeInactive()) {
-            popups = popupRepository.findAll(pageable);
-        } else {
-            popups = popupRepository.findByActive(true, pageable);
+        // 키워드 검색 (제목)
+        if (searchRequest.getKeyword() != null && !searchRequest.getKeyword().trim().isEmpty()) {
+            spec = spec.and(PopupSpecification.titleContains(searchRequest.getKeyword()));
         }
         
+        // 노출기간이 필터 기간과 겹치는 팝업 검색
+        // 시작일 (부터)와 시작일 (까지)를 사용하여 노출기간이 겹치는 팝업만 표시
+        if (searchRequest.getStartDateFrom() != null || searchRequest.getStartDateTo() != null) {
+            spec = spec.and(PopupSpecification.displayPeriodOverlaps(
+                    searchRequest.getStartDateFrom(), 
+                    searchRequest.getStartDateTo()
+            ));
+        }
+        
+        // 활성화 상태 필터
+        if (searchRequest.getActive() != null) {
+            spec = spec.and(PopupSpecification.isActive(searchRequest.getActive()));
+        } else if (searchRequest.getIncludeInactive() == null || !searchRequest.getIncludeInactive()) {
+            // 기본적으로 활성화된 팝업만 조회 (includeInactive가 false이거나 null인 경우)
+            spec = spec.and(PopupSpecification.isActive(true));
+        }
+        // includeInactive가 true이고 active가 null이면 모든 팝업 조회 (필터 없음)
+        
+        Page<Popup> popups = popupRepository.findAll(spec, pageable);
         return popups.map(PopupResponseDto::from);
     }
     

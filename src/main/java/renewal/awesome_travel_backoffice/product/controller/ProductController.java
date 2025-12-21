@@ -78,7 +78,7 @@ public class ProductController {
         model.addAttribute("productPage", productPage);
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
-        model.addAttribute("title", "Product List");
+        model.addAttribute("title", "여행상품 관리");
         model.addAttribute("content", "components/product/product"); // layout 안에서 이 fragment를 렌더
 
         return "layout";
@@ -99,7 +99,7 @@ public class ProductController {
         model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
         model.addAttribute("productTypes", ProductType.values());
         model.addAttribute("product", blankProduct);
-        model.addAttribute("title", "New Product");
+        model.addAttribute("title", "새 상품 등록");
         model.addAttribute("content", "components/product/productDetail");
 
         return "layout";
@@ -160,7 +160,7 @@ public class ProductController {
         
         model.addAttribute("product", product);
         model.addAttribute("productTypes", ProductType.values());
-        model.addAttribute("title", "Product " + product.getTitle());
+        model.addAttribute("title", "상품 상세");
         model.addAttribute("content", "components/product/productDetail");
 
         return "layout";

@@ -56,6 +56,23 @@
                         <dt class="text-sm font-medium text-gray-500">종료 날짜</dt>
                         <dd class="mt-1 text-sm text-gray-900" th:text="${#temporals.format(banner.endDate, 'yyyy-MM-dd')}">2024-12-31</dd>
                     </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">배너 위치 타입</dt>
+                        <dd class="mt-1 text-sm text-gray-900">
+                            <span th:switch="${banner.locationType}">
+                                <span th:case="HOME">홈페이지 메인</span>
+                                <span th:case="SUB_MENU">서브메뉴 페이지</span>
+                                <span th:case="AIR_SEARCH">항공선택 페이지</span>
+                                <span th:case="PRODUCT_LIST">상품 목록 페이지</span>
+                                <span th:case="PRODUCT_DETAIL">상품 상세 페이지</span>
+                                <span th:case="*" th:text="${banner.locationType}">위치 타입</span>
+                            </span>
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">위치 식별자</dt>
+                        <dd class="mt-1 text-sm text-gray-900" th:text="${banner.locationIdentifier != null ? banner.locationIdentifier : '-'}">-</dd>
+                    </div>
                     <div class="md:col-span-2">
                         <dt class="text-sm font-medium text-gray-500">연결 URL</dt>
                         <dd class="mt-1 text-sm text-gray-900">

@@ -202,7 +202,8 @@
 
         function deleteCountryCode(code) {
             if (confirm('정말로 이 국가 코드를 삭제하시겠습니까?\n코드: ' + code)) {
-                fetch(`/country-code/${code}`, {
+                const encodedCode = encodeURIComponent(code);
+                fetch(`/country-code/${encodedCode}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
@@ -210,7 +211,10 @@
                 })
                 .then(response => {
                     if (response.ok) {
-                        location.reload();
+                        return response.text().then(text => {
+                            alert(text || '국가 코드가 삭제되었습니다.');
+                            location.reload();
+                        });
                     } else {
                         return response.text().then(text => {
                             alert('삭제에 실패했습니다: ' + text);
@@ -219,7 +223,7 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('오류가 발생했습니다.');
+                    alert('오류가 발생했습니다: ' + error.message);
                 });
             }
         }

@@ -10,7 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import renewal.common.entity.CityCode;
+import renewal.common.entity.AirportCode;
 import renewal.common.repository.CityCodeRepository;
+import renewal.awesome_travel_backoffice.airport.repository.AirportCodeRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +20,7 @@ import renewal.common.repository.CityCodeRepository;
 public class CityCodeService {
 
     private final CityCodeRepository cityCodeRepository;
+    private final AirportCodeRepository airportCodeRepository;
 
     // 모든 도시 코드 조회 (페이징)
     public Page<CityCode> getAllCityCodes(Pageable pageable) {
@@ -93,6 +96,18 @@ public class CityCodeService {
         if (!cityCodeRepository.existsById(code)) {
             throw new RuntimeException("도시 코드를 찾을 수 없습니다: " + code);
         }
+        
+        // 해당 도시 코드를 참조하는 공항 코드가 있는지 확인
+        List<AirportCode> airportCodes = airportCodeRepository.findByCityCodeList(code);
+        if (!airportCodes.isEmpty()) {
+            int airportCount = airportCodes.size();
+            throw new RuntimeException(
+                "이 도시 코드를 참조하는 공항 코드가 " + airportCount + "개 있어 삭제할 수 없습니다.\n" +
+                "먼저 해당 공항 코드를 삭제한 후 도시 코드를 삭제해주세요.\n" +
+                "공항 코드 관리 페이지에서 도시 코드 '" + code + "'로 검색하여 관련 공항 코드를 확인하세요."
+            );
+        }
+        
         cityCodeRepository.deleteById(code);
     }
 

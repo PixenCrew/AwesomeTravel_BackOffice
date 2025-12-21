@@ -10,6 +10,10 @@ import org.springframework.ui.Model;
 
 import renewal.awesome_travel_backoffice.admin.Admin;
 import renewal.awesome_travel_backoffice.admin.AdminService;
+import renewal.awesome_travel_backoffice.product.repository.ProductAdminRepository;
+import renewal.awesome_travel_backoffice.user.repository.UserRepository;
+import renewal.awesome_travel_backoffice.purchaseAir.repository.PurchaseAirAdminRepository;
+import renewal.awesome_travel_backoffice.purchaseProduct.repository.PurchaseProductAdminRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,6 +23,10 @@ import lombok.RequiredArgsConstructor;
 public class MainController {
 
     private final AdminService adminService;
+    private final ProductAdminRepository productRepository;
+    private final UserRepository userRepository;
+    private final PurchaseAirAdminRepository purchaseAirRepository;
+    private final PurchaseProductAdminRepository purchaseProductRepository;
 
     // 로그인 페이지
     @GetMapping("login")
@@ -29,7 +37,17 @@ public class MainController {
     @GetMapping
     public String main(Model model, Authentication authentication) {
         
-        model.addAttribute("title", "Home");
+        // 대시보드 통계 데이터
+        long totalProducts = productRepository.count();
+        long totalMembers = userRepository.count();
+        long totalAirOrders = purchaseAirRepository.count();
+        long totalPackageOrders = purchaseProductRepository.count();
+        
+        model.addAttribute("totalProducts", totalProducts);
+        model.addAttribute("totalMembers", totalMembers);
+        model.addAttribute("totalAirOrders", totalAirOrders);
+        model.addAttribute("totalPackageOrders", totalPackageOrders);
+        model.addAttribute("title", "대시보드");
         model.addAttribute("content", "components/main");
         
         return "layout";

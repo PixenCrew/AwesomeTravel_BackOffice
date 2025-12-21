@@ -13,7 +13,10 @@
         })(window, document, 'script', 'dataLayer', 'GTM-N2JRTZZQ');</script>
     <!-- End Google Tag Manager -->
     <meta charset="UTF-8">
-    <title th:text="${title}">BackOffice</title>
+    <title th:text="|${title} - 딱좋은여행 관리자|">딱좋은여행 관리자</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" th:href="@{/favicon.ico}">
+    <link rel="apple-touch-icon" th:href="@{/favicon.ico}">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -266,27 +269,23 @@
                         </div>
                         <ul class="submenu hidden">
                             <li><a href="/timeDeal" class="submenu-link">타임딜 관리</a></li>
-                            <li><a href="/coupon" class="submenu-link">쿠폰 관리</a></li>
-                            <li><a href="/event" class="submenu-link">이벤트 관리</a></li>
-                            <li><a href="/promotion" class="submenu-link">프로모션 관리</a></li>
+                            <li><a href="/promotion" class="submenu-link">기획전 관리</a></li>
                         </ul>
                     </li>
 
-                    <!-- 기초 데이터 관리 -->
+                    <!-- 주문관리 -->
                     <li class="menu-item">
                         <div class="menu-item-content cursor-pointer" onclick="toggleMenu(this)">
                             <div class="menu-icon-container">
-                                <span class="menu-icon">🔧</span>
+                                <span class="menu-icon">🛍️</span>
                             </div>
-                            <span class="sidebar-text">기초 데이터 관리</span>
+                            <span class="sidebar-text">주문관리</span>
                             <span class="toggle-icon">+</span>
                         </div>
                         <ul class="submenu hidden">
-                            <li><a href="/menu-code" class="submenu-link">메뉴 코드 관리</a></li>
-                            <li><a href="/country-code" class="submenu-link">국가 코드 관리</a></li>
-                            <li><a href="/city-code" class="submenu-link">도시 코드 관리</a></li>
-                            <li><a href="/airport" class="submenu-link">공항 관리</a></li>
-                            <li><a href="/airline" class="submenu-link">항공사 관리</a></li>
+                            <li><a href="/air-purchase" class="submenu-link" th:classappend="${#strings.equals(content, 'components/airPurchase/airPurchaseList')} ? 'active' : ''">항공 주문 목록</a></li>
+                            <li><a href="/product-purchase" class="submenu-link" th:classappend="${#strings.equals(content, 'components/productPurchase/productPurchaseList')} ? 'active' : ''">패키지 상품 주문 목록</a></li>
+                            <li><a href="/refund" class="submenu-link" th:classappend="${#strings.equals(content, 'components/refund/refundManagement')} ? 'active' : ''">환불 관리</a></li>
                         </ul>
                     </li>
 
@@ -308,6 +307,24 @@
                         </ul>
                     </li>
 
+                    <!-- 기초 데이터 관리 -->
+                    <li class="menu-item">
+                        <div class="menu-item-content cursor-pointer" onclick="toggleMenu(this)">
+                            <div class="menu-icon-container">
+                                <span class="menu-icon">🔧</span>
+                            </div>
+                            <span class="sidebar-text">기초 데이터 관리</span>
+                            <span class="toggle-icon">+</span>
+                        </div>
+                        <ul class="submenu hidden">
+                            <li><a href="/menu-code" class="submenu-link">메뉴 코드 관리</a></li>
+                            <li><a href="/country-code" class="submenu-link">국가 코드 관리</a></li>
+                            <li><a href="/city-code" class="submenu-link">도시 코드 관리</a></li>
+                            <li><a href="/airport" class="submenu-link">공항 관리</a></li>
+                            <li><a href="/airline" class="submenu-link">항공사 관리</a></li>
+                        </ul>
+                    </li>
+
                     <!-- 시스템관리 -->
                     <li class="menu-item">
                         <div class="menu-item-content cursor-pointer" onclick="toggleMenu(this)">
@@ -319,22 +336,6 @@
                         </div>
                         <ul class="submenu hidden">
                             <li><a href="/file" class="submenu-link" th:classappend="${#strings.equals(content, 'components/file/fileList')} ? 'active' : ''">파일 관리</a></li>
-                        </ul>
-                    </li>
-
-                    <!-- 주문관리 -->
-                    <li class="menu-item">
-                        <div class="menu-item-content cursor-pointer" onclick="toggleMenu(this)">
-                            <div class="menu-icon-container">
-                                <span class="menu-icon">🛍️</span>
-                            </div>
-                            <span class="sidebar-text">주문관리</span>
-                            <span class="toggle-icon">+</span>
-                        </div>
-                        <ul class="submenu hidden">
-                            <li><a href="/air-purchase" class="submenu-link" th:classappend="${#strings.equals(content, 'components/airPurchase/airPurchaseList')} ? 'active' : ''">항공 주문 목록</a></li>
-                            <li><a href="/product-purchase" class="submenu-link" th:classappend="${#strings.equals(content, 'components/productPurchase/productPurchaseList')} ? 'active' : ''">패키지 상품 주문 목록</a></li>
-                            <li><a href="/refund" class="submenu-link" th:classappend="${#strings.equals(content, 'components/refund/refundManagement')} ? 'active' : ''">환불 관리</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -352,17 +353,6 @@
             </div>
 
             <div class="flex items-center space-x-4">
-                <!-- Search Bar -->
-                <div class="relative">
-                    <input type="text" placeholder="검색어를 입력하세요"
-                        class="w-64 px-4 py-2 pr-8 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                    <button class="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </button>
-                </div>
-
                 <!-- User Profile -->
                 <div class="flex items-center space-x-3">
                     <span class="text-sm text-gray-600" th:text="${userName}">관리자</span>
@@ -376,16 +366,6 @@
             <!-- 동적으로 교체될 컨텐츠 영역 -->
             <div th:replace="~{${content} :: content}" class="h-full min-w-0"></div>
         </div>
-
-        <!-- Footer -->
-        <footer class="h-16 bg-white border-t border-gray-200 flex justify-between items-center px-6 text-sm text-gray-500">
-            <div class="space-x-4">
-                <a href="#" class="hover:text-gray-700">Privacy Policy</a>
-                <a href="#" class="hover:text-gray-700">Terms of Service</a>
-                <a href="#" class="hover:text-gray-700">Contact Us</a>
-            </div>
-            <div>&copy; 2024 딱좋은여행. All rights reserved.</div>
-        </footer>
     </main>
 
     <script src="/js/util.js"></script>

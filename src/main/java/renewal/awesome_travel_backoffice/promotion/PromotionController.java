@@ -2,6 +2,10 @@ package renewal.awesome_travel_backoffice.promotion;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -14,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import lombok.RequiredArgsConstructor;
+import renewal.awesome_travel_backoffice.promotion.dto.PromotionFilterDTO;
+import renewal.awesome_travel_backoffice.promotion.service.PromotionService;
 import renewal.common.entity.MenuCode;
 import renewal.common.entity.Promotion;
 import renewal.common.repository.MenuCodeRepository;
@@ -26,15 +32,67 @@ public class PromotionController {
 
     private final PromotionRepository promotionRepo;
     private final MenuCodeRepository menuCodeRepo;
+    private final PromotionService promotionService;
 
     @GetMapping
     @Transactional(readOnly = true)
-    public String list(Model model) {
+    public String list(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String menuCodeCode,
+            @RequestParam(required = false) String active,
+            @RequestParam(required = false) String startDateFrom,
+            @RequestParam(required = false) String startDateTo,
+            @RequestParam(required = false) String endDateFrom,
+            @RequestParam(required = false) String endDateTo,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "startTime") String sortField,
+            @RequestParam(defaultValue = "desc") String sortDir,
+            Model model) {
         try {
-            List<Promotion> promotions = promotionRepo.findAll();
+            // 필터 DTO 생성
+            PromotionFilterDTO filter = new PromotionFilterDTO();
+            
+            filter.setTitle(title);
+            filter.setMenuCodeCode(menuCodeCode);
+            
+            if (active != null && !active.isEmpty()) {
+                filter.setActive(Boolean.parseBoolean(active));
+            }
+            
+            if (startDateFrom != null && !startDateFrom.isEmpty()) {
+                filter.setStartDateFrom(java.time.LocalDate.parse(startDateFrom));
+            }
+            
+            if (startDateTo != null && !startDateTo.isEmpty()) {
+                filter.setStartDateTo(java.time.LocalDate.parse(startDateTo));
+            }
+            
+            if (endDateFrom != null && !endDateFrom.isEmpty()) {
+                filter.setEndDateFrom(java.time.LocalDate.parse(endDateFrom));
+            }
+            
+            if (endDateTo != null && !endDateTo.isEmpty()) {
+                filter.setEndDateTo(java.time.LocalDate.parse(endDateTo));
+            }
+
+            // 정렬 설정
+            Sort sort = sortDir.equalsIgnoreCase("asc")
+                    ? Sort.by(sortField).ascending()
+                    : Sort.by(sortField).descending();
+            Pageable pageable = PageRequest.of(page, 20, sort);
+
+            // 필터링된 리스트 조회 (페이징)
+            Page<Promotion> promotionPage = promotionService.searchPromotions(filter, pageable);
+
+            List<MenuCode> menuCodes = menuCodeRepo.findAll();
 
             model.addAttribute("title", "기획전 관리");
-            model.addAttribute("promotions", promotions);
+            model.addAttribute("promotionPage", promotionPage);
+            model.addAttribute("promotions", promotionPage.getContent());
+            model.addAttribute("filter", filter);
+            model.addAttribute("sortField", sortField);
+            model.addAttribute("sortDir", sortDir);
+            model.addAttribute("menuCodes", menuCodes);
             model.addAttribute("content", "components/promotion/promotion");
             return "layout";
         } catch (Exception e) {

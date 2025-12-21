@@ -35,14 +35,17 @@
           <label class="font-medium text-gray-700 mb-2 text-sm">비행 타입</label>
           <select th:field="*{flightType}" class="p-3 border border-gray-300 rounded-lg text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100">
             <option value="">전체</option>
-            <option th:each="type : ${T(renewal.common.entity.Air.FlightType).values()}" th:value="${type}" th:text="${type}"></option>
+            <option value="DIRECT" th:selected="${filter?.flightType == T(renewal.common.entity.Air.FlightType).DIRECT}">직항</option>
+            <option value="STOP_OVER" th:selected="${filter?.flightType == T(renewal.common.entity.Air.FlightType).STOP_OVER}">경유</option>
           </select>
         </div>
         <div class="flex flex-col">
           <label class="font-medium text-gray-700 mb-2 text-sm">상태</label>
           <select th:field="*{status}" class="p-3 border border-gray-300 rounded-lg text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100">
             <option value="">전체</option>
-            <option th:each="st : ${T(renewal.common.entity.Air.AirStatus).values()}" th:value="${st}" th:text="${st}"></option>
+            <option value="ACTIVE" th:selected="${filter?.status == T(renewal.common.entity.Air.AirStatus).ACTIVE}">활성</option>
+            <option value="INACTIVE" th:selected="${filter?.status == T(renewal.common.entity.Air.AirStatus).INACTIVE}">비활성</option>
+            <option value="HIDDEN" th:selected="${filter?.status == T(renewal.common.entity.Air.AirStatus).HIDDEN}">숨김</option>
           </select>
         </div>
 
@@ -82,11 +85,15 @@
         </div>
         <div class="flex flex-col">
           <label class="font-medium text-gray-700 mb-2 text-sm">최소 가격</label>
-          <input type="number" th:field="*{minPrice}" placeholder="0" class="p-3 border border-gray-300 rounded-lg text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100" />
+          <input type="number" th:field="*{minPrice}" placeholder="0" min="0" step="1"
+            oninput="preventNegative(this)" onblur="preventNegative(this)"
+            class="p-3 border border-gray-300 rounded-lg text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100" />
         </div>
         <div class="flex flex-col">
           <label class="font-medium text-gray-700 mb-2 text-sm">최대 가격</label>
-          <input type="number" th:field="*{maxPrice}" placeholder="999999999" class="p-3 border border-gray-300 rounded-lg text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100" />
+          <input type="number" th:field="*{maxPrice}" placeholder="999999999" min="0" step="1"
+            oninput="preventNegative(this)" onblur="preventNegative(this)"
+            class="p-3 border border-gray-300 rounded-lg text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100" />
         </div>
 
         <div class="flex flex-col" style="grid-column: 1 / -1;">
@@ -137,8 +144,18 @@
           if (anyChecked) count++;
           return;
         }
+        // 날짜 필드와 일반 입력 필드 처리
         const val = (el.value || '').toString().trim();
-        if (val !== '') count++;
+        if (val !== '' && val !== null && val !== undefined) {
+          // 날짜 필드의 경우 빈 날짜 형식도 체크
+          if (el.type === 'date') {
+            // 날짜 필드는 값이 있으면 카운트
+            if (val) count++;
+          } else {
+            // 일반 입력 필드
+            count++;
+          }
+        }
       });
       return count;
     }
@@ -159,6 +176,36 @@
         updateFilterCount();
       }
     })();
+
+    // 음수 입력 방지 함수
+    function preventNegative(input) {
+      if (input.value < 0) {
+        input.value = 0;
+      }
+    }
+
+    // 폼 제출 시 가격 필드 음수 값 검증
+    const filterForm = document.getElementById('filterForm');
+    if (filterForm) {
+      filterForm.addEventListener('submit', function(e) {
+        const minPriceInput = filterForm.querySelector('input[name="minPrice"]');
+        const maxPriceInput = filterForm.querySelector('input[name="maxPrice"]');
+        
+        if (minPriceInput && minPriceInput.value < 0) {
+          e.preventDefault();
+          alert('최소 가격은 0 이상이어야 합니다.');
+          minPriceInput.focus();
+          return false;
+        }
+        
+        if (maxPriceInput && maxPriceInput.value < 0) {
+          e.preventDefault();
+          alert('최대 가격은 0 이상이어야 합니다.');
+          maxPriceInput.focus();
+          return false;
+        }
+      });
+    }
   </script>
 
   <!-- 결과 테이블 -->

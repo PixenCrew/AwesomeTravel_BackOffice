@@ -83,8 +83,13 @@
 
     <script>
         // 국가 코드 입력 시 대문자로 자동 변환
-        document.getElementById('code').addEventListener('input', function(e) {
-            this.value = this.value.toUpperCase();
+        document.addEventListener('DOMContentLoaded', function() {
+            const codeInput = document.getElementById('code');
+            if (codeInput) {
+                codeInput.addEventListener('input', function(e) {
+                    this.value = this.value.toUpperCase();
+                });
+            }
         });
     </script>
 </div>

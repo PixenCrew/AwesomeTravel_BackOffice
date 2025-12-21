@@ -11,6 +11,95 @@
         </a>
     </div>
 
+    <!-- 필터 섹션 -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <form th:action="@{/promotion}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" onsubmit="resetPage()">
+            <input type="hidden" name="page" value="0" id="pageInput">
+            <input type="hidden" name="sortField" th:value="${sortField != null ? sortField : 'startTime'}" id="sortFieldInput">
+            <input type="hidden" name="sortDir" th:value="${sortDir != null ? sortDir : 'desc'}" id="sortDirInput">
+            <div>
+                <label for="title" class="block text-sm font-medium text-gray-700 mb-2">제목 검색</label>
+                <input type="text" 
+                       id="title" 
+                       name="title" 
+                       th:value="${filter?.title}"
+                       placeholder="제목을 입력하세요"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            
+            <div>
+                <label for="menuCodeCode" class="block text-sm font-medium text-gray-700 mb-2">메뉴 코드</label>
+                <select id="menuCodeCode" 
+                        name="menuCodeCode" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="">전체</option>
+                    <option th:each="menuCode : ${menuCodes}" 
+                            th:value="${menuCode.code}" 
+                            th:text="${menuCode.name + ' (' + menuCode.code + ')'}"
+                            th:selected="${filter?.menuCodeCode == menuCode.code}"></option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="active" class="block text-sm font-medium text-gray-700 mb-2">상태</label>
+                <select id="active" 
+                        name="active" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="">전체</option>
+                    <option value="true" th:selected="${filter?.active == true}">진행중</option>
+                    <option value="false" th:selected="${filter?.active == false}">종료/예정</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="startDateFrom" class="block text-sm font-medium text-gray-700 mb-2">시작일 (부터)</label>
+                <input type="date" 
+                       id="startDateFrom" 
+                       name="startDateFrom" 
+                       th:value="${filter?.startDateFrom}"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            
+            <div>
+                <label for="startDateTo" class="block text-sm font-medium text-gray-700 mb-2">시작일 (까지)</label>
+                <input type="date" 
+                       id="startDateTo" 
+                       name="startDateTo" 
+                       th:value="${filter?.startDateTo}"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            
+            <div>
+                <label for="endDateFrom" class="block text-sm font-medium text-gray-700 mb-2">종료일 (부터)</label>
+                <input type="date" 
+                       id="endDateFrom" 
+                       name="endDateFrom" 
+                       th:value="${filter?.endDateFrom}"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            
+            <div>
+                <label for="endDateTo" class="block text-sm font-medium text-gray-700 mb-2">종료일 (까지)</label>
+                <input type="date" 
+                       id="endDateTo" 
+                       name="endDateTo" 
+                       th:value="${filter?.endDateTo}"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            
+            <div class="flex items-end gap-2">
+                <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                    <i class="fas fa-search mr-2"></i>검색
+                </button>
+                <button type="button" 
+                        onclick="resetFilter()" 
+                        class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200">
+                    <i class="fas fa-redo mr-2"></i>초기화
+                </button>
+            </div>
+        </form>
+    </div>
+
     <!-- 리스트 -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex-1 flex flex-col">
 
@@ -19,7 +108,7 @@
                 기획전 목록
                 <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                              bg-blue-100 text-blue-800"
-                    th:text="'총 ' + ${promotions.size()} + '개'"></span>
+                    th:text="'총 ' + ${promotionPage.totalElements} + '개'"></span>
             </h3>
         </div>
 
@@ -27,19 +116,29 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-xs font-medium text-gray-500">ID</th>
-                        <th class="px-6 py-3 text-xs font-medium text-gray-500">기간</th>
-                        <th class="px-6 py-3 text-xs font-medium text-gray-500">상태</th>
-                        <th class="px-6 py-3 text-xs font-medium text-gray-500">코드</th>
-                        <th class="px-6 py-3 text-xs font-medium text-gray-500">작업</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">제목</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">기간</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">상태</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">코드</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">작업</th>
                     </tr>
                 </thead>
 
                 <tbody class="bg-white divide-y divide-gray-200">
+                    <tr th:if="${promotions.isEmpty()}">
+                        <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+                            검색 조건에 맞는 기획전이 없습니다.
+                        </td>
+                    </tr>
                     <tr th:each="promotion : ${promotions}" class="hover:bg-gray-50">
                         <!-- ID -->
                         <td class="px-6 py-4 text-sm font-medium text-gray-800"
                             th:text="${promotion.id}">1</td>
+
+                        <!-- 제목 -->
+                        <td class="px-6 py-4 text-sm text-gray-700"
+                            th:text="${promotion.title != null ? promotion.title : '-'}">-</td>
 
                         <!-- 기간 -->
                         <td class="px-6 py-4 text-sm text-gray-700">
@@ -69,7 +168,9 @@
                         <!-- 작업 -->
                         <td class="px-6 py-4 text-sm font-medium">
                             <a th:href="@{/promotion/{id}(id=${promotion.id})}"
-                                class="text-blue-600 hover:underline">
+                                class="inline-flex items-center justify-center px-3 py-1.5 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                                title="상세보기">
+                                <i class="fas fa-eye mr-1"></i>
                                 상세
                             </a>
                         </td>
@@ -77,5 +178,64 @@
                 </tbody>
             </table>
         </div>
+        
+        <!-- 페이지네이션 -->
+        <div th:if="${promotionPage.totalPages > 1}" class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+            <div class="flex-1 flex justify-between sm:hidden">
+                <a th:if="${promotionPage.hasPrevious()}" 
+                   th:href="@{/promotion(page=${promotionPage.number - 1}, title=${filter?.title}, menuCodeCode=${filter?.menuCodeCode}, active=${filter?.active}, startDateFrom=${filter?.startDateFrom}, startDateTo=${filter?.startDateTo}, endDateFrom=${filter?.endDateFrom}, endDateTo=${filter?.endDateTo}, sortField=${sortField}, sortDir=${sortDir})}"
+                   class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    이전
+                </a>
+                <a th:if="${promotionPage.hasNext()}" 
+                   th:href="@{/promotion(page=${promotionPage.number + 1}, title=${filter?.title}, menuCodeCode=${filter?.menuCodeCode}, active=${filter?.active}, startDateFrom=${filter?.startDateFrom}, startDateTo=${filter?.startDateTo}, endDateFrom=${filter?.endDateFrom}, endDateTo=${filter?.endDateTo}, sortField=${sortField}, sortDir=${sortDir})}"
+                   class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    다음
+                </a>
+            </div>
+            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-sm text-gray-700">
+                        <span th:text="${promotionPage.number + 1}">1</span> / <span th:text="${promotionPage.totalPages}">1</span> 페이지
+                        (<span th:text="${promotionPage.totalElements}">0</span>개 항목)
+                    </p>
+                </div>
+                <div>
+                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                        <a th:if="${promotionPage.hasPrevious()}" 
+                           th:href="@{/promotion(page=${promotionPage.number - 1}, title=${filter?.title}, menuCodeCode=${filter?.menuCodeCode}, active=${filter?.active}, startDateFrom=${filter?.startDateFrom}, startDateTo=${filter?.startDateTo}, endDateFrom=${filter?.endDateFrom}, endDateTo=${filter?.endDateTo}, sortField=${sortField}, sortDir=${sortDir})}"
+                           class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                            <span class="sr-only">이전</span>
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                        </a>
+                        <a th:each="pageNum : ${#numbers.sequence(0, promotionPage.totalPages - 1)}"
+                           th:href="@{/promotion(page=${pageNum}, title=${filter?.title}, menuCodeCode=${filter?.menuCodeCode}, active=${filter?.active}, startDateFrom=${filter?.startDateFrom}, startDateTo=${filter?.startDateTo}, endDateFrom=${filter?.endDateFrom}, endDateTo=${filter?.endDateTo}, sortField=${sortField}, sortDir=${sortDir})}"
+                           th:class="${pageNum == promotionPage.number} ? 'relative inline-flex items-center px-4 py-2 border border-gray-300 bg-blue-50 text-sm font-medium text-blue-600' : 'relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50'"
+                           th:text="${pageNum + 1}">1</a>
+                        <a th:if="${promotionPage.hasNext()}" 
+                           th:href="@{/promotion(page=${promotionPage.number + 1}, title=${filter?.title}, menuCodeCode=${filter?.menuCodeCode}, active=${filter?.active}, startDateFrom=${filter?.startDateFrom}, startDateTo=${filter?.startDateTo}, endDateFrom=${filter?.endDateFrom}, endDateTo=${filter?.endDateTo}, sortField=${sortField}, sortDir=${sortDir})}"
+                           class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                            <span class="sr-only">다음</span>
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <script>
+        function resetFilter() {
+            window.location.href = '/promotion';
+        }
+        
+        function resetPage() {
+            document.getElementById('pageInput').value = '0';
+        }
+    </script>
+
 </div>

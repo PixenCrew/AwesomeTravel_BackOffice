@@ -72,7 +72,7 @@ public class AirController {
         model.addAttribute("filter", filter); // 필터 객체 추가
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
-        model.addAttribute("title", "Air List");
+        model.addAttribute("title", "항공 관리");
         // air.html에서 참조하는 플래그 기본값 설정 (null → SpEL 오류 방지)
         model.addAttribute("isSelectionPage", false);
         model.addAttribute("content", "components/air/air"); // layout 안에서 이 fragment를 렌더
@@ -104,7 +104,7 @@ public class AirController {
         model.addAttribute("airportCode", commonCodeService.getAllAirports());
 
         model.addAttribute("air", air);
-        model.addAttribute("title", "New Air");
+        model.addAttribute("title", "새 항공 등록");
         model.addAttribute("content", "components/air/airDetail"); // layout 안에서 이 fragment를 렌더
 
         return "layout";
@@ -136,7 +136,7 @@ public class AirController {
         model.addAttribute("airportCode", commonCodeService.getAllAirports());
 
         model.addAttribute("air", air);
-        model.addAttribute("title", "Air Detail");
+        model.addAttribute("title", "항공 상세");
         model.addAttribute("content", "components/air/airDetail"); // layout 안에서 이 fragment를 렌더
 
         return "layout";
@@ -207,7 +207,7 @@ public class AirController {
         model.addAttribute("airPage", airPage);
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
-        model.addAttribute("title", "Air Select");
+        model.addAttribute("title", "항공 선택");
         model.addAttribute("airportCode", commonCodeService.getAllAirports());
 
         // 항공선택 플래그

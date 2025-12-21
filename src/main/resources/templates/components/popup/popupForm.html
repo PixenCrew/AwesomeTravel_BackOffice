@@ -75,6 +75,7 @@
                                th:value="${popup?.startDate}"
                                required
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <p id="startDateError" class="text-xs text-red-600 mt-1 hidden"></p>
                     </div>
                     
                     <!-- 종료일 -->
@@ -86,6 +87,7 @@
                                th:value="${popup?.endDate}"
                                required
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <p id="endDateError" class="text-xs text-red-600 mt-1 hidden"></p>
                     </div>
                 </div>
                 
@@ -146,4 +148,58 @@
             </form>
         </div>
     </div>
+
+    <script>
+        // 날짜 유효성 검사
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const startDateError = document.getElementById('startDateError');
+        const endDateError = document.getElementById('endDateError');
+
+        // 시작일 변경 시 검증
+        startDateInput.addEventListener('change', function() {
+            validateDates();
+        });
+
+        // 종료일 변경 시 검증
+        endDateInput.addEventListener('change', function() {
+            validateDates();
+        });
+
+        // 날짜 유효성 검사 함수
+        function validateDates() {
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
+            
+            // 에러 메시지 초기화
+            startDateError.classList.add('hidden');
+            endDateError.classList.add('hidden');
+            startDateInput.classList.remove('border-red-500');
+            endDateInput.classList.remove('border-red-500');
+            
+            if (startDate && endDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                
+                if (end < start) {
+                    endDateError.textContent = '종료일은 시작일보다 이전일 수 없습니다.';
+                    endDateError.classList.remove('hidden');
+                    endDateInput.classList.add('border-red-500');
+                    endDateInput.focus();
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        // 폼 제출 시 최종 검증
+        document.querySelector('form').addEventListener('submit', function(e) {
+            if (!validateDates()) {
+                e.preventDefault();
+                alert('종료일은 시작일보다 이전일 수 없습니다. 날짜를 확인해주세요.');
+                return false;
+            }
+        });
+    </script>
 </div>

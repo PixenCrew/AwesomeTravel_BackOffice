@@ -3,6 +3,9 @@ package renewal.awesome_travel_backoffice.timeDeal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,8 +19,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import lombok.RequiredArgsConstructor;
+import renewal.awesome_travel_backoffice.timeDeal.dto.TimeDealFilterDTO;
+import renewal.awesome_travel_backoffice.timeDeal.service.TimeDealService;
 import renewal.common.entity.Product;
 import renewal.common.entity.TimeDeal;
+import renewal.common.entity.TimeDeal.DiscountType;
 import renewal.common.repository.ProductRepository;
 import renewal.common.repository.TimeDealRepository;
 
@@ -28,12 +34,72 @@ public class TimeDealController {
 
     private final TimeDealRepository timeDealRepo;
     private final ProductRepository productRepo;
+    private final TimeDealService timeDealService;
 
     @GetMapping
-    public String list(Model model) {
-        List<TimeDeal> list = timeDealRepo.findAll(Sort.by("startTime").descending());
-        model.addAttribute("list", list);
+    public String list(
+            @RequestParam(required = false) String discountType,
+            @RequestParam(required = false) String active,
+            @RequestParam(required = false) String startDateFrom,
+            @RequestParam(required = false) String startDateTo,
+            @RequestParam(required = false) String endDateFrom,
+            @RequestParam(required = false) String endDateTo,
+            @RequestParam(required = false) Long minValue,
+            @RequestParam(required = false) Long maxValue,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "startTime") String sortField,
+            @RequestParam(defaultValue = "desc") String sortDir,
+            Model model) {
+        
+        // 필터 DTO 생성
+        TimeDealFilterDTO filter = new TimeDealFilterDTO();
+        
+        if (discountType != null && !discountType.isEmpty()) {
+            try {
+                filter.setDiscountType(DiscountType.valueOf(discountType));
+            } catch (IllegalArgumentException e) {
+                // 잘못된 값은 무시
+            }
+        }
+        
+        if (active != null && !active.isEmpty()) {
+            filter.setActive(Boolean.parseBoolean(active));
+        }
+        
+        if (startDateFrom != null && !startDateFrom.isEmpty()) {
+            filter.setStartDateFrom(java.time.LocalDate.parse(startDateFrom));
+        }
+        
+        if (startDateTo != null && !startDateTo.isEmpty()) {
+            filter.setStartDateTo(java.time.LocalDate.parse(startDateTo));
+        }
+        
+        if (endDateFrom != null && !endDateFrom.isEmpty()) {
+            filter.setEndDateFrom(java.time.LocalDate.parse(endDateFrom));
+        }
+        
+        if (endDateTo != null && !endDateTo.isEmpty()) {
+            filter.setEndDateTo(java.time.LocalDate.parse(endDateTo));
+        }
+        
+        filter.setMinValue(minValue);
+        filter.setMaxValue(maxValue);
 
+        // 정렬 설정
+        Sort sort = sortDir.equalsIgnoreCase("asc")
+                ? Sort.by(sortField).ascending()
+                : Sort.by(sortField).descending();
+        Pageable pageable = PageRequest.of(page, 20, sort);
+
+        // 필터링된 리스트 조회 (페이징)
+        Page<TimeDeal> timeDealPage = timeDealService.searchTimeDeals(filter, pageable);
+
+        model.addAttribute("timeDealPage", timeDealPage);
+        model.addAttribute("list", timeDealPage.getContent());
+        model.addAttribute("filter", filter);
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDir", sortDir);
+        model.addAttribute("discountTypes", DiscountType.values());
         model.addAttribute("title", "타임딜 관리");
         model.addAttribute("content", "components/timeDeal/timeDeal");
         return "layout";

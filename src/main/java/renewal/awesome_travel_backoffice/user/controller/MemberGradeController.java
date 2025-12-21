@@ -51,6 +51,7 @@ public class MemberGradeController {
             }
             model.addAttribute("searchKeyword", search.trim());
         } else {
+            model.addAttribute("searchKeyword", null);
             // 검색어가 없는 경우 (기존 로직)
             if (grade == null || "전체".equals(grade)) {
                 userPage = userRepository.findAll(pageable);

@@ -36,9 +36,9 @@
                         class="p-3 border border-gray-300 rounded-lg text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100" />
                 </div>
 
-                <!-- 회사 선택 -->
+                <!-- 랜드사 선택 -->
                 <div class="flex flex-col" style="grid-column: 1 / -1;">
-                    <label class="font-medium text-gray-700 mb-2 text-sm">회사 선택</label>
+                    <label class="font-medium text-gray-700 mb-2 text-sm">랜드사 선택</label>
                     <div class="p-3 border border-gray-300 rounded-lg text-sm"
                         style="max-height: 8rem; overflow-y: auto;">
                         <div th:each="comp : ${allCompanies}" class="flex items-center gap-2 mb-2">
@@ -168,7 +168,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                             style="width: 22%;">투어명</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                            style="width: 8%;">회사</th>
+                            style="width: 8%;">랜드사명</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                             style="width: 10%;">
                             <a href="#" data-sortfield="price"
@@ -215,7 +215,7 @@
                             <td class="px-6 py-4 text-sm text-gray-900">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 truncate"
                                     th:text="${tour.company}"
-                                    th:title="${tour.company}">회사명</span>
+                                    th:title="${tour.company}">랜드사명</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 <span class="font-semibold text-green-600"

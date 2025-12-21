@@ -3,9 +3,11 @@ package renewal.awesome_travel_backoffice.banner.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import renewal.awesome_travel_backoffice.banner.repository.BannerRepository;
+import renewal.awesome_travel_backoffice.banner.repository.BannerSpecification;
 import renewal.common.entity.Banner;
 
 import java.time.LocalDate;
@@ -49,9 +51,27 @@ public class BannerService {
         return bannerRepository.findByActive(active, pageable);
     }
 
-    // 날짜 범위로 검색
-    public Page<Banner> searchBannersByDateRange(LocalDate startDate, LocalDate endDate, Pageable pageable) {
-        return bannerRepository.findByDateRange(startDate, endDate, pageable);
+    // 통합 검색 (제목, 활성 상태, 날짜 범위)
+    public Page<Banner> searchBanners(String title, Boolean active, LocalDate startDate, LocalDate endDate, Pageable pageable) {
+        Specification<Banner> spec = Specification.where(null);
+        
+        // 제목 검색
+        if (title != null && !title.trim().isEmpty()) {
+            spec = spec.and(BannerSpecification.titleContains(title));
+        }
+        
+        // 활성 상태 필터
+        if (active != null) {
+            spec = spec.and(BannerSpecification.isActive(active));
+        }
+        
+        // 노출기간이 필터 기간과 겹치는 배너 검색
+        if (startDate != null || endDate != null) {
+            spec = spec.and(BannerSpecification.displayPeriodOverlaps(startDate, endDate));
+        }
+        
+        // 정렬 적용 (displayOrder ASC, createdAt DESC)
+        return bannerRepository.findAll(spec, pageable);
     }
 
     // 배너 생성

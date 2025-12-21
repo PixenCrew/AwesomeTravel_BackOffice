@@ -137,9 +137,40 @@ public class FileController {
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            String errorMessage = e.getMessage();
+            
+            // invalid_grant 에러 (Refresh Token 만료/취소)
+            if (errorMessage != null && 
+                (errorMessage.contains("invalid_grant") || 
+                 errorMessage.contains("Token has been expired") ||
+                 errorMessage.contains("Token has been revoked") ||
+                 errorMessage.contains("Refresh Token이 만료"))) {
+                errorMessage = "⚠️ Google Drive Refresh Token 만료/취소됨\n\n" +
+                    "Refresh Token이 만료되었거나 취소되었습니다.\n\n" +
+                    "해결 방법:\n" +
+                    "1. OAuth 2.0 Playground 접속: https://developers.google.com/oauthplayground/\n" +
+                    "2. 설정(⚙️) → 'Use your own OAuth credentials' 체크\n" +
+                    "3. Client ID와 Secret 입력\n" +
+                    "4. Drive API v3 → https://www.googleapis.com/auth/drive 선택\n" +
+                    "5. 'Authorize APIs' 클릭 후 로그인 및 권한 승인\n" +
+                    "6. 'Exchange authorization code for tokens' 클릭\n" +
+                    "7. Refresh token 복사 후 application-google.properties에 설정\n\n" +
+                    "자세한 내용은 OAUTH_SETUP_GUIDE.md 참조";
+            }
+            // 403 에러인 경우
+            else if (errorMessage != null && errorMessage.contains("403")) {
+                errorMessage = "Google Drive 업로드 권한 오류 (403)\n\n" +
+                    "가능한 원인:\n" +
+                    "1. Refresh Token 만료 - 새로운 토큰 발급 필요\n" +
+                    "2. 폴더 접근 권한 없음 - Google Drive에서 폴더 공유 설정 확인\n" +
+                    "3. API 할당량 초과 - Google Cloud Console 확인\n" +
+                    "4. OAuth 스코프 부족 - Drive API 스코프 확인\n\n" +
+                    "자세한 내용은 서버 로그를 확인하세요.";
+            }
+            
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(FileUploadResponse.builder()
-                            .message("파일 업로드 실패: " + e.getMessage())
+                            .message("파일 업로드 실패: " + errorMessage)
                             .build());
         }
     }
