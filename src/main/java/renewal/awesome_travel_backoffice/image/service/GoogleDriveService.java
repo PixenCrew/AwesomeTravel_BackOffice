@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.ByteArrayContent;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -69,7 +70,85 @@ public class GoogleDriveService {
                     .build();
             
             // Access Token 갱신
-            credentials.refreshIfExpired();
+            try {
+                credentials.refreshIfExpired();
+                log.info("OAuth 2.0 인증 성공 (Refresh Token 사용)");
+            } catch (Exception e) {
+                String errorMessage = e.getMessage();
+                // 401 Unauthorized 에러 확인
+                boolean isUnauthorized = errorMessage != null && 
+                    (errorMessage.contains("401") || 
+                     errorMessage.contains("Unauthorized"));
+                
+                // invalid_grant 에러 (토큰 만료/취소) 확인
+                boolean isInvalidGrant = errorMessage != null && 
+                    (errorMessage.contains("invalid_grant") || 
+                     errorMessage.contains("Token has been expired") ||
+                     errorMessage.contains("Token has been revoked") ||
+                     errorMessage.contains("400 Bad Request"));
+                
+                if (isUnauthorized) {
+                    log.error("⚠️ Google Drive OAuth 인증 실패 (401 Unauthorized):");
+                    log.error("  - 에러 타입: 401 Unauthorized");
+                    log.error("  - Client ID: {}", clientId);
+                    log.error("  - Client Secret: {}...", clientSecret != null && clientSecret.length() > 10 
+                        ? clientSecret.substring(0, 10) + "..." : "null");
+                    log.error("  - Refresh Token: {}...", refreshToken != null && refreshToken.length() > 20 
+                        ? refreshToken.substring(0, 20) : "null");
+                    log.error("  - 상세 에러: {}", errorMessage);
+                    log.error("  - 가능한 원인:");
+                    log.error("    1. Client ID 또는 Client Secret이 잘못됨");
+                    log.error("    2. Refresh Token이 잘못 복사되었거나 잘못된 형식");
+                    log.error("    3. Refresh Token이 아직 유효하지 않음 (방금 발급받은 경우)");
+                    log.error("  - 해결 방법:");
+                    log.error("    1. application-google.properties에서 Client ID, Secret, Refresh Token 확인");
+                    log.error("    2. Refresh Token이 정확히 복사되었는지 확인 (앞뒤 공백 없음)");
+                    log.error("    3. OAuth 2.0 Playground에서 새로운 Refresh Token 발급");
+                    
+                    throw new IOException("Google Drive OAuth 인증 실패 (401 Unauthorized)\n\n" +
+                        "가능한 원인:\n" +
+                        "1. Client ID 또는 Client Secret이 잘못됨\n" +
+                        "2. Refresh Token이 잘못 복사되었거나 잘못된 형식\n" +
+                        "3. Refresh Token이 아직 유효하지 않음\n\n" +
+                        "해결 방법:\n" +
+                        "1. application-google.properties 확인:\n" +
+                        "   - google.client.id\n" +
+                        "   - google.client.secret\n" +
+                        "   - google.drive.refresh.token (앞뒤 공백 없이 정확히 복사)\n" +
+                        "2. OAuth 2.0 Playground에서 새로운 Refresh Token 발급:\n" +
+                        "   - https://developers.google.com/oauthplayground/\n" +
+                        "   - 설정에서 'Use your own OAuth credentials' 체크\n" +
+                        "   - Client ID와 Secret 정확히 입력\n" +
+                        "   - Drive API 스코프 선택 후 새로 발급", e);
+                } else if (isInvalidGrant) {
+                    log.error("⚠️ Google Drive Refresh Token 만료/취소됨:");
+                    log.error("  - 에러 타입: invalid_grant (400 Bad Request)");
+                    log.error("  - Client ID: {}", clientId);
+                    log.error("  - Refresh Token: {}...", refreshToken != null && refreshToken.length() > 20 
+                        ? refreshToken.substring(0, 20) : "null");
+                    log.error("  - 상세 에러: {}", errorMessage);
+                    log.error("  - 해결 방법:");
+                    log.error("    1. OAuth 2.0 Playground에서 새로운 Refresh Token 발급");
+                    log.error("    2. https://developers.google.com/oauthplayground/ 접속");
+                    log.error("    3. 새로운 Refresh Token을 application-google.properties에 설정");
+                    
+                    throw new IOException("Google Drive Refresh Token이 만료되었거나 취소되었습니다.\n\n" +
+                        "해결 방법:\n" +
+                        "1. OAuth 2.0 Playground 접속: https://developers.google.com/oauthplayground/\n" +
+                        "2. 설정(⚙️)에서 'Use your own OAuth credentials' 체크\n" +
+                        "3. Client ID와 Secret 입력 후 Drive API 스코프 선택\n" +
+                        "4. 새로운 Refresh Token 발급 후 application-google.properties에 업데이트\n\n" +
+                        "자세한 내용은 OAUTH_SETUP_GUIDE.md 참조", e);
+                } else {
+                    log.error("OAuth 2.0 인증 실패:");
+                    log.error("  - Client ID: {}", clientId);
+                    log.error("  - Refresh Token: {}...", refreshToken != null && refreshToken.length() > 20 
+                        ? refreshToken.substring(0, 20) : "null");
+                    log.error("  - 에러: {}", errorMessage);
+                    throw new IOException("Google Drive 인증 실패: " + errorMessage + 
+                        "\n새로운 Refresh Token을 발급받아 application-google.properties에 설정하세요.", e);
+                }
+            }
             
         } else if (credentialsPath != null && !credentialsPath.isEmpty()) {
             // 서비스 계정 키 파일 경로가 설정된 경우
@@ -150,10 +229,39 @@ public class GoogleDriveService {
         ByteArrayContent mediaContent = new ByteArrayContent(mimeType, fileBytes);
 
         // 파일 업로드 (서비스 계정은 공유된 폴더에만 업로드 가능)
-        com.google.api.services.drive.model.File uploadedFile = driveService.files().create(fileMetadata, mediaContent)
-                .setFields("id, name, webViewLink, webContentLink, mimeType, size")
-                .setSupportsAllDrives(true)  // Shared Drive 지원
-                .execute();
+        com.google.api.services.drive.model.File uploadedFile;
+        try {
+            uploadedFile = driveService.files().create(fileMetadata, mediaContent)
+                    .setFields("id, name, webViewLink, webContentLink, mimeType, size")
+                    .setSupportsAllDrives(true)  // Shared Drive 지원
+                    .execute();
+        } catch (com.google.api.client.googleapis.json.GoogleJsonResponseException e) {
+            // 403 에러 상세 로깅
+            if (e.getStatusCode() == 403) {
+                String errorMessage = e.getMessage();
+                String errorReason = e.getDetails() != null ? e.getDetails().getMessage() : "알 수 없는 오류";
+                
+                log.error("Google Drive 업로드 403 에러 발생:");
+                log.error("  - 폴더 ID: {}", targetFolderId);
+                log.error("  - 파일명: {}", multipartFile.getOriginalFilename());
+                log.error("  - 에러 메시지: {}", errorMessage);
+                log.error("  - 상세 사유: {}", errorReason);
+                log.error("  - 가능한 원인:");
+                log.error("    1. Refresh Token이 만료되었거나 무효함");
+                log.error("    2. 폴더 접근 권한이 없음 (폴더 공유 설정 확인 필요)");
+                log.error("    3. Google Drive API 할당량 초과");
+                log.error("    4. OAuth 스코프 부족 (https://www.googleapis.com/auth/drive 필요)");
+                log.error("    5. 폴더가 존재하지 않거나 삭제됨");
+                
+                throw new IOException("Google Drive 업로드 실패 (403 Forbidden): " + errorReason + 
+                    "\n가능한 해결 방법:\n" +
+                    "1. application-google.properties의 google.drive.refresh.token 확인\n" +
+                    "2. Google Drive에서 폴더 공유 설정 확인 (업로드 계정에 편집 권한 필요)\n" +
+                    "3. Google Cloud Console에서 Drive API 활성화 및 할당량 확인\n" +
+                    "4. OAuth 동의 화면에서 스코프 확인", e);
+            }
+            throw e;
+        }
 
         log.info("Google Drive 업로드 완료: File ID = {}", uploadedFile.getId());
 
