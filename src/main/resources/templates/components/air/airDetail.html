@@ -56,8 +56,9 @@
             <label class="block text-sm font-medium leading-6 text-gray-900">상태</label>
             <select th:field="*{status}"
               class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
-              <option th:each="st : ${T(renewal.common.entity.Air.AirStatus).values()}" th:value="${st}"
-                th:text="${st}">STATUS</option>
+              <option value="ACTIVE" th:selected="${air.status == T(renewal.common.entity.Air.AirStatus).ACTIVE}">활성</option>
+              <option value="INACTIVE" th:selected="${air.status == T(renewal.common.entity.Air.AirStatus).INACTIVE}">비활성</option>
+              <option value="HIDDEN" th:selected="${air.status == T(renewal.common.entity.Air.AirStatus).HIDDEN}">숨김</option>
             </select>
           </div>
 
@@ -195,7 +196,9 @@
                 <label class="block text-xs font-medium text-gray-700">출발 일시</label>
                 <input type="datetime-local" th:field="*{flightSegments[__${iterStat.index}__].departDateTime}" required
                   th:readonly="${iterStat.index == 0}"
+                  onchange="validateSegmentDateTime(this)"
                   class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                <p class="text-xs text-red-600 mt-1 hidden" th:attr="data-error='depart'"></p>
               </div>
 
               <!-- 도착 일시 -->
@@ -203,7 +206,9 @@
                 <label class="block text-xs font-medium text-gray-700">도착 일시</label>
                 <input type="datetime-local" th:field="*{flightSegments[__${iterStat.index}__].arriveDateTime}" required
                   th:readonly="${iterStat.index == (air.flightSegments.size() - 1)}"
+                  onchange="validateSegmentDateTime(this)"
                   class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                <p class="text-xs text-red-600 mt-1 hidden" th:attr="data-error='arrive'"></p>
               </div>
 
               <!-- 비행 시간 -->
@@ -361,13 +366,29 @@
       // 출발 일시
       const departTimeDiv = createFieldDiv('출발 일시', 'datetime-local');
       const departTimeInput = createInput('datetime-local', `flightSegments[${segmentIdx}].departDateTime`, true);
+      departTimeInput.addEventListener('change', function() {
+        validateSegmentDateTime(this);
+      });
       departTimeDiv.appendChild(departTimeInput);
+      // 에러 메시지 영역 추가
+      const departTimeError = document.createElement('p');
+      departTimeError.className = 'text-xs text-red-600 mt-1 hidden';
+      departTimeError.setAttribute('data-error', 'depart');
+      departTimeDiv.appendChild(departTimeError);
       fieldsContainer.appendChild(departTimeDiv);
 
       // 도착 일시
       const arriveTimeDiv = createFieldDiv('도착 일시', 'datetime-local');
       const arriveTimeInput = createInput('datetime-local', `flightSegments[${segmentIdx}].arriveDateTime`, true);
+      arriveTimeInput.addEventListener('change', function() {
+        validateSegmentDateTime(this);
+      });
       arriveTimeDiv.appendChild(arriveTimeInput);
+      // 에러 메시지 영역 추가
+      const arriveTimeError = document.createElement('p');
+      arriveTimeError.className = 'text-xs text-red-600 mt-1 hidden';
+      arriveTimeError.setAttribute('data-error', 'arrive');
+      arriveTimeDiv.appendChild(arriveTimeError);
       fieldsContainer.appendChild(arriveTimeDiv);
 
       // 비행 시간
@@ -392,6 +413,9 @@
 
       syncFirstLastReadonly();
       updateStopovers();
+      
+      // 새로 추가된 구간에 날짜 유효성 검사 이벤트 리스너 추가
+      attachDateTimeValidation();
     }
 
     function createFieldDiv(labelText, inputType) {
@@ -522,6 +546,145 @@
       const airIdInput = document.getElementById('id');
       if (container && (!airIdInput || !airIdInput.value)) {
         addSegment();
+      }
+      // 기존 구간에 이벤트 리스너 추가
+      attachDateTimeValidation();
+    });
+
+    // 구간의 출발일시와 도착일시 유효성 검사
+    function validateSegmentDateTime(input) {
+      const segmentEntry = input.closest('.segment-entry');
+      const container = document.getElementById('segmentContainer');
+      const allSegments = Array.from(container.querySelectorAll('.segment-entry'));
+      const currentIndex = allSegments.indexOf(segmentEntry);
+
+      const departTimeInput = segmentEntry.querySelector('input[name$=".departDateTime"]');
+      const arriveTimeInput = segmentEntry.querySelector('input[name$=".arriveDateTime"]');
+      const departTimeError = segmentEntry.querySelector('[data-error="depart"]');
+      const arriveTimeError = segmentEntry.querySelector('[data-error="arrive"]');
+
+      // 에러 메시지 초기화
+      if (departTimeError) {
+        departTimeError.classList.add('hidden');
+        departTimeError.textContent = '';
+      }
+      if (arriveTimeError) {
+        arriveTimeError.classList.add('hidden');
+        arriveTimeError.textContent = '';
+      }
+      if (departTimeInput) {
+        departTimeInput.classList.remove('border-red-500', 'ring-red-500');
+      }
+      if (arriveTimeInput) {
+        arriveTimeInput.classList.remove('border-red-500', 'ring-red-500');
+      }
+
+      const departTime = departTimeInput ? departTimeInput.value : null;
+      const arriveTime = arriveTimeInput ? arriveTimeInput.value : null;
+
+      let hasError = false;
+
+      // 1. 같은 구간 내에서 도착일시가 출발일시보다 이후여야 함
+      if (departTime && arriveTime) {
+        const depart = new Date(departTime);
+        const arrive = new Date(arriveTime);
+        
+        if (arrive <= depart) {
+          if (arriveTimeError) {
+            arriveTimeError.textContent = '도착 일시는 출발 일시보다 이후여야 합니다.';
+            arriveTimeError.classList.remove('hidden');
+          }
+          if (arriveTimeInput) {
+            arriveTimeInput.classList.add('border-red-500', 'ring-red-500');
+          }
+          hasError = true;
+        }
+      }
+
+      // 2. 이전 구간과의 관계 검증 (현재 구간의 출발일시가 이전 구간의 도착일시보다 이후여야 함)
+      if (currentIndex > 0 && departTime) {
+        const prevSegment = allSegments[currentIndex - 1];
+        const prevArriveTimeInput = prevSegment.querySelector('input[name$=".arriveDateTime"]');
+        if (prevArriveTimeInput && prevArriveTimeInput.value) {
+          const prevArrive = new Date(prevArriveTimeInput.value);
+          const currentDepart = new Date(departTime);
+          
+          if (currentDepart <= prevArrive) {
+            if (departTimeError) {
+              departTimeError.textContent = '출발 일시는 이전 구간의 도착 일시보다 이후여야 합니다.';
+              departTimeError.classList.remove('hidden');
+            }
+            if (departTimeInput) {
+              departTimeInput.classList.add('border-red-500', 'ring-red-500');
+            }
+            hasError = true;
+          }
+        }
+      }
+
+      // 3. 다음 구간과의 관계 검증 (다음 구간의 출발일시가 현재 구간의 도착일시보다 이후여야 함)
+      if (currentIndex < allSegments.length - 1 && arriveTime) {
+        const nextSegment = allSegments[currentIndex + 1];
+        const nextDepartTimeInput = nextSegment.querySelector('input[name$=".departDateTime"]');
+        if (nextDepartTimeInput && nextDepartTimeInput.value) {
+          const currentArrive = new Date(arriveTime);
+          const nextDepart = new Date(nextDepartTimeInput.value);
+          
+          if (nextDepart <= currentArrive) {
+            if (arriveTimeError) {
+              arriveTimeError.textContent = '도착 일시는 다음 구간의 출발 일시보다 이전이어야 합니다.';
+              arriveTimeError.classList.remove('hidden');
+            }
+            if (arriveTimeInput) {
+              arriveTimeInput.classList.add('border-red-500', 'ring-red-500');
+            }
+            hasError = true;
+          }
+        }
+      }
+
+      return !hasError;
+    }
+
+    // 기존 구간에 날짜 유효성 검사 이벤트 리스너 추가
+    function attachDateTimeValidation() {
+      const container = document.getElementById('segmentContainer');
+      if (!container) return;
+      
+      container.querySelectorAll('input[name$=".departDateTime"], input[name$=".arriveDateTime"]').forEach(input => {
+        if (!input.hasAttribute('data-validated')) {
+          input.addEventListener('change', function() {
+            validateSegmentDateTime(this);
+          });
+          input.setAttribute('data-validated', 'true');
+        }
+      });
+    }
+
+    // 폼 제출 시 모든 구간의 날짜 유효성 검사
+    document.querySelector('form').addEventListener('submit', function(e) {
+      const container = document.getElementById('segmentContainer');
+      if (!container) return true;
+      
+      const allSegments = container.querySelectorAll('.segment-entry');
+      let isValid = true;
+      
+      allSegments.forEach(segment => {
+        const departTimeInput = segment.querySelector('input[name$=".departDateTime"]');
+        const arriveTimeInput = segment.querySelector('input[name$=".arriveDateTime"]');
+        
+        if (departTimeInput && !validateSegmentDateTime(departTimeInput)) {
+          isValid = false;
+        }
+        if (arriveTimeInput && !validateSegmentDateTime(arriveTimeInput)) {
+          isValid = false;
+        }
+      });
+      
+      if (!isValid) {
+        e.preventDefault();
+        alert('구간의 출발 일시와 도착 일시를 확인해주세요. 도착 일시는 출발 일시보다 이후여야 하며, 각 구간의 시간 순서가 올바르게 입력되어야 합니다.');
+        return false;
       }
     });
   </script>

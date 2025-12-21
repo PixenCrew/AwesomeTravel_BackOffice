@@ -68,12 +68,24 @@ public class AirSpecification {
     public static Specification<SeatClass> departDateTimeBetween(LocalDate from, LocalDate to) {
         return (root, query, builder) -> {
             Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT);
+            // LocalDate를 LocalDateTime으로 변환하여 비교
             if (from != null && to != null) {
-                return builder.between(seatJoin.get("departDateTime"), from, to);
+                // from의 시작 시간(00:00:00)과 to의 끝 시간(23:59:59)으로 비교
+                return builder.between(
+                    seatJoin.get("departDateTime"),
+                    from.atStartOfDay(),
+                    to.atTime(23, 59, 59)
+                );
             } else if (from != null) {
-                return builder.greaterThanOrEqualTo(seatJoin.get("departDateTime"), from);
+                return builder.greaterThanOrEqualTo(
+                    seatJoin.get("departDateTime"),
+                    from.atStartOfDay()
+                );
             } else if (to != null) {
-                return builder.lessThanOrEqualTo(seatJoin.get("departDateTime"), to);
+                return builder.lessThanOrEqualTo(
+                    seatJoin.get("departDateTime"),
+                    to.atTime(23, 59, 59)
+                );
             } else {
                 return null;
             }
@@ -84,12 +96,25 @@ public class AirSpecification {
     public static Specification<SeatClass> arriveDateBetween(LocalDate from, LocalDate to) {
         return (root, query, builder) -> {
             Join<SeatClass, Air> seatJoin = root.join("air", JoinType.LEFT);
+            // arriveDateTime의 날짜 부분만 추출하여 비교
+            // LocalDateTime을 LocalDate로 변환하여 비교
             if (from != null && to != null) {
-                return builder.between(seatJoin.get("arriveDate"), from, to);
+                // from의 시작 시간(00:00:00)과 to의 끝 시간(23:59:59)으로 비교
+                return builder.between(
+                    seatJoin.get("arriveDateTime"),
+                    from.atStartOfDay(),
+                    to.atTime(23, 59, 59)
+                );
             } else if (from != null) {
-                return builder.greaterThanOrEqualTo(seatJoin.get("arriveDate"), from);
+                return builder.greaterThanOrEqualTo(
+                    seatJoin.get("arriveDateTime"),
+                    from.atStartOfDay()
+                );
             } else if (to != null) {
-                return builder.lessThanOrEqualTo(seatJoin.get("arriveDate"), to);
+                return builder.lessThanOrEqualTo(
+                    seatJoin.get("arriveDateTime"),
+                    to.atTime(23, 59, 59)
+                );
             } else {
                 return null;
             }
