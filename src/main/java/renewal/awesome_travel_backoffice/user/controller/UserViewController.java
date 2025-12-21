@@ -96,6 +96,40 @@ public class UserViewController {
         }
     }
     
+    // 회원 생성 폼
+    @GetMapping("/new")
+    public String createUserForm(Model model) {
+        UserRequestDto userRequestDto = new UserRequestDto();
+        userRequestDto.setProvider(UserProvider.LOCAL);
+        userRequestDto.setRole(UserRole.USER);
+        userRequestDto.setStatus(UserStatus.ACTIVE);
+        
+        model.addAttribute("title", "회원 등록");
+        model.addAttribute("content", "components/user/memberForm");
+        model.addAttribute("user", userRequestDto);
+        model.addAttribute("userId", null); // 생성 모드임을 표시
+        model.addAttribute("providers", UserProvider.values());
+        model.addAttribute("roles", UserRole.values());
+        model.addAttribute("statuses", UserStatus.values());
+        return "layout";
+    }
+    
+    // 회원 생성 처리
+    @PostMapping("/new")
+    public String createUser(
+            UserRequestDto userRequestDto,
+            @RequestParam(required = false) String password,
+            RedirectAttributes redirectAttributes) {
+        try {
+            Long userId = userService.createUser(userRequestDto, password);
+            redirectAttributes.addFlashAttribute("message", "회원이 성공적으로 등록되었습니다.");
+            return "redirect:/member";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/member/new";
+        }
+    }
+    
     // 회원 수정 폼
     @GetMapping("/edit/{id}")
     public String editUserForm(@PathVariable Long id, Model model) {
@@ -145,12 +179,12 @@ public class UserViewController {
         }
     }
     
-    // 회원 삭제
-    @GetMapping("/delete/{id}")
+    // 회원 삭제 (소프트 삭제: 상태를 BANNED로 변경)
+    @PostMapping("/delete/{id}")
     public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             userService.deleteUser(id);
-            redirectAttributes.addFlashAttribute("message", "회원이 성공적으로 삭제되었습니다.");
+            redirectAttributes.addFlashAttribute("message", "회원이 차단되었습니다.");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }

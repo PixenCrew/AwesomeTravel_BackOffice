@@ -2,6 +2,7 @@ package renewal.awesome_travel_backoffice.user.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,8 @@ import renewal.awesome_travel_backoffice.user.repository.UserRepository;
 import renewal.common.entity.PurchaseAir;
 import renewal.common.entity.PurchaseProduct;
 import renewal.common.entity.User;
+import renewal.common.entity.User.UserProvider;
+import renewal.common.entity.User.UserRole;
 import renewal.common.entity.User.UserStatus;
 import renewal.common.repository.PurchaseProductRepository;
 
@@ -28,6 +31,7 @@ import java.util.stream.Collectors;
 public class UserService {
     
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     private final renewal.common.repository.PurchaseAirRepository commonPurchaseAirRepository;
     private final renewal.awesome_travel_backoffice.purchaseAir.repository.PurchaseAirAdminRepository adminPurchaseAirRepository;
     private final PurchaseAirService purchaseAirService;
@@ -65,6 +69,42 @@ public class UserService {
         return convertToResponseDto(user);
     }
     
+    // 회원 생성
+    @Transactional
+    public Long createUser(UserRequestDto userRequestDto, String password) {
+        // 이메일 중복 체크
+        if (userRepository.existsByEmail(userRequestDto.getEmail())) {
+            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+        }
+        
+        // User 엔티티 생성
+        User.UserBuilder userBuilder = User.builder()
+                .email(userRequestDto.getEmail())
+                .name(userRequestDto.getName())
+                .phone(userRequestDto.getPhone())
+                .birthDate(userRequestDto.getBirthDate())
+                .role(userRequestDto.getRole() != null ? userRequestDto.getRole() : UserRole.USER)
+                .status(userRequestDto.getStatus() != null ? userRequestDto.getStatus() : UserStatus.ACTIVE)
+                .emailVerified(userRequestDto.getEmailVerified() != null ? userRequestDto.getEmailVerified() : false);
+        
+        // 비밀번호 설정 (LOCAL provider인 경우)
+        if (password != null && !password.isEmpty()) {
+            userBuilder.password(passwordEncoder.encode(password));
+            userBuilder.provider(userRequestDto.getProvider() != null ? userRequestDto.getProvider() : UserProvider.LOCAL);
+        } else {
+            userBuilder.provider(userRequestDto.getProvider() != null ? userRequestDto.getProvider() : UserProvider.LOCAL);
+        }
+        
+        // 소셜 ID 설정
+        if (userRequestDto.getSocialId() != null && !userRequestDto.getSocialId().isEmpty()) {
+            userBuilder.providerId(userRequestDto.getSocialId());
+        }
+        
+        User user = userBuilder.build();
+        User savedUser = userRepository.save(user);
+        return savedUser.getId();
+    }
+    
     // 회원 수정
     @Transactional
     public void updateUser(Long id, UserRequestDto userRequestDto) {
@@ -100,13 +140,15 @@ public class UserService {
         userRepository.save(user);
     }
     
-    // 회원 삭제
+    // 회원 삭제 (소프트 삭제: 상태를 BANNED로 변경)
     @Transactional
     public void deleteUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다. ID: " + id));
         
-        userRepository.delete(user);
+        // 실제 삭제 대신 상태를 BANNED로 변경 (소프트 삭제)
+        user.setStatus(UserStatus.BANNED);
+        userRepository.save(user);
     }
     
     // 회원의 항공 구매 내역 조회

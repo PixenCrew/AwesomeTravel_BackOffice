@@ -6,6 +6,13 @@
                     <h2 class="text-2xl font-bold text-gray-900">회원 정보 관리</h2>
                     <p class="text-sm text-gray-600 mt-1">총 <span th:text="${totalCount}">0</span>명의 회원</p>
                 </div>
+                <a href="/member/new" 
+                   class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors duration-200">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    유저 생성
+                </a>
             </div>
         </div>
 
@@ -58,16 +65,9 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     <tr th:each="user : ${users}" class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-10 w-10">
-                                    <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                        <span class="text-sm font-medium text-blue-600" th:text="${#strings.substring(user.name, 0, 1)}">U</span>
-                                    </div>
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900" th:text="${user.name}">홍길동</div>
-                                    <div class="text-sm text-gray-500" th:text="${user.email}">user@example.com</div>
-                                </div>
+                            <div>
+                                <div class="text-sm font-medium text-gray-900" th:text="${user.name}">홍길동</div>
+                                <div class="text-sm text-gray-500" th:text="${user.email}">user@example.com</div>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -77,31 +77,54 @@
                             <div class="text-sm text-gray-900" th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd')}">2024-01-01</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span th:switch="${user.status}" 
+                            <span th:switch="${user.status?.name()}" 
                                   class="inline-flex px-2 py-1 text-xs font-semibold rounded-full">
-                                <span th:case="ACTIVE" class="bg-green-100 text-green-800">활성</span>
-                                <span th:case="WITHDRAWN" class="bg-gray-100 text-gray-800">탈퇴</span>
-                                <span th:case="BANNED" class="bg-red-100 text-red-800">차단</span>
-                                <span th:case="*" class="bg-gray-100 text-gray-800" th:text="${user.status}">상태</span>
+                                <span th:case="'ACTIVE'" class="bg-green-100 text-green-800">활성</span>
+                                <span th:case="'WITHDRAWN'" class="bg-gray-100 text-gray-800">탈퇴</span>
+                                <span th:case="'BANNED'" class="bg-red-100 text-red-800">차단</span>
+                                <span th:case="*" class="bg-gray-100 text-gray-800" th:text="${user.status?.name()}">상태</span>
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span th:switch="${user.role}" 
+                            <span th:switch="${user.role?.name()}" 
                                   class="inline-flex px-2 py-1 text-xs font-semibold rounded-full">
-                                <span th:case="ADMIN" class="bg-purple-100 text-purple-800">관리자</span>
-                                <span th:case="USER" class="bg-blue-100 text-blue-800">일반회원</span>
-                                <span th:case="*" class="bg-gray-100 text-gray-800" th:text="${user.role}">역할</span>
+                                <span th:case="'ADMIN'" class="bg-purple-100 text-purple-800">관리자</span>
+                                <span th:case="'USER'" class="bg-blue-100 text-blue-800">유저</span>
+                                <span th:case="*" class="bg-gray-100 text-gray-800" th:text="${user.role?.name()}">역할</span>
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <div class="flex space-x-2">
                                 <a th:href="@{/member/{id}(id=${user.id})}" 
-                                   class="text-blue-600 hover:text-blue-900">상세</a>
+                                   class="inline-flex items-center px-3 py-1.5 bg-blue-50 text-blue-700 rounded-md hover:bg-blue-100 transition-colors duration-200 text-xs font-medium"
+                                   title="상세보기">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                    상세
+                                </a>
                                 <a th:href="@{/member/edit/{id}(id=${user.id})}" 
-                                   class="text-indigo-600 hover:text-indigo-900">수정</a>
-                                <a th:href="@{/member/delete/{id}(id=${user.id})}" 
-                                   class="text-red-600 hover:text-red-900"
-                                   onclick="return confirm('정말 삭제하시겠습니까?')">삭제</a>
+                                   class="inline-flex items-center px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-md hover:bg-indigo-100 transition-colors duration-200 text-xs font-medium"
+                                   title="수정">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                    수정
+                                </a>
+                                <form th:action="@{/member/delete/{id}(id=${user.id})}" 
+                                      method="post" 
+                                      class="inline"
+                                      onsubmit="return confirm('정말 삭제하시겠습니까?')">
+                                    <button type="submit"
+                                            class="inline-flex items-center px-3 py-1.5 bg-red-50 text-red-700 rounded-md hover:bg-red-100 transition-colors duration-200 text-xs font-medium"
+                                            title="삭제">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                        삭제
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>
