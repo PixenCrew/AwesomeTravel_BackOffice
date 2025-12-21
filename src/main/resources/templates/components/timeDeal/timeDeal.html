@@ -157,15 +157,22 @@
                             </div>
                         </td>
 
-                        <!-- 타입 -->
+                        <!-- 할인 유형 -->
                         <td class="px-6 py-4 text-sm text-gray-700">
-                            <span th:if="${td.discountType=='PERCENT'}"
-                                class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">
-                                정률할인
-                            </span>
-                            <span th:if="${td.discountType=='ABSOLUTE'}"
-                                class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded">
-                                정액할인
+                            <span th:switch="${td.discountType?.name()}"
+                                class="inline-flex items-center">
+                                <span th:case="'PERCENT'"
+                                    class="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded">
+                                    정률할인
+                                </span>
+                                <span th:case="'ABSOLUTE'"
+                                    class="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded">
+                                    정액할인
+                                </span>
+                                <span th:case="*"
+                                    class="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded">
+                                    -
+                                </span>
                             </span>
                         </td>
 
