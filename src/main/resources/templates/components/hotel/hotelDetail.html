@@ -77,13 +77,15 @@
 
                     <div>
                         <label class="block text-sm font-medium leading-6 text-gray-900">가격 (원)</label>
-                        <input type="number" th:field="*{price}" required
+                        <input type="number" th:field="*{price}" required min="0" step="1"
+                            oninput="preventNegative(this)" onblur="preventNegative(this)"
                             class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium leading-6 text-gray-900">최대 객실 수</label>
-                        <input type="number" th:field="*{maxRoomCount}"
+                        <input type="number" th:field="*{maxRoomCount}" min="0" step="1"
+                            oninput="preventNegative(this)" onblur="preventNegative(this)"
                             class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
                     </div>
 
@@ -180,6 +182,33 @@
                     });
             }
         }
+
+        // 음수 입력 방지 함수
+        function preventNegative(input) {
+            if (input.value < 0) {
+                input.value = 0;
+            }
+        }
+
+        // 폼 제출 시 음수 값 검증
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const priceInput = document.querySelector('input[name="price"]');
+            const maxRoomCountInput = document.querySelector('input[name="maxRoomCount"]');
+            
+            if (priceInput && priceInput.value < 0) {
+                e.preventDefault();
+                alert('가격은 0 이상이어야 합니다.');
+                priceInput.focus();
+                return false;
+            }
+            
+            if (maxRoomCountInput && maxRoomCountInput.value < 0) {
+                e.preventDefault();
+                alert('최대 객실 수는 0 이상이어야 합니다.');
+                maxRoomCountInput.focus();
+                return false;
+            }
+        });
 
         // function addImage() {
         //     const fieldset = document.getElementById("images-fieldset");

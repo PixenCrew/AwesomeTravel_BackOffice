@@ -61,7 +61,7 @@ public class HotelController {
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("isSelectionPage", false); // 기본값 설정
-        model.addAttribute("title", "Hotel List");
+        model.addAttribute("title", "호텔 관리");
         model.addAttribute("content", "components/hotel/hotel");
 
         return "layout";
@@ -78,7 +78,7 @@ public class HotelController {
         model.addAttribute("hotel", hotel);
         model.addAttribute("hotelTypes", HotelType.values());
         model.addAttribute("allAmenities", amenityRepo.findAll());
-        model.addAttribute("title", "New Hotel");
+        model.addAttribute("title", "새 호텔 등록");
         model.addAttribute("content", "components/hotel/hotelDetail");
         return "layout";
     }
@@ -102,7 +102,7 @@ public class HotelController {
         model.addAttribute("hotel", hotel);
         model.addAttribute("hotelTypes", HotelType.values());
         model.addAttribute("allAmenities", amenityRepo.findAll());
-        model.addAttribute("title", "Hotel Detail");
+        model.addAttribute("title", "호텔 상세");
         model.addAttribute("content", "components/hotel/hotelDetail");
         return "layout";
     }
@@ -165,7 +165,7 @@ public class HotelController {
         model.addAttribute("filter", filter); // 필터 객체 추가
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
-        model.addAttribute("title", "Hotel Select");
+        model.addAttribute("title", "호텔 선택");
         model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
         
         // 호텔선택 플래그
