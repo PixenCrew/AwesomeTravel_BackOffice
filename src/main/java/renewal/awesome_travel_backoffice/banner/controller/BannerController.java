@@ -54,20 +54,26 @@ public class BannerController {
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<Banner> bannerPage;
 
-        // 검색 조건에 따른 조회
-        if (title != null && !title.trim().isEmpty()) {
-            bannerPage = bannerService.searchBannersByTitle(title, pageable);
-        } else if (active != null) {
-            bannerPage = bannerService.searchBannersByActive(active, pageable);
-        } else if (startDate != null && endDate != null && !startDate.isEmpty() && !endDate.isEmpty()) {
-            bannerPage = bannerService.searchBannersByDateRange(
-                LocalDate.parse(startDate), 
-                LocalDate.parse(endDate), 
-                pageable
-            );
-        } else {
-            bannerPage = bannerService.getAllBanners(pageable);
+        // 날짜 파싱
+        LocalDate startDateParsed = null;
+        LocalDate endDateParsed = null;
+        if (startDate != null && !startDate.isEmpty()) {
+            try {
+                startDateParsed = LocalDate.parse(startDate);
+            } catch (Exception e) {
+                // 파싱 실패 시 무시
+            }
         }
+        if (endDate != null && !endDate.isEmpty()) {
+            try {
+                endDateParsed = LocalDate.parse(endDate);
+            } catch (Exception e) {
+                // 파싱 실패 시 무시
+            }
+        }
+
+        // 통합 검색 (모든 조건을 조합하여 검색)
+        bannerPage = bannerService.searchBanners(title, active, startDateParsed, endDateParsed, pageable);
 
         model.addAttribute("bannerPage", bannerPage);
         model.addAttribute("currentPage", page);
@@ -132,6 +138,8 @@ public class BannerController {
             @RequestParam String url,
             @RequestParam(required = false) String fileUrl,
             @RequestParam(required = false) MultipartFile file,
+            @RequestParam(required = false) String locationType,
+            @RequestParam(required = false) String locationIdentifier,
             Model model) {
 
         try {
@@ -157,6 +165,25 @@ public class BannerController {
                 banner.setActive(active != null ? active : true);
                 banner.setUrl(url);
                 
+                // locationType 설정
+                if (locationType != null && !locationType.isEmpty()) {
+                    try {
+                        Banner.BannerLocationType type = Banner.BannerLocationType.valueOf(locationType);
+                        banner.setLocationType(type);
+                    } catch (IllegalArgumentException e) {
+                        banner.setLocationType(Banner.BannerLocationType.HOME);
+                    }
+                } else {
+                    banner.setLocationType(Banner.BannerLocationType.HOME);
+                }
+                
+                // locationIdentifier 설정
+                if (locationIdentifier != null && !locationIdentifier.trim().isEmpty()) {
+                    banner.setLocationIdentifier(locationIdentifier.trim());
+                } else {
+                    banner.setLocationIdentifier(null);
+                }
+                
                 if (fileName != null) {
                     banner.setFile(fileName);
                 }
@@ -167,13 +194,32 @@ public class BannerController {
                 if (fileName == null || fileName.isEmpty()) {
                     throw new RuntimeException("배너 이미지는 필수입니다.");
                 }
+                
+                // locationType 설정
+                Banner.BannerLocationType type = Banner.BannerLocationType.HOME;
+                if (locationType != null && !locationType.isEmpty()) {
+                    try {
+                        type = Banner.BannerLocationType.valueOf(locationType);
+                    } catch (IllegalArgumentException e) {
+                        type = Banner.BannerLocationType.HOME;
+                    }
+                }
+                
+                // locationIdentifier 설정
+                String identifier = null;
+                if (locationIdentifier != null && !locationIdentifier.trim().isEmpty()) {
+                    identifier = locationIdentifier.trim();
+                }
+                
                 banner = new Banner(
                     displayOrder,
                     title,
                     LocalDate.parse(startDate),
                     LocalDate.parse(endDate),
                     fileName,
-                    url
+                    url,
+                    type,
+                    identifier
                 );
                 banner.setActive(active != null ? active : true);
                 bannerService.createBanner(banner);
