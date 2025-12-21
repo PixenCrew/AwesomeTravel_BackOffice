@@ -327,10 +327,11 @@
                 <label class="filter-label">주문 상태</label>
                 <select name="status" class="filter-input">
                     <option value="">전체</option>
-                    <option th:each="statusOption : ${purchaseStatuses}" 
-                            th:value="${statusOption}" 
-                            th:text="${statusOption}"
-                            th:selected="${statusOption == status}">HOLDING</option>
+                    <option value="RESERVED" th:selected="${status != null && status.name() == 'RESERVED'}">예약접수</option>
+                    <option value="CONFIRMED" th:selected="${status != null && status.name() == 'CONFIRMED'}">담당자 확인</option>
+                    <option value="HOLDING" th:selected="${status != null && status.name() == 'HOLDING'}">결제 대기</option>
+                    <option value="PAID" th:selected="${status != null && status.name() == 'PAID'}">결제 완료</option>
+                    <option value="CANCELLED" th:selected="${status != null && status.name() == 'CANCELLED'}">취소됨</option>
                 </select>
             </div>
             
@@ -431,7 +432,11 @@
                             <div class="space-y-1">
                                 <span class="status-badge" 
                                       th:classappend="'status-' + ${purchase.status.name().toLowerCase()}"
-                                      th:text="${purchase.status}">HOLDING</span>
+                                      th:text="${purchase.status.name() == 'RESERVED'} ? '예약접수' : 
+                                               (${purchase.status.name() == 'CONFIRMED'} ? '담당자 확인' : 
+                                               (${purchase.status.name() == 'HOLDING'} ? '결제 대기' : 
+                                               (${purchase.status.name() == 'PAID'} ? '결제 완료' : 
+                                               (${purchase.status.name() == 'CANCELLED'} ? '취소됨' : '${purchase.status}'))))">HOLDING</span>
                                 <div th:if="${!purchase.isPassengerInfoComplete}" 
                                      class="text-xs text-orange-600 font-medium">
                                     승객정보 미완료
