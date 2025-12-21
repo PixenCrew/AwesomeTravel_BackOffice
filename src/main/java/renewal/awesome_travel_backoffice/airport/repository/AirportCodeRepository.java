@@ -35,6 +35,10 @@ public interface AirportCodeRepository extends JpaRepository<AirportCode, String
     // 도시별 공항 조회
     @Query("SELECT a FROM AirportCode a WHERE a.cityCode.cityCode = :cityCode ORDER BY a.airportCode ASC")
     Page<AirportCode> findByCityCode(@Param("cityCode") String cityCode, Pageable pageable);
+    
+    // 도시별 공항 조회 (리스트)
+    @Query("SELECT a FROM AirportCode a WHERE a.cityCode.cityCode = :cityCode ORDER BY a.airportCode ASC")
+    List<AirportCode> findByCityCodeList(@Param("cityCode") String cityCode);
 
     // 국가 + 도시별 공항 조회
     @Query("SELECT a FROM AirportCode a WHERE a.cityCode.countryCode.countryCode = :countryCode AND a.cityCode.cityCode = :cityCode ORDER BY a.airportCode ASC")
