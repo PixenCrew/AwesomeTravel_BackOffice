@@ -50,6 +50,7 @@
                            name="startDateFrom" 
                            th:value="${searchRequest?.startDateFrom}"
                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <p id="startDateFromError" class="text-xs text-red-600 mt-1 hidden"></p>
                 </div>
                 
                 <div>
@@ -59,6 +60,7 @@
                            name="startDateTo" 
                            th:value="${searchRequest?.startDateTo}"
                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <p id="startDateToError" class="text-xs text-red-600 mt-1 hidden"></p>
                 </div>
                 
                 <div>
@@ -72,9 +74,14 @@
                     </select>
                 </div>
                 
-                <div class="flex items-end">
-                    <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                <div class="flex items-end gap-2">
+                    <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
                         <i class="fas fa-search mr-2"></i>검색
+                    </button>
+                    <button type="button" 
+                            onclick="resetFilter()" 
+                            class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200">
+                        <i class="fas fa-redo mr-2"></i>초기화
                     </button>
                 </div>
             </form>
@@ -201,6 +208,108 @@
     </div>
 
     <script>
+        // 날짜 필터 유효성 검사
+        const startDateFromInput = document.getElementById('startDateFrom');
+        const startDateToInput = document.getElementById('startDateTo');
+        const startDateFromError = document.getElementById('startDateFromError');
+        const startDateToError = document.getElementById('startDateToError');
+
+        // 시작일 (부터) 변경 시 검증
+        if (startDateFromInput) {
+            startDateFromInput.addEventListener('change', function() {
+                validateFilterDates();
+            });
+        }
+
+        // 시작일 (까지) 변경 시 검증
+        if (startDateToInput) {
+            startDateToInput.addEventListener('change', function() {
+                validateFilterDates();
+            });
+        }
+
+        // 날짜 필터 유효성 검사 함수
+        function validateFilterDates() {
+            const startDateFrom = startDateFromInput.value;
+            const startDateTo = startDateToInput.value;
+            
+            // 에러 메시지 초기화
+            if (startDateFromError) {
+                startDateFromError.classList.add('hidden');
+            }
+            if (startDateToError) {
+                startDateToError.classList.add('hidden');
+            }
+            if (startDateFromInput) {
+                startDateFromInput.classList.remove('border-red-500');
+            }
+            if (startDateToInput) {
+                startDateToInput.classList.remove('border-red-500');
+            }
+            
+            if (startDateFrom && startDateTo) {
+                const from = new Date(startDateFrom);
+                const to = new Date(startDateTo);
+                
+                if (to < from) {
+                    if (startDateToError) {
+                        startDateToError.textContent = '종료일은 시작일보다 이전일 수 없습니다.';
+                        startDateToError.classList.remove('hidden');
+                    }
+                    if (startDateToInput) {
+                        startDateToInput.classList.add('border-red-500');
+                        startDateToInput.focus();
+                    }
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        // 폼 제출 시 최종 검증
+        const filterForm = document.querySelector('form');
+        if (filterForm) {
+            filterForm.addEventListener('submit', function(e) {
+                if (!validateFilterDates()) {
+                    e.preventDefault();
+                    alert('시작일 (까지)는 시작일 (부터)보다 이전일 수 없습니다. 날짜를 확인해주세요.');
+                    return false;
+                }
+            });
+        }
+
+        // 필터 초기화 함수
+        function resetFilter() {
+            // 모든 입력 필드 초기화
+            const keywordInput = document.getElementById('keyword');
+            const startDateFromInput = document.getElementById('startDateFrom');
+            const startDateToInput = document.getElementById('startDateTo');
+            const activeSelect = document.getElementById('active');
+            
+            if (keywordInput) keywordInput.value = '';
+            if (startDateFromInput) startDateFromInput.value = '';
+            if (startDateToInput) startDateToInput.value = '';
+            if (activeSelect) activeSelect.value = '';
+            
+            // 에러 메시지 초기화
+            if (startDateFromError) {
+                startDateFromError.classList.add('hidden');
+            }
+            if (startDateToError) {
+                startDateToError.classList.add('hidden');
+            }
+            if (startDateFromInput) {
+                startDateFromInput.classList.remove('border-red-500');
+            }
+            if (startDateToInput) {
+                startDateToInput.classList.remove('border-red-500');
+            }
+            
+            // 필터 초기화 후 목록 페이지로 이동 (쿼리 파라미터 없이)
+            window.location.href = '/popup';
+        }
+
         function togglePopup(id) {
             if (confirm('팝업 상태를 변경하시겠습니까?')) {
                 fetch(`/popup/${id}/toggle`, {
