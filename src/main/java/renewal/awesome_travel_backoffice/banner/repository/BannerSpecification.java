@@ -49,5 +49,15 @@ public class BannerSpecification {
             return builder.equal(root.get("active"), active);
         };
     }
+
+    // 위치 타입 필터
+    public static Specification<Banner> locationTypeEquals(Banner.BannerLocationType locationType) {
+        return (root, query, builder) -> {
+            if (locationType == null) {
+                return null;
+            }
+            return builder.equal(root.get("locationType"), locationType);
+        };
+    }
 }
 

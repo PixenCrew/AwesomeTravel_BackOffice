@@ -51,8 +51,8 @@ public class BannerService {
         return bannerRepository.findByActive(active, pageable);
     }
 
-    // 통합 검색 (제목, 활성 상태, 날짜 범위)
-    public Page<Banner> searchBanners(String title, Boolean active, LocalDate startDate, LocalDate endDate, Pageable pageable) {
+    // 통합 검색 (제목, 활성 상태, 날짜 범위, 위치 타입)
+    public Page<Banner> searchBanners(String title, Boolean active, LocalDate startDate, LocalDate endDate, Banner.BannerLocationType locationType, Pageable pageable) {
         Specification<Banner> spec = Specification.where(null);
         
         // 제목 검색
@@ -63,6 +63,11 @@ public class BannerService {
         // 활성 상태 필터
         if (active != null) {
             spec = spec.and(BannerSpecification.isActive(active));
+        }
+        
+        // 위치 타입 필터
+        if (locationType != null) {
+            spec = spec.and(BannerSpecification.locationTypeEquals(locationType));
         }
         
         // 노출기간이 필터 기간과 겹치는 배너 검색
@@ -77,6 +82,17 @@ public class BannerService {
     // 배너 생성
     @Transactional
     public Banner createBanner(Banner banner) {
+        // 표시순서 중복 체크 (위치 타입별)
+        if (banner.getDisplayOrder() != null && banner.getLocationType() != null) {
+            boolean exists = bannerRepository.existsByDisplayOrderAndLocationType(
+                banner.getDisplayOrder(), 
+                banner.getLocationType()
+            );
+            if (exists) {
+                throw new IllegalArgumentException("해당 위치 타입에서 이미 사용 중인 표시순서입니다. 다른 순서를 선택해주세요.");
+            }
+        }
+        
         return bannerRepository.save(banner);
     }
 
@@ -86,6 +102,18 @@ public class BannerService {
         Banner banner = bannerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("배너를 찾을 수 없습니다: " + id));
         
+        // 표시순서 중복 체크 (위치 타입별, 자기 자신 제외)
+        if (updatedBanner.getDisplayOrder() != null && updatedBanner.getLocationType() != null) {
+            boolean exists = bannerRepository.existsByDisplayOrderAndLocationTypeAndIdNot(
+                updatedBanner.getDisplayOrder(), 
+                updatedBanner.getLocationType(),
+                id
+            );
+            if (exists) {
+                throw new IllegalArgumentException("해당 위치 타입에서 이미 사용 중인 표시순서입니다. 다른 순서를 선택해주세요.");
+            }
+        }
+        
         banner.setTitle(updatedBanner.getTitle());
         banner.setDisplayOrder(updatedBanner.getDisplayOrder());
         banner.setStartDate(updatedBanner.getStartDate());
@@ -93,6 +121,8 @@ public class BannerService {
         banner.setActive(updatedBanner.getActive());
         banner.setFile(updatedBanner.getFile());
         banner.setUrl(updatedBanner.getUrl());
+        banner.setLocationType(updatedBanner.getLocationType());
+        banner.setLocationIdentifier(updatedBanner.getLocationIdentifier());
         
         return bannerRepository.save(banner);
     }
