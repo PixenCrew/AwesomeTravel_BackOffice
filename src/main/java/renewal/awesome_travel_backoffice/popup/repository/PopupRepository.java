@@ -16,4 +16,10 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     // (프론트엔드에서 현재 노출되어야 하는 팝업을 조회하는 용도로 사용)
     @Query("SELECT p FROM Popup p WHERE p.active = true AND p.startDate <= :currentDate AND p.endDate >= :currentDate ORDER BY p.displayOrder ASC")
     List<Popup> findCurrentActivePopups(@Param("currentDate") LocalDate currentDate);
+    
+    // 노출순서 중복 체크 (생성 시)
+    boolean existsByDisplayOrder(Integer displayOrder);
+    
+    // 노출순서 중복 체크 (수정 시, 자기 자신 제외)
+    boolean existsByDisplayOrderAndIdNot(Integer displayOrder, Long id);
 }
