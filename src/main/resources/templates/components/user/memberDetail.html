@@ -3,28 +3,22 @@
         <div class="bg-white rounded-lg shadow-sm">
             <div class="px-6 py-4 border-b border-gray-200">
                 <div class="flex justify-between items-center">
-                    <div class="flex items-center space-x-4">
-                        <div class="flex-shrink-0 h-16 w-16">
-                            <div class="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center">
-                                <span class="text-2xl font-medium text-blue-600" th:text="${#strings.substring(user.name, 0, 1)}">U</span>
-                            </div>
-                        </div>
-                        <div>
-                            <h2 class="text-2xl font-bold text-gray-900" th:text="${user.name}">홍길동</h2>
-                            <p class="text-sm text-gray-600" th:text="${user.email}">user@example.com</p>
-                            <div class="flex items-center space-x-2 mt-1">
-                                <span th:switch="${user.status}" 
-                                      class="inline-flex px-2 py-1 text-xs font-semibold rounded-full">
-                                    <span th:case="ACTIVE" class="bg-green-100 text-green-800">활성</span>
-                                    <span th:case="WITHDRAWN" class="bg-gray-100 text-gray-800">탈퇴</span>
-                                    <span th:case="BANNED" class="bg-red-100 text-red-800">차단</span>
-                                </span>
-                                <span th:switch="${user.role}" 
-                                      class="inline-flex px-2 py-1 text-xs font-semibold rounded-full">
-                                    <span th:case="ADMIN" class="bg-purple-100 text-purple-800">관리자</span>
-                                    <span th:case="USER" class="bg-blue-100 text-blue-800">유저</span>
-                                </span>
-                            </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900" th:text="${user.name}">홍길동</h2>
+                        <p class="text-sm text-gray-600" th:text="${user.email}">user@example.com</p>
+                        <div class="flex items-center space-x-2 mt-1">
+                            <span th:switch="${user.status?.name()}" 
+                                  class="inline-flex px-2 py-1 text-xs font-semibold rounded-full">
+                                <span th:case="'INACTIVE'" class="bg-yellow-100 text-yellow-800">비활성</span>
+                                <span th:case="'ACTIVE'" class="bg-green-100 text-green-800">활성</span>
+                                <span th:case="'WITHDRAWN'" class="bg-gray-100 text-gray-800">탈퇴</span>
+                                <span th:case="'BANNED'" class="bg-red-100 text-red-800">차단</span>
+                            </span>
+                            <span th:switch="${user.role?.name()}" 
+                                  class="inline-flex px-2 py-1 text-xs font-semibold rounded-full">
+                                <span th:case="'ADMIN'" class="bg-purple-100 text-purple-800">관리자</span>
+                                <span th:case="'USER'" class="bg-blue-100 text-blue-800">일반회원</span>
+                            </span>
                         </div>
                     </div>
                     <div class="flex space-x-3">
@@ -32,6 +26,16 @@
                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
                             수정
                         </a>
+                        <form th:action="@{/member/ban/{id}(id=${user.id})}" 
+                              method="post" 
+                              class="inline"
+                              th:if="${user.status?.name() != 'BANNED'}"
+                              onsubmit="return confirm('정말 이 회원을 정지하시겠습니까?');">
+                            <button type="submit"
+                                    class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
+                                정지
+                            </button>
+                        </form>
                         <a href="/member" 
                            class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
                             목록으로

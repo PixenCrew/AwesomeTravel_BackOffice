@@ -190,4 +190,28 @@ public class UserViewController {
         }
         return "redirect:/member";
     }
+    
+    // 회원 상태 토글 (ACTIVE <-> INACTIVE)
+    @PostMapping("/toggle-status/{id}")
+    public String toggleUserStatus(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            userService.toggleUserStatus(id);
+            redirectAttributes.addFlashAttribute("message", "회원 상태가 변경되었습니다.");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/member";
+    }
+    
+    // 회원 정지 (상태를 BANNED로 변경)
+    @PostMapping("/ban/{id}")
+    public String banUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            userService.banUser(id);
+            redirectAttributes.addFlashAttribute("message", "회원이 정지되었습니다.");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/member/" + id;
+    }
 }

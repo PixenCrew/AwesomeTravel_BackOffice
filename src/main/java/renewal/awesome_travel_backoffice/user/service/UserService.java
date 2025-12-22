@@ -151,6 +151,34 @@ public class UserService {
         userRepository.save(user);
     }
     
+    // 회원 상태 토글 (ACTIVE <-> INACTIVE)
+    @Transactional
+    public void toggleUserStatus(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다. ID: " + id));
+        
+        if (user.getStatus() == UserStatus.ACTIVE) {
+            user.setStatus(UserStatus.INACTIVE);
+        } else if (user.getStatus() == UserStatus.INACTIVE) {
+            user.setStatus(UserStatus.ACTIVE);
+        } else {
+            // ACTIVE나 INACTIVE가 아닌 경우(탈퇴, 차단 등)는 ACTIVE로 설정
+            user.setStatus(UserStatus.ACTIVE);
+        }
+        
+        userRepository.save(user);
+    }
+    
+    // 회원 정지 (상태를 BANNED로 변경)
+    @Transactional
+    public void banUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다. ID: " + id));
+        
+        user.setStatus(UserStatus.BANNED);
+        userRepository.save(user);
+    }
+    
     // 회원의 항공 구매 내역 조회
     public List<PurchaseAirResponseDto> getUserAirPurchases(Long userId) {
         List<PurchaseAir> purchases = commonPurchaseAirRepository.findByUserId(userId);
