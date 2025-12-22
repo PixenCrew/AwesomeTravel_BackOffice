@@ -44,6 +44,7 @@ public class BannerController {
             @RequestParam(required = false) Boolean active,
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate,
+            @RequestParam(required = false) String locationType,
             Model model) {
 
         // 정렬 설정
@@ -72,14 +73,25 @@ public class BannerController {
             }
         }
 
+        // 위치 타입 파싱
+        Banner.BannerLocationType locationTypeEnum = null;
+        if (locationType != null && !locationType.isEmpty()) {
+            try {
+                locationTypeEnum = Banner.BannerLocationType.valueOf(locationType);
+            } catch (IllegalArgumentException e) {
+                // 파싱 실패 시 무시
+            }
+        }
+
         // 통합 검색 (모든 조건을 조합하여 검색)
-        bannerPage = bannerService.searchBanners(title, active, startDateParsed, endDateParsed, pageable);
+        bannerPage = bannerService.searchBanners(title, active, startDateParsed, endDateParsed, locationTypeEnum, pageable);
 
         model.addAttribute("bannerPage", bannerPage);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", bannerPage.getTotalPages());
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
+        model.addAttribute("locationTypes", Banner.BannerLocationType.values());
         model.addAttribute("title", "배너 관리");
         model.addAttribute("content", "components/banner/banner");
 

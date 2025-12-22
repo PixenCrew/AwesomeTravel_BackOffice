@@ -82,8 +82,8 @@
                                 th:classappend="${userId != null ? 'bg-gray-100 cursor-not-allowed' : ''}">
                             <option value="">선택하세요</option>
                             <option th:each="provider : ${providers}" 
-                                    th:value="${provider}" 
-                                    th:text="${provider}">GOOGLE</option>
+                                    th:value="${provider}"
+                                    th:text="${provider?.name() == 'LOCAL' ? '로컬' : (provider?.name() == 'GOOGLE' ? '구글' : (provider?.name() == 'KAKAO' ? '카카오' : (provider?.name() == 'NAVER' ? '네이버' : provider)))}">GOOGLE</option>
                         </select>
                     </div>
                     
@@ -136,8 +136,8 @@
                                 th:required="${userId == null}">
                             <option value="">선택하세요</option>
                             <option th:each="role : ${roles}" 
-                                    th:value="${role}" 
-                                    th:text="${role}">USER</option>
+                                    th:value="${role}"
+                                    th:text="${role?.name() == 'ADMIN' ? '관리자' : (role?.name() == 'USER' ? '일반회원' : role)}">USER</option>
                         </select>
                         <p th:if="${userId != null}" class="mt-1 text-xs text-gray-500">역할은 수정할 수 없습니다.</p>
                     </div>
@@ -150,8 +150,8 @@
                                 required>
                             <option value="">선택하세요</option>
                             <option th:each="status : ${statuses}" 
-                                    th:value="${status}" 
-                                    th:text="${status}">ACTIVE</option>
+                                    th:value="${status}"
+                                    th:text="${status?.name() == 'INACTIVE' ? '비활성' : (status?.name() == 'ACTIVE' ? '활성' : (status?.name() == 'WITHDRAWN' ? '탈퇴' : (status?.name() == 'BANNED' ? '차단' : status)))}">ACTIVE</option>
                         </select>
                     </div>
                 </div>
@@ -188,6 +188,17 @@
     </div>
 
     <script>
+        // 페이지 로드 시 역할 기본값 설정 (회원 생성 모드일 때만)
+        document.addEventListener('DOMContentLoaded', function() {
+            const userId = /*[[${userId}]]*/ null;
+            const roleSelect = document.getElementById('role');
+            
+            // 회원 생성 모드이고 역할이 선택되지 않은 경우 USER로 설정
+            if (!userId && roleSelect && !roleSelect.value) {
+                roleSelect.value = 'USER';
+            }
+        });
+
         // 폼 유효성 검사
         document.querySelector('form').addEventListener('submit', function(e) {
             const userId = /*[[${userId}]]*/ null;

@@ -80,6 +80,14 @@ public class PopupService {
     // 팝업 생성
     @Transactional
     public Long create(PopupRequestDto requestDto) {
+        // 노출순서 중복 체크
+        if (requestDto.getDisplayOrder() != null) {
+            boolean exists = popupRepository.existsByDisplayOrder(requestDto.getDisplayOrder());
+            if (exists) {
+                throw new IllegalArgumentException("이미 사용 중인 노출순서입니다. 다른 순서를 선택해주세요.");
+            }
+        }
+        
         Popup popup = new Popup();
         popup.setDisplayOrder(requestDto.getDisplayOrder());
         popup.setTitle(requestDto.getTitle());
@@ -98,6 +106,14 @@ public class PopupService {
     public void update(Long id, PopupRequestDto requestDto) {
         Popup popup = popupRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("팝업을 찾을 수 없습니다. ID: " + id));
+        
+        // 노출순서 중복 체크 (수정 시, 자기 자신 제외)
+        if (requestDto.getDisplayOrder() != null) {
+            boolean exists = popupRepository.existsByDisplayOrderAndIdNot(requestDto.getDisplayOrder(), id);
+            if (exists) {
+                throw new IllegalArgumentException("이미 사용 중인 노출순서입니다. 다른 순서를 선택해주세요.");
+            }
+        }
         
         popup.setDisplayOrder(requestDto.getDisplayOrder());
         popup.setTitle(requestDto.getTitle());

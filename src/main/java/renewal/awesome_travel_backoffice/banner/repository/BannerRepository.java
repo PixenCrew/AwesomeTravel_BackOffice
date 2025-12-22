@@ -38,5 +38,11 @@ public interface BannerRepository extends JpaRepository<Banner, Long>, JpaSpecif
     // 날짜 범위로 검색
     @Query("SELECT b FROM Banner b WHERE b.startDate >= :startDate AND b.endDate <= :endDate ORDER BY b.displayOrder ASC, b.createdAt DESC")
     Page<Banner> findByDateRange(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate, Pageable pageable);
+    
+    // 표시순서 중복 체크 (생성 시, 위치 타입별)
+    boolean existsByDisplayOrderAndLocationType(Integer displayOrder, Banner.BannerLocationType locationType);
+    
+    // 표시순서 중복 체크 (수정 시, 위치 타입별, 자기 자신 제외)
+    boolean existsByDisplayOrderAndLocationTypeAndIdNot(Integer displayOrder, Banner.BannerLocationType locationType, Long id);
 }
 
