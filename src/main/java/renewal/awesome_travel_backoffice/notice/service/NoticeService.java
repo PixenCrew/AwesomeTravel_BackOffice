@@ -25,6 +25,14 @@ public class NoticeService {
 
     @Transactional
     public Long create(NoticeRequestDto dto) {
+        // 고정순서 중복 체크 (fix가 true이고 priority가 설정된 경우)
+        if (dto.getFix() != null && dto.getFix() && dto.getPriority() != null) {
+            boolean exists = noticeRepository.existsByFixTrueAndPriority(dto.getPriority());
+            if (exists) {
+                throw new IllegalArgumentException("이미 사용 중인 고정순서입니다. 다른 순서를 선택해주세요.");
+            }
+        }
+        
         Notice notice = new Notice(
                 dto.getTitle(),
                 dto.getContent(),
@@ -90,6 +98,14 @@ public class NoticeService {
     public void update(Long id, NoticeRequestDto dto) {
         Notice notice = noticeRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("공지사항이 존재하지 않습니다."));
+
+        // 고정순서 중복 체크 (fix가 true이고 priority가 변경되는 경우, 자기 자신은 제외)
+        if (dto.getFix() != null && dto.getFix() && dto.getPriority() != null) {
+            boolean exists = noticeRepository.existsByFixTrueAndPriorityAndIdNot(dto.getPriority(), id);
+            if (exists) {
+                throw new IllegalArgumentException("이미 사용 중인 고정순서입니다. 다른 순서를 선택해주세요.");
+            }
+        }
 
         if (dto.getTitle() != null)     notice.setTitle(dto.getTitle());
         if (dto.getContent() != null)   notice.setContent(dto.getContent());

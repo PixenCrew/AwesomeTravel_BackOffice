@@ -21,7 +21,11 @@ public interface NoticeRepository extends JpaRepository<Notice, Long>, JpaSpecif
             "WHERE n.startAt <= :now AND n.endAt >= :now AND n.isVisible = false")
     int exposeValidNotices(@Param("now") LocalDateTime now);
 
-
+    // 고정순서 중복 체크 (생성 시)
+    boolean existsByFixTrueAndPriority(Integer priority);
+    
+    // 고정순서 중복 체크 (수정 시, 자기 자신 제외)
+    boolean existsByFixTrueAndPriorityAndIdNot(Integer priority, Long id);
 
 }
 

@@ -119,7 +119,7 @@
                                         <span th:if="${notice.visible}">
                                             <span th:if="${notice.startAt != null and notice.startAt.isAfter(now)}" class="text-orange-600">대기 중</span>
                                             <span th:if="${notice.endAt != null and notice.endAt.isBefore(now)}" class="text-red-600">종료됨</span>
-                                            <span th:if="${(notice.startAt == null or notice.startAt.isBefore(now)) and (notice.endAt == null or notice.endAt.isAfter(now))}" class="text-green-600">노출 중</span>
+                                            <span th:if="${(notice.startAt == null or notice.startAt.isBefore(now)) and (notice.endAt == null or notice.endAt.isAfter(now))}" class="text-green-600">공개 중</span>
                                         </span>
                                     </div>
                                 </div>
