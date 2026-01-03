@@ -506,8 +506,19 @@
                 <div class="form-group">
                     <label class="form-label">가격</label>
                     <div class="input-group">
-                        <input type="number" th:field="*{price}" required min="0" step="1" class="form-input" placeholder="가격을 입력하세요" />
+                        <input type="number" 
+                               th:field="*{price}" 
+                               id="price"
+                               required 
+                               min="0" 
+                               max="100000000"
+                               step="1" 
+                               oninput="removeLeadingZeros(this); validatePriceLimit(this)"
+                               onblur="removeLeadingZeros(this); validatePriceLimit(this)"
+                               class="form-input" 
+                               placeholder="가격을 입력하세요" />
                         <span class="unit">원</span>
+                        <p id="priceError" class="text-xs text-red-600 mt-1" style="display: none;">가격은 1억원을 넘을 수 없습니다.</p>
                     </div>
                 </div>
 
@@ -1067,6 +1078,42 @@
             return true;
         }
 
+        // 앞의 0 제거 함수 (가격 입력 필드용)
+        function removeLeadingZeros(input) {
+            if (input.value && input.value.trim() !== '') {
+                // 숫자로 변환하여 앞의 0 제거
+                const numValue = parseInt(input.value, 10);
+                if (!isNaN(numValue)) {
+                    input.value = numValue.toString();
+                } else {
+                    // 숫자가 아닌 경우 빈 문자열로 설정
+                    input.value = '';
+                }
+            }
+        }
+        
+        // 가격 1억원 제한 검증
+        function validatePriceLimit(input) {
+            const maxPrice = 100000000; // 1억원
+            const price = parseInt(input.value) || 0;
+            const errorElement = document.getElementById('priceError');
+            
+            if (!errorElement) return true;
+            
+            // 가격이 1억원을 넘는 경우
+            if (price > maxPrice) {
+                input.classList.add('border-red-500', 'ring-red-500');
+                errorElement.style.display = 'block';
+                // 자동으로 1억원으로 조정
+                input.value = maxPrice;
+                return false;
+            } else {
+                input.classList.remove('border-red-500', 'ring-red-500');
+                errorElement.style.display = 'none';
+                return true;
+            }
+        }
+        
         // 입력 시 실시간 검증
         document.addEventListener('DOMContentLoaded', function() {
             const priceInput = document.querySelector('input[name="price"]');

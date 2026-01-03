@@ -256,92 +256,103 @@
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <th:block th:each="seatClass : ${airPage.content}">
-            <tr
-              th:onclick="${isSelectionPage} ? |returnNumber(${seatClass.id})| : |window.location.href='@{/air/{id}(id=${seatClass.air.id})}'|"
-              class="hover:bg-gray-50 cursor-pointer">
-              <!-- 항공편 정보 -->
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center">
-                  <div class="flex-shrink-0 h-10 w-10">
-                    <div
-                      class="relative h-10 w-10 rounded-full bg-blue-100 overflow-hidden flex items-center justify-center">
+          <th:block th:if="${airPage.content != null and !airPage.content.isEmpty()}">
+            <th:block th:each="seatClass : ${airPage.content}">
+              <tr
+                th:onclick="${isSelectionPage} ? |returnNumber(${seatClass.id})| : |window.location.href='@{/air/{id}(id=${seatClass.air.id})}'|"
+                class="hover:bg-gray-50 cursor-pointer">
+                <!-- 항공편 정보 -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-10 w-10">
+                      <div
+                        class="relative h-10 w-10 rounded-full bg-blue-100 overflow-hidden flex items-center justify-center">
 
-                      <img th:src="${seatClass.air.airline.iconUrl}" alt="airline logo"
-                        class="absolute inset-0 w-full h-full object-cover opacity-80" />
+                        <img th:src="${seatClass.air.airline.iconUrl}" alt="airline logo"
+                          class="absolute inset-0 w-full h-full object-cover opacity-80" />
 
-                      <i class="fas fa-plane text-blue-600 text-sm relative z-10"></i>
+                        <i class="fas fa-plane text-blue-600 text-sm relative z-10"></i>
+                      </div>
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900" th:text="${seatClass.air.flightNumber}">AB123
+                      </div>
+                      <div class="text-sm text-gray-500">
+                        <span th:text="${seatClass.air.departAirport.airportCode}">ICN</span>→
+                        <span th:text="${seatClass.air.arriveAirport.airportCode}">NRT</span>
+                      </div>
                     </div>
                   </div>
-                  <div class="ml-4">
-                    <div class="text-sm font-medium text-gray-900" th:text="${seatClass.air.flightNumber}">AB123
-                    </div>
-                    <div class="text-sm text-gray-500">
-                      <span th:text="${seatClass.air.departAirport.airportCode}">ICN</span>→
-                      <span th:text="${seatClass.air.arriveAirport.airportCode}">NRT</span>
-                    </div>
+                </td>
+
+                <!-- 출발일시 -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900"
+                    th:text="${#temporals.format(seatClass.air.departDateTime, 'yyyy-MM-dd HH:mm')}">
                   </div>
-                </div>
-              </td>
+                </td>
 
-              <!-- 출발일시 -->
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900"
-                  th:text="${#temporals.format(seatClass.air.departDateTime, 'yyyy-MM-dd HH:mm')}">
-                </div>
-              </td>
+                <!-- 도착일시 -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900"
+                    th:text="${#temporals.format(seatClass.air.arriveDateTime, 'yyyy-MM-dd HH:mm')}">
+                  </div>
+                </td>
 
-              <!-- 도착일시 -->
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900"
-                  th:text="${#temporals.format(seatClass.air.arriveDateTime, 'yyyy-MM-dd HH:mm')}">
-                </div>
-              </td>
+                <!-- 항공사 -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900" th:text="${seatClass.air.airline.nameKor}">좋은항공</div>
+                  <div class="text-sm text-gray-500" th:text="${seatClass.air.airline.nameEng}">GreatAir</div>
+                  <div class="text-xs text-gray-400" th:text="${seatClass.air.airline.code}">AAA</div>
+                </td>
 
-              <!-- 항공사 -->
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm font-medium text-gray-900" th:text="${seatClass.air.airline.nameKor}">좋은항공</div>
-                <div class="text-sm text-gray-500" th:text="${seatClass.air.airline.nameEng}">GreatAir</div>
-                <div class="text-xs text-gray-400" th:text="${seatClass.air.airline.code}">AAA</div>
-              </td>
+                <!-- 좌석 정보 -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900" th:text="${seatClass.classType}">FIRST</div>
+                  <div class="text-sm text-gray-500">
+                    <span th:text="${seatClass.availableSeats}">10</span> / <span
+                      th:text="${seatClass.maxSeats}">100</span>
+                  </div>
+                  <div class="text-xs text-gray-400">
+                    경유: <span th:text="${seatClass.air.stopovers}">0</span>회
+                  </div>
+                </td>
 
-              <!-- 좌석 정보 -->
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm font-medium text-gray-900" th:text="${seatClass.classType}">FIRST</div>
-                <div class="text-sm text-gray-500">
-                  <span th:text="${seatClass.availableSeats}">10</span> / <span
-                    th:text="${seatClass.maxSeats}">100</span>
-                </div>
-                <div class="text-xs text-gray-400">
-                  경유: <span th:text="${seatClass.air.stopovers}">0</span>회
-                </div>
-              </td>
+                <!-- 가격 -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900">
+                    <span th:text="${#numbers.formatDecimal(seatClass.price, 0, 'COMMA', 0, 'POINT')}">50,000</span>원
+                  </div>
+                </td>
 
-              <!-- 가격 -->
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm font-medium text-gray-900">
-                  <span th:text="${#numbers.formatDecimal(seatClass.price, 0, 'COMMA', 0, 'POINT')}">50,000</span>원
-                </div>
-              </td>
+                <!-- 상태 -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span th:if="${seatClass.air.status.name() == 'ACTIVE'}"
+                    class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                    활성
+                  </span>
+                  <span th:if="${seatClass.air.status.name() == 'INACTIVE'}"
+                    class="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20">
+                    비활성
+                  </span>
+                  <span th:if="${seatClass.air.status.name() == 'CANCELLED'}"
+                    class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-700 ring-1 ring-inset ring-gray-600/20">
+                    취소
+                  </span>
+                </td>
 
-              <!-- 상태 -->
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span th:if="${seatClass.air.status.name() == 'ACTIVE'}"
-                  class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                  활성
-                </span>
-                <span th:if="${seatClass.air.status.name() == 'INACTIVE'}"
-                  class="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20">
-                  비활성
-                </span>
-                <span th:if="${seatClass.air.status.name() == 'CANCELLED'}"
-                  class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-700 ring-1 ring-inset ring-gray-600/20">
-                  취소
-                </span>
-              </td>
-
-            </tr>
+              </tr>
+            </th:block>
           </th:block>
+          <tr th:if="${airPage.content == null or airPage.content.isEmpty()}">
+            <td colspan="7" class="px-6 py-12 text-center">
+              <div class="flex flex-col items-center justify-center">
+                <i class="fas fa-plane-slash text-gray-400 text-4xl mb-4"></i>
+                <p class="text-gray-500 text-lg font-medium">조건에 해당하는 항공편이 없습니다</p>
+                <p class="text-gray-400 text-sm mt-2">다른 검색 조건을 시도해보세요.</p>
+              </div>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>

@@ -85,7 +85,21 @@ public class HotelController {
 
     // 새 호텔 등록 처리
     @PostMapping("/new")
-    public String submitNewHotel(@ModelAttribute Hotel hotel) {
+    public String submitNewHotel(@ModelAttribute Hotel hotel, Model model) {
+        final long MAX_PRICE = 100000000L; // 1억원
+        
+        // 가격 1억원 제한 검증
+        if (hotel.getPrice() != null && hotel.getPrice() > MAX_PRICE) {
+            model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
+            model.addAttribute("hotel", hotel);
+            model.addAttribute("hotelTypes", HotelType.values());
+            model.addAttribute("allAmenities", amenityRepo.findAll());
+            model.addAttribute("title", "새 호텔 등록");
+            model.addAttribute("content", "components/hotel/hotelDetail");
+            model.addAttribute("error", String.format("가격(%d원)은 1억원을 넘을 수 없습니다.", hotel.getPrice()));
+            return "layout";
+        }
+        
         hotelRepo.save(hotel);
         return "redirect:/hotel";
     }
@@ -109,7 +123,21 @@ public class HotelController {
 
     // 호텔 수정 처리
     @PostMapping("/{id}")
-    public String submitEditedHotel(@ModelAttribute Hotel hotel) {
+    public String submitEditedHotel(@ModelAttribute Hotel hotel, Model model) {
+        final long MAX_PRICE = 100000000L; // 1억원
+        
+        // 가격 1억원 제한 검증
+        if (hotel.getPrice() != null && hotel.getPrice() > MAX_PRICE) {
+            model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
+            model.addAttribute("hotel", hotel);
+            model.addAttribute("hotelTypes", HotelType.values());
+            model.addAttribute("allAmenities", amenityRepo.findAll());
+            model.addAttribute("title", "호텔 상세");
+            model.addAttribute("content", "components/hotel/hotelDetail");
+            model.addAttribute("error", String.format("가격(%d원)은 1억원을 넘을 수 없습니다.", hotel.getPrice()));
+            return "layout";
+        }
+        
         hotelRepo.save(hotel);
         return "redirect:/hotel";
     }
