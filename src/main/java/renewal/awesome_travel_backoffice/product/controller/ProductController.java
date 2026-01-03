@@ -107,7 +107,20 @@ public class ProductController {
 
     // 새 패키지 등록
     @PostMapping("/new")
-    public String submitProduct(@ModelAttribute Product product) throws Exception {
+    public String submitProduct(@ModelAttribute Product product, Model model) throws Exception {
+        final long MAX_PRICE = 100000000L; // 1억원
+        
+        // 가격 1억원 제한 검증
+        if (product.getPrice() != null && product.getPrice() > MAX_PRICE) {
+            model.addAttribute("countryCode", commonCodeService.getAllCountryCodes());
+            model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
+            model.addAttribute("productTypes", ProductType.values());
+            model.addAttribute("product", product);
+            model.addAttribute("title", "새 상품 등록");
+            model.addAttribute("content", "components/product/productDetail");
+            model.addAttribute("error", String.format("가격(%d원)은 1억원을 넘을 수 없습니다.", product.getPrice()));
+            return "layout";
+        }
 
         // product 등록 (먼저 저장하여 ID 생성)
         Product savedProduct = productAdminRepo.save(product);
@@ -169,7 +182,18 @@ public class ProductController {
     // 특정 패키지 수정
     @PostMapping("/{id}")
     @Transactional
-    public String submitSelectedProduct(@ModelAttribute Product product) {
+    public String submitSelectedProduct(@ModelAttribute Product product, Model model) {
+        final long MAX_PRICE = 100000000L; // 1억원
+        
+        // 가격 1억원 제한 검증
+        if (product.getPrice() != null && product.getPrice() > MAX_PRICE) {
+            model.addAttribute("product", product);
+            model.addAttribute("productTypes", ProductType.values());
+            model.addAttribute("title", "상품 상세");
+            model.addAttribute("content", "components/product/productDetail");
+            model.addAttribute("error", String.format("가격(%d원)은 1억원을 넘을 수 없습니다.", product.getPrice()));
+            return "layout";
+        }
 
         // 기존 Product 조회하여 리뷰 데이터 보존
         Product existingProduct = productAdminRepo.findById(product.getId())
