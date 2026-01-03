@@ -67,7 +67,7 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium leading-6 text-gray-900">호텔 유형</label>
+                        <label class="block text-sm font-medium leading-6 text-gray-900">유형</label>
                         <select th:field="*{hotelType}"
                             class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
                             <option th:each="type : ${T(renewal.common.entity.Hotel.HotelType).values()}"
@@ -77,9 +77,17 @@
 
                     <div>
                         <label class="block text-sm font-medium leading-6 text-gray-900">가격 (원)</label>
-                        <input type="number" th:field="*{price}" required min="0" step="1"
-                            oninput="preventNegative(this)" onblur="preventNegative(this)"
-                            class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                        <input type="number" 
+                               th:field="*{price}" 
+                               id="price"
+                               required 
+                               min="0" 
+                               max="100000000"
+                               step="1"
+                               oninput="preventNegative(this); removeLeadingZeros(this); validatePriceLimit(this)" 
+                               onblur="preventNegative(this); removeLeadingZeros(this); validatePriceLimit(this)"
+                               class="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                        <p id="priceError" class="text-xs text-red-600 mt-1 hidden">가격은 1억원을 넘을 수 없습니다.</p>
                     </div>
 
                     <div>
@@ -189,6 +197,42 @@
                 input.value = 0;
             }
         }
+        
+        // 앞의 0 제거 함수 (가격 입력 필드용)
+        function removeLeadingZeros(input) {
+            if (input.value && input.value.trim() !== '') {
+                // 숫자로 변환하여 앞의 0 제거
+                const numValue = parseInt(input.value, 10);
+                if (!isNaN(numValue)) {
+                    input.value = numValue.toString();
+                } else {
+                    // 숫자가 아닌 경우 빈 문자열로 설정
+                    input.value = '';
+                }
+            }
+        }
+        
+        // 가격 1억원 제한 검증
+        function validatePriceLimit(input) {
+            const maxPrice = 100000000; // 1억원
+            const price = parseInt(input.value) || 0;
+            const errorElement = document.getElementById('priceError');
+            
+            if (!errorElement) return true;
+            
+            // 가격이 1억원을 넘는 경우
+            if (price > maxPrice) {
+                input.classList.add('border-red-500', 'ring-red-500');
+                errorElement.classList.remove('hidden');
+                // 자동으로 1억원으로 조정
+                input.value = maxPrice;
+                return false;
+            } else {
+                input.classList.remove('border-red-500', 'ring-red-500');
+                errorElement.classList.add('hidden');
+                return true;
+            }
+        }
 
         // 폼 제출 시 음수 값 검증
         document.querySelector('form').addEventListener('submit', function(e) {
@@ -245,4 +289,5 @@
 
     <div th:replace="components/datalist/cityList :: cityDatalistFragment"></div>
 
+</div>
 </div>
