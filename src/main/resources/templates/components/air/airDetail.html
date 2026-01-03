@@ -16,6 +16,20 @@
     </div>
   </div>
 
+  <!-- 에러 메시지 표시 -->
+  <div th:if="${error}" class="mt-4 rounded-md bg-red-50 p-4">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm font-medium text-red-800" th:text="${error}">오류 메시지</p>
+      </div>
+    </div>
+  </div>
+
   <form th:object="${air}" th:action="${air.id == null} ? @{/air/new} : @{/air/{id}(id=${air.id})}" method="post"
     class="mt-6 space-y-8">
     <!-- 기본 정보 -->
@@ -235,10 +249,33 @@
     <!-- 좌석 등급 정보 -->
     <div class="bg-white shadow rounded-lg">
       <div class="px-4 py-5 sm:p-6">
-        <h3 class="text-base font-semibold leading-6 text-gray-900 mb-4">좌석 등급 정보</h3>
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-base font-semibold leading-6 text-gray-900">좌석 등급 정보</h3>
+          <div class="text-sm text-gray-600" th:if="${air.id == null}">등록할 좌석 등급을 선택하세요</div>
+        </div>
+        
+        <!-- 좌석 등급 선택 체크박스 (새 항공 등록 시에만 표시) -->
+        <div th:if="${air.id == null}" class="mb-6 p-4 bg-gray-50 rounded-lg">
+          <label class="block text-sm font-medium text-gray-700 mb-2">좌석 등급 선택</label>
+          <div class="flex flex-wrap gap-4">
+            <label th:each="seatType : ${seatClassTypes}" class="flex items-center">
+              <input type="checkbox" 
+                     th:value="${seatType.name()}" 
+                     th:id="'seatTypeCheck_' + ${seatType.name()}"
+                     th:checked="${air.id != null && air.seatClasses != null && air.seatClasses.?[classType == seatType].size() > 0}"
+                     onchange="toggleSeatClass(this)"
+                     class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+              <span class="ml-2 text-sm text-gray-700" 
+                    th:text="${seatType.name() == 'ECONOMY' ? '이코노미' : (seatType.name() == 'PREMIUMECONOMY' ? '프리미엄 이코노미' : (seatType.name() == 'BUSINESS' ? '비즈니스' : '퍼스트'))}">등급</span>
+            </label>
+          </div>
+        </div>
 
         <div class="space-y-4">
-          <div th:each="seat, iterStat : ${air.seatClasses}" class="border rounded-lg p-4">
+          <div th:each="seat, iterStat : ${air.seatClasses}" 
+               th:attr="data-seat-type=${seat.classType?.name()}"
+               th:class="${air.id == null ? 'seat-class-entry border rounded-lg p-4' : 'border rounded-lg p-4'}"
+               th:style="${air.id == null ? 'display: none;' : ''}">
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <div>
                 <label class="block text-sm font-medium text-gray-700">등급</label>
@@ -247,28 +284,67 @@
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700">가격[성인]</label>
-                <input type="number" th:field="*{seatClasses[__${iterStat.index}__].priceAdult}" min="0" required
+                <input type="number" 
+                  th:field="*{seatClasses[__${iterStat.index}__].priceAdult}" 
+                  th:id="'priceAdult_' + ${iterStat.index}"
+                  min="0" 
+                  max="100000000"
+                  required
+                  oninput="removeLeadingZeros(this); validatePriceLimit(this)"
+                  onblur="removeLeadingZeros(this); validatePriceLimit(this)"
                   class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                <p th:id="'priceAdultError_' + ${iterStat.index}" class="text-xs text-red-600 mt-1 hidden">가격은 1억원을 넘을 수 없습니다.</p>
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700">가격[청소년]</label>
-                <input type="number" th:field="*{seatClasses[__${iterStat.index}__].priceYouth}" min="0" required
+                <input type="number" 
+                  th:field="*{seatClasses[__${iterStat.index}__].priceYouth}" 
+                  th:id="'priceYouth_' + ${iterStat.index}"
+                  min="0" 
+                  max="100000000"
+                  required
+                  oninput="removeLeadingZeros(this); validatePriceLimit(this)"
+                  onblur="removeLeadingZeros(this); validatePriceLimit(this)"
                   class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                <p th:id="'priceYouthError_' + ${iterStat.index}" class="text-xs text-red-600 mt-1 hidden">가격은 1억원을 넘을 수 없습니다.</p>
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700">가격[영유아]</label>
-                <input type="number" th:field="*{seatClasses[__${iterStat.index}__].priceInfant}" min="0" required
+                <input type="number" 
+                  th:field="*{seatClasses[__${iterStat.index}__].priceInfant}" 
+                  th:id="'priceInfant_' + ${iterStat.index}"
+                  min="0" 
+                  max="100000000"
+                  required
+                  oninput="removeLeadingZeros(this); validatePriceLimit(this)"
+                  onblur="removeLeadingZeros(this); validatePriceLimit(this)"
                   class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                <p th:id="'priceInfantError_' + ${iterStat.index}" class="text-xs text-red-600 mt-1 hidden">가격은 1억원을 넘을 수 없습니다.</p>
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700">최대 좌석 수</label>
-                <input type="number" th:field="*{seatClasses[__${iterStat.index}__].maxSeats}" min="0" required
+                <input type="number" 
+                  th:field="*{seatClasses[__${iterStat.index}__].maxSeats}" 
+                  th:id="'maxSeats_' + ${iterStat.index}"
+                  min="0" 
+                  max="1000"
+                  required
+                  oninput="validateMaxSeatsLimit(this); validateAvailableSeatsForMaxSeats(this)"
+                  onblur="validateMaxSeatsLimit(this); validateAvailableSeatsForMaxSeats(this)"
                   class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                <p th:id="'maxSeatsError_' + ${iterStat.index}" class="text-xs text-red-600 mt-1 hidden">최대 좌석 수는 1000을 넘을 수 없습니다.</p>
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700">잔여 좌석 수</label>
-                <input type="number" th:field="*{seatClasses[__${iterStat.index}__].availableSeats}" min="0" required
+                <input type="number" 
+                  th:field="*{seatClasses[__${iterStat.index}__].availableSeats}" 
+                  th:id="'availableSeats_' + ${iterStat.index}"
+                  min="0" 
+                  required
+                  oninput="validateAvailableSeats(this)"
+                  onblur="adjustAvailableSeats(this); validateAvailableSeats(this)"
                   class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" />
+                <p th:id="'availableSeatsError_' + ${iterStat.index}" class="text-xs text-red-600 mt-1 hidden">잔여 좌석 수는 최대 좌석 수를 넘을 수 없습니다.</p>
               </div>
             </div>
           </div>
@@ -661,29 +737,270 @@
       });
     }
 
-    // 폼 제출 시 모든 구간의 날짜 유효성 검사
+    // 잔여 좌석 수 검증 (최대 좌석 수를 넘지 않도록)
+    function validateAvailableSeats(input) {
+      const index = input.id.replace('availableSeats_', '');
+      const maxSeatsInput = document.getElementById('maxSeats_' + index);
+      const errorElement = document.getElementById('availableSeatsError_' + index);
+      
+      if (!maxSeatsInput || !errorElement) return true;
+      
+      const availableSeats = parseInt(input.value) || 0;
+      const maxSeats = parseInt(maxSeatsInput.value) || 0;
+      
+      // 최대 좌석 수가 0이거나 입력되지 않은 경우는 검증하지 않음
+      if (maxSeats <= 0) {
+        input.classList.remove('border-red-500', 'ring-red-500');
+        errorElement.classList.add('hidden');
+        return true;
+      }
+      
+      // 잔여 좌석 수가 최대 좌석 수를 넘는 경우
+      if (availableSeats > maxSeats) {
+        input.classList.add('border-red-500', 'ring-red-500');
+        errorElement.classList.remove('hidden');
+        errorElement.textContent = `잔여 좌석 수는 최대 좌석 수(${maxSeats})를 넘을 수 없습니다.`;
+        return false;
+      } else {
+        input.classList.remove('border-red-500', 'ring-red-500');
+        errorElement.classList.add('hidden');
+        return true;
+      }
+    }
+    
+    // 최대 좌석 수 1000 제한 검증
+    function validateMaxSeatsLimit(input) {
+      const index = input.id.replace('maxSeats_', '');
+      const errorElement = document.getElementById('maxSeatsError_' + index);
+      
+      if (!errorElement) return true;
+      
+      const maxSeats = parseInt(input.value) || 0;
+      
+      // 최대 좌석 수가 1000을 넘는 경우
+      if (maxSeats > 1000) {
+        input.classList.add('border-red-500', 'ring-red-500');
+        errorElement.classList.remove('hidden');
+        // 자동으로 1000으로 조정
+        input.value = 1000;
+        return false;
+      } else {
+        input.classList.remove('border-red-500', 'ring-red-500');
+        errorElement.classList.add('hidden');
+        return true;
+      }
+    }
+    
+    // 최대 좌석 수 변경 시 잔여 좌석 수 검증 및 자동 조정
+    function validateAvailableSeatsForMaxSeats(input) {
+      const index = input.id.replace('maxSeats_', '');
+      const availableSeatsInput = document.getElementById('availableSeats_' + index);
+      
+      if (availableSeatsInput) {
+        const maxSeats = parseInt(input.value) || 0;
+        const availableSeats = parseInt(availableSeatsInput.value) || 0;
+        
+        // 최대 좌석 수가 변경되었을 때, 잔여 좌석 수가 최대 좌석 수를 넘으면 자동으로 조정
+        if (maxSeats > 0 && availableSeats > maxSeats) {
+          availableSeatsInput.value = maxSeats;
+          // 조정 후 검증 수행
+          validateAvailableSeats(availableSeatsInput);
+        } else {
+          validateAvailableSeats(availableSeatsInput);
+        }
+      }
+    }
+    
+    // 잔여 좌석 수 입력 시 자동 조정 (blur 이벤트에서)
+    function adjustAvailableSeats(input) {
+      const index = input.id.replace('availableSeats_', '');
+      const maxSeatsInput = document.getElementById('maxSeats_' + index);
+      
+      if (!maxSeatsInput) return;
+      
+      const maxSeats = parseInt(maxSeatsInput.value) || 0;
+      const availableSeats = parseInt(input.value) || 0;
+      
+      // 최대 좌석 수가 설정되어 있고, 잔여 좌석 수가 최대 좌석 수를 넘으면 자동 조정
+      if (maxSeats > 0 && availableSeats > maxSeats) {
+        input.value = maxSeats;
+        // 조정 후 검증 수행
+        validateAvailableSeats(input);
+      }
+    }
+    
+    // 앞의 0 제거 함수 (가격, 좌석 수 입력 필드용)
+    function removeLeadingZeros(input) {
+      if (input.value && input.value.trim() !== '') {
+        // 숫자로 변환하여 앞의 0 제거
+        const numValue = parseInt(input.value, 10);
+        if (!isNaN(numValue)) {
+          input.value = numValue.toString();
+        } else {
+          // 숫자가 아닌 경우 빈 문자열로 설정
+          input.value = '';
+        }
+      }
+    }
+    
+    // 가격 1억원 제한 검증
+    function validatePriceLimit(input) {
+      const maxPrice = 100000000; // 1억원
+      const price = parseInt(input.value) || 0;
+      const inputId = input.id;
+      const errorElementId = inputId.replace(/_/, '_Error_');
+      const errorElement = document.getElementById(errorElementId);
+      
+      if (!errorElement) return true;
+      
+      // 가격이 1억원을 넘는 경우
+      if (price > maxPrice) {
+        input.classList.add('border-red-500', 'ring-red-500');
+        errorElement.classList.remove('hidden');
+        // 자동으로 1억원으로 조정
+        input.value = maxPrice;
+        return false;
+      } else {
+        input.classList.remove('border-red-500', 'ring-red-500');
+        errorElement.classList.add('hidden');
+        return true;
+      }
+    }
+
+    // 좌석 등급 체크박스 토글
+    function toggleSeatClass(checkbox) {
+      const seatType = checkbox.value;
+      const seatClassEntries = document.querySelectorAll('.seat-class-entry');
+      
+      seatClassEntries.forEach(entry => {
+        const entrySeatType = entry.getAttribute('data-seat-type');
+        if (entrySeatType === seatType) {
+          if (checkbox.checked) {
+            entry.style.display = 'block';
+            // 필수 필드 활성화
+            entry.querySelectorAll('input').forEach(input => {
+              if (input.name && (input.name.includes('priceAdult') || input.name.includes('priceYouth') || 
+                  input.name.includes('priceInfant') || input.name.includes('maxSeats') || 
+                  input.name.includes('availableSeats'))) {
+                input.required = true;
+                input.disabled = false;
+              }
+            });
+          } else {
+            entry.style.display = 'none';
+            // 필수 필드 비활성화 및 값 초기화 (제출 시 제외하기 위해)
+            entry.querySelectorAll('input').forEach(input => {
+              if (input.name && (input.name.includes('priceAdult') || input.name.includes('priceYouth') || 
+                  input.name.includes('priceInfant') || input.name.includes('maxSeats') || 
+                  input.name.includes('availableSeats'))) {
+                input.required = false;
+                input.disabled = true;
+                // 값 초기화
+                if (input.type === 'number') {
+                  input.value = '';
+                }
+              }
+            });
+          }
+        }
+      });
+    }
+    
+    // 페이지 로드 시 체크박스 상태에 따라 좌석 등급 섹션 표시/숨김
+    document.addEventListener('DOMContentLoaded', function() {
+      const checkboxes = document.querySelectorAll('input[type="checkbox"][id^="seatTypeCheck_"]');
+      checkboxes.forEach(checkbox => {
+        toggleSeatClass(checkbox);
+      });
+    });
+    
+    // 폼 제출 시 모든 구간의 날짜 유효성 검사 및 좌석 수 검증
     document.querySelector('form').addEventListener('submit', function(e) {
       const container = document.getElementById('segmentContainer');
-      if (!container) return true;
-      
-      const allSegments = container.querySelectorAll('.segment-entry');
       let isValid = true;
       
-      allSegments.forEach(segment => {
-        const departTimeInput = segment.querySelector('input[name$=".departDateTime"]');
-        const arriveTimeInput = segment.querySelector('input[name$=".arriveDateTime"]');
+      // 선택되지 않은 SeatClass의 입력 필드 비활성화 (제출 시 제외)
+      const checkboxes = document.querySelectorAll('input[type="checkbox"][id^="seatTypeCheck_"]:not(:checked)');
+      const seatClassEntries = document.querySelectorAll('.seat-class-entry');
+      
+      checkboxes.forEach(checkbox => {
+        const seatType = checkbox.value;
+        seatClassEntries.forEach(entry => {
+          const entrySeatType = entry.getAttribute('data-seat-type');
+          if (entrySeatType === seatType) {
+            // 선택되지 않은 SeatClass의 모든 입력 필드를 비활성화하여 제출되지 않도록 함
+            entry.querySelectorAll('input').forEach(input => {
+              input.disabled = true;
+            });
+          }
+        });
+      });
+      
+      // 구간 날짜 유효성 검사
+      if (container) {
+        const allSegments = container.querySelectorAll('.segment-entry');
         
-        if (departTimeInput && !validateSegmentDateTime(departTimeInput)) {
-          isValid = false;
+        allSegments.forEach(segment => {
+          const departTimeInput = segment.querySelector('input[name$=".departDateTime"]');
+          const arriveTimeInput = segment.querySelector('input[name$=".arriveDateTime"]');
+          
+          if (departTimeInput && !validateSegmentDateTime(departTimeInput)) {
+            isValid = false;
+          }
+          if (arriveTimeInput && !validateSegmentDateTime(arriveTimeInput)) {
+            isValid = false;
+          }
+        });
+      }
+      
+      // 좌석 수 유효성 검사 (표시된 SeatClass만)
+      const visibleSeatClassEntries = document.querySelectorAll('.seat-class-entry[style*="block"], .seat-class-entry:not([style*="none"])');
+      let seatValidationErrors = [];
+      visibleSeatClassEntries.forEach(entry => {
+        const availableSeatsInput = entry.querySelector('input[id^="availableSeats_"]');
+        const maxSeatsInput = entry.querySelector('input[id^="maxSeats_"]');
+        
+        if (maxSeatsInput) {
+          // 최대 좌석 수 1000 제한 검증
+          if (!validateMaxSeatsLimit(maxSeatsInput)) {
+            isValid = false;
+            seatValidationErrors.push('최대 좌석 수는 1000을 넘을 수 없습니다.');
+          }
         }
-        if (arriveTimeInput && !validateSegmentDateTime(arriveTimeInput)) {
-          isValid = false;
+        
+        if (availableSeatsInput && maxSeatsInput) {
+          const availableSeats = parseInt(availableSeatsInput.value) || 0;
+          const maxSeats = parseInt(maxSeatsInput.value) || 0;
+          
+          if (maxSeats > 0 && availableSeats > maxSeats) {
+            isValid = false;
+            // 자동으로 최대 좌석 수로 조정
+            availableSeatsInput.value = maxSeats;
+            validateAvailableSeats(availableSeatsInput);
+            seatValidationErrors.push(`잔여 좌석 수가 최대 좌석 수를 초과하여 ${maxSeats}로 조정되었습니다.`);
+          } else if (!validateAvailableSeats(availableSeatsInput)) {
+            isValid = false;
+          }
         }
       });
       
+      if (seatValidationErrors.length > 0) {
+        alert(seatValidationErrors.join('\n'));
+      }
+      
+      // 최소 1개 이상의 좌석 등급이 선택되었는지 확인 (새 항공 등록 시)
+      const checkedCheckboxes = document.querySelectorAll('input[type="checkbox"][id^="seatTypeCheck_"]:checked');
+      const airIdInput = document.querySelector('input[name="id"]');
+      if (!airIdInput || !airIdInput.value) {
+        if (checkedCheckboxes.length === 0) {
+          isValid = false;
+          alert('최소 1개 이상의 좌석 등급을 선택해주세요.');
+        }
+      }
+      
       if (!isValid) {
         e.preventDefault();
-        alert('구간의 출발 일시와 도착 일시를 확인해주세요. 도착 일시는 출발 일시보다 이후여야 하며, 각 구간의 시간 순서가 올바르게 입력되어야 합니다.');
+        alert('입력한 정보를 확인해주세요.\n- 구간의 출발 일시와 도착 일시가 올바른지 확인해주세요.\n- 잔여 좌석 수는 최대 좌석 수를 넘을 수 없습니다.\n- 최소 1개 이상의 좌석 등급을 선택해주세요.');
         return false;
       }
     });

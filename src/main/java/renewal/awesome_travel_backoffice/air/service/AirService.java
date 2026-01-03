@@ -56,6 +56,9 @@ public class AirService {
         // 조회한 Airline 엔티티로 설정
         air.setAirline(airline);
 
+        // 잔여 좌석 수가 최대 좌석 수를 넘지 않도록 검증
+        validateSeatCounts(air);
+
         saveAir(air);
 
         // // 조회한 Airline 엔티티로 설정
@@ -113,6 +116,18 @@ public class AirService {
     }
 
     public void saveAir(Air air) {
+        // 선택되지 않은 SeatClass 제거 (가격이나 좌석 수가 입력되지 않은 경우)
+        if (air.getSeatClasses() != null) {
+            air.getSeatClasses().removeIf(seat -> 
+                seat == null || 
+                seat.getClassType() == null ||
+                seat.getPriceAdult() == null || seat.getPriceAdult() == 0 ||
+                seat.getMaxSeats() == null || seat.getMaxSeats() == 0
+            );
+        }
+        
+        // 잔여 좌석 수가 최대 좌석 수를 넘지 않도록 검증
+        validateSeatCounts(air);
 
         for (SeatClass seat : air.getSeatClasses()) {
             seat.setAir(air);
@@ -356,6 +371,60 @@ public class AirService {
         double variation = (random.nextDouble() * 0.4 - 0.2); // -20% ~ +20%
         long newSeats = Math.round(original * (1 + variation));
         return Math.max(newSeats, 1L); // 최소 1석은 보장
+    }
+
+    /**
+     * 잔여 좌석 수가 최대 좌석 수를 넘지 않도록 검증
+     * 최대 좌석 수는 1000을 넘을 수 없음
+     * 가격은 1억원을 넘을 수 없음
+     */
+    private void validateSeatCounts(Air air) {
+        if (air.getSeatClasses() == null) {
+            return;
+        }
+        
+        final long MAX_PRICE = 100000000L; // 1억원
+        
+        for (SeatClass seat : air.getSeatClasses()) {
+            // 최대 좌석 수 1000 제한 검증
+            if (seat.getMaxSeats() != null && seat.getMaxSeats() > 1000) {
+                throw new IllegalArgumentException(
+                    String.format("최대 좌석 수(%d)는 1000을 넘을 수 없습니다. (등급: %s)", 
+                        seat.getMaxSeats(), 
+                        seat.getClassType()));
+            }
+            
+            // 잔여 좌석 수가 최대 좌석 수를 넘지 않도록 검증
+            if (seat.getMaxSeats() != null && seat.getAvailableSeats() != null) {
+                if (seat.getAvailableSeats() > seat.getMaxSeats()) {
+                    throw new IllegalArgumentException(
+                        String.format("잔여 좌석 수(%d)는 최대 좌석 수(%d)를 넘을 수 없습니다. (등급: %s)", 
+                            seat.getAvailableSeats(), 
+                            seat.getMaxSeats(), 
+                            seat.getClassType()));
+                }
+            }
+            
+            // 가격 1억원 제한 검증
+            if (seat.getPriceAdult() != null && seat.getPriceAdult() > MAX_PRICE) {
+                throw new IllegalArgumentException(
+                    String.format("가격[성인](%d원)은 1억원을 넘을 수 없습니다. (등급: %s)", 
+                        seat.getPriceAdult(), 
+                        seat.getClassType()));
+            }
+            if (seat.getPriceYouth() != null && seat.getPriceYouth() > MAX_PRICE) {
+                throw new IllegalArgumentException(
+                    String.format("가격[청소년](%d원)은 1억원을 넘을 수 없습니다. (등급: %s)", 
+                        seat.getPriceYouth(), 
+                        seat.getClassType()));
+            }
+            if (seat.getPriceInfant() != null && seat.getPriceInfant() > MAX_PRICE) {
+                throw new IllegalArgumentException(
+                    String.format("가격[영유아](%d원)은 1억원을 넘을 수 없습니다. (등급: %s)", 
+                        seat.getPriceInfant(), 
+                        seat.getClassType()));
+            }
+        }
     }
 
 }
