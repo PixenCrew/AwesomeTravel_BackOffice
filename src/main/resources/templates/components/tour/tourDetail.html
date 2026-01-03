@@ -332,6 +332,14 @@
         </div>
     </div>
 
+    <!-- 에러 메시지 표시 -->
+    <div th:if="${error}" class="alert alert-danger mt-4" role="alert">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <span th:text="${error}">오류 메시지</span>
+        </div>
+    </div>
+
     <form th:object="${tour}" th:action="${tour.id} == null ?
                @{/tour/new} :
                @{/tour/{id}(id=${tour.id})}" method="post" class="tour-form">
@@ -357,14 +365,14 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="startDate">시작일 <span class="required">*</span></label>
+                    <label for="startDate">판매시작일 <span class="required">*</span></label>
                     <input type="date" th:field="*{startDate}" id="startDate" min="2000-04-01" required 
                         onchange="validateTourDates()" class="form-control" />
                     <p id="startDateError" class="text-danger small mt-1" style="display: none;"></p>
                 </div>
 
                 <div class="form-group">
-                    <label for="endDate">종료일 <span class="required">*</span></label>
+                    <label for="endDate">판매종료일 <span class="required">*</span></label>
                     <input type="date" th:field="*{endDate}" id="endDate" min="2000-04-01" required 
                         onchange="validateTourDates()" class="form-control" />
                     <p id="endDateError" class="text-danger small mt-1" style="display: none;"></p>
@@ -373,27 +381,54 @@
                 <div class="form-group">
                     <label for="price">가격(성인) <span class="required">*</span></label>
                     <div class="input-group">
-                        <input type="number" th:field="*{priceAdult}" min="1" required class="form-control"
-                            placeholder="가격을 입력하세요" />
+                        <input type="number" 
+                               th:field="*{priceAdult}" 
+                               id="priceAdult"
+                               min="1" 
+                               max="100000000"
+                               required 
+                               oninput="removeLeadingZeros(this); validatePriceLimit(this)"
+                               onblur="removeLeadingZeros(this); validatePriceLimit(this)"
+                               class="form-control"
+                               placeholder="가격을 입력하세요" />
                         <span class="input-group-text">원</span>
+                        <p id="priceAdultError" class="text-xs text-danger mt-1 hidden" style="width: 100%;">가격은 1억원을 넘을 수 없습니다.</p>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="price">가격(청소년) <span class="required">*</span></label>
                     <div class="input-group">
-                        <input type="number" th:field="*{priceYouth}" min="1" required class="form-control"
-                            placeholder="가격을 입력하세요" />
+                        <input type="number" 
+                               th:field="*{priceYouth}" 
+                               id="priceYouth"
+                               min="1" 
+                               max="100000000"
+                               required 
+                               oninput="removeLeadingZeros(this); validatePriceLimit(this)"
+                               onblur="removeLeadingZeros(this); validatePriceLimit(this)"
+                               class="form-control"
+                               placeholder="가격을 입력하세요" />
                         <span class="input-group-text">원</span>
+                        <p id="priceYouthError" class="text-xs text-danger mt-1 hidden" style="width: 100%;">가격은 1억원을 넘을 수 없습니다.</p>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="price">가격(영유아) <span class="required">*</span></label>
                     <div class="input-group">
-                        <input type="number" th:field="*{priceInfant}" min="1" required class="form-control"
-                            placeholder="가격을 입력하세요" />
+                        <input type="number" 
+                               th:field="*{priceInfant}" 
+                               id="priceInfant"
+                               min="1" 
+                               max="100000000"
+                               required 
+                               oninput="removeLeadingZeros(this); validatePriceLimit(this)"
+                               onblur="removeLeadingZeros(this); validatePriceLimit(this)"
+                               class="form-control"
+                               placeholder="가격을 입력하세요" />
                         <span class="input-group-text">원</span>
+                        <p id="priceInfantError" class="text-xs text-danger mt-1 hidden" style="width: 100%;">가격은 1억원을 넘을 수 없습니다.</p>
                     </div>
                 </div>
 
@@ -406,18 +441,35 @@
                 <div class="form-group">
                     <label for="count">최대인원 <span class="required">*</span></label>
                     <div class="input-group">
-                        <input type="number" th:field="*{maxCapacity}" min="1" required class="form-control"
-                            placeholder="인원수를 입력하세요" />
+                        <input type="number" 
+                               th:field="*{maxCapacity}" 
+                               id="maxCapacity"
+                               min="1" 
+                               max="1000"
+                               required 
+                               oninput="validateMaxCapacityLimit(this); validateMinCapacityForMaxCapacity(this)"
+                               onblur="validateMaxCapacityLimit(this); validateMinCapacityForMaxCapacity(this)"
+                               class="form-control"
+                               placeholder="인원수를 입력하세요" />
                         <span class="input-group-text">명</span>
+                        <p id="maxCapacityError" class="text-xs text-danger mt-1 hidden" style="width: 100%;">최대인원은 1000을 넘을 수 없습니다.</p>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="count">최소인원 <span class="required">*</span></label>
                     <div class="input-group">
-                        <input type="number" th:field="*{minCapacity}" min="1" required class="form-control"
-                            placeholder="인원수를 입력하세요" />
+                        <input type="number" 
+                               th:field="*{minCapacity}" 
+                               id="minCapacity"
+                               min="1" 
+                               required 
+                               oninput="validateMinCapacity(this)"
+                               onblur="adjustMinCapacity(this); validateMinCapacity(this)"
+                               class="form-control"
+                               placeholder="인원수를 입력하세요" />
                         <span class="input-group-text">명</span>
+                        <p id="minCapacityError" class="text-xs text-danger mt-1 hidden" style="width: 100%;">최소인원은 최대인원을 넘을 수 없습니다.</p>
                     </div>
                 </div>
                 <!-- 
@@ -459,7 +511,7 @@
                     th:attr="data-sched-idx=${schedStat.index}">
                     <div class="schedule-header">
                         <div class="schedule-date">
-                            <label>날짜</label>
+                            <label>일차</label>
                             <input type="number" th:field="*{schedules[__${schedStat.index}__].day}"
                                 class="form-control" />
                         </div>
@@ -595,6 +647,131 @@
 
 
     <script>
+        // 앞의 0 제거 함수 (가격 입력 필드용)
+        function removeLeadingZeros(input) {
+            if (input.value && input.value.trim() !== '') {
+                // 숫자로 변환하여 앞의 0 제거
+                const numValue = parseInt(input.value, 10);
+                if (!isNaN(numValue)) {
+                    input.value = numValue.toString();
+                } else {
+                    // 숫자가 아닌 경우 빈 문자열로 설정
+                    input.value = '';
+                }
+            }
+        }
+        
+        // 가격 1억원 제한 검증
+        function validatePriceLimit(input) {
+            const maxPrice = 100000000; // 1억원
+            const price = parseInt(input.value) || 0;
+            const inputId = input.id;
+            const errorElement = document.getElementById(inputId + 'Error');
+            
+            if (!errorElement) return true;
+            
+            // 가격이 1억원을 넘는 경우
+            if (price > maxPrice) {
+                input.classList.add('border-danger', 'is-invalid');
+                errorElement.classList.remove('hidden');
+                // 자동으로 1억원으로 조정
+                input.value = maxPrice;
+                return false;
+            } else {
+                input.classList.remove('border-danger', 'is-invalid');
+                errorElement.classList.add('hidden');
+                return true;
+            }
+        }
+        
+        // 최소인원 검증 (최대인원을 넘지 않도록)
+        function validateMinCapacity(input) {
+            const maxCapacityInput = document.getElementById('maxCapacity');
+            const errorElement = document.getElementById('minCapacityError');
+            
+            if (!maxCapacityInput || !errorElement) return true;
+            
+            const minCapacity = parseInt(input.value) || 0;
+            const maxCapacity = parseInt(maxCapacityInput.value) || 0;
+            
+            // 최대인원이 0이거나 입력되지 않은 경우는 검증하지 않음
+            if (maxCapacity <= 0) {
+                input.classList.remove('border-danger', 'is-invalid');
+                errorElement.classList.add('hidden');
+                return true;
+            }
+            
+            // 최소인원이 최대인원을 넘는 경우
+            if (minCapacity > maxCapacity) {
+                input.classList.add('border-danger', 'is-invalid');
+                errorElement.classList.remove('hidden');
+                errorElement.textContent = `최소인원은 최대인원(${maxCapacity})을 넘을 수 없습니다.`;
+                return false;
+            } else {
+                input.classList.remove('border-danger', 'is-invalid');
+                errorElement.classList.add('hidden');
+                return true;
+            }
+        }
+        
+        // 최대인원 1000 제한 검증
+        function validateMaxCapacityLimit(input) {
+            const errorElement = document.getElementById('maxCapacityError');
+            
+            if (!errorElement) return true;
+            
+            const maxCapacity = parseInt(input.value) || 0;
+            
+            // 최대인원이 1000을 넘는 경우
+            if (maxCapacity > 1000) {
+                input.classList.add('border-danger', 'is-invalid');
+                errorElement.classList.remove('hidden');
+                // 자동으로 1000으로 조정
+                input.value = 1000;
+                return false;
+            } else {
+                input.classList.remove('border-danger', 'is-invalid');
+                errorElement.classList.add('hidden');
+                return true;
+            }
+        }
+        
+        // 최대인원 변경 시 최소인원 검증 및 자동 조정
+        function validateMinCapacityForMaxCapacity(input) {
+            const minCapacityInput = document.getElementById('minCapacity');
+            
+            if (minCapacityInput) {
+                const maxCapacity = parseInt(input.value) || 0;
+                const minCapacity = parseInt(minCapacityInput.value) || 0;
+                
+                // 최대인원이 변경되었을 때, 최소인원이 최대인원을 넘으면 자동으로 조정
+                if (maxCapacity > 0 && minCapacity > maxCapacity) {
+                    minCapacityInput.value = maxCapacity;
+                    // 조정 후 검증 수행
+                    validateMinCapacity(minCapacityInput);
+                } else {
+                    validateMinCapacity(minCapacityInput);
+                }
+            }
+        }
+        
+        // 최소인원 입력 시 자동 조정 (blur 이벤트에서)
+        function adjustMinCapacity(input) {
+            const maxCapacityInput = document.getElementById('maxCapacity');
+            
+            if (!maxCapacityInput) return;
+            
+            const maxCapacity = parseInt(maxCapacityInput.value) || 0;
+            const minCapacity = parseInt(input.value) || 0;
+            
+            // 최대인원이 설정되어 있고, 최소인원이 최대인원을 넘으면 자동 조정
+            if (maxCapacity > 0 && minCapacity > maxCapacity) {
+                input.value = maxCapacity;
+                // 조정 후 검증 수행
+                validateMinCapacity(input);
+            }
+        }
+        
         // 유틸 함수들
         function createLabel(text) {
             const label = document.createElement('label');
@@ -646,7 +823,7 @@
             dateDiv.className = "schedule-date";
 
             const dateLabel = document.createElement("label");
-            dateLabel.textContent = "날짜";
+            dateLabel.textContent = "일차";
             dateDiv.appendChild(dateLabel);
 
             const dateInput = document.createElement("input");
@@ -1057,7 +1234,7 @@
 
                 if (end < start) {
                     if (endDateError) {
-                        endDateError.textContent = '종료일은 시작일보다 이전일 수 없습니다.';
+                        endDateError.textContent = '판매종료일은 판매시작일보다 이전일 수 없습니다.';
                         endDateError.style.display = 'block';
                     }
                     if (endDateInput) {
@@ -1072,10 +1249,47 @@
         }
 
         // 폼 제출 시 최종 검증
-        document.querySelector('.tour-form').addEventListener('submit', function(e) {
+        document.querySelector('form').addEventListener('submit', function(e) {
+            let isValid = true;
+            let errorMessages = [];
+            
+            // 날짜 유효성 검사
             if (!validateTourDates()) {
+                isValid = false;
+                errorMessages.push('판매종료일은 판매시작일보다 이전일 수 없습니다.');
+            }
+            
+            // 최소인원/최대인원 검증
+            const maxCapacityInput = document.getElementById('maxCapacity');
+            const minCapacityInput = document.getElementById('minCapacity');
+            
+            if (maxCapacityInput) {
+                // 최대인원 1000 제한 검증
+                if (!validateMaxCapacityLimit(maxCapacityInput)) {
+                    isValid = false;
+                    errorMessages.push('최대인원은 1000을 넘을 수 없습니다.');
+                }
+            }
+            
+            if (maxCapacityInput && minCapacityInput) {
+                const maxCapacity = parseInt(maxCapacityInput.value) || 0;
+                const minCapacity = parseInt(minCapacityInput.value) || 0;
+                
+                if (maxCapacity > 0 && minCapacity > maxCapacity) {
+                    isValid = false;
+                    // 자동으로 최대인원으로 조정
+                    minCapacityInput.value = maxCapacity;
+                    validateMinCapacity(minCapacityInput);
+                    errorMessages.push(`최소인원이 최대인원을 초과하여 ${maxCapacity}로 조정되었습니다.`);
+                } else if (!validateMinCapacity(minCapacityInput)) {
+                    isValid = false;
+                    errorMessages.push('최소인원은 최대인원을 넘을 수 없습니다.');
+                }
+            }
+            
+            if (!isValid) {
                 e.preventDefault();
-                alert('종료일은 시작일보다 이전일 수 없습니다. 날짜를 확인해주세요.');
+                alert('입력한 정보를 확인해주세요.\n' + errorMessages.join('\n'));
                 return false;
             }
         });

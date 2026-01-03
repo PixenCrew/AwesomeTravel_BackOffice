@@ -52,7 +52,7 @@ public class TourController {
     public String listAndFilter(
             @ModelAttribute TourFilterDTO filter, // 필터 DTO를 바인딩
             @RequestParam(defaultValue = "0") int page, // 페이지 번호
-            @RequestParam(defaultValue = "startDate") String sortField,
+            @RequestParam(defaultValue = "id") String sortField,
             @RequestParam(defaultValue = "asc") String sortDir,
             Model model) {
         // 1) 정렬 객체 설정
@@ -76,7 +76,7 @@ public class TourController {
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("isSelectionPage", false); // 일반 목록 페이지임을 명시
-        model.addAttribute("title", "Tour List");
+        model.addAttribute("title", "투어 관리");
         model.addAttribute("content", "components/tour/tour"); // layout 안에서 이 fragment를 렌더
 
         return "layout";
@@ -118,7 +118,83 @@ public class TourController {
 
     // 새 투어 등록
     @PostMapping("/new")
-    public String submitTravel(@ModelAttribute Tour tour) throws Exception {
+    public String submitTravel(@ModelAttribute Tour tour, Model model) throws Exception {
+        final long MAX_PRICE = 100000000L; // 1억원
+        
+        // 최대인원이 1000을 넘지 않도록 검증
+        if (tour.getMaxCapacity() != null && tour.getMaxCapacity() > 1000) {
+            model.addAttribute("types", LocationType.values());
+            model.addAttribute("countryCode", commonCodeService.getAllCountryCodes());
+            model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
+            model.addAttribute("airportCode", commonCodeService.getAllAirports());
+            model.addAttribute("tour", tour);
+            model.addAttribute("connectedProduct", new Product());
+            model.addAttribute("isSelectionPage", false);
+            model.addAttribute("title", "새 투어 등록");
+            model.addAttribute("content", "components/tour/tourDetail");
+            model.addAttribute("error", String.format("최대인원(%d)은 1000을 넘을 수 없습니다.", tour.getMaxCapacity()));
+            return "layout";
+        }
+        
+        // 최소인원이 최대인원을 넘지 않도록 검증
+        if (tour.getMinCapacity() != null && tour.getMaxCapacity() != null) {
+            if (tour.getMinCapacity() > tour.getMaxCapacity()) {
+                model.addAttribute("types", LocationType.values());
+                model.addAttribute("countryCode", commonCodeService.getAllCountryCodes());
+                model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
+                model.addAttribute("airportCode", commonCodeService.getAllAirports());
+                model.addAttribute("tour", tour);
+                model.addAttribute("connectedProduct", new Product());
+                model.addAttribute("isSelectionPage", false);
+                model.addAttribute("title", "새 투어 등록");
+                model.addAttribute("content", "components/tour/tourDetail");
+                model.addAttribute("error", String.format("최소인원(%d)은 최대인원(%d)을 넘을 수 없습니다.", 
+                    tour.getMinCapacity(), tour.getMaxCapacity()));
+                return "layout";
+            }
+        }
+        
+        // 가격 1억원 제한 검증
+        if (tour.getPriceAdult() != null && tour.getPriceAdult() > MAX_PRICE) {
+            model.addAttribute("types", LocationType.values());
+            model.addAttribute("countryCode", commonCodeService.getAllCountryCodes());
+            model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
+            model.addAttribute("airportCode", commonCodeService.getAllAirports());
+            model.addAttribute("tour", tour);
+            model.addAttribute("connectedProduct", new Product());
+            model.addAttribute("isSelectionPage", false);
+            model.addAttribute("title", "새 투어 등록");
+            model.addAttribute("content", "components/tour/tourDetail");
+            model.addAttribute("error", String.format("가격[성인](%d원)은 1억원을 넘을 수 없습니다.", tour.getPriceAdult()));
+            return "layout";
+        }
+        if (tour.getPriceYouth() != null && tour.getPriceYouth() > MAX_PRICE) {
+            model.addAttribute("types", LocationType.values());
+            model.addAttribute("countryCode", commonCodeService.getAllCountryCodes());
+            model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
+            model.addAttribute("airportCode", commonCodeService.getAllAirports());
+            model.addAttribute("tour", tour);
+            model.addAttribute("connectedProduct", new Product());
+            model.addAttribute("isSelectionPage", false);
+            model.addAttribute("title", "새 투어 등록");
+            model.addAttribute("content", "components/tour/tourDetail");
+            model.addAttribute("error", String.format("가격[청소년](%d원)은 1억원을 넘을 수 없습니다.", tour.getPriceYouth()));
+            return "layout";
+        }
+        if (tour.getPriceInfant() != null && tour.getPriceInfant() > MAX_PRICE) {
+            model.addAttribute("types", LocationType.values());
+            model.addAttribute("countryCode", commonCodeService.getAllCountryCodes());
+            model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
+            model.addAttribute("airportCode", commonCodeService.getAllAirports());
+            model.addAttribute("tour", tour);
+            model.addAttribute("connectedProduct", new Product());
+            model.addAttribute("isSelectionPage", false);
+            model.addAttribute("title", "새 투어 등록");
+            model.addAttribute("content", "components/tour/tourDetail");
+            model.addAttribute("error", String.format("가격[영유아](%d원)은 1억원을 넘을 수 없습니다.", tour.getPriceInfant()));
+            return "layout";
+        }
+        
         // 모든 Schedule 객체에 tour 참조를 세팅
         for (Schedule schedule : tour.getSchedules()) {
             schedule.setTour(tour);
@@ -154,7 +230,87 @@ public class TourController {
 
     // 특정 투어 수정
     @PostMapping("/{id}")
-    public String submitSelectedTravel(@ModelAttribute Tour tour) throws Exception {
+    public String submitSelectedTravel(@ModelAttribute Tour tour, Model model) throws Exception {
+        final long MAX_PRICE = 100000000L; // 1억원
+        
+        // 최대인원이 1000을 넘지 않도록 검증
+        if (tour.getMaxCapacity() != null && tour.getMaxCapacity() > 1000) {
+            Product connectedProduct = productAdminRepo.findByTourId(tour.getId());
+            model.addAttribute("types", LocationType.class);
+            model.addAttribute("countryCode", commonCodeService.getAllCountryCodes());
+            model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
+            model.addAttribute("airportCode", commonCodeService.getAllAirports());
+            model.addAttribute("tour", tour);
+            model.addAttribute("connectedProduct", connectedProduct == null ? 0 : connectedProduct.getId());
+            model.addAttribute("isSelectionPage", false);
+            model.addAttribute("title", "투어 상세");
+            model.addAttribute("content", "components/tour/tourDetail");
+            model.addAttribute("error", String.format("최대인원(%d)은 1000을 넘을 수 없습니다.", tour.getMaxCapacity()));
+            return "layout";
+        }
+        
+        // 최소인원이 최대인원을 넘지 않도록 검증
+        if (tour.getMinCapacity() != null && tour.getMaxCapacity() != null) {
+            if (tour.getMinCapacity() > tour.getMaxCapacity()) {
+                Product connectedProduct = productAdminRepo.findByTourId(tour.getId());
+                model.addAttribute("types", LocationType.class);
+                model.addAttribute("countryCode", commonCodeService.getAllCountryCodes());
+                model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
+                model.addAttribute("airportCode", commonCodeService.getAllAirports());
+                model.addAttribute("tour", tour);
+                model.addAttribute("connectedProduct", connectedProduct == null ? 0 : connectedProduct.getId());
+                model.addAttribute("isSelectionPage", false);
+                model.addAttribute("title", "투어 상세");
+                model.addAttribute("content", "components/tour/tourDetail");
+                model.addAttribute("error", String.format("최소인원(%d)은 최대인원(%d)을 넘을 수 없습니다.", 
+                    tour.getMinCapacity(), tour.getMaxCapacity()));
+                return "layout";
+            }
+        }
+        
+        // 가격 1억원 제한 검증
+        if (tour.getPriceAdult() != null && tour.getPriceAdult() > MAX_PRICE) {
+            Product connectedProduct = productAdminRepo.findByTourId(tour.getId());
+            model.addAttribute("types", LocationType.class);
+            model.addAttribute("countryCode", commonCodeService.getAllCountryCodes());
+            model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
+            model.addAttribute("airportCode", commonCodeService.getAllAirports());
+            model.addAttribute("tour", tour);
+            model.addAttribute("connectedProduct", connectedProduct == null ? 0 : connectedProduct.getId());
+            model.addAttribute("isSelectionPage", false);
+            model.addAttribute("title", "투어 상세");
+            model.addAttribute("content", "components/tour/tourDetail");
+            model.addAttribute("error", String.format("가격[성인](%d원)은 1억원을 넘을 수 없습니다.", tour.getPriceAdult()));
+            return "layout";
+        }
+        if (tour.getPriceYouth() != null && tour.getPriceYouth() > MAX_PRICE) {
+            Product connectedProduct = productAdminRepo.findByTourId(tour.getId());
+            model.addAttribute("types", LocationType.class);
+            model.addAttribute("countryCode", commonCodeService.getAllCountryCodes());
+            model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
+            model.addAttribute("airportCode", commonCodeService.getAllAirports());
+            model.addAttribute("tour", tour);
+            model.addAttribute("connectedProduct", connectedProduct == null ? 0 : connectedProduct.getId());
+            model.addAttribute("isSelectionPage", false);
+            model.addAttribute("title", "투어 상세");
+            model.addAttribute("content", "components/tour/tourDetail");
+            model.addAttribute("error", String.format("가격[청소년](%d원)은 1억원을 넘을 수 없습니다.", tour.getPriceYouth()));
+            return "layout";
+        }
+        if (tour.getPriceInfant() != null && tour.getPriceInfant() > MAX_PRICE) {
+            Product connectedProduct = productAdminRepo.findByTourId(tour.getId());
+            model.addAttribute("types", LocationType.class);
+            model.addAttribute("countryCode", commonCodeService.getAllCountryCodes());
+            model.addAttribute("cityCode", commonCodeService.getAllCityCodes());
+            model.addAttribute("airportCode", commonCodeService.getAllAirports());
+            model.addAttribute("tour", tour);
+            model.addAttribute("connectedProduct", connectedProduct == null ? 0 : connectedProduct.getId());
+            model.addAttribute("isSelectionPage", false);
+            model.addAttribute("title", "투어 상세");
+            model.addAttribute("content", "components/tour/tourDetail");
+            model.addAttribute("error", String.format("가격[영유아](%d원)은 1억원을 넘을 수 없습니다.", tour.getPriceInfant()));
+            return "layout";
+        }
 
         // 모든 Schedule 객체에 tour 참조를 세팅
         for (Schedule schedule : tour.getSchedules()) {
@@ -199,7 +355,7 @@ public class TourController {
     public String searchTour(
             @ModelAttribute TourFilterDTO filter, // 필터 DTO를 바인딩
             @RequestParam(defaultValue = "0") int page, // 페이지 번호
-            @RequestParam(defaultValue = "startDate") String sortField,
+            @RequestParam(defaultValue = "id") String sortField,
             @RequestParam(defaultValue = "asc") String sortDir,
             Model model) {
         Sort sort = sortDir.equalsIgnoreCase("asc")
