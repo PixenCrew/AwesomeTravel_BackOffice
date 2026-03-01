@@ -126,12 +126,17 @@ public class FileController {
         try {
             UploadedFile uploadedFile = fileUploadService.uploadFile(file, folderType);
 
+            // 로컬 업로드 시 imageUrl은 filePath (브라우저에서 /images/xxx 로 접근)
+            String imageUrl = uploadedFile.getDriveImageUrl() != null
+                    ? uploadedFile.getDriveImageUrl()
+                    : uploadedFile.getFilePath();
+
             FileUploadResponse response = FileUploadResponse.builder()
                     .message("파일 업로드 완료")
                     .fileId(uploadedFile.getId())
                     .filename(uploadedFile.getOriginalFilename())
                     .driveLink(uploadedFile.getDriveWebViewLink())
-                    .imageUrl(uploadedFile.getDriveImageUrl())  // 이미지 직접 표시용 URL
+                    .imageUrl(imageUrl)
                     .uploadType(uploadedFile.getUploadType())
                     .build();
 

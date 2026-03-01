@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.image.entity.UploadedFile;
 import renewal.awesome_travel_backoffice.image.repository.UploadedFileRepository;
@@ -14,6 +16,8 @@ import renewal.awesome_travel_backoffice.image.repository.UploadedFileRepository
 @Service
 @RequiredArgsConstructor
 public class FileUploadService {
+
+    private static final Logger log = LoggerFactory.getLogger(FileUploadService.class);
 
     private final UploadedFileRepository uploadedFileRepository;
     private final GoogleDriveService googleDriveService;
@@ -72,10 +76,17 @@ public class FileUploadService {
         String savedFileName = localFileService.uploadFile(multipartFile);
         String filePath = "/images/" + savedFileName;
 
+        String mimeType = multipartFile.getContentType();
+        if (mimeType == null || mimeType.isBlank()) {
+            mimeType = "application/octet-stream";
+        }
+        long size = multipartFile.getSize();
+        Long fileSize = size >= 0 ? size : 0L;
+
         UploadedFile uploadedFile = UploadedFile.createLocalFile(
-                multipartFile.getOriginalFilename(),
-                multipartFile.getContentType(),
-                multipartFile.getSize(),
+                multipartFile.getOriginalFilename() != null ? multipartFile.getOriginalFilename() : savedFileName,
+                mimeType,
+                fileSize,
                 filePath
         );
 
@@ -116,8 +127,7 @@ public class FileUploadService {
             try {
                 googleDriveService.deleteFile(file.getDriveFileId());
             } catch (Exception e) {
-                // Drive 삭제 실패해도 DB는 삭제
-                System.err.println("Google Drive 파일 삭제 실패: " + e.getMessage());
+                log.warn("Google Drive 파일 삭제 실패: {}", e.getMessage());
             }
         }
         // 로컬 파일인 경우 로컬에서도 삭제
@@ -125,8 +135,7 @@ public class FileUploadService {
             try {
                 localFileService.deleteFile(file.getFilePath());
             } catch (Exception e) {
-                // 로컬 삭제 실패해도 DB는 삭제
-                System.err.println("로컬 파일 삭제 실패: " + e.getMessage());
+                log.warn("로컬 파일 삭제 실패: {}", e.getMessage());
             }
         }
 
