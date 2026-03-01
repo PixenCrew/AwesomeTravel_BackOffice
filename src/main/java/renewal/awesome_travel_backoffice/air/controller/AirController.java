@@ -273,7 +273,8 @@ public class AirController {
     // !!!!!!!!!!!!!!!!!![TEST] 항공권 100일치 복제 !!!!!!!!!!!!!!!!!!!!!!!!!!!!
     @GetMapping("/replicate/{id}")
     public String replicateAir100(@PathVariable Long id) {
-        Air originAir = airRepo.findById(id).get();
+        Air originAir = airRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("항공편을 찾을 수 없습니다. id=" + id));
         airService.generateAirVariantsWithRandomPrice(originAir);
         return "redirect:/air";
     }

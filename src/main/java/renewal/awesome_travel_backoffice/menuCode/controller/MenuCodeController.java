@@ -103,7 +103,8 @@ public class MenuCodeController {
     @GetMapping("/{id}")
     public String getMenuCodeDetail(@PathVariable Long id, Model model) {
 
-        MenuCode menuCode = menuCodeRepository.findByCode2(id).get();
+        MenuCode menuCode = menuCodeRepository.findByCode2(id)
+                .orElseThrow(() -> new IllegalArgumentException("메뉴 코드를 찾을 수 없습니다. id=" + id));
 
         model.addAttribute("title", "메뉴 코드 상세");
         model.addAttribute("menuCode", menuCode);

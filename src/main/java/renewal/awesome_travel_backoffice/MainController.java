@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import renewal.awesome_travel_backoffice.admin.Admin;
 import renewal.awesome_travel_backoffice.admin.AdminService;
 import renewal.awesome_travel_backoffice.product.repository.ProductAdminRepository;
@@ -21,6 +23,8 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequestMapping("/")
 public class MainController {
+
+    private static final Logger log = LoggerFactory.getLogger(MainController.class);
 
     private final AdminService adminService;
     private final ProductAdminRepository productRepository;
@@ -56,9 +60,9 @@ public class MainController {
     // TEST 테스트용 가입 TEST
     @PostMapping("admin")
     public String newAdmin(Admin admin) {
-        System.out.println(admin.getId());
-        System.out.println(admin.getPassword());
-        System.out.println(admin.getRole());
+        if (log.isDebugEnabled()) {
+            log.debug("테스트 관리자 가입: id={}, role={}", admin.getId(), admin.getRole());
+        }
         adminService.createUser(admin);
         return "redirect:/login";
     }

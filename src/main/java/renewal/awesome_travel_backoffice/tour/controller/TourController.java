@@ -20,13 +20,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import org.hibernate.Hibernate;
+
 import lombok.RequiredArgsConstructor;
+import renewal.awesome_travel_backoffice.air.dto.GenerateAirForTourRequest;
+import renewal.awesome_travel_backoffice.air.service.AirService;
 import renewal.awesome_travel_backoffice.common.service.CommonCodeService;
 import renewal.awesome_travel_backoffice.hotel.repository.HotelRepository;
 import renewal.awesome_travel_backoffice.product.repository.ProductAdminRepository;
 import renewal.awesome_travel_backoffice.tour.TourService;
 import renewal.awesome_travel_backoffice.tour.dto.TourFilterDTO;
 import renewal.awesome_travel_backoffice.tour.repository.TourRepository;
+import renewal.awesome_travel_backoffice.airport.repository.AirportCodeRepository;
+import renewal.common.entity.AirportCode;
 import renewal.common.entity.Hotel;
 import renewal.common.entity.Location;
 import renewal.common.entity.Location.LocationType;
@@ -43,6 +49,8 @@ public class TourController {
     private final TourService tourService;
     private final ProductAdminRepository productAdminRepo;
     private final HotelRepository hotelRepo;
+    private final AirService airService;
+    private final AirportCodeRepository airportCodeRepo;
 
     private final CommonCodeService commonCodeService;
 
@@ -194,6 +202,9 @@ public class TourController {
             model.addAttribute("error", String.format("가격[영유아](%d원)은 1억원을 넘을 수 없습니다.", tour.getPriceInfant()));
             return "layout";
         }
+
+        // AIR 타입 Location의 출발/도착 공항을 폼에서 넘어온 코드로 DB 엔티티로 조회해 세팅 (FK 오류 방지)
+        resolveAirportCodesForTour(tour);
         
         // 모든 Schedule 객체에 tour 참조를 세팅
         for (Schedule schedule : tour.getSchedules()) {
@@ -213,7 +224,8 @@ public class TourController {
     @GetMapping("/{id}")
     public String selectTravel(@PathVariable Long id, Model model) {
 
-        Tour tour = tourRepo.findById(id).get();
+        Tour tour = tourRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("투어를 찾을 수 없습니다. id=" + id));
         Product connectedProduct = productAdminRepo.findByTourId(id);
         model.addAttribute("types", LocationType.class);
         model.addAttribute("countryCode", commonCodeService.getAllCountryCodes());
@@ -224,8 +236,80 @@ public class TourController {
         model.addAttribute("isSelectionPage", false);
         model.addAttribute("title", "투어 상세");
         model.addAttribute("content", "components/tour/tourDetail");
+        model.addAttribute("allAirlines", commonCodeService.getAllAirlines());
 
         return "layout";
+    }
+
+    /**
+     * 투어의 AIR 구간·운영 기간에 맞는 항공편을 일괄 생성합니다.
+     * 투어 상세 페이지에서 "조건에 맞는 항공 생성"으로 호출합니다.
+     */
+    @PostMapping("/{id}/generate-air")
+    public String generateAirForTour(
+            @PathVariable Long id,
+            @RequestParam(required = false) List<String> airlineCodes,
+            @RequestParam(required = false) Integer departHour,
+            @RequestParam(required = false) Integer departMinute,
+            @RequestParam(required = false) Long flightDurationMinutes,
+            @RequestParam(required = false) Long defaultPriceAdult,
+            @RequestParam(required = false) Long defaultMaxSeats,
+            @RequestParam(required = false) Long priceEconomy,
+            @RequestParam(required = false) Long pricePremiumEconomy,
+            @RequestParam(required = false) Long priceBusiness,
+            @RequestParam(required = false) Long priceFirst,
+            @RequestParam(required = false) Long maxSeatsEconomy,
+            @RequestParam(required = false) Long maxSeatsPremiumEconomy,
+            @RequestParam(required = false) Long maxSeatsBusiness,
+            @RequestParam(required = false) Long maxSeatsFirst,
+            Model model,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        try {
+            Tour tour = tourRepo.findById(id).orElse(null);
+            if (tour == null) {
+                redirectAttributes.addFlashAttribute("generateAirError", "투어를 찾을 수 없습니다.");
+                return "redirect:/tour";
+            }
+            Hibernate.initialize(tour.getSchedules());
+            if (tour.getSchedules() != null) {
+                for (Schedule schedule : tour.getSchedules()) {
+                    Hibernate.initialize(schedule.getLocations());
+                    if (schedule.getLocations() != null) {
+                        for (Location loc : schedule.getLocations()) {
+                            if (loc != null && loc.getLocationType() == LocationType.AIR) {
+                                if (loc.getDepartAirport() != null) Hibernate.initialize(loc.getDepartAirport());
+                                if (loc.getArriveAirport() != null) Hibernate.initialize(loc.getArriveAirport());
+                            }
+                        }
+                    }
+                }
+            }
+            GenerateAirForTourRequest request = GenerateAirForTourRequest.builder()
+                    .airlineCodes(airlineCodes)
+                    .departHour(departHour != null ? departHour : 9)
+                    .departMinute(departMinute != null ? departMinute : 0)
+                    .flightDurationMinutes(flightDurationMinutes != null ? flightDurationMinutes : 720L)
+                    .defaultPriceAdult(defaultPriceAdult != null ? defaultPriceAdult : 500_000L)
+                    .defaultMaxSeats(defaultMaxSeats != null ? defaultMaxSeats : 30L)
+                    .priceEconomy(priceEconomy)
+                    .pricePremiumEconomy(pricePremiumEconomy)
+                    .priceBusiness(priceBusiness)
+                    .priceFirst(priceFirst)
+                    .maxSeatsEconomy(maxSeatsEconomy)
+                    .maxSeatsPremiumEconomy(maxSeatsPremiumEconomy)
+                    .maxSeatsBusiness(maxSeatsBusiness)
+                    .maxSeatsFirst(maxSeatsFirst)
+                    .build();
+            java.util.List<renewal.common.entity.Air> created = airService.generateAirForTour(tour, request);
+            redirectAttributes.addFlashAttribute("generateAirMessage",
+                    created.size() + "건의 항공편이 생성되었습니다.");
+        } catch (Exception e) {
+            org.slf4j.LoggerFactory.getLogger(TourController.class)
+                    .warn("generate-air failed for tour id={}", id, e);
+            String message = e.getMessage() != null ? e.getMessage() : "항공 생성 중 오류가 발생했습니다.";
+            redirectAttributes.addFlashAttribute("generateAirError", message);
+        }
+        return "redirect:/tour/" + id;
     }
 
     // 특정 투어 수정
@@ -312,6 +396,9 @@ public class TourController {
             return "layout";
         }
 
+        // AIR 타입 Location의 출발/도착 공항을 폼에서 넘어온 코드로 DB 엔티티로 조회해 세팅 (FK 오류 방지)
+        resolveAirportCodesForTour(tour);
+
         // 모든 Schedule 객체에 tour 참조를 세팅
         for (Schedule schedule : tour.getSchedules()) {
             schedule.setTour(tour);
@@ -324,6 +411,31 @@ public class TourController {
         tourRepo.save(processTour(tour));
 
         return "redirect:/tour";
+    }
+
+    /** AIR 타입 Location의 departAirport, arriveAirport를 폼에서 바인딩된 코드 문자열로 DB의 AirportCode 엔티티로 교체 (FK 오류 방지) */
+    private void resolveAirportCodesForTour(Tour tour) {
+        if (tour.getSchedules() == null) return;
+        for (Schedule schedule : tour.getSchedules()) {
+            if (schedule.getLocations() == null) continue;
+            for (Location location : schedule.getLocations()) {
+                if (location == null || location.getLocationType() != LocationType.AIR) continue;
+                String depCode = location.getDepartAirport() != null ? location.getDepartAirport().getAirportCode() : null;
+                if (depCode != null && !depCode.isBlank()) {
+                    depCode = depCode.trim().split("\\|")[0].trim(); // "ICN | 인천" 형태 대비
+                    location.setDepartAirport(airportCodeRepo.findByCode(depCode).orElse(null));
+                } else {
+                    location.setDepartAirport(null);
+                }
+                String arrCode = location.getArriveAirport() != null ? location.getArriveAirport().getAirportCode() : null;
+                if (arrCode != null && !arrCode.isBlank()) {
+                    arrCode = arrCode.trim().split("\\|")[0].trim();
+                    location.setArriveAirport(airportCodeRepo.findByCode(arrCode).orElse(null));
+                } else {
+                    location.setArriveAirport(null);
+                }
+            }
+        }
     }
 
     // 투어 삭제 처리
@@ -399,10 +511,12 @@ public class TourController {
                     // AIR 처리
                 } else if (location.getLocationType() == LocationType.HOTEL) {
                     // 호텔 가격 합산
-                    Hotel hotel = hotelRepo.findById(location.getHotel().getId()).get();
                     keywords.add(location.getName());
-                    if (hotel != null) {
-                        hotelPriceSum += hotel.getPrice();
+                    if (location.getHotel() != null && location.getHotel().getId() != null) {
+                        Hotel hotel = hotelRepo.findById(location.getHotel().getId()).orElse(null);
+                        if (hotel != null) {
+                            hotelPriceSum += hotel.getPrice();
+                        }
                     }
                 } else {
                     // POINT 처리

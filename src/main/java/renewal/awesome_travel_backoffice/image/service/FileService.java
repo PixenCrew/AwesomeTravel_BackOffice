@@ -41,11 +41,16 @@ public class FileService {
             throw new IllegalArgumentException("파일 확장자를 확인할 수 없습니다: " + originalFilename);
         }
 
-        // 3. 파일 내용 이미지 검증
+        // 3. 파일 내용 이미지 검증 (ImageIO는 WebP 등 일부 형식 미지원 → null이어도 저장 허용)
         try (InputStream is = file.getInputStream()) {
             BufferedImage image = ImageIO.read(is);
             if (image == null) {
-                throw new IllegalArgumentException("실제 이미지 파일이 아닙니다: " + originalFilename);
+                String ext = extension.toLowerCase();
+                if (ext.equals(".webp") || ext.equals(".heic") || ext.equals(".avif")) {
+                    log.warning("이미지 형식(" + ext + ")은 Java ImageIO에서 미지원. 파일만 저장합니다: " + originalFilename);
+                } else {
+                    throw new IllegalArgumentException("실제 이미지 파일이 아닙니다. JPG, PNG, GIF를 사용해 주세요: " + originalFilename);
+                }
             }
         }
         

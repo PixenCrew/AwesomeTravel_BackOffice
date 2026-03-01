@@ -804,7 +804,7 @@
         <div class="bg-white shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
                 <h3 class="text-base font-semibold leading-6 text-gray-900 mb-4">사진 관리</h3>
-                <fieldset id="images-fieldset" class="space-y-4">
+                <fieldset id="photos-fieldset" class="space-y-4">
                     <div class="image-item" th:each="img, iterStat : *{photos}">
                         <div class="flex space-x-2">
                             <input type="text" th:field="*{photos[__${iterStat.index}__]}" placeholder="사진 URL을 입력하세요"
@@ -827,10 +827,10 @@
         <div class="bg-white shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
                 <h3 class="text-base font-semibold leading-6 text-gray-900 mb-4">상세이미지 관리</h3>
-                <fieldset id="images-fieldset" class="space-y-4">
+                <fieldset id="detail-image-fieldset" class="space-y-4">
                     <div class="image-item">
                         <div class="flex space-x-2">
-                            <input type="text" th:field="*{image}" placeholder="이미지 URL" readonly />
+                            <input type="text" th:field="*{image}" name="image" placeholder="이미지 URL" readonly />
                             <input type="file" onchange="uploadImage(this, 'product')" />
                         </div>
                     </div>
@@ -1030,7 +1030,8 @@
         }
 
         function reindexImages() {
-            const inputs = document.querySelectorAll("#images-fieldset .image-item input[type='text']");
+            // 사진(photos)만 재인덱스. 상세이미지(image) input은 건드리지 않음
+            const inputs = document.querySelectorAll("#photos-fieldset .image-item input[type='text']");
             inputs.forEach((input, idx) => {
                 input.name = `photos[${idx}]`;
             });
@@ -1141,7 +1142,7 @@
         // 
 
         function addImage() {
-            const fieldset = document.getElementById("images-fieldset");
+            const fieldset = document.getElementById("photos-fieldset");
 
             // .image-item 개수 → 다음 인덱스
             const index = fieldset.querySelectorAll(".image-item").length;

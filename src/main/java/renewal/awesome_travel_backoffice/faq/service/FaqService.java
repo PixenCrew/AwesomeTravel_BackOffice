@@ -4,6 +4,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import renewal.awesome_travel_backoffice.faq.dto.request.FaqRequestDto;
 import renewal.awesome_travel_backoffice.faq.dto.response.FaqResponseDto;
 import renewal.awesome_travel_backoffice.faq.repositiry.FaqRepository;
@@ -14,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class FaqService {
+
+    private static final Logger log = LoggerFactory.getLogger(FaqService.class);
 
     private final FaqRepository faqRepository;
 
@@ -78,7 +82,9 @@ public class FaqService {
         faq.update(dto.getQuestion(), dto.getAnswer(), dto.getCategory());
         // 체크박스가 체크되지 않으면 null이 전달되므로 false로 처리
         boolean newVisible = dto.getVisible() != null ? dto.getVisible() : false;
-        System.out.println("Update FAQ - ID: " + id + ", Visible from DTO: " + dto.getVisible() + ", Setting to: " + newVisible);
+        if (log.isDebugEnabled()) {
+            log.debug("Update FAQ: id={}, visible from DTO={}, setting to={}", id, dto.getVisible(), newVisible);
+        }
         faq.setVisible(newVisible);
         faqRepository.save(faq);
     }
@@ -90,9 +96,10 @@ public class FaqService {
     public void toggleStatus(Long id) {
         Faq faq = faqRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("FAQ가 존재하지 않습니다."));
-        System.out.println("Before toggle - FAQ ID: " + id + ", Visible: " + faq.getVisible());
+        if (log.isDebugEnabled()) {
+            log.debug("FAQ toggle: id={}, visible {} -> {}", id, faq.getVisible(), !faq.getVisible());
+        }
         faq.setVisible(!faq.getVisible());
-        System.out.println("After toggle - FAQ ID: " + id + ", Visible: " + faq.getVisible());
         // 변경사항을 저장
         faqRepository.save(faq);
     }

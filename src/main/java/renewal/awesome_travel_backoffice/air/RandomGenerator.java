@@ -24,10 +24,14 @@ import renewal.common.entity.Air.FlightType;
 import renewal.common.entity.Airline;
 import renewal.common.entity.AirportCode;
 import renewal.common.entity.SeatClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import renewal.common.repository.CountryCodeRepository;
 
 // @Configuration
 public class RandomGenerator {
+
+    private static final Logger log = LoggerFactory.getLogger(RandomGenerator.class);
 
     @Bean
     CommandLineRunner loadFakeAirWithSeats(
@@ -39,7 +43,7 @@ public class RandomGenerator {
             AirService airService) {
         return args -> {
             setDummyAuthentication();
-            System.out.println(">>> RandomGenerator CommandLineRunner 실행됨!");
+            log.info("RandomGenerator CommandLineRunner 실행");
             Random random = new Random();
             List<Airline> airlines = airlineRepo.findAll();
             // List<AirportCode> cities =
@@ -182,7 +186,7 @@ public class RandomGenerator {
                 try {
                     airRepo.save(air);
                 } catch (Exception e) {
-                    System.out.println(">>> 중복 또는 저장 오류 발생, break: " + e.getMessage());
+                    log.warn("RandomGenerator 저장 오류, break: {}", e.getMessage());
                     break;
                 }
             }

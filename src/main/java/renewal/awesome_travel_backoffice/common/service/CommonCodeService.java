@@ -14,9 +14,14 @@ import renewal.common.entity.CountryCode;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 @RequiredArgsConstructor
 public class CommonCodeService {
+
+    private static final Logger log = LoggerFactory.getLogger(CommonCodeService.class);
 
     private final AirportCodeRepository airportRepo;
     private final AirlineCodeRepository airlineRepo;
@@ -26,28 +31,36 @@ public class CommonCodeService {
     /** 공항코드 캐싱 */
     @Cacheable("airportCodes")
     public List<AirportCode> getAllAirports() {
-        System.out.println(">>> DB 조회: airportCodes"); // 캐시 확인용 로그
+        if (log.isDebugEnabled()) {
+            log.debug("DB 조회: airportCodes");
+        }
         return airportRepo.findAll();
     }
 
     /** 항공사 캐싱 */
     @Cacheable("airlines")
     public List<Airline> getAllAirlines() {
-        System.out.println(">>> DB 조회: airlines");
+        if (log.isDebugEnabled()) {
+            log.debug("DB 조회: airlines");
+        }
         return airlineRepo.findAll();
     }
 
     /** 항공사 캐싱 */
     @Cacheable("cityCodes")
     public List<CityCode> getAllCityCodes() {
-        System.out.println(">>> DB 조회: cityCodes");
+        if (log.isDebugEnabled()) {
+            log.debug("DB 조회: cityCodes");
+        }
         return cityCodeRepo.findAll();
     }
 
     /** 국가코드 캐싱 */
     @Cacheable("countryCodes")
     public List<CountryCode> getAllCountryCodes() {
-        System.out.println(">>> DB 조회: countryCodes");
+        if (log.isDebugEnabled()) {
+            log.debug("DB 조회: countryCodes");
+        }
         return countryCodeRepo.findAll();
     }
 }

@@ -122,11 +122,17 @@ public class ProductController {
             return "layout";
         }
 
+        // 신규 상품은 클라이언트 노출용으로 활성화 (폼에 isActive가 없으면 null로 저장될 수 있음)
+        if (product.getIsActive() == null) {
+            product.setIsActive(true);
+        }
+
         // product 등록 (먼저 저장하여 ID 생성)
         Product savedProduct = productAdminRepo.save(product);
 
-        // 투어 productId 업데이트
-        Tour tour = tourRepo.findById(product.getTour().getId()).get();
+        // 투어 productId 업데이트 (Tour 엔티티는 productId 필드 없음, Product.tour FK로 연결)
+        Tour tour = tourRepo.findById(product.getTour().getId())
+                .orElseThrow(() -> new IllegalArgumentException("투어를 찾을 수 없습니다."));
         tour.setProductId(savedProduct.getId());
         tourRepo.save(tour);
 
@@ -156,10 +162,11 @@ public class ProductController {
         product.setTour(tour);
         productAdminRepo.save(product);
 
-        // 첫 사진 섬네일로 등록
+        // 첫 사진 섬네일로 등록 후 DB에 반영
         if (!product.getPhotos().isEmpty()) {
             product.setThumbnail(product.getPhotos().get(0));
         }
+        productAdminRepo.save(product);
 
         return "redirect:/product";
     }
@@ -222,9 +229,23 @@ public class ProductController {
         product.setStar4(existingProduct.getStar4());
         product.setStar5(existingProduct.getStar5());
 
-        // 첫 사진 섬네일로 등록
+        // 🔧 isActive는 수정 폼에서 덮어쓰지 않고 항상 기존 값 유지 (클라이언트 노출 여부 보호)
+        product.setIsActive(existingProduct.getIsActive() != null ? existingProduct.getIsActive() : true);
+
+        // 첫 사진을 썸네일로 사용 (전체 경로(/ 또는 http로 시작)인 경우만, 파일명만 있으면 기존 썸네일 유지)
         if (!product.getPhotos().isEmpty()) {
-            product.setThumbnail(product.getPhotos().get(0));
+            String firstPhoto = product.getPhotos().get(0);
+            if (firstPhoto != null && (firstPhoto.startsWith("/") || firstPhoto.startsWith("http"))) {
+                product.setThumbnail(firstPhoto);
+            }
+            // firstPhoto가 "val.jpg"처럼 경로가 없으면 기존 썸네일 유지
+            else if (existingProduct.getThumbnail() != null) {
+                product.setThumbnail(existingProduct.getThumbnail());
+            }
+        }
+        // image 필드도 파일명만 있으면 기존 값 유지 (업로드 실패 시 "val.jpg" 등 저장 방지)
+        if (product.getImage() != null && !product.getImage().startsWith("/") && !product.getImage().startsWith("http")) {
+            product.setImage(existingProduct.getImage());
         }
 
         // 키워드 등록
@@ -312,7 +333,8 @@ public class ProductController {
     public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
 
         // Product와 연결된 Tour가 있으면 연결 해제
-        Product product = productAdminRepo.findById(id).get();
+        Product product = productAdminRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. id=" + id));
         Tour tour = product.getTour();
         if (tour != null) {
             // tour.setProduct(null); // FK를 null로 만들어서 참조 끊기

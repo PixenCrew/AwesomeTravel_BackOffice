@@ -1,5 +1,7 @@
 package renewal.awesome_travel_backoffice.refund.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +19,8 @@ import renewal.common.entity.Refund;
 @RequestMapping("/refund")
 @RequiredArgsConstructor
 public class RefundViewController {
+
+    private static final Logger log = LoggerFactory.getLogger(RefundViewController.class);
 
     private final RefundService refundService;
 
@@ -45,12 +49,9 @@ public class RefundViewController {
         stats.setProcessedCount(refundService.getRefundCountByStatus(Refund.RefundStatus.COMPLETED));
         stats.setRejectedCount(refundService.getRefundCountByStatus(Refund.RefundStatus.REJECTED));
 
-        // 디버깅 로그
-        System.out.println("=== 환불 관리 페이지 디버깅 ===");
-        System.out.println("status: " + status + " (type: " + (status != null ? status.getClass().getSimpleName() : "null") + ")");
-        System.out.println("refundType: " + refundType + " (type: " + (refundType != null ? refundType.getClass().getSimpleName() : "null") + ")");
-        System.out.println("refundTypes: " + java.util.Arrays.toString(Refund.RefundType.values()));
-        System.out.println("===============================");
+        if (log.isDebugEnabled()) {
+            log.debug("환불 관리 페이지: status={}, refundType={}", status, refundType);
+        }
 
         // 모델에 데이터 추가
         model.addAttribute("refundPage", refundPage);
