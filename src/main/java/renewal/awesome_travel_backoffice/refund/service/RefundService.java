@@ -5,11 +5,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.air.repository.AirRepository;
 import renewal.awesome_travel_backoffice.air.repository.SeatClassAdminRepository;
 import renewal.common.repository.PurchaseAirRepository;
 import renewal.common.repository.PurchaseProductRepository;
+import renewal.common.service.ProductServiceCommon;
 import renewal.awesome_travel_backoffice.refund.repository.RefundBackOfficeRepository;
 import renewal.common.entity.Air;
 import renewal.common.entity.PurchaseAir;
@@ -23,9 +26,12 @@ import renewal.common.entity.SeatClass;
 @RequiredArgsConstructor
 public class RefundService {
 
+    private static final Logger log = LoggerFactory.getLogger(RefundService.class);
+
     private final RefundBackOfficeRepository refundRepository;
     private final PurchaseAirRepository purchaseAirRepository;
     private final PurchaseProductRepository productPurchaseRepository;
+    private final ProductServiceCommon productServiceCommon;
     private final AirRepository airRepository;
     private final SeatClassAdminRepository seatClassAdminRepository;
 
@@ -109,15 +115,13 @@ public class RefundService {
                 seatClass.setAvailableSeats(seatClass.getAvailableSeats() + totalSeats);
             }
 
-            System.out.printf("[환불 처리 완료 - 항공권] 환불ID=%d, 주문ID=%d, 금액=%d, 처리자=%s\n",
+            log.info("[환불 처리 완료 - 항공권] refundId={}, purchaseId={}, amount={}, processedBy={}",
                     refundId, refund.getPurchaseId(), refund.getAmount(), processedBy);
         } else if (refund.getRefundType() == Refund.RefundType.PRODUCT) {
-            // PurchaseProduct 환불 처리
-            PurchaseProduct productPurchase = productPurchaseRepository.findById(refund.getPurchaseId())
-                    .orElseThrow(() -> new IllegalArgumentException("PurchaseProduct not found"));
-            productPurchase.setPurchaseStatus(PurchaseStatus.CANCELLED); // 환불 완료는 취소로 처리
+            // PurchaseProduct 환불 처리: 취소 처리로 좌석 복원(또는 홀드 allocated 감소)까지 수행
+            productServiceCommon.cancelPurchase(refund.getPurchaseId());
 
-            System.out.printf("[환불 처리 완료 - 패키지] 환불ID=%d, 주문ID=%d, 금액=%d, 처리자=%s\n",
+            log.info("[환불 처리 완료 - 패키지] refundId={}, purchaseId={}, amount={}, processedBy={}",
                     refundId, refund.getPurchaseId(), refund.getAmount(), processedBy);
         }
     }
@@ -136,12 +140,11 @@ public class RefundService {
         refund.setAdminNote(reason);
         refund.reject(reason);
 
-        // 로그 출력
         if (refund.getRefundType() == Refund.RefundType.AIR) {
-            System.out.printf("[환불 거부 - 항공권] 환불ID=%d, 주문ID=%d, 사유=%s, 처리자=%s\n",
+            log.info("[환불 거부 - 항공권] refundId={}, purchaseId={}, reason={}, processedBy={}",
                     refundId, refund.getPurchaseId(), reason, processedBy);
         } else if (refund.getRefundType() == Refund.RefundType.PRODUCT) {
-            System.out.printf("[환불 거부 - 패키지] 환불ID=%d, 주문ID=%d, 사유=%s, 처리자=%s\n",
+            log.info("[환불 거부 - 패키지] refundId={}, purchaseId={}, reason={}, processedBy={}",
                     refundId, refund.getPurchaseId(), reason, processedBy);
         }
     }
@@ -156,31 +159,24 @@ public class RefundService {
 
     // 환불 목록 조회 (상태 + 주문유형)
     public Page<Refund> getRefunds(Refund.RefundStatus status, Refund.RefundType refundType, Pageable pageable) {
-        System.out.println("=== RefundService.getRefunds 디버깅 ===");
-        System.out.println("status: " + status);
-        System.out.println("refundType: " + refundType);
+        if (log.isDebugEnabled()) {
+            log.debug("getRefunds: status={}, refundType={}", status, refundType);
+        }
 
         Page<Refund> result;
         if (status != null && refundType != null) {
-            System.out.println("상태 + 주문유형 필터 적용");
             result = refundRepository.findByStatusAndRefundType(status, refundType, pageable);
         } else if (status != null) {
-            System.out.println("상태 필터만 적용");
             result = refundRepository.findByStatus(status, pageable);
         } else if (refundType != null) {
-            System.out.println("주문유형 필터만 적용");
             result = refundRepository.findByRefundType(refundType, pageable);
         } else {
-            System.out.println("필터 없음 - 전체 조회");
             result = refundRepository.findAll(pageable);
         }
 
-        System.out.println("조회된 결과 수: " + result.getTotalElements());
-        result.getContent().forEach(refund -> {
-            System.out.println("  - 환불ID: " + refund.getId() + ", 상태: " + refund.getStatus() + ", 주문유형: "
-                    + refund.getRefundType());
-        });
-        System.out.println("=====================================");
+        if (log.isDebugEnabled()) {
+            log.debug("getRefunds 결과: totalElements={}", result.getTotalElements());
+        }
 
         return result;
     }

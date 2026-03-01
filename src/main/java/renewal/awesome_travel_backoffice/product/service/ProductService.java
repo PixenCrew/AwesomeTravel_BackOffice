@@ -20,6 +20,7 @@ public class ProductService {
 
     private final ProductAdminRepository productAdminRepo;
 
+    @Transactional(readOnly = true)
     public Page<Product> searchProducts(ProductFilterDTO filter, Pageable pageable) {
         Specification<Product> spec = Specification.where(null);
 
@@ -58,7 +59,10 @@ public class ProductService {
             spec = spec.and(ProductSpecification.tourEndDateBetween(filter.getEndDateFrom(), filter.getEndDateTo()));
         }
 
-        return productAdminRepo.findAll(spec, pageable);
+        Page<Product> productPage = productAdminRepo.findAll(spec, pageable);
+        // 뷰 렌더 시 LazyInitializationException 방지: tour를 트랜잭션 안에서 미리 로드
+        productPage.getContent().forEach(p -> { if (p.getTour() != null) p.getTour().getId(); });
+        return productPage;
     }
 
     /**

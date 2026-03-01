@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.purchaseProduct.controller.PurchaseProductAdminController.CountryCodeDto;
 import renewal.awesome_travel_backoffice.purchaseProduct.dto.request.PurchaseProductSearchCondition;
@@ -35,6 +37,8 @@ import renewal.common.service.ProductServiceCommon;
 @Service
 @RequiredArgsConstructor
 public class PurchaseProductService {
+
+    private static final Logger log = LoggerFactory.getLogger(PurchaseProductService.class);
 
     private final PurchaseProductRepository productPurchaseRepository;
     private final PurchaseProductAdminRepository purchaseProductAdminRepository;
@@ -128,25 +132,13 @@ public class PurchaseProductService {
                 .orElseGet(ArrayList::new);
         purchase.setFinalSeatClasses(seatSnapshots);
 
-        // 디버깅 로그 추가
-        System.out.println("=== PurchaseProduct 디버깅 정보 ===");
-        System.out.println("PurchaseProduct ID: " + purchase.getId());
-        System.out.println("Expected Passengers: " + purchase.getPassengers().size());
-        System.out.println(
-                "Actual Passengers: " + (purchase.getPassengers() != null ? purchase.getPassengers().size() : "null"));
-        System.out.println("Passenger Info Complete: " + purchase.getIsPassengerInfoComplete());
-        System.out.println("Transaction Complete: " + purchase.getIsTransactionComplete());
-        if (purchase.getPassengers() != null && !purchase.getPassengers().isEmpty()) {
-            purchase.getPassengers().forEach(passenger -> {
-                String displayName = passengerServiceCommon.buildKoreanName(passenger);
-                System.out.println("  - 승객: " + (displayName != null ? displayName : "null") + " (ID: "
-                        + passenger.getId() + ")");
-                System.out.println("    특별요청: " + passenger.getSpecialRequests());
-            });
-        } else {
-            System.out.println("  ⚠️ Passengers가 비어있습니다!");
+        if (log.isDebugEnabled()) {
+            log.debug("PurchaseProduct 상세: id={}, passengers={}, passengerInfoComplete={}, transactionComplete={}",
+                    purchase.getId(),
+                    purchase.getPassengers() != null ? purchase.getPassengers().size() : 0,
+                    purchase.getIsPassengerInfoComplete(),
+                    purchase.getIsTransactionComplete());
         }
-        System.out.println("===============================");
 
         return toDto(purchase);
     }
@@ -197,9 +189,7 @@ public class PurchaseProductService {
         // 상태 변경 적용
         purchase.setPurchaseStatus(newStatus);
 
-        // 로그 (예: 실제로는 DB에 남기거나 파일에 기록 가능)
-        System.out.printf("[관리자] 패키지 상품 구매 상태 변경: ID=%d | %s → %s | 시간=%s\n",
-                purchase.getId(), currentStatus, newStatus, LocalDateTime.now());
+        log.info("[관리자] 패키지 상품 구매 상태 변경: id={}, {} → {}", purchase.getId(), currentStatus, newStatus);
     }
 
     /**
@@ -233,8 +223,7 @@ public class PurchaseProductService {
 
         productPurchaseRepository.save(purchase);
 
-        System.out.printf("[2단계] 패키지 상품 승객 정보 추가: 구매ID=%d, 승객명=%s | 시간=%s\n",
-                purchaseId, passengerServiceCommon.buildKoreanName(emptyPassenger), LocalDateTime.now());
+        log.info("[2단계] 패키지 상품 승객 정보 추가: purchaseId={}, 승객명={}", purchaseId, passengerServiceCommon.buildKoreanName(emptyPassenger));
     }
 
     /**
@@ -282,8 +271,7 @@ public class PurchaseProductService {
             purchase.setPurchaseStatus(PurchaseStatus.CANCELLED);
             productPurchaseRepository.save(purchase);
 
-            System.out.printf("[자동취소] 패키지 상품 승객 정보 마감일 초과: 구매ID=%d, 마감일=%s, 현재시간=%s\n",
-                    purchase.getId(), purchase.getPassengerInfoDeadline(), now);
+            log.info("[자동취소] 패키지 상품 승객 정보 마감일 초과: purchaseId={}, 마감일={}", purchase.getId(), purchase.getPassengerInfoDeadline());
         }
     }
 
@@ -362,9 +350,7 @@ public class PurchaseProductService {
         // 승객 정보 완료 상태 재확인
         refreshPassengerInfoComplete(purchase);
 
-        // 로그
-        System.out.printf("[관리자] 패키지 상품 승객 정보 수정: 구매ID=%d, 승객ID=%d, 승객명=%s | 시간=%s\n",
-                purchaseId, passengerId, passengerServiceCommon.buildKoreanName(passenger), LocalDateTime.now());
+        log.info("[관리자] 패키지 상품 승객 정보 수정: purchaseId={}, passengerId={}, 승객명={}", purchaseId, passengerId, passengerServiceCommon.buildKoreanName(passenger));
     }
 
     /**
@@ -531,12 +517,12 @@ public class PurchaseProductService {
      * 국적 코드 목록 조회 (검색 기능 포함)
      */
     public List<CountryCodeDto> getCountries(String search) {
-        System.out.println("=== PurchaseProduct getCountries 호출됨 ===");
-        System.out.println("검색어: " + search);
+        if (log.isDebugEnabled()) {
+            log.debug("getCountries: search={}", search);
+        }
 
         try {
             List<CountryCode> countries = countryCodeRepository.findAll();
-            System.out.println("전체 국가 수: " + countries.size());
 
             if (search != null && !search.trim().isEmpty()) {
                 // 검색어가 있는 경우: 코드나 한글명, 영문명으로 검색
@@ -564,12 +550,10 @@ public class PurchaseProductService {
                             country.getNameEng()))
                     .collect(java.util.stream.Collectors.toList());
 
-            System.out.println("반환할 국가 수: " + result.size());
             return result;
 
         } catch (Exception e) {
-            System.err.println("국가 조회 오류: " + e.getMessage());
-            e.printStackTrace();
+            log.warn("국가 조회 오류: {}", e.getMessage());
             return new ArrayList<>();
         }
     }
