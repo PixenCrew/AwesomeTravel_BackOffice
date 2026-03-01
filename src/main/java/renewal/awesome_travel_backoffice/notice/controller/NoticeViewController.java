@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.notice.dto.request.NoticeRequestDto;
 import renewal.awesome_travel_backoffice.notice.dto.request.NoticeSearchRequest;
@@ -26,6 +28,8 @@ import renewal.common.entity.Notice.SearchType;
 @RequestMapping("/notice")
 @RequiredArgsConstructor
 public class NoticeViewController {
+
+    private static final Logger log = LoggerFactory.getLogger(NoticeViewController.class);
 
     private final NoticeService noticeService;
 
@@ -73,8 +77,7 @@ public class NoticeViewController {
             
             return "layout";
         } catch (Exception e) {
-            e.printStackTrace(); // 스택 트레이스 출력
-            System.err.println("공지사항 리스트 조회 오류: " + e.getMessage());
+            log.warn("공지사항 리스트 조회 오류: {}", e.getMessage(), e);
             model.addAttribute("error", "공지사항 목록을 불러오는 중 오류가 발생했습니다: " + e.getMessage());
             model.addAttribute("title", "공지사항 관리");
             model.addAttribute("content", "components/notice/noticeList");
@@ -137,16 +140,14 @@ public class NoticeViewController {
                 try {
                     dto.setStartAt(java.time.LocalDateTime.parse(startAt));
                 } catch (Exception e) {
-                    // 파싱 실패 시 로그만 남기고 null로 설정
-                    System.err.println("날짜 파싱 실패 (startAt): " + startAt);
+                    log.warn("날짜 파싱 실패 (startAt): {}", startAt);
                 }
             }
             if (endAt != null && !endAt.isEmpty()) {
                 try {
                     dto.setEndAt(java.time.LocalDateTime.parse(endAt));
                 } catch (Exception e) {
-                    // 파싱 실패 시 로그만 남기고 null로 설정
-                    System.err.println("날짜 파싱 실패 (endAt): " + endAt);
+                    log.warn("날짜 파싱 실패 (endAt): {}", endAt);
                 }
             }
             
@@ -155,8 +156,7 @@ public class NoticeViewController {
             
             return "redirect:/notice?message=success";
         } catch (Exception e) {
-            e.printStackTrace(); // 스택 트레이스 출력
-            System.err.println("공지사항 등록 오류: " + e.getMessage());
+            log.warn("공지사항 등록 오류: {}", e.getMessage(), e);
             model.addAttribute("error", "공지사항 등록 중 오류가 발생했습니다: " + e.getMessage());
             model.addAttribute("title", "공지사항 작성");
             model.addAttribute("content", "components/notice/noticeForm");
@@ -210,16 +210,14 @@ public class NoticeViewController {
                 try {
                     dto.setStartAt(java.time.LocalDateTime.parse(startAt));
                 } catch (Exception e) {
-                    // 파싱 실패 시 로그만 남기고 null로 설정
-                    System.err.println("날짜 파싱 실패 (startAt): " + startAt);
+                    log.warn("날짜 파싱 실패 (startAt): {}", startAt);
                 }
             }
             if (endAt != null && !endAt.isEmpty()) {
                 try {
                     dto.setEndAt(java.time.LocalDateTime.parse(endAt));
                 } catch (Exception e) {
-                    // 파싱 실패 시 로그만 남기고 null로 설정
-                    System.err.println("날짜 파싱 실패 (endAt): " + endAt);
+                    log.warn("날짜 파싱 실패 (endAt): {}", endAt);
                 }
             }
             
