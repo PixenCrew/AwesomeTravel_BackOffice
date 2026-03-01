@@ -18,6 +18,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.airline.service.AirlineService;
 import renewal.awesome_travel_backoffice.airport.service.AirportService;
@@ -31,6 +33,8 @@ import renewal.common.entity.CountryCode;
 @Service
 @RequiredArgsConstructor
 public class ExcelService {
+
+    private static final Logger log = LoggerFactory.getLogger(ExcelService.class);
 
     private final CountryCodeService countryCodeService;
     private final CityCodeService cityCodeService;
@@ -77,7 +81,7 @@ public class ExcelService {
                     }
                     successCount++;
                 } catch (Exception e) {
-                    System.err.println("Error processing row " + i + ": " + e.getMessage());
+                    log.warn("Error processing row {}: {}", i, e.getMessage());
                     skipCount++;
                 }
             }
@@ -130,7 +134,7 @@ public class ExcelService {
 
                     successCount++;
                 } catch (Exception e) {
-                    System.err.println("Error processing row " + i + ": " + e.getMessage());
+                    log.warn("Error processing row {}: {}", i, e.getMessage());
                     skipCount++;
                 }
             }
@@ -357,7 +361,7 @@ public class ExcelService {
                     }
                     successCount++;
                 } catch (Exception e) {
-                    System.err.println("Error processing row " + i + ": " + e.getMessage());
+                    log.warn("Error processing row {}: {}", i, e.getMessage());
                 }
             }
 
@@ -506,7 +510,7 @@ public class ExcelService {
                     }
                     successCount++;
                 } catch (Exception e) {
-                    System.err.println("Error processing row " + i + ": " + e.getMessage());
+                    log.warn("Error processing row {}: {}", i, e.getMessage());
                 }
             }
             return successCount;

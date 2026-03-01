@@ -506,8 +506,19 @@
                 <div class="form-group">
                     <label class="form-label">가격</label>
                     <div class="input-group">
-                        <input type="number" th:field="*{price}" required min="0" step="1" class="form-input" placeholder="가격을 입력하세요" />
+                        <input type="number" 
+                               th:field="*{price}" 
+                               id="price"
+                               required 
+                               min="0" 
+                               max="100000000"
+                               step="1" 
+                               oninput="removeLeadingZeros(this); validatePriceLimit(this)"
+                               onblur="removeLeadingZeros(this); validatePriceLimit(this)"
+                               class="form-input" 
+                               placeholder="가격을 입력하세요" />
                         <span class="unit">원</span>
+                        <p id="priceError" class="text-xs text-red-600 mt-1" style="display: none;">가격은 1억원을 넘을 수 없습니다.</p>
                     </div>
                 </div>
 
@@ -793,7 +804,7 @@
         <div class="bg-white shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
                 <h3 class="text-base font-semibold leading-6 text-gray-900 mb-4">사진 관리</h3>
-                <fieldset id="images-fieldset" class="space-y-4">
+                <fieldset id="photos-fieldset" class="space-y-4">
                     <div class="image-item" th:each="img, iterStat : *{photos}">
                         <div class="flex space-x-2">
                             <input type="text" th:field="*{photos[__${iterStat.index}__]}" placeholder="사진 URL을 입력하세요"
@@ -816,10 +827,10 @@
         <div class="bg-white shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
                 <h3 class="text-base font-semibold leading-6 text-gray-900 mb-4">상세이미지 관리</h3>
-                <fieldset id="images-fieldset" class="space-y-4">
+                <fieldset id="detail-image-fieldset" class="space-y-4">
                     <div class="image-item">
                         <div class="flex space-x-2">
-                            <input type="text" th:field="*{image}" placeholder="이미지 URL" readonly />
+                            <input type="text" th:field="*{image}" name="image" placeholder="이미지 URL" readonly />
                             <input type="file" onchange="uploadImage(this, 'product')" />
                         </div>
                     </div>
@@ -1019,7 +1030,8 @@
         }
 
         function reindexImages() {
-            const inputs = document.querySelectorAll("#images-fieldset .image-item input[type='text']");
+            // 사진(photos)만 재인덱스. 상세이미지(image) input은 건드리지 않음
+            const inputs = document.querySelectorAll("#photos-fieldset .image-item input[type='text']");
             inputs.forEach((input, idx) => {
                 input.name = `photos[${idx}]`;
             });
@@ -1067,6 +1079,42 @@
             return true;
         }
 
+        // 앞의 0 제거 함수 (가격 입력 필드용)
+        function removeLeadingZeros(input) {
+            if (input.value && input.value.trim() !== '') {
+                // 숫자로 변환하여 앞의 0 제거
+                const numValue = parseInt(input.value, 10);
+                if (!isNaN(numValue)) {
+                    input.value = numValue.toString();
+                } else {
+                    // 숫자가 아닌 경우 빈 문자열로 설정
+                    input.value = '';
+                }
+            }
+        }
+        
+        // 가격 1억원 제한 검증
+        function validatePriceLimit(input) {
+            const maxPrice = 100000000; // 1억원
+            const price = parseInt(input.value) || 0;
+            const errorElement = document.getElementById('priceError');
+            
+            if (!errorElement) return true;
+            
+            // 가격이 1억원을 넘는 경우
+            if (price > maxPrice) {
+                input.classList.add('border-red-500', 'ring-red-500');
+                errorElement.style.display = 'block';
+                // 자동으로 1억원으로 조정
+                input.value = maxPrice;
+                return false;
+            } else {
+                input.classList.remove('border-red-500', 'ring-red-500');
+                errorElement.style.display = 'none';
+                return true;
+            }
+        }
+        
         // 입력 시 실시간 검증
         document.addEventListener('DOMContentLoaded', function() {
             const priceInput = document.querySelector('input[name="price"]');
@@ -1094,7 +1142,7 @@
         // 
 
         function addImage() {
-            const fieldset = document.getElementById("images-fieldset");
+            const fieldset = document.getElementById("photos-fieldset");
 
             // .image-item 개수 → 다음 인덱스
             const index = fieldset.querySelectorAll(".image-item").length;

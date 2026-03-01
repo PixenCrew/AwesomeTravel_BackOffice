@@ -139,7 +139,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold" th:text="${#numbers.formatInteger(product.price, 3, 'COMMA') + '원'}">100,000원</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <span th:text="${product.tour.id}">123</span>
+                            <span th:text="${product.tour != null ? product.tour.id : '-'}">123</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             <div class="flex items-center space-x-1">

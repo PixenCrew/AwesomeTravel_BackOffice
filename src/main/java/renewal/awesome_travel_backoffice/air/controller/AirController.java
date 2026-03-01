@@ -102,6 +102,9 @@ public class AirController {
 
         // 공항코드 목록 (드롭박스용)
         model.addAttribute("airportCode", commonCodeService.getAllAirports());
+        
+        // 좌석 등급 타입 목록 (체크박스용)
+        model.addAttribute("seatClassTypes", SeatClassType.values());
 
         model.addAttribute("air", air);
         model.addAttribute("title", "새 항공 등록");
@@ -112,16 +115,35 @@ public class AirController {
 
     @PostMapping("/new")
     public String createAir(@ModelAttribute Air air, Model model) {
-        // 경유 횟수로 비행 타입 지정
-        if (air.getStopovers() == 0) {
-            air.setFlightType(FlightType.DIRECT);
-        } else {
-            air.setFlightType(FlightType.STOP_OVER);
+        try {
+            // 경유 횟수로 비행 타입 지정
+            if (air.getStopovers() == 0) {
+                air.setFlightType(FlightType.DIRECT);
+            } else {
+                air.setFlightType(FlightType.STOP_OVER);
+            }
+
+            airService.createAir(air);
+
+            return "redirect:/air";
+        } catch (IllegalArgumentException e) {
+            // 항공사 목록 (드롭박스용)
+            List<Airline> allAirlines = commonCodeService.getAllAirlines();
+            model.addAttribute("allAirlines", allAirlines);
+
+            // 공항코드 목록 (드롭박스용)
+            model.addAttribute("airportCode", commonCodeService.getAllAirports());
+            
+            // 좌석 등급 타입 목록 (체크박스용)
+            model.addAttribute("seatClassTypes", SeatClassType.values());
+
+            model.addAttribute("air", air);
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("title", "새 항공 등록");
+            model.addAttribute("content", "components/air/airDetail");
+
+            return "layout";
         }
-
-        airService.createAir(air);
-
-        return "redirect:/air";
     }
 
     @GetMapping("/{id}")
@@ -134,6 +156,9 @@ public class AirController {
 
         // 공항코드 목록 (드롭박스용)
         model.addAttribute("airportCode", commonCodeService.getAllAirports());
+        
+        // 좌석 등급 타입 목록 (체크박스용)
+        model.addAttribute("seatClassTypes", SeatClassType.values());
 
         model.addAttribute("air", air);
         model.addAttribute("title", "항공 상세");
@@ -144,16 +169,35 @@ public class AirController {
 
     @PostMapping("/{id}")
     public String modifyAir(@ModelAttribute Air air, Authentication authentication, Model model) {
-        // 경유 횟수로 비행 타입 지정
-        if (air.getStopovers() == 0) {
-            air.setFlightType(FlightType.DIRECT);
-        } else {
-            air.setFlightType(FlightType.STOP_OVER);
+        try {
+            // 경유 횟수로 비행 타입 지정
+            if (air.getStopovers() == 0) {
+                air.setFlightType(FlightType.DIRECT);
+            } else {
+                air.setFlightType(FlightType.STOP_OVER);
+            }
+
+            airService.saveAir(air);
+
+            return "redirect:/air";
+        } catch (IllegalArgumentException e) {
+            // 항공사 목록 (드롭박스용)
+            List<Airline> allAirlines = commonCodeService.getAllAirlines();
+            model.addAttribute("allAirlines", allAirlines);
+
+            // 공항코드 목록 (드롭박스용)
+            model.addAttribute("airportCode", commonCodeService.getAllAirports());
+            
+            // 좌석 등급 타입 목록 (체크박스용)
+            model.addAttribute("seatClassTypes", SeatClassType.values());
+
+            model.addAttribute("air", air);
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("title", "항공 상세");
+            model.addAttribute("content", "components/air/airDetail");
+
+            return "layout";
         }
-
-        airService.saveAir(air);
-
-        return "redirect:/air";
     }
 
     // @GetMapping("/search")
@@ -229,7 +273,8 @@ public class AirController {
     // !!!!!!!!!!!!!!!!!![TEST] 항공권 100일치 복제 !!!!!!!!!!!!!!!!!!!!!!!!!!!!
     @GetMapping("/replicate/{id}")
     public String replicateAir100(@PathVariable Long id) {
-        Air originAir = airRepo.findById(id).get();
+        Air originAir = airRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("항공편을 찾을 수 없습니다. id=" + id));
         airService.generateAirVariantsWithRandomPrice(originAir);
         return "redirect:/air";
     }

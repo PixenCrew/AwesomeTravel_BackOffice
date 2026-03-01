@@ -307,12 +307,12 @@ public class PurchaseAirService {
      * 국적 코드 목록 조회 (검색 기능 포함)
      */
     public List<CountryCodeDto> getCountries(String search) {
-        System.out.println("=== PurchaseAir getCountries 호출됨 ===");
-        System.out.println("검색어: " + search);
+        if (log.isDebugEnabled()) {
+            log.debug("getCountries: search={}", search);
+        }
 
         try {
             List<CountryCode> countries = countryCodeRepository.findAll();
-            System.out.println("전체 국가 수: " + countries.size());
 
             if (search != null && !search.trim().isEmpty()) {
                 // 검색어가 있는 경우: 코드나 한글명, 영문명으로 검색
@@ -340,12 +340,10 @@ public class PurchaseAirService {
                             country.getNameEng()))
                     .collect(java.util.stream.Collectors.toList());
 
-            System.out.println("반환할 국가 수: " + result.size());
             return result;
 
         } catch (Exception e) {
-            System.err.println("국가 조회 오류: " + e.getMessage());
-            e.printStackTrace();
+            log.warn("국가 조회 오류: {}", e.getMessage());
             return new java.util.ArrayList<>();
         }
     }

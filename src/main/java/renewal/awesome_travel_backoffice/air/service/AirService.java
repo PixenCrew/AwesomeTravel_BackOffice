@@ -2,11 +2,14 @@ package renewal.awesome_travel_backoffice.air.service;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +20,7 @@ import org.springframework.util.StringUtils;
 
 import lombok.RequiredArgsConstructor;
 import renewal.awesome_travel_backoffice.air.dto.AirFilterDTO;
+import renewal.awesome_travel_backoffice.air.dto.GenerateAirForTourRequest;
 import renewal.awesome_travel_backoffice.air.repository.AirRepository;
 import renewal.awesome_travel_backoffice.air.repository.AirSpecification;
 import renewal.awesome_travel_backoffice.air.repository.AirlineRepository;
@@ -27,7 +31,12 @@ import renewal.common.entity.Air.AirStatus;
 import renewal.common.entity.Air.FlightSegment;
 import renewal.common.entity.Airline;
 import renewal.common.entity.AirportCode;
+import renewal.common.entity.Location;
+import renewal.common.entity.Location.LocationType;
+import renewal.common.entity.Schedule;
 import renewal.common.entity.SeatClass;
+import renewal.common.entity.SeatClass.SeatClassType;
+import renewal.common.entity.Tour;
 import renewal.common.repository.CityCodeRepository;
 
 @Service
@@ -55,6 +64,9 @@ public class AirService {
 
         // 조회한 Airline 엔티티로 설정
         air.setAirline(airline);
+
+        // 잔여 좌석 수가 최대 좌석 수를 넘지 않도록 검증
+        validateSeatCounts(air);
 
         saveAir(air);
 
@@ -113,6 +125,18 @@ public class AirService {
     }
 
     public void saveAir(Air air) {
+        // 선택되지 않은 SeatClass 제거 (가격이나 좌석 수가 입력되지 않은 경우)
+        if (air.getSeatClasses() != null) {
+            air.getSeatClasses().removeIf(seat -> 
+                seat == null || 
+                seat.getClassType() == null ||
+                seat.getPriceAdult() == null || seat.getPriceAdult() == 0 ||
+                seat.getMaxSeats() == null || seat.getMaxSeats() == 0
+            );
+        }
+        
+        // 잔여 좌석 수가 최대 좌석 수를 넘지 않도록 검증
+        validateSeatCounts(air);
 
         for (SeatClass seat : air.getSeatClasses()) {
             seat.setAir(air);
@@ -334,6 +358,162 @@ public class AirService {
     }
 
     /**
+     * 투어의 AIR 구간(출발/도착 공항, 일차)과 운영 기간(startDate~endDate)에 맞는 항공편을 일괄 생성합니다.
+     * 클라이언트에서 findLowestPriceSeatsByAirportCodes로 조회 시 매칭되도록 departDateTime을 설정합니다.
+     *
+     * @param tour Schedules, Locations, departAirport, arriveAirport 초기화된 Tour
+     * @param request 출발 시간, 비행 시간, 기본 가격/좌석 수 등 옵션 (null이면 기본값 사용)
+     * @return 생성된 Air 목록
+     */
+    @Transactional
+    public List<Air> generateAirForTour(Tour tour, GenerateAirForTourRequest request) {
+        if (tour == null || tour.getStartDate() == null || tour.getEndDate() == null) {
+            throw new IllegalArgumentException("투어 및 운영 기간(startDate, endDate)이 필요합니다.");
+        }
+        if (request == null) {
+            request = new GenerateAirForTourRequest();
+        }
+        // 항공사 목록: 지정 코드들로 조회, 없으면 첫 번째 항공사만
+        List<Airline> airlines = new ArrayList<>();
+        if (request.getAirlineCodes() != null && !request.getAirlineCodes().isEmpty()) {
+            for (String code : request.getAirlineCodes()) {
+                if (code != null && !code.isBlank()) {
+                    airlineRepo.findByCode(code.trim()).ifPresent(airlines::add);
+                }
+            }
+        }
+        if (airlines.isEmpty()) {
+            Airline first = airlineRepo.findAll().stream().findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("등록된 항공사가 없습니다."));
+            airlines.add(first);
+        }
+
+        // (day, departAirport, arriveAirport) 조합 수집 (중복 제거)
+        Set<String> routeKeys = new LinkedHashSet<>();
+        List<RouteByDay> routes = new ArrayList<>();
+        List<Schedule> schedules = tour.getSchedules();
+        if (schedules == null) {
+            return new ArrayList<>();
+        }
+        for (Schedule schedule : schedules) {
+            if (schedule == null || schedule.getLocations() == null) continue;
+            Long day = schedule.getDay();
+            for (Location loc : schedule.getLocations()) {
+                if (loc == null || loc.getLocationType() != LocationType.AIR) continue;
+                AirportCode depart = loc.getDepartAirport();
+                AirportCode arrive = loc.getArriveAirport();
+                if (depart == null || arrive == null) continue;
+                String key = day + "|" + depart.getAirportCode() + "|" + arrive.getAirportCode();
+                if (routeKeys.add(key)) {
+                    routes.add(new RouteByDay(day, depart, arrive));
+                }
+            }
+        }
+        if (routes.isEmpty()) {
+            throw new IllegalArgumentException("투어에 AIR 구간(출발/도착 공항이 있는 Location)이 없습니다.");
+        }
+
+        List<Air> created = new ArrayList<>();
+        int departHour = Math.max(0, Math.min(23, request.getDepartHour()));
+        int departMinute = Math.max(0, Math.min(59, request.getDepartMinute()));
+        long durationMinutes = request.getFlightDurationMinutes() <= 0 ? 720L : request.getFlightDurationMinutes();
+        long priceAdult = request.getDefaultPriceAdult() <= 0 ? 500_000L : request.getDefaultPriceAdult();
+        long maxSeats = request.getDefaultMaxSeats() <= 0 ? 30L : request.getDefaultMaxSeats();
+
+        for (RouteByDay route : routes) {
+            LocalDate start = tour.getStartDate().plusDays(route.day);
+            LocalDate end = tour.getEndDate().plusDays(route.day);
+            for (LocalDate d = start; !d.isAfter(end); d = d.plusDays(1)) {
+                LocalDateTime departDateTime = d.atTime(departHour, departMinute);
+                LocalDateTime arriveDateTime = departDateTime.plusMinutes(durationMinutes);
+
+                String baseFlightNumber = "T" + tour.getId() + "D" + route.day + "D" + d.toString().replace("-", "");
+                String flightNumber = baseFlightNumber;
+                int suffix = 0;
+                while (airRepo.existsByflightNumber(flightNumber)) {
+                    flightNumber = baseFlightNumber + "-" + (++suffix);
+                }
+
+                Air air = new Air();
+                air.setFlightNumber(flightNumber);
+                air.setAirline(airlines.get(created.size() % airlines.size()));
+                air.setDepartAirport(route.departAirport);
+                air.setArriveAirport(route.arriveAirport);
+                air.setDepartDateTime(departDateTime);
+                air.setArriveDateTime(arriveDateTime);
+                air.setFlightDuration(durationMinutes);
+                air.setStopovers(0);
+                air.setFlightType(Air.FlightType.DIRECT);
+                air.setStatus(AirStatus.ACTIVE);
+
+                List<Air.FlightSegment> segments = new ArrayList<>();
+                Air.FlightSegment seg = new Air.FlightSegment();
+                seg.setDepartAirport(route.departAirport);
+                seg.setDepartDateTime(departDateTime);
+                seg.setArriveAirport(route.arriveAirport);
+                seg.setArriveDateTime(arriveDateTime);
+                seg.setFlightDuration(calcDuration(departDateTime, route.departAirport, arriveDateTime, route.arriveAirport));
+                segments.add(seg);
+                air.setFlightSegments(segments);
+
+                List<SeatClass> seatClasses = new ArrayList<>();
+                for (SeatClassType type : SeatClassType.values()) {
+                    long classPrice = resolvePriceForClass(type, request, priceAdult);
+                    long classMaxSeats = resolveMaxSeatsForClass(type, request, maxSeats);
+                    SeatClass sc = new SeatClass();
+                    sc.setAir(air);
+                    sc.setClassType(type);
+                    sc.setPriceAdult(classPrice);
+                    sc.setPriceYouth(classPrice * 80 / 100);
+                    sc.setPriceInfant(classPrice * 10 / 100);
+                    sc.setMaxSeats(classMaxSeats);
+                    sc.setAvailableSeats(classMaxSeats);
+                    seatClasses.add(sc);
+                }
+                air.setSeatClasses(seatClasses);
+
+                saveAir(air);
+                created.add(air);
+            }
+        }
+        return created;
+    }
+
+    private long resolvePriceForClass(SeatClassType type, GenerateAirForTourRequest request, long defaultPrice) {
+        Long price = null;
+        switch (type) {
+            case ECONOMY -> price = request.getPriceEconomy();
+            case PREMIUMECONOMY -> price = request.getPricePremiumEconomy();
+            case BUSINESS -> price = request.getPriceBusiness();
+            case FIRST -> price = request.getPriceFirst();
+        }
+        return (price != null && price > 0) ? price : defaultPrice;
+    }
+
+    private long resolveMaxSeatsForClass(SeatClassType type, GenerateAirForTourRequest request, long defaultMax) {
+        Long max = null;
+        switch (type) {
+            case ECONOMY -> max = request.getMaxSeatsEconomy();
+            case PREMIUMECONOMY -> max = request.getMaxSeatsPremiumEconomy();
+            case BUSINESS -> max = request.getMaxSeatsBusiness();
+            case FIRST -> max = request.getMaxSeatsFirst();
+        }
+        return (max != null && max > 0) ? max : defaultMax;
+    }
+
+    private static class RouteByDay {
+        final Long day;
+        final AirportCode departAirport;
+        final AirportCode arriveAirport;
+
+        RouteByDay(Long day, AirportCode departAirport, AirportCode arriveAirport) {
+            this.day = day;
+            this.departAirport = departAirport;
+            this.arriveAirport = arriveAirport;
+        }
+    }
+
+    /**
      * 기존 가격에서 ±10~30% 변동 (랜덤)
      */
     private Long applyRandomPrice(Long original) {
@@ -356,6 +536,60 @@ public class AirService {
         double variation = (random.nextDouble() * 0.4 - 0.2); // -20% ~ +20%
         long newSeats = Math.round(original * (1 + variation));
         return Math.max(newSeats, 1L); // 최소 1석은 보장
+    }
+
+    /**
+     * 잔여 좌석 수가 최대 좌석 수를 넘지 않도록 검증
+     * 최대 좌석 수는 1000을 넘을 수 없음
+     * 가격은 1억원을 넘을 수 없음
+     */
+    private void validateSeatCounts(Air air) {
+        if (air.getSeatClasses() == null) {
+            return;
+        }
+        
+        final long MAX_PRICE = 100000000L; // 1억원
+        
+        for (SeatClass seat : air.getSeatClasses()) {
+            // 최대 좌석 수 1000 제한 검증
+            if (seat.getMaxSeats() != null && seat.getMaxSeats() > 1000) {
+                throw new IllegalArgumentException(
+                    String.format("최대 좌석 수(%d)는 1000을 넘을 수 없습니다. (등급: %s)", 
+                        seat.getMaxSeats(), 
+                        seat.getClassType()));
+            }
+            
+            // 잔여 좌석 수가 최대 좌석 수를 넘지 않도록 검증
+            if (seat.getMaxSeats() != null && seat.getAvailableSeats() != null) {
+                if (seat.getAvailableSeats() > seat.getMaxSeats()) {
+                    throw new IllegalArgumentException(
+                        String.format("잔여 좌석 수(%d)는 최대 좌석 수(%d)를 넘을 수 없습니다. (등급: %s)", 
+                            seat.getAvailableSeats(), 
+                            seat.getMaxSeats(), 
+                            seat.getClassType()));
+                }
+            }
+            
+            // 가격 1억원 제한 검증
+            if (seat.getPriceAdult() != null && seat.getPriceAdult() > MAX_PRICE) {
+                throw new IllegalArgumentException(
+                    String.format("가격[성인](%d원)은 1억원을 넘을 수 없습니다. (등급: %s)", 
+                        seat.getPriceAdult(), 
+                        seat.getClassType()));
+            }
+            if (seat.getPriceYouth() != null && seat.getPriceYouth() > MAX_PRICE) {
+                throw new IllegalArgumentException(
+                    String.format("가격[청소년](%d원)은 1억원을 넘을 수 없습니다. (등급: %s)", 
+                        seat.getPriceYouth(), 
+                        seat.getClassType()));
+            }
+            if (seat.getPriceInfant() != null && seat.getPriceInfant() > MAX_PRICE) {
+                throw new IllegalArgumentException(
+                    String.format("가격[영유아](%d원)은 1억원을 넘을 수 없습니다. (등급: %s)", 
+                        seat.getPriceInfant(), 
+                        seat.getClassType()));
+            }
+        }
     }
 
 }

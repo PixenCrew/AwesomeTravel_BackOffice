@@ -81,10 +81,9 @@ function uploadImage(inputElement, folderType) {
         })
         .then(data => {
             console.log("업로드 성공:", data);
-            // 이미지 직접 표시용 URL을 input 필드에 채우기 (클라이언트에서 <img> 태그로 사용)
+            // 이미지 직접 표시용 URL만 채우기 (경로가 있어야 함. filename만 넣으면 클라이언트에서 조회 안 됨)
             if (imageInput) {
-                // imageUrl이 있으면 사용, 없으면 driveLink 사용
-                imageInput.value = data.imageUrl || data.driveLink || data.filename || "";
+                imageInput.value = data.imageUrl || data.driveLink || "";
                 imageInput.disabled = false;
             }
         })

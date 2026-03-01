@@ -7,17 +7,23 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class OpenApiService {
 
+    private static final Logger log = LoggerFactory.getLogger(OpenApiService.class);
+
     public void fetchAndSaveData() throws UnsupportedEncodingException {
 
         String SERVICE_KEY = "LlzmSnhpn+oy0xRuNRMG8B7zoQQFfiaIkqMpw6ZfXw1HGSiYmOUPwwNSq1mayIkaQED3E5GUYYzHGX92CVXYgQ==".trim();
         String encodedKey = URLEncoder.encode(SERVICE_KEY, "UTF-8");
-        System.out.println("미리 인코딩된 키: " + encodedKey); // 미리 인코딩된 결과 확인
+        if (log.isDebugEnabled()) {
+            log.debug("OpenAPI 서비스키 인코딩 완료");
+        }
 
         URI uri = UriComponentsBuilder
                 .fromUriString("https://api.odcloud.kr/api/15043890/v1/uddi:57dcf102-1447-49e9-bd2b-cfb32e869d5c")
@@ -27,7 +33,9 @@ public class OpenApiService {
                 .build(true) // true: 이미 인코딩된 값이라고 가정하면 false로 설정
                 .toUri();
 
-        System.out.println("최종 uri : " + uri);
+        if (log.isDebugEnabled()) {
+            log.debug("OpenAPI URI 빌드 완료");
+        }
 
         // try {
         //     ApiResponse apiResponse = restTemplate.getForObject(uri, ApiResponse.class);

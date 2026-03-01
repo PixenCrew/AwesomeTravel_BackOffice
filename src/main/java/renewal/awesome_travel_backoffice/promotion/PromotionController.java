@@ -135,6 +135,7 @@ public class PromotionController {
     }
 
     @PostMapping
+    @Transactional
     public String savePromotion(
             @ModelAttribute Promotion promotion,
             @RequestParam(required = false) String menuCodeCode,
@@ -142,16 +143,46 @@ public class PromotionController {
             Model model) {
         
         try {
-            // menuCode 바인딩 처리
-            if (menuCodeCode != null && !menuCodeCode.isEmpty()) {
-                MenuCode menuCode = menuCodeRepo.findByCode(menuCodeCode);
-                if (menuCode != null) {
-                    promotion.setMenuCode(menuCode);
+            // 수정인 경우 기존 엔티티를 조회하여 업데이트
+            if (promotion.getId() != null) {
+                Promotion existingPromotion = promotionRepo.findById(promotion.getId())
+                        .orElseThrow(() -> new IllegalArgumentException("기획전을 찾을 수 없습니다. ID: " + promotion.getId()));
+                
+                // 기존 엔티티에 새로운 값들을 설정
+                existingPromotion.setTitle(promotion.getTitle());
+                existingPromotion.setDescription(promotion.getDescription());
+                existingPromotion.setThumnailImg(promotion.getThumnailImg());
+                existingPromotion.setContentImg(promotion.getContentImg());
+                existingPromotion.setStartTime(promotion.getStartTime());
+                existingPromotion.setEndTime(promotion.getEndTime());
+                
+                // menuCode 바인딩 처리
+                if (menuCodeCode != null && !menuCodeCode.isEmpty()) {
+                    MenuCode menuCode = menuCodeRepo.findByCode(menuCodeCode);
+                    if (menuCode != null) {
+                        existingPromotion.setMenuCode(menuCode);
+                    } else {
+                        existingPromotion.setMenuCode(null);
+                    }
+                } else {
+                    existingPromotion.setMenuCode(null);
                 }
+                
+                promotionRepo.save(existingPromotion);
+                redirectAttributes.addFlashAttribute("successMessage", "기획전이 수정되었습니다.");
+            } else {
+                // 신규 생성인 경우
+                // menuCode 바인딩 처리
+                if (menuCodeCode != null && !menuCodeCode.isEmpty()) {
+                    MenuCode menuCode = menuCodeRepo.findByCode(menuCodeCode);
+                    if (menuCode != null) {
+                        promotion.setMenuCode(menuCode);
+                    }
+                }
+                
+                promotionRepo.save(promotion);
+                redirectAttributes.addFlashAttribute("successMessage", "기획전이 저장되었습니다.");
             }
-            
-            promotionRepo.save(promotion);
-            redirectAttributes.addFlashAttribute("successMessage", "기획전이 저장되었습니다.");
             
             return "redirect:/promotion";
         } catch (Exception e) {

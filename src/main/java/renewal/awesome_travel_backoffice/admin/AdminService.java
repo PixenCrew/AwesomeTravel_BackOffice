@@ -12,18 +12,24 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class AdminService implements UserDetailsService {
 
+    private static final Logger log = LoggerFactory.getLogger(AdminService.class);
+
     private final PasswordEncoder passwordEncoder;
     private final JdbcTemplate adminJdbcTemplate;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        System.out.println("admin 테이블 조회");
+        if (log.isDebugEnabled()) {
+            log.debug("admin 테이블 조회: username={}", username);
+        }
 
         try {
             Map<String, Object> adminMap = adminJdbcTemplate.queryForMap("SELECT * FROM admin WHERE id = ?", username);
