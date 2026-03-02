@@ -69,15 +69,18 @@ function uploadImage(inputElement, folderType) {
         imageInput.disabled = true;
     }
 
-    fetch("/api/files/upload", {  // Google Drive 업로드 엔드포인트
+    fetch("/api/files/upload", {  // Drive 또는 로컬 업로드 엔드포인트
         method: "POST",
         body: formData
     })
-        .then(response => {
+        .then(async response => {
+            const data = await response.json().catch(() => ({}));
             if (!response.ok) {
-                throw new Error("업로드 실패: " + response.status);
+                // 500 등 에러 시 서버가 반환한 message 활용 (Refresh Token 만료, 403 등)
+                const msg = (data && data.message) ? data.message : ("업로드 실패: " + response.status);
+                throw new Error(msg);
             }
-            return response.json();
+            return data;
         })
         .then(data => {
             console.log("업로드 성공:", data);
@@ -89,7 +92,7 @@ function uploadImage(inputElement, folderType) {
         })
         .catch(error => {
             console.error("이미지 업로드 실패:", error);
-            alert("이미지 업로드 실패: " + error.message);
+            alert("이미지 업로드 실패: " + (error.message || "알 수 없는 오류"));
             if (imageInput) {
                 imageInput.value = "";
                 imageInput.disabled = false;

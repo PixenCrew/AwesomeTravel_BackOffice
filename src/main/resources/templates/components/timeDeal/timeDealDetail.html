@@ -58,18 +58,24 @@
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-2xl font-bold text-gray-800">적용 상품 목록</h2>
 
-            <!-- 추가 입력 UI -->
-            <div class="flex gap-2 items-center">
-                <input id="addProductIdInput"
-                    type="number"
-                    placeholder="상품 ID 입력"
-                    class="border rounded px-3 py-2 w-40 text-sm" />
-
+            <div class="flex gap-3 items-center flex-wrap">
                 <button type="button"
-                    onclick="addProductId()"
-                    class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                    추가
+                    onclick="openProductSearchPopup()"
+                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    <i class="fas fa-search mr-1"></i>상품 검색하여 추가
                 </button>
+                <span class="text-gray-400 text-sm">또는</span>
+                <div class="flex gap-2 items-center">
+                    <input id="addProductIdInput"
+                        type="number"
+                        placeholder="상품 ID 직접 입력"
+                        class="border rounded px-3 py-2 w-36 text-sm" />
+                    <button type="button"
+                        onclick="addProductId()"
+                        class="px-3 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 text-sm">
+                        ID 추가
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -268,6 +274,52 @@
 
             // 시각적 피드백
             alert("상품이 추가되었습니다.");
+        }
+
+        function openProductSearchPopup() {
+            window.open(
+                '/timeDeal/product-search',
+                'productSearchPopup',
+                'width=900,height=700,scrollbars=yes'
+            );
+        }
+
+        function addProductFromPopup(id, title, price) {
+            if (document.querySelector(`input[name="productIds"][value="${id}"]`)) {
+                alert("이미 추가된 상품입니다.");
+                return;
+            }
+
+            const container = document.getElementById("productIdsContainer");
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "productIds";
+            input.value = id;
+            container.appendChild(input);
+
+            const tableBody = document.getElementById("productTableBody");
+            const emptyRow = tableBody.querySelector("tr td[colspan='4']");
+            if (emptyRow) emptyRow.closest("tr").remove();
+
+            const priceStr = price && Number(price) > 0 ? Number(price).toLocaleString() + "원" : "-";
+            const newRow = document.createElement("tr");
+            newRow.setAttribute("data-id", id);
+            newRow.className = "hover:bg-gray-50";
+            newRow.innerHTML = `
+                <td class="px-6 py-4 text-sm font-semibold text-gray-900">${id}</td>
+                <td class="px-6 py-4 text-sm text-gray-700 truncate max-w-xs" title="${(title || '').replace(/"/g, '&quot;')}">${escapeHtml(title || '-')}</td>
+                <td class="px-6 py-4 text-sm text-gray-900 font-semibold">${priceStr}</td>
+                <td class="px-6 py-4 text-sm">
+                    <button type="button" onclick="removeProductId(${id})" class="text-red-600 hover:underline">삭제</button>
+                </td>
+            `;
+            tableBody.appendChild(newRow);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement("div");
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         function removeProductId(id) {
