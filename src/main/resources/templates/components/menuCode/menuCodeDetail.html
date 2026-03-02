@@ -23,12 +23,63 @@
             </div>
         </div>
 
+        <!-- 이 메뉴에 노출되는 상품 (상세 화면에서만) -->
+        <div th:if="${menuCode.code != null}" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div class="px-4 py-3 bg-gray-50 border-b border-gray-200">
+                <h3 class="text-base font-semibold text-gray-800">
+                    이 메뉴에 노출되는 상품
+                    <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
+                          th:text="${matchingProductCount != null ? matchingProductCount : 0} + '건'">0건</span>
+                </h3>
+                <p class="text-xs text-gray-500 mt-1">상세 항목(국가/도시)과 맞는 투어를 가진 상품만 표시됩니다.</p>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200" th:if="${matchingProductPreview != null && !matchingProductPreview.isEmpty()}">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">상품명</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">작업</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr th:each="p : ${matchingProductPreview}">
+                            <td class="px-4 py-2 text-sm text-gray-900" th:text="${p.id}">1</td>
+                            <td class="px-4 py-2 text-sm text-gray-900 truncate max-w-xs" th:text="${p.title}" th:title="${p.title}">상품명</td>
+                            <td class="px-4 py-2">
+                                <a th:href="@{/product/{id}(id=${p.id})}"
+                                   class="text-blue-600 hover:text-blue-800 text-sm font-medium">상품 보기</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p th:if="${matchingProductPreview == null || matchingProductPreview.isEmpty()}"
+                   class="px-4 py-4 text-sm text-gray-500">노출되는 상품이 없습니다. 상세 항목에 국가(COUNTRY) 또는 도시(CITY)를 추가해 보세요.</p>
+            </div>
+            <div th:if="${matchingProductCount != null && matchingProductCount > 10}"
+                 class="px-4 py-2 bg-gray-50 border-t border-gray-200 text-xs text-gray-500">
+                최대 10건만 미리보기 표시. 전체는 상품 관리에서 국가/도시로 검색하세요.
+            </div>
+        </div>
+
         <!-- 폼 -->
         <div class="bg-white rounded-lg shadow-sm p-6">
             <form th:object="${menuCode}"
                   th:action="${menuCode.code} == null ? @{/menu-code/new} : @{/menu-code/{id}(id=${menuCode.code2})}"
                   method="post"
                   class="space-y-6">
+
+                <!-- 국가/도시 타입 시 검색 가능한 자동완성용 datalist (J, LON 등 입력 시 필터) -->
+                <datalist id="country-codes-datalist">
+                    <option th:each="c : ${countryCodes}"
+                            th:value="${c.countryCode}"
+                            th:text="${c.countryCode + ' | ' + (c.countryKor != null ? c.countryKor : c.countryEng)}"></option>
+                </datalist>
+                <datalist id="city-codes-datalist">
+                    <option th:each="c : ${cityCodes}"
+                            th:value="${c.cityCode}"
+                            th:text="${c.cityCode + ' | ' + (c.cityKor != null ? c.cityKor : c.cityEng)}"></option>
+                </datalist>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- 코드 -->
@@ -67,6 +118,7 @@
 
                 <!-- 상세 항목 -->
                 <div>
+                    <p class="text-xs text-gray-500 mb-2">국가(COUNTRY)·도시(CITY)는 입력 시 코드·이름으로 자동완성(J, LON 등), ID는 상품 검색 또는 직접 입력하세요.</p>
                     <div class="flex items-center justify-between mb-3">
                         <label class="block text-sm font-medium text-gray-700">상세 항목 *</label>
                         <button type="button"
@@ -77,19 +129,40 @@
                     </div>
 
                     <div id="details-container" class="space-y-3">
+                        <!-- 빈 행: 유형에 따라 국가/도시 드롭다운 또는 ID(상품 검색) 표시 -->
                         <div th:if="${menuCode.details == null || menuCode.details.isEmpty()}" class="detail-row flex items-center space-x-3">
                             <select name="details[0].targetColumn"
-                                    class="w-40 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    class="w-40 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    onchange="toggleMenuCodeValueControl(this)">
                                 <option th:each="col : ${targetColumns}"
                                         th:value="${col}"
                                         th:text="${col}">
                                 </option>
                             </select>
-                            <input type="text"
-                                   name="details[0].value"
-                                   placeholder="값"
-                                   required
-                                   class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+                            <div class="value-controls flex-1 flex items-center gap-2 flex-wrap">
+                                <input type="text" data-value-type="COUNTRY" style="display:none;"
+                                       list="country-codes-datalist"
+                                       placeholder="국가 코드·이름 검색 (예: J, KR)"
+                                       class="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       autocomplete="off"/>
+                                <input type="text" data-value-type="CITY" style="display:none;"
+                                       list="city-codes-datalist"
+                                       placeholder="도시 코드·이름 검색 (예: L, LON)"
+                                       class="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       autocomplete="off"/>
+                                <span data-value-type="ID" class="flex-1 flex items-center gap-2">
+                                    <input type="text"
+                                           name="details[0].value"
+                                           placeholder="상품 검색 또는 ID 입력"
+                                           required
+                                           class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+                                    <button type="button"
+                                            onclick="openMenuCodeProductSearch(this)"
+                                            class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition text-sm whitespace-nowrap">
+                                        상품 검색
+                                    </button>
+                                </span>
+                            </div>
                             <button type="button"
                                     class="px-3 py-1.5 bg-red-100 text-red-700 rounded hover:bg-red-200 transition"
                                     onclick="removeDetailField(this)">
@@ -98,6 +171,7 @@
                         </div>
 
                         <div th:each="det, iterStat : *{details}"
+                             th:with="targetStr=${det.targetColumn != null ? det.targetColumn.toString() : ''}"
                              class="detail-row flex items-center space-x-3">
                             <select th:field="*{details[__${iterStat.index}__].targetColumn}"
                                     class="w-40 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
@@ -106,11 +180,35 @@
                                         th:text="${col}">
                                 </option>
                             </select>
-                            <input type="text"
+                            <!-- COUNTRY: 국가 검색(자동완성) -->
+                            <input th:if="${targetStr == 'COUNTRY'}"
+                                   type="text"
                                    th:field="*{details[__${iterStat.index}__].value}"
-                                   placeholder="값"
+                                   list="country-codes-datalist"
+                                   placeholder="국가 코드·이름 검색 (예: J, KR)"
+                                   autocomplete="off"
+                                   class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+                            <!-- CITY: 도시 검색(자동완성) -->
+                            <input th:if="${targetStr == 'CITY'}"
+                                   type="text"
+                                   th:field="*{details[__${iterStat.index}__].value}"
+                                   list="city-codes-datalist"
+                                   placeholder="도시 코드·이름 검색 (예: L, LON)"
+                                   autocomplete="off"
+                                   class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+                            <!-- ID 또는 기타: 상품 검색 또는 직접 입력 -->
+                            <input th:if="${targetStr != 'COUNTRY' and targetStr != 'CITY'}"
+                                   type="text"
+                                   th:field="*{details[__${iterStat.index}__].value}"
+                                   placeholder="상품 검색 또는 ID 입력"
                                    required
                                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+                            <button th:if="${targetStr != 'COUNTRY' and targetStr != 'CITY'}"
+                                    type="button"
+                                    onclick="openMenuCodeProductSearch(this)"
+                                    class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition text-sm">
+                                상품 검색
+                            </button>
                             <button type="button"
                                     class="px-3 py-1.5 bg-red-100 text-red-700 rounded hover:bg-red-200 transition"
                                     onclick="removeDetailField(this)">
@@ -133,6 +231,37 @@
                     </button>
                 </div>
             </form>
+
+            <!-- JS 추가 행용 템플릿 (폼 밖에 두어 숨은 input이 폼 검증에 포함되지 않도록 함) -->
+            <div id="detail-row-template" style="display:none !important;" th:if="${countryCodes != null}">
+                <div class="detail-row flex items-center space-x-3">
+                    <select class="w-40 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            onchange="toggleMenuCodeValueControl(this)">
+                        <option value="ID">ID</option>
+                        <option value="COUNTRY">COUNTRY</option>
+                        <option value="CITY">CITY</option>
+                    </select>
+                    <div class="value-controls flex-1 flex items-center gap-2 flex-wrap">
+                        <input type="text" data-value-type="COUNTRY" style="display:none;"
+                               list="country-codes-datalist"
+                               placeholder="국가 코드·이름 검색 (예: J, KR)"
+                               class="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               autocomplete="off"/>
+                        <input type="text" data-value-type="CITY" style="display:none;"
+                               list="city-codes-datalist"
+                               placeholder="도시 코드·이름 검색 (예: L, LON)"
+                               class="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               autocomplete="off"/>
+                        <span data-value-type="ID" class="flex-1 flex items-center gap-2">
+                            <input type="text" placeholder="상품 검색 또는 ID 입력"
+                                   class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+                            <button type="button" onclick="openMenuCodeProductSearch(this)"
+                                    class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition text-sm whitespace-nowrap">상품 검색</button>
+                        </span>
+                    </div>
+                    <button type="button" class="px-3 py-1.5 bg-red-100 text-red-700 rounded hover:bg-red-200 transition" onclick="removeDetailField(this)">삭제</button>
+                </div>
+            </div>
         </div>
 
         <!-- 삭제 버튼 -->
@@ -187,9 +316,54 @@
             resultSpan.className = 'mt-1 text-sm';
         }
 
+        function toggleMenuCodeValueControl(selectEl) {
+            const row = selectEl.closest('.detail-row');
+            const valueControls = row && row.querySelector('.value-controls');
+            if (!valueControls) return;
+
+            const container = document.getElementById('details-container');
+            const rows = container.querySelectorAll('.detail-row');
+            const index = Array.from(rows).indexOf(row);
+            if (index < 0) return;
+
+            const type = (selectEl.value || 'ID').toUpperCase();
+            const countrySelect = valueControls.querySelector('[data-value-type="COUNTRY"]');
+            const citySelect = valueControls.querySelector('[data-value-type="CITY"]');
+            const idSpan = valueControls.querySelector('[data-value-type="ID"]');
+            const idInput = idSpan && idSpan.querySelector('input');
+
+            const nameAttr = `details[${index}].value`;
+
+            [countrySelect, citySelect].forEach(el => { if (el) { el.style.display = 'none'; el.removeAttribute('name'); el.removeAttribute('required'); } });
+            if (idSpan) { idSpan.style.display = 'none'; if (idInput) { idInput.removeAttribute('name'); idInput.removeAttribute('required'); } }
+
+            if (type === 'COUNTRY' && countrySelect) {
+                countrySelect.style.display = '';
+                countrySelect.setAttribute('name', nameAttr);
+                countrySelect.setAttribute('required', 'required');
+            } else if (type === 'CITY' && citySelect) {
+                citySelect.style.display = '';
+                citySelect.setAttribute('name', nameAttr);
+                citySelect.setAttribute('required', 'required');
+            } else if (idSpan && idInput) {
+                idSpan.style.display = '';
+                idInput.setAttribute('name', nameAttr);
+                idInput.setAttribute('required', 'required');
+            }
+        }
+
         function addDetailField() {
             const container = document.getElementById('details-container');
+            const templateEl = document.getElementById('detail-row-template');
             const index = container.querySelectorAll('.detail-row').length;
+
+            if (templateEl && templateEl.querySelector('.detail-row')) {
+                const clone = templateEl.querySelector('.detail-row').cloneNode(true);
+                clone.querySelector('select:not([data-value-type])').name = `details[${index}].targetColumn`;
+                container.appendChild(clone);
+                toggleMenuCodeValueControl(clone.querySelector('select:not([data-value-type])'));
+                return;
+            }
 
             const div = document.createElement('div');
             div.className = 'detail-row flex items-center space-x-3';
@@ -197,9 +371,9 @@
             const select = document.createElement('select');
             select.name = `details[${index}].targetColumn`;
             select.className = 'w-40 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent';
+            select.onchange = function () { toggleMenuCodeValueControl(select); };
 
-            const options = ['ID', 'COUNTRY', 'CITY'];
-            options.forEach(optValue => {
+            ['ID', 'COUNTRY', 'CITY'].forEach(optValue => {
                 const option = document.createElement('option');
                 option.value = optValue;
                 option.textContent = optValue;
@@ -209,9 +383,15 @@
             const input = document.createElement('input');
             input.type = 'text';
             input.name = `details[${index}].value`;
-            input.placeholder = '값';
+            input.placeholder = '상품 검색 또는 값 입력';
             input.required = true;
             input.className = 'flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent';
+
+            const searchBtn = document.createElement('button');
+            searchBtn.type = 'button';
+            searchBtn.textContent = '상품 검색';
+            searchBtn.className = 'px-3 py-1.5 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition text-sm';
+            searchBtn.onclick = function () { openMenuCodeProductSearch(searchBtn); };
 
             const btn = document.createElement('button');
             btn.type = 'button';
@@ -221,28 +401,59 @@
 
             div.appendChild(select);
             div.appendChild(input);
+            div.appendChild(searchBtn);
             div.appendChild(btn);
 
             container.appendChild(div);
         }
 
+        function openMenuCodeProductSearch(btn) {
+            const row = btn.closest('.detail-row');
+            const container = document.getElementById('details-container');
+            const rows = container.querySelectorAll('.detail-row');
+            const rowIndex = Array.from(rows).indexOf(row);
+            if (rowIndex < 0) return;
+            window.open('/menu-code/product-search?rowIndex=' + rowIndex, 'menuCodeProductSearch', 'width=900,height=700,scrollbars=yes');
+        }
+
+        function onProductSelectedForMenuCode(rowIndex, id, title) {
+            const container = document.getElementById('details-container');
+            const rows = container.querySelectorAll('.detail-row');
+            const row = rows[rowIndex];
+            if (!row) return;
+            const valueInput = row.querySelector('input[name*=".value"]') || row.querySelector('input[type="text"]');
+            if (valueInput) valueInput.value = id;
+        }
+
         function removeDetailField(btn) {
             const container = document.getElementById('details-container');
-            btn.parentNode.remove();
+            btn.closest('.detail-row').remove();
 
             const detailDivs = container.querySelectorAll('.detail-row');
             detailDivs.forEach((div, index) => {
-                const select = div.querySelector('select');
-                const input = div.querySelector('input');
-
-                select.name = `details[${index}].targetColumn`;
-                input.name = `details[${index}].value`;
+                const typeSelect = div.querySelector('select:not([data-value-type])');
+                if (typeSelect) {
+                    typeSelect.name = `details[${index}].targetColumn`;
+                    if (div.querySelector('.value-controls')) {
+                        toggleMenuCodeValueControl(typeSelect);
+                    } else {
+                        const valueEl = div.querySelector('[name*=".value"]');
+                        if (valueEl) valueEl.name = `details[${index}].value`;
+                    }
+                }
             });
 
             if (detailDivs.length === 0) {
                 addDetailField();
             }
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.detail-row').forEach(function (row) {
+                const typeSelect = row.querySelector('.value-controls') && row.querySelector('select:not([data-value-type])');
+                if (typeSelect) toggleMenuCodeValueControl(typeSelect);
+            });
+        });
 
         function deleteMenuCode(id) {
             if (confirm('정말로 삭제하시겠습니까?')) {
