@@ -19,8 +19,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
 import lombok.RequiredArgsConstructor;
+import renewal.awesome_travel_backoffice.common.service.CommonCodeService;
+import renewal.awesome_travel_backoffice.menuCode.service.MenuCodeService;
+import renewal.awesome_travel_backoffice.product.dto.ProductFilterDTO;
+import renewal.awesome_travel_backoffice.product.service.ProductService;
 import renewal.common.entity.MenuCode;
+import renewal.common.entity.Product;
 import renewal.common.repository.MenuCodeRepository;
 
 @RequiredArgsConstructor
@@ -28,7 +38,12 @@ import renewal.common.repository.MenuCodeRepository;
 @Controller
 public class MenuCodeController {
 
+    private static final int PRODUCT_PREVIEW_MAX = 10;
+
     private final MenuCodeRepository menuCodeRepository;
+    private final CommonCodeService commonCodeService;
+    private final MenuCodeService menuCodeService;
+    private final ProductService productService;
 
     @GetMapping
     public String getMenuCodeList(
@@ -100,15 +115,54 @@ public class MenuCodeController {
         return "layout";
     }
 
+    /** 메뉴코드 상세 항목 ID(상품) 선택용 팝업. rowIndex로 어느 행에 넣을지 부모창에 전달 */
+    @GetMapping("/product-search")
+    public String productSearchPopup(
+            @RequestParam(name = "rowIndex", required = false, defaultValue = "0") int rowIndex,
+            @RequestParam(required = false) String title,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "id") String sortField,
+            @RequestParam(defaultValue = "desc") String sortDir,
+            Model model) {
+        ProductFilterDTO filter = new ProductFilterDTO();
+        filter.setTitle(title);
+        filter.setStatus("all");
+
+        Sort sort = sortDir.equalsIgnoreCase("asc")
+                ? Sort.by(sortField).ascending()
+                : Sort.by(sortField).descending();
+        Pageable pageable = PageRequest.of(page, 20, sort);
+
+        Page<Product> productPage = productService.searchProducts(filter, pageable);
+
+        model.addAttribute("productPage", productPage);
+        model.addAttribute("filter", filter);
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDir", sortDir);
+        model.addAttribute("rowIndex", rowIndex);
+        model.addAttribute("title", "상품 선택 (메뉴코드 ID)");
+        model.addAttribute("content", "components/menuCode/productSearchPopup");
+        return "popup";
+    }
+
     @GetMapping("/{id}")
     public String getMenuCodeDetail(@PathVariable Long id, Model model) {
 
         MenuCode menuCode = menuCodeRepository.findByCode2(id)
                 .orElseThrow(() -> new IllegalArgumentException("메뉴 코드를 찾을 수 없습니다. id=" + id));
 
+        List<Product> matchingProducts = menuCodeService.findProductsByMenuCode(menuCode);
+        List<Product> productPreview = matchingProducts.size() > PRODUCT_PREVIEW_MAX
+                ? matchingProducts.subList(0, PRODUCT_PREVIEW_MAX)
+                : matchingProducts;
+
         model.addAttribute("title", "메뉴 코드 상세");
         model.addAttribute("menuCode", menuCode);
         model.addAttribute("targetColumns", MenuCode.MenuCodeDetail.TargetColumn.values());
+        model.addAttribute("countryCodes", commonCodeService.getAllCountryCodes());
+        model.addAttribute("cityCodes", commonCodeService.getAllCityCodes());
+        model.addAttribute("matchingProductCount", matchingProducts.size());
+        model.addAttribute("matchingProductPreview", productPreview);
         model.addAttribute("content", "components/menuCode/menuCodeDetail");
         return "layout";
     }
@@ -138,6 +192,8 @@ public class MenuCodeController {
         model.addAttribute("title", "메뉴 코드 등록");
         model.addAttribute("menuCode", menuCode);
         model.addAttribute("targetColumns", MenuCode.MenuCodeDetail.TargetColumn.values());
+        model.addAttribute("countryCodes", commonCodeService.getAllCountryCodes());
+        model.addAttribute("cityCodes", commonCodeService.getAllCityCodes());
         model.addAttribute("content", "components/menuCode/menuCodeDetail");
 
         return "layout";

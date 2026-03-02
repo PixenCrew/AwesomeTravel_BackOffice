@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import lombok.RequiredArgsConstructor;
+import renewal.awesome_travel_backoffice.product.dto.ProductFilterDTO;
+import renewal.awesome_travel_backoffice.product.service.ProductService;
 import renewal.awesome_travel_backoffice.timeDeal.dto.TimeDealFilterDTO;
 import renewal.awesome_travel_backoffice.timeDeal.service.TimeDealService;
 import renewal.common.entity.Product;
@@ -35,6 +37,7 @@ public class TimeDealController {
     private final TimeDealRepository timeDealRepo;
     private final ProductRepository productRepo;
     private final TimeDealService timeDealService;
+    private final ProductService productService;
 
     @GetMapping
     public String list(
@@ -132,10 +135,39 @@ public class TimeDealController {
         return "layout";
     }
 
+    /** 타임딜 적용 상품 선택용 팝업: 상품 검색 후 행 클릭 시 부모창에 전달 */
+    @GetMapping("/product-search")
+    public String productSearchPopup(
+            @RequestParam(required = false) String title,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "id") String sortField,
+            @RequestParam(defaultValue = "desc") String sortDir,
+            Model model) {
+        ProductFilterDTO filter = new ProductFilterDTO();
+        filter.setTitle(title);
+        filter.setStatus("all"); // 선택용이므로 활성/비활성 모두 표시
+
+        org.springframework.data.domain.Sort sort = sortDir.equalsIgnoreCase("asc")
+                ? org.springframework.data.domain.Sort.by(sortField).ascending()
+                : org.springframework.data.domain.Sort.by(sortField).descending();
+        Pageable pageable = PageRequest.of(page, 20, sort);
+
+        Page<Product> productPage = productService.searchProducts(filter, pageable);
+
+        model.addAttribute("productPage", productPage);
+        model.addAttribute("filter", filter);
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDir", sortDir);
+        model.addAttribute("title", "상품 선택");
+        model.addAttribute("isSelectionPage", true);
+        model.addAttribute("content", "components/timeDeal/productSearchPopup");
+        return "popup";
+    }
+
     @PostMapping
     public String saveTimeDeal(
             @ModelAttribute TimeDeal timeDeal,
-            @RequestParam List<Long> productIds,
+            @RequestParam(required = false) List<Long> productIds,
             RedirectAttributes redirectAttributes) {
 
         // 1) TimeDeal 저장 (신규 & 수정 동일)
@@ -144,9 +176,14 @@ public class TimeDealController {
         // 2) 현재 이 TimeDeal에 연결된 상품들
         List<Product> oldList = productRepo.findByTimeDeal(savedTimeDeal);
 
+        // 상품을 모두 제거한 경우 productIds가 없을 수 있음 → 빈 리스트로 처리
+        if (productIds == null) {
+            productIds = java.util.Collections.emptyList();
+        }
+
         // 3) 기존 상품 → productIds에 없으면 연결 해제
         for (Product product : oldList) {
-            if (productIds == null || !productIds.contains(product.getId())) {
+            if (!productIds.contains(product.getId())) {
                 product.setTimeDeal(null);
                 productRepo.save(product);
             }
